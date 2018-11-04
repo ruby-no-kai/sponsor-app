@@ -1,0 +1,11 @@
+{
+  "name": "sponsor_app2",
+  "private": true,
+  "dependencies": {
+    "@rails/webpacker": "https://github.com/rails/webpacker",
+    "rails-ujs": "^5.2.1"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^3.1.10"
+  }
+}
