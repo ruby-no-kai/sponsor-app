@@ -6,9 +6,4 @@
   - @conferences.each do |conference|
     %li
       = link_to conference.name, conference
-      (
-      = link_to 'Edit', edit_conference_path(conference)
-      = '|'
-      = link_to 'Destroy', conference, method: :delete, data: {confirm: 'Are you sure?'}
-      )
   
