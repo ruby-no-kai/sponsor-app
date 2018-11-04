@@ -11,13 +11,13 @@
 
   .form-group
     = form.label :application_opens_at
-    = form.datetime_select :application_opens_at, class: 'form-control'
+    = form.datetime_local_field :application_opens_at, class: 'form-control'
   .form-group
     = form.label :application_closes_at
-    = form.datetime_select :application_closes_at, class: 'form-control'
+    = form.datetime_local_field :application_closes_at, class: 'form-control'
   .form-group
     = form.label :amendment_closes_at
-    = form.datetime_select :amendment_closes_at, class: 'form-control'
+    = form.datetime_local_field :amendment_closes_at, class: 'form-control'
 
   .form-group
     = form.submit class: 'btn btn-primary'
