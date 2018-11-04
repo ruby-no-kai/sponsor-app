@@ -11,3 +11,11 @@
   = @conference.amendment_closes_at
 
 = link_to 'Edit', edit_conference_path(@conference), class: 'btn btn-primary'
+
+%h2 Form descriptions
+
+%ul
+  - @conference.form_descriptions.select(:id, :locale).each do |desc|
+    %li= link_to desc.locale, [@conference, desc]
+
+= link_to 'Add locale', new_conference_form_description_path(@conference), class: 'btn btn-primary'

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_04_183057) do
+ActiveRecord::Schema.define(version: 2018_11_04_214542) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,4 +26,22 @@ ActiveRecord::Schema.define(version: 2018_11_04_183057) do
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
   end
 
+  create_table "form_descriptions", force: :cascade do |t|
+    t.bigint "conference_id", null: false
+    t.string "locale", null: false
+    t.text "head"
+    t.text "head_html"
+    t.text "plan_help"
+    t.text "plan_help_html"
+    t.text "booth_help"
+    t.text "booth_help_html"
+    t.text "policy_help"
+    t.text "policy_help_html"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conference_id", "locale"], name: "index_form_descriptions_on_conference_id_and_locale", unique: true
+    t.index ["conference_id"], name: "index_form_descriptions_on_conference_id"
+  end
+
+  add_foreign_key "form_descriptions", "conferences"
 end
