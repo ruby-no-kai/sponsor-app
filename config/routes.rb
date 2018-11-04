@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     scope module: 'admin' do
       resources :conferences do
         resources :form_descriptions, except: %i(index)
+        resources :plans, except: %i(index show)
       end
     end
   end

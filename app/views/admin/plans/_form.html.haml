@@ -1,0 +1,34 @@
+= form_with(model: plan, url: [@conference, plan], local: true) do |form|
+  - if plan.errors.any?
+    .alert.alert-danger
+      %p #{pluralize(conference.errors.count, "error")} prohibited this from being saved:
+      %ul
+        - conference.errors.full_messages.each do |message|
+          %li= message
+
+  .form-group
+    = form.label :name
+    = form.text_field :name, class: 'form-control'
+
+  .form-group
+    = form.label :summary
+    = form.text_field :summary, class: 'form-control'
+
+  .form-group
+    = form.label :rank
+    = form.number_field :rank, class: 'form-control'
+
+  .form-group
+    = form.label :capacity
+    = form.number_field :capacity, class: 'form-control'
+
+  .form-group
+    = form.label :number_of_guests
+    = form.number_field :number_of_guests, class: 'form-control'
+
+  .form-group
+    = form.label :booth_size
+    = form.number_field :booth_size, class: 'form-control'
+
+  .form-group
+    = form.submit class: 'btn btn-primary'
