@@ -1,0 +1,23 @@
+= form_with(model: conference, local: true) do |form|
+  - if conference.errors.any?
+    .alert.alert-danger
+      %p #{pluralize(conference.errors.count, "error")} prohibited this from being saved:
+      %ul
+        - conference.errors.full_messages.each do |message|
+          %li= message
+  .form-group
+    = form.label :name
+    = form.text_field :name, class: 'form-control'
+
+  .form-group
+    = form.label :application_opens_at
+    = form.datetime_select :application_opens_at, class: 'form-control'
+  .form-group
+    = form.label :application_closes_at
+    = form.datetime_select :application_closes_at, class: 'form-control'
+  .form-group
+    = form.label :amendment_closes_at
+    = form.datetime_select :amendment_closes_at, class: 'form-control'
+
+  .form-group
+    = form.submit class: 'btn btn-primary'

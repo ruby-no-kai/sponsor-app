@@ -1,0 +1,13 @@
+%p
+  %strong Name:
+  = @conference.name
+%p
+  %strong Application opens:
+  = @conference.application_opens_at
+  til
+  = @conference.application_closes_at
+%p
+  %strong Accepting amendment closes:
+  = @conference.amendment_closes_at
+
+= link_to 'Edit', edit_conference_path(@conference), class: 'btn btn-primary'
