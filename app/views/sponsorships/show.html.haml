@@ -1,3 +1,16 @@
 %h2= t('.header', name: @conference.name)
 
-%p= @sponsorship.id
+.row
+  .col-md-6
+    .card
+      .card-header= t('.your_application')
+      .card-body
+        %h5.card-title= @sponsorship.name
+        %p.card-text
+          %a{href: @sponsorship.url}= @sponsorship.url
+        %p.card-text= @sponsorship.profile
+
+        %p.card-text
+          = link_to t('.edit'), edit_user_conference_sponsorship_path(@conference), class: 'btn btn-primary'
+          - if @conference.amendment_closes_at
+            %p= t('.amendment_availability', ts: l(@conference.amendment_closes_at))
