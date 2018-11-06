@@ -65,26 +65,13 @@
     = @sponsorship.contact.organization
   %p= @sponsorship.contact.address
 
+  %p= @sponsorship.locale
+
 %section.py-2
   %h4 Organization
 
   %p
     = @sponsorship.organization.name
-
-%section.py-2
-  %h4 Contact
-
-  %p
-    #{@sponsorship.contact.name} (
-    %a{href: "mailto:#{@sponsorship.contact.email}"}= @sponsorship.contact.email
-    )
-  %p
-    - if @sponsorship.contact.unit
-      = @sponsorship.contact.unit
-      %br
-    = @sponsorship.contact.organization
-  %p= @sponsorship.contact.address
-
 
 %section.py-2
   %h4 Billing
