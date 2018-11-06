@@ -39,12 +39,21 @@ class Admin::SponsorshipsController < Admin::ApplicationController
       contact_attributes: %i(id email address organization unit name),
       alternate_billing_contact_attributes: %i(_keep id email address organization unit name),
 
-      billing_request: %i(id body),
-      customization_request: %i(id body),
-      other_request: %i(id body),
+      billing_request_attributes: %i(id body),
+      customization_request_attributes: %i(id body),
+      note_attributes: %i(id body),
     ).tap do |sp|
       unless sp[:alternate_billing_contact_attributes].nil? || sp[:alternate_billing_contact_attributes][:_keep] == '1'
         (sp[:alternate_billing_contact_attributes] ||= {})[:_destroy] = '1'
+      end
+      %i(
+        billing_request_attributes
+        customization_request_attributes
+        note_attributes
+      ).each do |k|
+        unless sp.dig(k, :body).present?
+          sp[k][:_destroy] = '1' if sp[k]
+        end
       end
     end
   end
