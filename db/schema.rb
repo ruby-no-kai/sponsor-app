@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_04_225716) do
+ActiveRecord::Schema.define(version: 2018_11_05_022433) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,21 @@ ActiveRecord::Schema.define(version: 2018_11_04_225716) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
+  end
+
+  create_table "contacts", force: :cascade do |t|
+    t.bigint "sponsorship_id", null: false
+    t.integer "kind", null: false
+    t.string "email", null: false
+    t.string "address", null: false
+    t.string "organization", null: false
+    t.string "unit"
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email", "kind", "sponsorship_id"], name: "index_contacts_on_email_and_kind_and_sponsorship_id"
+    t.index ["sponsorship_id", "kind"], name: "index_contacts_on_sponsorship_id_and_kind", unique: true
+    t.index ["sponsorship_id"], name: "index_contacts_on_sponsorship_id"
   end
 
   create_table "form_descriptions", force: :cascade do |t|
@@ -43,6 +58,14 @@ ActiveRecord::Schema.define(version: 2018_11_04_225716) do
     t.index ["conference_id"], name: "index_form_descriptions_on_conference_id"
   end
 
+  create_table "organizations", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "domain", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["domain"], name: "index_organizations_on_domain", unique: true
+  end
+
   create_table "plans", force: :cascade do |t|
     t.bigint "conference_id", null: false
     t.string "name", null: false
@@ -57,6 +80,65 @@ ActiveRecord::Schema.define(version: 2018_11_04_225716) do
     t.index ["conference_id"], name: "index_plans_on_conference_id"
   end
 
+  create_table "sponsorship_requests", force: :cascade do |t|
+    t.bigint "sponsorship_id", null: false
+    t.integer "kind", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sponsorship_id", "kind"], name: "index_sponsorship_requests_on_sponsorship_id_and_kind", unique: true
+    t.index ["sponsorship_id"], name: "index_sponsorship_requests_on_sponsorship_id"
+  end
+
+  create_table "sponsorship_staff_notes", force: :cascade do |t|
+    t.bigint "sponsorship_id", null: false
+    t.bigint "staff_id", null: false
+    t.integer "stickiness", default: 0, null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sponsorship_id", "stickiness", "created_at"], name: "the_index"
+    t.index ["sponsorship_id"], name: "index_sponsorship_staff_notes_on_sponsorship_id"
+    t.index ["staff_id"], name: "index_sponsorship_staff_notes_on_staff_id"
+  end
+
+  create_table "sponsorships", force: :cascade do |t|
+    t.bigint "conference_id", null: false
+    t.bigint "organization_id", null: false
+    t.bigint "plan_id"
+    t.string "locale", null: false
+    t.boolean "customization", default: false, null: false
+    t.string "customization_name"
+    t.string "name", null: false
+    t.string "url", null: false
+    t.text "profile", null: false
+    t.string "logo_key"
+    t.boolean "booth_requested", default: false, null: false
+    t.boolean "booth_assigned", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conference_id", "organization_id"], name: "index_sponsorships_on_conference_id_and_organization_id", unique: true
+    t.index ["conference_id"], name: "index_sponsorships_on_conference_id"
+    t.index ["organization_id"], name: "index_sponsorships_on_organization_id"
+    t.index ["plan_id"], name: "index_sponsorships_on_plan_id"
+  end
+
+  create_table "staffs", force: :cascade do |t|
+    t.string "login", null: false
+    t.string "name", null: false
+    t.string "uid", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["login"], name: "index_staffs_on_login", unique: true
+    t.index ["uid"], name: "index_staffs_on_uid", unique: true
+  end
+
+  add_foreign_key "contacts", "sponsorships"
   add_foreign_key "form_descriptions", "conferences"
   add_foreign_key "plans", "conferences"
+  add_foreign_key "sponsorship_staff_notes", "sponsorships"
+  add_foreign_key "sponsorship_staff_notes", "staffs"
+  add_foreign_key "sponsorships", "conferences"
+  add_foreign_key "sponsorships", "organizations"
+  add_foreign_key "sponsorships", "plans"
 end

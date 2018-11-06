@@ -1,0 +1,3 @@
+%ul
+  - @conferences.each do |conference|
+    %li= link_to conference.name, user_conference_sponsorship_path(conference)

@@ -30,4 +30,56 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+
+  activerecord:
+    attributes:
+      sponsorship:
+        name: 'Organization Name'
+        url: 'URL'
+        profile: 'Profile text'
+        booth_requested: 'Request a booth'
+        policy_agreement: 'I confirmed and agree with the policies'
+
+      sponsorship/note: &note
+        body: 'Note'
+      sponsorship/customization_request: &customization_request
+        body: 'Additional Note for Your Plan'
+      sponsorship/billing_request: &billing_request
+        body: 'Additional Note for Billing'
+
+      contact:
+        email: 'Email Address'
+        address: 'Address'
+        organization: 'Organization'
+        unit: 'Unit'
+        name: 'Name'
+  helpers:
+    label:
+      'sponsorship[billing_request_attributes]': *billing_request
+      'sponsorship[customization_request_attributes]': *customization_request
+      'sponsorship[note_attributes]': *note
+
+  layouts:
+    application:
+      brand: 'Sponsorships'
+      conferences: 'All Conferences'
+      login: 'Log in'
+
+  sponsorships:
+    form:
+      header: '%{name} Sponsorship Application Form'
+      contact: 'Point of Contact'
+      billing: 'Billing Information'
+      plan: 'Sponsor Plan'
+      plans: 'Pick a plan:'
+      booth: 'Sponsor Booth'
+      information: 'Sponsor Information'
+      logo: 'Logo'
+      note: 'Others'
+      policies: 'Policies'
+      submit: 'Submit'
+    create:
+      notice: "Thank you for the application. We'll send you a confirmation email."
+    show:
+      header: "%{name} Sponsorship Portal"
+

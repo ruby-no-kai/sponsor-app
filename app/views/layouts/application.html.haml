@@ -1,0 +1,28 @@
+!!! 5
+%html
+  %head
+    %meta{charset: 'utf-8'}
+    %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, shrink-to-fit=no'}
+    %title= yield(:title) || 'sponsor-app'
+    = csrf_meta_tags
+    = csp_meta_tag
+
+    = stylesheet_pack_tag 'application', media: 'all'
+  %body
+    %nav.navbar.navbar-expand-lg.navbar-light.bg-light
+      %a.navbar-brand{href: '/'}= t('.brand')
+      %button.navbar-toggler{type: :button, data: {toggle: :collapse, target: '#navbarNavAltMarkup'}, aria: {controls: 'navbarNavAltMarkup', expanded: false, label: 'Toggle navigation'}}
+        %span.navbar-toggler-icon
+      .collapse.navbar-collapse#navbarNavAltMarkup
+        .navbar-nav
+          %a.nav-item.nav-link{href: user_conferences_path}= t('.conferences')
+      .collapse.navbar-collapse
+        .navbar-nav.ml-auto
+          %a.nav-item.nav-link{href: new_user_session_path}= t('.login')
+    .container
+      - if notice
+        .alert.alert-success.mb-5= notice
+
+      %main
+        = yield
+    = javascript_pack_tag 'application'

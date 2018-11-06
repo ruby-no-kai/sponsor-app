@@ -7,5 +7,17 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  get '/' => 'root#index'
+
+  scope as: :user do
+    resource :session, only: %i(new create destroy) do
+      get 'claim/:key', action: :claim
+    end
+
+    resources :conferences, only: %i(index) do
+      resource :sponsorship, only: %i(new create show edit update)
+    end
+  end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
