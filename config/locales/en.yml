@@ -70,6 +70,7 @@ en:
       header: '%{name} Sponsorship Application Form'
       contact: 'Point of Contact'
       billing: 'Billing Information'
+      specify_alternate_billing_contact: 'Specify an alternate contact for billing'
       plan: 'Sponsor Plan'
       plans: 'Pick a plan:'
       booth: 'Sponsor Booth'

@@ -48,24 +48,28 @@
       .form-group
         .form-check
           = contact_form.check_box :_keep, class: 'form-check-input'
-          = contact_form.label :_keep, "Specify an alternate contact for billing", class: 'form-check-label'
+          = contact_form.label :_keep, t('.specify_alternate_billing_contact'), class: 'form-check-label'
 
       %fieldset
+        .form-group
+          = contact_form.label :email
+          = contact_form.email_field :email, class: 'form-control', required: true
+
+        .form-group
+          = contact_form.label :address
+          = contact_form.text_field :address, class: 'form-control', required: true
+
         .form-group
           = contact_form.label :organization
           = contact_form.text_field :organization, class: 'form-control', required: true
 
         .form-group
-          = contact_form.label :unit, class: 'form'
+          = contact_form.label :unit
           = contact_form.text_field :unit, class: 'form-control'
 
         .form-group
           = contact_form.label :name
           = contact_form.text_field :name, class: 'form-control', required: true
-
-        .form-group
-          = contact_form.label :address
-          = contact_form.text_field :address, class: 'form-control', required: true
 
     = form.fields_for :billing_request do |request_form|
       .form-group

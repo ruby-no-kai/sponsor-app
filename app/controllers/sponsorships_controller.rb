@@ -12,13 +12,19 @@ class SponsorshipsController < ApplicationController
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
     raise ActiveRecord::RecordNotFound unless @conference&.amendment_open?
+
+    @sponsorship.build_alternate_billing_contact unless @sponsorship.alternate_billing_contact
+    @sponsorship.build_billing_request unless @sponsorship.billing_request
+    @sponsorship.build_customization_request unless @sponsorship.customization_request
+    @sponsorship.build_note unless @sponsorship.note
   end
 
   def new
     return render(status: 404, plain: '404') if current_sponsorship
-    return render(:closed, status: 403) unless @conference&.application_open?
 
     @conference = Conference.application_open.find(params[:conference_id])
+    return render(:closed, status: 403) unless @conference&.application_open?
+
     @sponsorship = Sponsorship.new(conference: @conference)
     @sponsorship.build_contact
     @sponsorship.build_alternate_billing_contact
@@ -76,7 +82,7 @@ class SponsorshipsController < ApplicationController
       customization_request: %i(id body),
       other_request: %i(id body),
     ).tap do |sp|
-      unless sp[:alternate_billing_contact_attributes].nil? || sp[:alternate_billing_contact_attributes].delete(:_keep) == '1'
+      unless sp[:alternate_billing_contact_attributes].nil? || sp[:alternate_billing_contact_attributes][:_keep] == '1'
         (sp[:alternate_billing_contact_attributes] ||= {})[:_destroy] = '1'
       end
     end
