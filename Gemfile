@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rails', '~> 5.2.1'
+gem 'rails-i18n', '~> 5.1'
 
 gem 'pg', '>= 0.18', '< 2.0'
 
@@ -15,6 +16,7 @@ gem 'rspec-rails'
 gem 'revision_plate'
 
 gem 'puma'
+
 
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 4.0'
