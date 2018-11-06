@@ -78,6 +78,9 @@ en:
       note: 'Others'
       policies: 'Policies'
       submit: 'Submit'
+    closed:
+      header: 'Application closed'
+      message: "Thank you for your interest. But we're sorry, we have closed the sponsorship application for this conference at %{ts}."
     create:
       notice: "Thank you for the application. We'll send you a confirmation email."
     show:

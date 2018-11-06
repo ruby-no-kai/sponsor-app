@@ -11,11 +11,13 @@ class SponsorshipsController < ApplicationController
   def edit
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
-    raise ActiveRecord::RecordNotFound unless @conference&.amendment_open
+    raise ActiveRecord::RecordNotFound unless @conference&.amendment_open?
   end
 
   def new
     return render(status: 404, plain: '404') if current_sponsorship
+    return render(:closed, status: 403) unless @conference&.application_open?
+
     @conference = Conference.application_open.find(params[:conference_id])
     @sponsorship = Sponsorship.new(conference: @conference)
     @sponsorship.build_contact
@@ -46,7 +48,7 @@ class SponsorshipsController < ApplicationController
   def update
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
-    raise ActiveRecord::RecordNotFound unless conference&.amendment_open
+    raise ActiveRecord::RecordNotFound unless conference&.amendment_open?
 
     @sponsorship.locale = I18n.locale
     respond_to do |format|
