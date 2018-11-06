@@ -1,0 +1,150 @@
+- conference = sponsorship.conference
+= form_with(model: sponsorship, url: conference_sponsorship_path(conference, sponsorship), local: true) do |form|
+
+  - if sponsorship.errors.any?
+    - I18n.with_options(scope: %i(errors template)) do |lo|
+      .alert.alert-danger
+        %p= lo.t :header, count: sponsorship.errors.count, model: sponsorship.class.name
+        %ul
+          - sponsorship.errors.full_messages.each do |message|
+            %li= message
+
+  %section.py-2
+    .form-group
+      %h3 Contact
+
+    = form.fields_for :contact do |contact_form|
+      .form-group
+        = contact_form.label :email
+        = contact_form.email_field :email, class: 'form-control', required: true
+
+      .form-group
+        = contact_form.label :address
+        = contact_form.text_field :address, class: 'form-control', required: true
+
+      .form-group
+        = contact_form.label :organization
+        = contact_form.text_field :organization, class: 'form-control', required: true
+
+      .form-group
+        = contact_form.label :unit
+        = contact_form.text_field :unit, class: 'form-control'
+
+      .form-group
+        = contact_form.label :name
+        = contact_form.text_field :name, class: 'form-control', required: true
+
+  %section.py-2.sponsorships_form_billing_contact
+    .form-group
+      %h3 Billing
+
+    = form.fields_for :alternate_billing_contact do |contact_form|
+      .form-group
+        .form-check
+          = contact_form.check_box :_keep, class: 'form-check-input'
+          = contact_form.label :_keep, "Specify an alternate billing contact", class: 'form-check-label'
+
+      %fieldset
+        .form-group
+          = contact_form.label :email
+          = contact_form.email_field :email, class: 'form-control', required: true
+
+        .form-group
+          = contact_form.label :address
+          = contact_form.text_field :address, class: 'form-control', required: true
+
+        .form-group
+          = contact_form.label :organization
+          = contact_form.text_field :organization, class: 'form-control', required: true
+
+        .form-group
+          = contact_form.label :unit
+          = contact_form.text_field :unit, class: 'form-control'
+
+        .form-group
+          = contact_form.label :name
+          = contact_form.text_field :name, class: 'form-control', required: true
+
+    = form.fields_for :billing_request do |request_form|
+      .form-group
+        = request_form.label :body
+        = request_form.text_area :body, class: 'form-control'
+
+  %section.py-2
+    .form-group
+      %h3 Plan
+
+      - conference.plans.each do |plan|
+        .form-check
+          %label.form-check-label
+            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input'
+            = plan.name
+        .form-check
+          %label.form-check-label
+            = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && @sponsorship.persisted?, class: 'form-check-input'
+            Other
+
+    = form.fields_for :customization_request do |request_form|
+      .form-group
+        = request_form.label :body
+        = request_form.text_area :body, class: 'form-control'
+
+    .form-group
+      %h5 Customization
+    .form-group
+      .form-check
+        = form.check_box :customization, class: 'form-check-input'
+        = form.label :customizaion, class: 'form-check-label'
+
+    .form-group
+      = form.label :customization_name
+      = form.text_field :customization_name, class: 'form-control'
+
+  %section.py-2
+    .form-group
+      %h3 Booth
+
+    .form-group
+      .form-check
+        = form.check_box :booth_requested, class: 'form-check-input'
+        = form.label :booth_requested, class: 'form-check-label'
+
+    .form-group
+      .form-check
+        = form.check_box :booth_assigned, class: 'form-check-input'
+        = form.label :booth_assigned, class: 'form-check-label'
+
+  %section.py-2
+    .form-group
+      %h3 Information
+
+    .form-group
+      = form.label :name
+      = form.text_field :name, class: 'form-control', required: true
+
+    .form-group
+      = form.label :url
+      = form.text_field :url, class: 'form-control', required: true
+
+    .form-group
+      = form.label :profile
+      = form.text_area :profile, class: 'form-control', required: true
+
+  %section.py-2
+    .form-group
+      %h3 Logo
+
+  %section.py-2
+    .form-group
+      %h3 Note from Sponsor
+
+    = form.fields_for :note do |request_form|
+      .form-group
+        = request_form.label :body
+        = request_form.text_area :body, class: 'form-control'
+
+  %section.py-2
+    .form-group
+      = form.submit "Save", class: 'btn btn-primary'
+
+

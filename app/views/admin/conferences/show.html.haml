@@ -28,3 +28,14 @@
 
 = link_to 'Add plan', new_conference_plan_path(@conference), class: 'btn btn-default'
 
+%h4 Sponsorships
+
+- @conference.sponsorships.group_by(&:plan).each do |plan, sponsorships|
+  %h5= plan&.name || 'Undetermined'
+  %ul
+    - sponsorships.each do |sponsorship|
+      %li
+        - if sponsorship.customized?
+          #{sponsorship.customization_name}:
+        = link_to sponsorship.name, [@conference, sponsorship]
+

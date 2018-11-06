@@ -1,0 +1,105 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item Sponsorships
+    %li.breadcrumb-item.active{aria: {current: 'page'}}= @sponsorship.name
+
+%h3 #{@sponsorship.name}
+
+= link_to "Edit", edit_conference_sponsorship_path(@conference, @sponsorship), class: 'btn btn-primary'
+
+%p
+  = @sponsorship.name
+  %br
+  %a{href: @sponsorship.url}= @sponsorship.url
+%p= @sponsorship.profile
+
+%section.py-2
+  %h4 Plan
+
+  - if @sponsorship.plan
+    %p
+      %strong= @sponsorship.plan.name
+  - else @sponsorship.plan
+    %p
+      %span.label.label-danger UNDETERMINED
+
+  - if @sponsorship.customized?
+    %p Shown as: #{@sponsorship.customization_name}
+
+  - if @sponsorship.billing_request&.body&.present?
+    %pre
+      %code= @sponsorship.billing_request.body
+
+%section.py-2
+  %h4 Booth
+
+  - case
+  - when @sponsorship.booth_assigned && !@sponsorship.booth_requested
+    Assigned but Not requested (!?)
+  - when @sponsorship.booth_assigned
+    Assigned
+  - when @sponsorship.booth_requested
+    Requested
+  - else
+    - if @sponsorship.plan.booth_applicable?
+      Applicable but Not requested
+    - else
+      N/A
+
+%section.py-2
+  %h4 Contact
+
+  %p
+    #{@sponsorship.contact.name} (
+    %a{href: "mailto:#{@sponsorship.contact.email}"}= @sponsorship.contact.email
+    )
+  %p
+    - if @sponsorship.contact.unit
+      = @sponsorship.contact.unit
+      %br
+    = @sponsorship.contact.organization
+  %p= @sponsorship.contact.address
+
+%section.py-2
+  %h4 Organization
+
+  %p
+    = @sponsorship.organization.name
+
+%section.py-2
+  %h4 Contact
+
+  %p
+    #{@sponsorship.contact.name} (
+    %a{href: "mailto:#{@sponsorship.contact.email}"}= @sponsorship.contact.email
+    )
+  %p
+    - if @sponsorship.contact.unit
+      = @sponsorship.contact.unit
+      %br
+    = @sponsorship.contact.organization
+  %p= @sponsorship.contact.address
+
+
+%section.py-2
+  %h4 Billing
+
+  - if @sponsorship.billing_request&.body&.present?
+    %pre
+      %code= @sponsorship.billing_request.body
+
+  %h5 Billing Contact
+  - if @sponsorship.alternate_billing_contact
+    %p
+      %span.label.label-danger Alternate billing contact specified
+  %p
+    #{@sponsorship.billing_contact.name} (
+    %a{href: "mailto:#{@sponsorship.billing_contact.email}"}= @sponsorship.billing_contact.email
+    )
+  %p
+    - if @sponsorship.billing_contact.unit
+      = @sponsorship.billing_contact.unit
+      %br
+    = @sponsorship.billing_contact.organization
+  %p= @sponsorship.billing_contact.address

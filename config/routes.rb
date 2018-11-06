@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       resources :conferences do
         resources :form_descriptions, except: %i(index)
         resources :plans, except: %i(index show)
+        resources :sponsorships, except: %i(index new create destroy)
       end
     end
   end

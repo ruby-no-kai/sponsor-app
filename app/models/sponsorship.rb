@@ -30,6 +30,14 @@ class Sponsorship < ApplicationRecord
   accepts_nested_attributes_for :customization_request, reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :note, reject_if: -> (attrs) { attrs['kind'].present? }
 
+  def customized?
+    customization && customization_name.present?
+  end
+
+  def plan_name
+    customized? ? (customization_name || plan&.name) : plan&.name
+  end
+
   def policy_agreement
     return @policy_agreement if defined? @policy_agreement
     @policy_agreement = self.persisted?
