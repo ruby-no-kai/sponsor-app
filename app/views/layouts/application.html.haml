@@ -16,9 +16,16 @@
       .collapse.navbar-collapse#navbarNavAltMarkup
         .navbar-nav
           %a.nav-item.nav-link{href: user_conferences_path}= t('.conferences')
+
       .collapse.navbar-collapse
-        .navbar-nav.ml-auto
-          %a.nav-item.nav-link{href: new_user_session_path}= t('.login')
+        %ul.navbar-nav.ml-auto
+          %li.nav-item.dropdown
+            .nav-link.dropdown-toggle#navbarDropdownMenuLink{href: '#', role: 'button', data: {toggle: 'dropdown'}, aria: {haspopup: 'true', expanded: 'false'}} Language
+            .dropdown-menu{aria: {labelledby: 'navbarDropdownMenuLink'}}
+              %a.dropdown-item{href: url_for(params.to_unsafe_h.merge(only_path: true, hl: 'en'))} English
+              %a.dropdown-item{href: url_for(params.to_unsafe_h.merge(only_path: true, hl: 'ja'))} Japanese
+          %li.nav-item
+            .nav-link{href: new_user_session_path}= t('.login')
     .container
       - if notice
         .alert.alert-success.mb-5= notice
