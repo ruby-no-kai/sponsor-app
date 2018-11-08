@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_07_013458) do
+ActiveRecord::Schema.define(version: 2018_11_08_070634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 2018_11_07_013458) do
     t.integer "booth_capacity", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "contact_email_address"
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
   end
 
