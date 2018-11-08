@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '~> 5.2.1'
 gem 'rails-i18n', '~> 5.1'
+gem 'rack-contrib'
 
 gem 'pg', '>= 0.18', '< 2.0'
 
