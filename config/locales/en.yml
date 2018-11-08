@@ -77,6 +77,7 @@ en:
       email_sent: "We sent you an email with the link for logging in. Check your inbox."
   session_token_mailer:
     notify:
+      subject: "Here's a link to log into sponsor's portal"
       greeting: "Hi,"
       explanation: "Use the following link to log into our sponsor's portal:"
       expiry: "This link expires at %{ts}. You can use this link for multiple times until it expires."

@@ -85,5 +85,8 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
+  config.x.org_name = ENV.fetch('ORG_NAME')
+
   config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
+  config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST')
 end

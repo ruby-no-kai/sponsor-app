@@ -59,5 +59,8 @@ Rails.application.configure do
   # *.lo.example.org
   config.action_dispatch.tld_length = 2
 
+  config.x.org_name = "RubyKaigi"
+
   config.x.default_email_address = 'sponsorapp@localhost'
+  config.x.default_email_host_part = 'localhost'
 end

@@ -44,5 +44,8 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
+  config.x.org_name = "RubyKaigi"
+
   config.x.default_email_address = 'sponsorapp@localhost'
+  config.x.default_email_host_part = 'sponsorapp@localhost'
 end
