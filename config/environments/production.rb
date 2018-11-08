@@ -1,6 +1,18 @@
 Rails.application.configure do
-  config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST')
-  config.x.admin_url_host = ENV.fetch('ADMIN_URL_HOST')
+  unless ENV['STACK'] # not during heroku build
+    config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST')
+    config.x.admin_url_host = ENV.fetch('ADMIN_URL_HOST')
+
+    config.x.org_name = ENV.fetch('ORG_NAME')
+
+    config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
+    config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST')
+
+    config.x.github.repo = ENV.fetch('GITHUB_REPO')
+    config.x.github.client_id = ENV.fetch('GITHUB_CLIENT_ID')
+    config.x.github.client_secret = ENV.fetch('GITHUB_CLIENT_SECRET')
+
+  end
 
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -88,14 +100,4 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
-
-  config.x.org_name = ENV.fetch('ORG_NAME')
-
-  config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
-  config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST')
-
-  config.x.github.repo = ENV.fetch('GITHUB_REPO')
-  config.x.github.client_id = ENV.fetch('GITHUB_CLIENT_ID')
-  config.x.github.client_secret = ENV.fetch('GITHUB_CLIENT_SECRET')
-
 end
