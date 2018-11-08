@@ -10,6 +10,9 @@ gem 'addressable'
 gem 'commonmarker'
 gem 'aws-sdk-core' # STS
 gem 'aws-sdk-s3'
+gem 'omniauth'
+gem 'omniauth-github'
+gem 'octokit'
 
 gem 'jbuilder', '~> 2.5'
 gem 'haml', '>= 5.0.0'

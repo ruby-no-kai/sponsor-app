@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_08_073122) do
+ActiveRecord::Schema.define(version: 2018_11_08_175905) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -154,6 +154,7 @@ ActiveRecord::Schema.define(version: 2018_11_08_073122) do
     t.string "uid", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "avatar_url"
     t.index ["login"], name: "index_staffs_on_login", unique: true
     t.index ["uid"], name: "index_staffs_on_uid", unique: true
   end

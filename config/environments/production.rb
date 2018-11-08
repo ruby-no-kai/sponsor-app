@@ -90,4 +90,9 @@ Rails.application.configure do
 
   config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
   config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST')
+
+  config.x.github.repo = ENV.fetch('GITHUB_REPO')
+  config.x.github.client_id = ENV.fetch('GITHUB_CLIENT_ID')
+  config.x.github.client_secret = ENV.fetch('GITHUB_CLIENT_SECRET')
+
 end

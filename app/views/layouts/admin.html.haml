@@ -15,7 +15,13 @@
         %span.navbar-toggler-icon
       .collapse.navbar-collapse#navbarNavAltMarkup
         .navbar-nav
-          %a.nav-item.nav-link{href: conferences_path} Conferences
+          - if current_staff
+            %a.nav-item.nav-link{href: conferences_path} Conferences
+      .collapse.navbar-collapse
+        %ul.navbar-nav.ml-auto
+          %li.nav-item
+            - if current_staff
+              = link_to "@#{current_staff.login}", session_path, method: :delete, class: 'nav-link', data: {confirm: 'Log out?'}
     .container
       %main
         - if notice

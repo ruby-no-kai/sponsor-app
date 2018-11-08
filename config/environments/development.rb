@@ -65,4 +65,8 @@ Rails.application.configure do
 
   config.x.default_email_address = 'sponsorapp@localhost'
   config.x.default_email_host_part = 'localhost'
+
+  config.x.github.repo = ENV['GITHUB_REPO']
+  config.x.github.client_id = ENV['GITHUB_CLIENT_ID']
+  config.x.github.client_secret = ENV['GITHUB_CLIENT_SECRET']
 end

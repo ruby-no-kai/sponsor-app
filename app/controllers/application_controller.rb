@@ -14,13 +14,20 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  helper_method def current_staff
+    return @current_staff if defined? @current_staff
+    @current_staff = session[:staff_id] && Staff.find_by(id: session[:staff_id])
+  end
+
   helper_method def current_sponsorship
     return @current_sponsorship if defined? @current_sponsorship
     @current_sponsorship = session[:sponsorship_id] && Sponsorship.find_by(id: session[:sponsorship_id])
   end
 
   def require_staff
-    # TODO:
+    unless current_staff
+      redirect_to new_session_path(back_to: url_for(params.to_unsafe_h.merge(only_path: true)))
+    end
   end
 
   def require_sponsorship_session

@@ -12,6 +12,8 @@ Rails.application.routes.draw do
           end
         end
       end
+      resource :session, only: %i(new destroy)
+      get '/auth/:provider/callback' => 'sessions#create'
     end
   end
 
@@ -27,5 +29,7 @@ Rails.application.routes.draw do
       resource :sponsorship_asset_file, only: %i(create update)
     end
   end
+
+  get '/site/sha' => RevisionPlate::App.new(File.join(__dir__, '..', 'REVISION'))
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
