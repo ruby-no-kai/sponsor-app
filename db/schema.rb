@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_08_070634) do
+ActiveRecord::Schema.define(version: 2018_11_08_073122) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -79,6 +79,20 @@ ActiveRecord::Schema.define(version: 2018_11_08_070634) do
     t.datetime "updated_at", null: false
     t.index ["conference_id", "rank"], name: "index_plans_on_conference_id_and_rank"
     t.index ["conference_id"], name: "index_plans_on_conference_id"
+  end
+
+  create_table "session_tokens", force: :cascade do |t|
+    t.string "handle", null: false
+    t.string "email"
+    t.bigint "sponsorship_id"
+    t.bigint "staff_id"
+    t.boolean "user_initiated", default: true
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["handle"], name: "index_session_tokens_on_handle", unique: true
+    t.index ["sponsorship_id"], name: "index_session_tokens_on_sponsorship_id"
+    t.index ["staff_id"], name: "index_session_tokens_on_staff_id"
   end
 
   create_table "sponsorship_asset_files", force: :cascade do |t|

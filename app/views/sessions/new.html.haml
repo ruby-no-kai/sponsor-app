@@ -1,0 +1,17 @@
+%h3= t('.header')
+
+%p= t('.description')
+
+.row.mt-3
+  .col-md-4
+  .col-md-4
+    = form_tag(user_session_path) do
+      .form-group
+        .row
+          .col-12
+            = email_field_tag :email, '', required: true, placeholder: t('.email_address'), class: 'form-control'
+      .form-group
+        .row
+          .col-md-4
+          .col-md-4
+            = submit_tag t('.submit'), class: 'btn btn-primary'

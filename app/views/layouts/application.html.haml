@@ -25,10 +25,16 @@
               %a.dropdown-item{href: url_for(params.to_unsafe_h.merge(only_path: true, hl: 'en'))} English
               %a.dropdown-item{href: url_for(params.to_unsafe_h.merge(only_path: true, hl: 'ja'))} Japanese
           %li.nav-item
-            .nav-link{href: new_user_session_path}= t('.login')
+            - if current_sponsorship
+              = link_to t('.logout'), user_session_path, method: :delete, class: 'nav-link'
+            - else
+              %a.nav-link{href: new_user_session_path(back_to: url_for(params.to_unsafe_h.merge(only_path: true)))}= t('.login')
     .container
       - if notice
-        .alert.alert-success.mb-5= notice
+        .alert.alert-success.mt-5.mb-2= notice
+
+      - if flash[:alert]
+        .alert.alert-danger.mt-5.mb-2= flash[:alert]
 
       %main
         = yield

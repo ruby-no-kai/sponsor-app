@@ -64,6 +64,22 @@ en:
       brand: 'Sponsorships'
       conferences: 'All Conferences'
       login: 'Log in'
+      logout: 'Log out'
+
+  sessions:
+    new:
+      header: Log in
+      description: "Enter your email address used for your sponsorship application to proceed."
+      email_address: Email Address
+      submit: Proceed
+    create:
+      no_email_found: "We're sorry but no applications found for the email address you entered. Please try again or contact us."
+      email_sent: "We sent you an email with the link for logging in. Check your inbox."
+  session_token_mailer:
+    notify:
+      greeting: "Hi,"
+      explanation: "Use the following link to log into our sponsor's portal:"
+      expiry: "This link expires at %{ts}. You can use this link for multiple times until it expires."
 
   sponsorships:
     form:

@@ -19,7 +19,7 @@ Rails.application.routes.draw do
 
   scope as: :user do
     resource :session, only: %i(new create destroy) do
-      get 'claim/:key', action: :claim
+      get 'claim/:handle', action: :claim, as: :claim
     end
 
     resources :conferences, only: %i(index) do

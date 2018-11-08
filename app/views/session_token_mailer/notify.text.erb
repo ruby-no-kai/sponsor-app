@@ -1,0 +1,7 @@
+<%= t('.greeting') %>
+
+<%= t('.explanation') %>
+
+<%= claim_user_session_url(@token) %>
+
+<%= t('.expiry', ts: l(@token.expires_at)) %>
