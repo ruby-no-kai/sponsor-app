@@ -48,6 +48,7 @@ class SponsorshipsController < ApplicationController
       if @sponsorship.save
         session[:asset_file_ids].delete(@sponsorship.asset_file.id)
         session[:sponsorship_id] = @sponsorship.id
+        SponsorshipAcceptanceJob.perform_later(@sponsorship)
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: t('.notice') }
       else
         format.html { render :new }

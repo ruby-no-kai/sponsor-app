@@ -4,9 +4,15 @@ class ApplicationMailer < ActionMailer::Base
 
   private
 
-  def message_id_for(local)
+  def message_id_for(local, reference = nil)
     headers 'Message-ID' => nil
-    headers 'Message-ID' => "#{local}@#{Rails.application.config.x.default_email_host_part}"
+    headers 'Message-ID' => "<#{local}@#{Rails.application.config.x.default_email_host_part}>"
+    if reference
+      headers 'References' => nil
+      headers 'References' => "<#{reference}@#{Rails.application.config.x.default_email_host_part}>"
+      headers 'In-Reply-To' => nil
+      headers 'In-Reply-To' => "<#{reference}@#{Rails.application.config.x.default_email_host_part}>"
+    end
   end
 
   def subject_prefix
