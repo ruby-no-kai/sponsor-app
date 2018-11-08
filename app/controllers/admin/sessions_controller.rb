@@ -2,6 +2,21 @@ class Admin::SessionsController < ::ApplicationController
   layout 'admin'
 
   def new
+    if Rails.env.development? && params[:login] # backdoor
+      if ENV['BACKDOOR_SECRET'] && !Rack::Utils.secure_compare(params[:backdoor], ENV['BACKDOOR_SECRET'])
+        return render(status: 401, plain: 'BACKDOOR_SECRET?')
+      end
+
+      staff = Staff.create_with(
+        name: params[:login],
+        avatar_url: 'https://pbs.twimg.com/profile_images/2446689015/fjxbuni2hmaqz6xkh3n2_400x400.png',
+      ).find_or_create_by!(
+        login: params[:login],
+      )
+      session[:staff_id] = staff.id
+      redirect_to '/'
+    end
+
     if params[:proceed]
       session.delete(:back_to)
       if params[:back_to]
