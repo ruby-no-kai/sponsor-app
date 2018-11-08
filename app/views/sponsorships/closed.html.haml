@@ -2,4 +2,8 @@
 
 %h3= t('.header')
 
-%p= t('.message', ts: l(@conference.application_closes_at))
+- t = Time.now
+- if @conference.application_closes_at && @conference.application_closes_at < Time.now
+  %p= t('.closed', ts: l(@conference.application_closes_at))
+- else
+  %p= t('.not_yet_open', ts: @conference.application_opens_at && l(@conference.application_opens_at))
