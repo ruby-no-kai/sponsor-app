@@ -6,6 +6,7 @@ gem 'rack-contrib'
 
 gem 'pg', '>= 0.18', '< 2.0'
 
+gem 'addressable'
 gem 'commonmarker'
 gem 'aws-sdk-core' # STS
 gem 'aws-sdk-s3'

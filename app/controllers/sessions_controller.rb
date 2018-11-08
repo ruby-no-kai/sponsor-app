@@ -5,14 +5,21 @@ class SessionsController < ApplicationController
   def create
     contact = Contact.find_by(kind: :primary, email: params[:email])
 
-    if contact
-      token = SessionToken.create!(email: contact.email)
-      SessionTokenMailer.with(token: token).notify.deliver_now
-      redirect_to new_user_session_path, notice: t('.email_sent')
-    else
+    unless contact
       flash.now[:alert] = t('.no_email_found')
-      render :new, status: 401
+      return render :new, status: 401
     end
+
+    if params[:back_to]
+      uri = Addressable::URI.parse(params[:back_to])
+      if uri && uri.host.nil? && uri.scheme.nil? && uri.path.start_with?('/')
+        session[:back_to] = params[:back_to]
+      end
+    end
+
+    token = SessionToken.create!(email: contact.email)
+    SessionTokenMailer.with(token: token).notify.deliver_now
+    redirect_to new_user_session_path, notice: t('.email_sent')
   end
 
   def claim

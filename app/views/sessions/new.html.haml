@@ -6,6 +6,8 @@
   .col-md-4
   .col-md-4
     = form_tag(user_session_path) do
+      - if params[:back_to].present?
+        = hidden_field_tag :back_to, params[:back_to]
       .form-group
         .row
           .col-12
