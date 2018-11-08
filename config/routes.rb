@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
+
   constraints subdomain: %w(admin sponsorship-admin) do
     scope module: 'admin' do
       resources :conferences do
