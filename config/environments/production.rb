@@ -1,4 +1,7 @@
 Rails.application.configure do
+  config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST')
+  config.x.admin_url_host = ENV.fetch('ADMIN_URL_HOST')
+
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
@@ -61,7 +64,7 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
-  config.action_mailer.default_url_options = {host: ENV.fetch('DEFAULT_URL_HOST'), protocol: 'https'}
+  config.action_mailer.default_url_options = {host: config.x.public_url_host, protocol: 'https'}
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

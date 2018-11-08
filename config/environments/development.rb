@@ -1,4 +1,7 @@
 Rails.application.configure do
+  config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST', 'localhost:3000')
+  config.x.admin_url_host = ENV.fetch('ADMIN_URL_HOST', 'admin.lo.sorah.jp:3000')
+
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded on
@@ -39,7 +42,7 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
-  config.action_mailer.default_url_options = {host: 'localhost:3000'}
+  config.action_mailer.default_url_options = {host: config.x.public_url_host, protocol: 'https'}
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

@@ -7,7 +7,7 @@ class SponsorshipAcceptanceJob < ApplicationJob
       session_token: token,
     ).user_email.deliver_now
 
-    SponsorshipAcceptedMailer.with(
+    Admin::SponsorshipAcceptedMailer.with(
       sponsorship: sponsorship,
     ).admin_email.deliver_now
   end
