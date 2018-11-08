@@ -1,6 +1,6 @@
 - conference = sponsorship.conference
 - desc = conference.form_description_for_locale
-= form_with(model: sponsorship, url: user_conference_sponsorship_path(conference), local: true) do |form|
+= form_with(model: sponsorship, url: user_conference_sponsorship_path(conference), local: true, class: 'sponsorships_form') do |form|
 
   - if sponsorship.errors.any?
     - I18n.with_options(scope: %i(errors template)) do |lo|
@@ -127,6 +127,10 @@
     .form-group
       %h3= t('.logo')
 
+    .form-group.sponsorships_form_asset_file{data: {session_endpoint: user_conference_sponsorship_asset_file_path, session_endpoint_method: sponsorship.asset_file&.persisted? ? 'PUT': 'POST'}}
+      = form.hidden_field :asset_file_id
+      .sponsorships_form_asset_file_form (Loading)
+
   %section.py-2
     .form-group
       %h3= t('.note')
@@ -147,4 +151,4 @@
     .form-group
       = form.submit t('.submit'), class: 'btn btn-primary'
 
-
+    .alert.alert-danger.submit_error.d-none

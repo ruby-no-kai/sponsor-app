@@ -4,6 +4,12 @@ class Admin::SponsorshipsController < Admin::ApplicationController
   def show
   end
 
+  def download_asset
+    asset = @sponsorship.asset_file
+    raise ActiveRecord::RecordNotFound unless asset
+    redirect_to asset.download_url()
+  end
+
   def edit
     @sponsorship.build_alternate_billing_contact unless @sponsorship.alternate_billing_contact
     @sponsorship.build_billing_request unless @sponsorship.billing_request

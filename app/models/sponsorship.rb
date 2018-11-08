@@ -12,6 +12,12 @@ class Sponsorship < ApplicationRecord
   has_one :customization_request, -> { where(kind: :customization) }, class_name: 'SponsorshipRequest'
   has_one :note, -> { where(kind: :note) }, class_name: 'SponsorshipRequest'
 
+  has_one :asset_file, class_name: 'SponsorshipAssetFile'
+  def asset_file_id; self.asset_file&.id; end
+  def asset_file_id=(other)
+    self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
+  end
+
   validates :organization, presence: true, uniqueness: true
 
   validates :contact, presence: true
@@ -19,6 +25,8 @@ class Sponsorship < ApplicationRecord
   validates :name, presence: true
   validates :url, presence: true
   validates :profile, presence: true
+
+  validates :asset_file, presence: true
 
   validate :validate_correct_plan
   validate :policy_agreement

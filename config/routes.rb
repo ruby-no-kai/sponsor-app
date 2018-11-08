@@ -4,7 +4,11 @@ Rails.application.routes.draw do
       resources :conferences do
         resources :form_descriptions, except: %i(index)
         resources :plans, except: %i(index show)
-        resources :sponsorships, except: %i(index new create destroy)
+        resources :sponsorships, except: %i(index new create destroy) do
+          member do
+            get :download_asset
+          end
+        end
       end
     end
   end
@@ -18,6 +22,7 @@ Rails.application.routes.draw do
 
     resources :conferences, only: %i(index) do
       resource :sponsorship, only: %i(new create show edit update)
+      resource :sponsorship_asset_file, only: %i(create update)
     end
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

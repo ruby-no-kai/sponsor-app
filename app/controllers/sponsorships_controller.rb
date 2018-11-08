@@ -37,12 +37,16 @@ class SponsorshipsController < ApplicationController
     return render(status: 404, plain: '404') if current_sponsorship
     @conference = Conference.application_open.find(params[:conference_id])
     @sponsorship = Sponsorship.new(sponsorship_params)
+    return render(status: 403, plain: '403') if session[:asset_file_ids] && !session[:asset_file_ids].include?(@sponsorship.asset_file.id)
+
     @sponsorship.locale = I18n.locale
     @sponsorship.conference = @conference
     @sponsorship.assume_organization
 
+
     respond_to do |format|
       if @sponsorship.save
+        session[:asset_file_ids].delete(@sponsorship.asset_file.id)
         session[:sponsorship_id] = @sponsorship.id
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: t('.notice') }
       else
@@ -54,11 +58,13 @@ class SponsorshipsController < ApplicationController
   def update
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
-    raise ActiveRecord::RecordNotFound unless conference&.amendment_open?
+    raise ActiveRecord::RecordNotFound unless @conference&.amendment_open?
 
     @sponsorship.locale = I18n.locale
     respond_to do |format|
-      if @sponsorship.update(sponsorship_params)
+      sp = sponsorship_params
+      sp.delete(:asset_file_id)
+      if @sponsorship.update(sp)
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: 'Your application was successfully updated.' }
       else
         format.html { render :edit }
@@ -74,7 +80,7 @@ class SponsorshipsController < ApplicationController
       :name,
       :url,
       :profile,
-      :logo_key,
+      :asset_file_id,
       :booth_requested,
       contact_attributes: %i(id email address organization unit name),
       alternate_billing_contact_attributes: %i(_keep id email address organization unit name),

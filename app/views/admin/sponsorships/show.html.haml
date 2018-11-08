@@ -18,6 +18,8 @@
   %pre
     %code= @sponsorship.billing_request.body
 
+%p= link_to 'Download Asset', download_asset_conference_sponsorship_path(@conference, @sponsorship)
+
 %section.py-2
   %h4 Plan
 
@@ -46,7 +48,7 @@
   - when @sponsorship.booth_requested
     Requested
   - else
-    - if @sponsorship.plan.booth_applicable?
+    - if @sponsorship.plan&.booth_applicable?
       Applicable but Not requested
     - else
       N/A
