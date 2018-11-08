@@ -1,1 +1,9 @@
+- if current_staff && !@conference.application_open?
+  .alert.alert-warning
+    Application
+    %b is not
+    open. You're seeing this because you're logged in as a staff.
+    %br
+    Application opens at: #{l(@conference.application_opens_at)}
+
 = render 'form', sponsorship: @sponsorship

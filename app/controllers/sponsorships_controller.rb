@@ -22,8 +22,8 @@ class SponsorshipsController < ApplicationController
   def new
     return render(status: 404, plain: '404') if current_sponsorship
 
-    @conference = Conference.application_open.find(params[:conference_id])
-    return render(:closed, status: 403) unless @conference&.application_open?
+    @conference = Conference.find(params[:conference_id])
+    return render(:closed, status: 403) if !@conference&.application_open? && !current_staff
 
     @sponsorship = Sponsorship.new(conference: @conference)
     @sponsorship.build_contact

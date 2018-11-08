@@ -12,7 +12,9 @@ Rails.application.routes.draw do
           end
         end
       end
-      resource :session, only: %i(new destroy)
+      resource :session, only: %i(new destroy) do
+        get :rise, as: :rise
+      end
       get '/auth/:provider/callback' => 'sessions#create'
     end
   end
