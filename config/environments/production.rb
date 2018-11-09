@@ -1,7 +1,6 @@
 Rails.application.configure do
   unless ENV['STACK'] # not during heroku build
     config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST')
-    config.x.admin_url_host = ENV.fetch('ADMIN_URL_HOST')
 
     config.x.org_name = ENV.fetch('ORG_NAME')
 

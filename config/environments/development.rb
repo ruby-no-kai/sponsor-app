@@ -1,6 +1,5 @@
 Rails.application.configure do
   config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST', 'localhost:3000')
-  config.x.admin_url_host = ENV.fetch('ADMIN_URL_HOST', 'admin.lo.sorah.jp:3000')
 
   # Settings specified here will take precedence over those in config/application.rb.
 
