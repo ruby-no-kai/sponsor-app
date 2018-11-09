@@ -57,13 +57,6 @@ class Admin::SessionsController < ::ApplicationController
     redirect_to '/'
   end
 
-  def rise
-    return render(status: 401, plain: 'Who are you?') unless current_staff
-
-    token = SessionToken.create!(staff: current_staff, expires_at: Time.zone.now + 1.minute)
-    redirect_to claim_user_session_url(token, back_to: params[:back_to], host: Rails.application.config.x.public_url_host)
-  end
-
   private
 
   def staff_member?(access_token)

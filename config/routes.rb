@@ -1,23 +1,22 @@
 Rails.application.routes.draw do
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
-  constraints subdomain: %w(admin sponsorship-admin) do
-    scope module: 'admin' do
-      resources :conferences do
-        resources :form_descriptions, except: %i(index)
-        resources :plans, except: %i(index show)
-        resources :sponsorships, except: %i(index new create destroy) do
-          member do
-            get :download_asset
-          end
+  scope path: 'admin', module: 'admin' do
+    get '/' => 'dashboard#index'
+    resources :conferences do
+      resources :form_descriptions, except: %i(index)
+      resources :plans, except: %i(index show)
+      resources :sponsorships, except: %i(index new create destroy) do
+        member do
+          get :download_asset
         end
       end
-      resource :session, only: %i(new destroy) do
-        get :rise, as: :rise
-      end
-      get '/auth/:provider/callback' => 'sessions#create'
+    end
+    resource :session, only: %i(new destroy) do
+      get :rise, as: :rise
     end
   end
+  get '/auth/:provider/callback' => 'admin/sessions#create'
 
   get '/' => 'root#index'
 

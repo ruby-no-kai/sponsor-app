@@ -7,9 +7,7 @@ rails s
 ./bin/webpack --watch
 ```
 
-- http://sponsorships.lo.sorah.jp:3000/
-- http://admin.lo.sorah.jp:3000/
-  - Development Backdoor access: http://admin.lo.sorah.jp:3000/session/new?login=your-github-login
+- http://localhost:3000/
 
 ### Enviroment variables
 

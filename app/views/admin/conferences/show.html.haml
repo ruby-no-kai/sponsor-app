@@ -11,7 +11,7 @@
   = @conference.amendment_closes_at
 
 = link_to 'Edit', edit_conference_path(@conference), class: 'btn btn-primary'
-= link_to 'Preview Form', rise_session_path(back_to: new_user_conference_sponsorship_path(@conference)), class: 'btn btn-secondary'
+= link_to 'Preview Form', new_user_conference_sponsorship_path(@conference), class: 'btn btn-secondary'
 
 %h3 Form descriptions
 
