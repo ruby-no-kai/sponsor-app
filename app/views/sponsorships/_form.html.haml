@@ -161,6 +161,8 @@
     .form-group
       %h3= t('.policies')
 
+      %p= desc.policy_help_html&.html_safe
+
       .form-check
         = form.check_box :policy_agreement, class: 'form-check-input', required: true
         = form.label :policy_agreement, "", class: 'form-check-label'
