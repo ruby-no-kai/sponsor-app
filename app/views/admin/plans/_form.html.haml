@@ -19,6 +19,10 @@
     = form.number_field :rank, class: 'form-control'
 
   .form-group
+    = form.label :price_text
+    = form.text_field :price_text, class: 'form-control'
+
+  .form-group
     = form.label :capacity
     = form.number_field :capacity, class: 'form-control'
 
@@ -29,6 +33,13 @@
   .form-group
     = form.label :booth_size
     = form.number_field :booth_size, class: 'form-control'
+
+  .form-group
+    .form-check
+      %label.form-check-label
+        = form.check_box :talkable, class: 'form-check-input', required: true
+        = form.label :talkable, "", class: 'form-check-label'
+
 
   .form-group
     = form.submit class: 'btn btn-primary'

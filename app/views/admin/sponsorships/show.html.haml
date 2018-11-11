@@ -48,7 +48,7 @@
   - when @sponsorship.booth_requested
     Requested
   - else
-    - if @sponsorship.plan&.booth_applicable?
+    - if @sponsorship.plan&.booth_eligible?
       Applicable but Not requested
     - else
       N/A
