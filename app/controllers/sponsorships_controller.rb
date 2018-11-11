@@ -13,10 +13,7 @@ class SponsorshipsController < ApplicationController
     @conference = current_sponsorship&.conference
     raise ActiveRecord::RecordNotFound unless @conference&.amendment_open?
 
-    @sponsorship.build_alternate_billing_contact unless @sponsorship.alternate_billing_contact
-    @sponsorship.build_billing_request unless @sponsorship.billing_request
-    @sponsorship.build_customization_request unless @sponsorship.customization_request
-    @sponsorship.build_note unless @sponsorship.note
+    @sponsorship.build_nested_attributes_associations
   end
 
   def new
@@ -26,11 +23,7 @@ class SponsorshipsController < ApplicationController
     return render(:closed, status: 403) if !@conference&.application_open? && !current_staff
 
     @sponsorship = Sponsorship.new(conference: @conference)
-    @sponsorship.build_contact
-    @sponsorship.build_alternate_billing_contact
-    @sponsorship.build_billing_request
-    @sponsorship.build_customization_request
-    @sponsorship.build_note
+    @sponsorship.build_nested_attributes_associations
   end
 
   def create
@@ -51,6 +44,7 @@ class SponsorshipsController < ApplicationController
         SponsorshipAcceptanceJob.perform_later(@sponsorship)
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: t('.notice') }
       else
+        @sponsorship.build_nested_attributes_associations
         format.html { render :new }
       end
     end

@@ -38,6 +38,14 @@ class Sponsorship < ApplicationRecord
   accepts_nested_attributes_for :customization_request, reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :note, reject_if: -> (attrs) { attrs['kind'].present? }
 
+  def build_nested_attributes_associations
+    self.build_contact unless self.contact
+    self.build_alternate_billing_contact unless self.alternate_billing_contact
+    self.build_billing_request unless self.billing_request
+    self.build_customization_request unless self.customization_request
+    self.build_note unless self.note
+  end
+
   def customized?
     customization && customization_name.present?
   end
