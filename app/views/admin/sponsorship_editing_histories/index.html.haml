@@ -1,0 +1,12 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item Sponsorships
+    %li.breadcrumb-item= link_to @sponsorship.name, [@conference, @sponsorship]
+    %li.breadcrumb-item.active{aria: {current: 'page'}} History
+
+%h5 Editing histories
+
+- @editing_histories.each do |history|
+  %section.my-3
+    = render 'item', history: history

@@ -18,6 +18,8 @@ class Sponsorship < ApplicationRecord
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
   end
 
+  has_many :editing_histories, -> { order(id: :desc) }, class_name: 'SponsorshipEditingHistory'
+
   validates :organization, presence: true, uniqueness: true
 
   validates :contact, presence: true
@@ -33,13 +35,14 @@ class Sponsorship < ApplicationRecord
   validate :validate_word_count
   validate :policy_agreement
 
-
   accepts_nested_attributes_for :contact, allow_destroy: true,reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :alternate_billing_contact, allow_destroy: true, reject_if: -> (attrs) { attrs['kind'].present? }
 
   accepts_nested_attributes_for :billing_request, reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :customization_request, reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :note, reject_if: -> (attrs) { attrs['kind'].present? }
+
+  around_save :create_history
 
   def build_nested_attributes_associations
     self.build_contact unless self.contact
@@ -78,6 +81,25 @@ class Sponsorship < ApplicationRecord
     self.organization = Organization.create_with(name: self.name).find_or_initialize_by(domain: self.contact&.email&.split(?@, 2).last)
   end
 
+  def to_h_for_history
+    {
+      "contact" => contact&.as_json&.slice("id", "name", "email", "organization", "unit", "address"),
+      "alternate_billing_contact" => alternate_billing_contact&.as_json&.slice("id", "name", "email", "organization", "unit", "address"),
+      "billing_request" => billing_request&.body,
+      "plan_id" => plan&.id,
+      "plan_name" => plan&.name,
+      "customization_request" => customization_request&.body,
+      "booth_requested" => booth_requested,
+      "booth_assigned" => booth_assigned,
+      "name" => name,
+      "url" => url,
+      "profile" => profile,
+      "asset_file_id" => asset_file&.id,
+      "note" => note&.body,
+      "policy_agreement" => policy_agreement,
+    }
+  end
+
   private 
 
   def validate_correct_plan
@@ -103,5 +125,12 @@ class Sponsorship < ApplicationRecord
     if limit  && word_count > limit
       errors.add :profile, :too_long, maximum: (plan.words_limit || 0)
     end
+  end
+
+  def create_history
+    yield
+    editing_histories.create!(
+      raw: self.to_h_for_history,
+    )
   end
 end

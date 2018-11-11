@@ -7,6 +7,7 @@
 %h3 #{@sponsorship.name}
 
 = link_to "Edit", edit_conference_sponsorship_path(@conference, @sponsorship), class: 'btn btn-primary'
+= link_to "Edit History", conference_sponsorship_editing_histories_path(@conference, @sponsorship), class: 'btn btn-secondary'
 
 %p
   = @sponsorship.name

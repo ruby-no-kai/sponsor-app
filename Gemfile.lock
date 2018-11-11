@@ -84,6 +84,7 @@ GEM
     haml (5.0.4)
       temple (>= 0.8.0)
       tilt
+    hashdiff (0.3.7)
     hashie (3.5.7)
     i18n (1.1.1)
       concurrent-ruby (~> 1.0)
@@ -223,6 +224,7 @@ DEPENDENCIES
   aws-sdk-s3
   commonmarker
   haml (>= 5.0.0)
+  hashdiff
   jbuilder (~> 2.5)
   letter_opener_web!
   octokit

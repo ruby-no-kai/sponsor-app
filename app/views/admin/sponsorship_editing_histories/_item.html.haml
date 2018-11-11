@@ -1,0 +1,17 @@
+.card
+  .card-header
+    Edit at #{history.created_at}
+  .card-body
+    - if history.diff.present?
+      %table.table.table-responsible-sm
+        %tbody
+          - history.diff.each do |row|
+            %tr{class: {'~' => 'bg-warning', '+' => 'bg-info', '-' => 'bg-danger'}[row[0]] }
+              %td= row[0]
+              %td= row[1].to_json
+              - if row[0] == '~'
+                %td= row[3].to_json
+              - else
+                %td= row[2].to_json
+    - else
+      %span.label.label-info No diff

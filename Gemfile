@@ -14,6 +14,7 @@ gem 'aws-sdk-s3'
 gem 'omniauth'
 gem 'omniauth-github'
 gem 'octokit'
+gem 'hashdiff'
 
 gem 'jbuilder', '~> 2.5'
 gem 'haml', '>= 5.0.0'

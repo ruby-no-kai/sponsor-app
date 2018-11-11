@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_11_212804) do
+ActiveRecord::Schema.define(version: 2018_11_11_224714) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -109,6 +109,19 @@ ActiveRecord::Schema.define(version: 2018_11_11_212804) do
     t.index ["sponsorship_id"], name: "index_sponsorship_asset_files_on_sponsorship_id"
   end
 
+  create_table "sponsorship_editing_histories", force: :cascade do |t|
+    t.bigint "sponsorship_id", null: false
+    t.bigint "staff_id"
+    t.string "comment"
+    t.jsonb "diff", null: false
+    t.jsonb "raw", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sponsorship_id", "id"], name: "index_sponsorship_editing_histories_on_sponsorship_id_and_id"
+    t.index ["sponsorship_id"], name: "index_sponsorship_editing_histories_on_sponsorship_id"
+    t.index ["staff_id"], name: "index_sponsorship_editing_histories_on_staff_id"
+  end
+
   create_table "sponsorship_requests", force: :cascade do |t|
     t.bigint "sponsorship_id", null: false
     t.integer "kind", null: false
@@ -166,6 +179,8 @@ ActiveRecord::Schema.define(version: 2018_11_11_212804) do
   add_foreign_key "form_descriptions", "conferences"
   add_foreign_key "plans", "conferences"
   add_foreign_key "sponsorship_asset_files", "sponsorships"
+  add_foreign_key "sponsorship_editing_histories", "sponsorships"
+  add_foreign_key "sponsorship_editing_histories", "staffs"
   add_foreign_key "sponsorship_staff_notes", "sponsorships"
   add_foreign_key "sponsorship_staff_notes", "staffs"
   add_foreign_key "sponsorships", "conferences"
