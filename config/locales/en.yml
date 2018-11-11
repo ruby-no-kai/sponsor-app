@@ -107,7 +107,12 @@ en:
           zero: 'No booth'
           one: 'Booth'
           other: 'Booth'
+        words_limit:
+          zero: '0 word'
+          one: 'About 1 word'
+          other: 'About %{count} words'
       booth: 'Sponsor Booth'
+      booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
       information: 'Sponsor Information'
       information_help: |
         Please provide a short introduction of your company. Note that the length of the introduction will be vary depending on the sponsorship plan you chose.

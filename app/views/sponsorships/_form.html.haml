@@ -82,11 +82,12 @@
       %h3= t('.plan')
       = desc.plan_help_html&.html_safe
 
+    .form-group.sponsorships_form_plans
       %h5= t('.plans')
-      - conference.plans.order(rank: :desc).each do |plan|
+      - conference.plans.each do |plan|
         .form-check
           %label.form-check-label
-            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input'
+            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit)}
             = plan.name
             %small.text-muted<
               #{plan.price_text}
@@ -97,23 +98,24 @@
                 , #{t('.plan_explanation.talk')}
         .form-check
           %label.form-check-label
-            = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && @sponsorship.persisted?, class: 'form-check-input'
+            = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && @sponsorship.persisted?, class: 'form-check-input', data: {other: '1'}
             Other
 
     = form.fields_for :customization_request do |request_form|
       .form-group
         = request_form.label :body
-        = request_form.text_area :body, class: 'form-control'
+        = request_form.text_area :body, class: 'form-control sponsorships_form_customization_request'
 
   %section.py-2
     .form-group
       %h3= t('.booth')
       = desc.booth_help_html&.html_safe
 
-    .form-group
+    .form-group.sponsorships_form_booth_request
       .form-check
         = form.check_box :booth_requested, class: 'form-check-input'
         = form.label :booth_requested, class: 'form-check-label'
+      %small.d-none.sponsorships_form_booth_request_uneligible.form-text.text-small.text-info= t('.booth_uneligible_plan_selected', plans: conference.plans.select(&:booth_eligible?).map(&:name).join(', '))
 
   %section.py-2
     .form-group
@@ -132,6 +134,7 @@
     .form-group
       = form.label :profile
       = form.text_area :profile, class: 'form-control', required: true
+      %small.sponsorships_form_profile_help.form-text.text-muted
 
   %section.py-2
     .form-group
