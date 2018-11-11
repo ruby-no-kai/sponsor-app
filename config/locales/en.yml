@@ -53,6 +53,13 @@ en:
         organization: 'Organization Name'
         unit: 'Unit'
         name: 'Name'
+    errors:
+      models:
+        sponsorship:
+          attributes:
+            organization:
+              taken: "Exists: Looks like we already have received the sponsorship application from your organization. Contact us for details."
+
   helpers:
     label:
       'sponsorship[billing_request_attributes]': *billing_request
