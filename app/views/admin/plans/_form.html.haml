@@ -1,9 +1,9 @@
 = form_with(model: plan, url: [@conference, plan], local: true) do |form|
   - if plan.errors.any?
     .alert.alert-danger
-      %p #{pluralize(conference.errors.count, "error")} prohibited this from being saved:
+      %p #{pluralize(plan.errors.count, "error")} prohibited this from being saved:
       %ul
-        - conference.errors.full_messages.each do |message|
+        - plan.errors.full_messages.each do |message|
           %li= message
 
   .form-group
@@ -35,9 +35,13 @@
     = form.number_field :booth_size, class: 'form-control'
 
   .form-group
+    = form.label :words_limit
+    = form.number_field :words_limit, class: 'form-control'
+
+  .form-group
     .form-check
       %label.form-check-label
-        = form.check_box :talkable, class: 'form-check-input', required: true
+        = form.check_box :talkable, class: 'form-check-input'
         = form.label :talkable, "", class: 'form-check-label'
 
 

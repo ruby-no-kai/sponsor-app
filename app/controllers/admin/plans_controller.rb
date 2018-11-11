@@ -38,10 +38,12 @@ class Admin::PlansController < Admin::ApplicationController
     params.require(:plan).permit(
       :name,
       :rank,
+      :price_text,
       :summary,
       :capacity,
       :number_of_guests,
       :booth_size,
+      :words_limit,
     )
   end
 
