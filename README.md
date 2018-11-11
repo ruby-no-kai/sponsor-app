@@ -59,5 +59,5 @@ And you need to manually install the app to the repositories.
 
 ### Oversights
 
-- [ ] profile words limit
+- [x] profile words limit
 - [ ] withdrawing
