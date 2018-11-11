@@ -83,11 +83,18 @@
       = desc.plan_help_html&.html_safe
 
       %h5= t('.plans')
-      - conference.plans.each do |plan|
+      - conference.plans.order(rank: :desc).each do |plan|
         .form-check
           %label.form-check-label
             = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input'
             = plan.name
+            %small.text-muted<
+              #{plan.price_text}
+              , #{t('.plan_explanation.guests', count: plan.number_of_guests)}
+              - if plan.booth_eligible?
+                , #{t('.plan_explanation.booth', count: plan.booth_size)}
+              - if plan.talkable?
+                , #{t('.plan_explanation.talk')}
         .form-check
           %label.form-check-label
             = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && @sponsorship.persisted?, class: 'form-check-input'

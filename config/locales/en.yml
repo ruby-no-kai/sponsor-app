@@ -97,6 +97,16 @@ en:
       billing_request_help: 'Use this field especially if you have: requirement of contract or submitting form, explicit due date for a bill...'
       plan: 'Sponsorship Package'
       plans: 'Pick a plan:'
+      plan_explanation:
+        guests:
+          zero: 'No guests'
+          one: '1 guest'
+          other: '%{count} guests'
+        talk: 'Sponsor Talk'
+        booth:
+          zero: 'No booth'
+          one: 'Booth'
+          other: 'Booth'
       booth: 'Sponsor Booth'
       information: 'Sponsor Information'
       information_help: |
