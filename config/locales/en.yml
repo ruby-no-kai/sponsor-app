@@ -50,7 +50,7 @@ en:
       contact:
         email: 'Email Address'
         address: 'Address'
-        organization: 'Organization'
+        organization: 'Organization Name'
         unit: 'Unit'
         name: 'Name'
   helpers:
@@ -89,15 +89,23 @@ en:
 
   sponsorships:
     form:
+      optional: '(Optional)'
       header: '%{name} Sponsorship Application Form'
       contact: 'Point of Contact'
       billing: 'Billing Information'
       specify_alternate_billing_contact: 'Specify an alternate contact for billing'
-      plan: 'Sponsor Plan'
+      billing_request_help: 'Use this field especially if you have: requirement of contract or submitting form, explicit due date for a bill...'
+      plan: 'Sponsorship Package'
       plans: 'Pick a plan:'
       booth: 'Sponsor Booth'
       information: 'Sponsor Information'
+      information_help: |
+        Please provide a short introduction of your company. Note that the length of the introduction will be vary depending on the sponsorship plan you chose.
       logo: 'Logo'
+      logo_help: |
+        Upload your company logo file for the sponsors page in our website. Please make sure your file is in vector format (like .ai, .eps, .svg).
+      others_help: |
+        Use the following field for anything you want let us know in advance.
       note: 'Others'
       policies: 'Policies'
       submit: 'Submit'

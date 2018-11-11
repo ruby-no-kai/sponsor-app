@@ -34,7 +34,7 @@
 
       .form-group
         = contact_form.label :unit
-        = contact_form.text_field :unit, class: 'form-control'
+        = contact_form.text_field :unit, class: 'form-control', placeholder: t('.optional')
 
       .form-group
         = contact_form.label :name
@@ -65,7 +65,7 @@
 
         .form-group
           = contact_form.label :unit
-          = contact_form.text_field :unit, class: 'form-control'
+          = contact_form.text_field :unit, class: 'form-control', placeholder: t('.optional')
 
         .form-group
           = contact_form.label :name
@@ -74,7 +74,8 @@
     = form.fields_for :billing_request do |request_form|
       .form-group
         = request_form.label :body
-        = request_form.text_area :body, class: 'form-control'
+        = request_form.text_area :body, class: 'form-control', aria: {describedby: 'billing_request_help'}
+        %small.form-text.text-muted#billing_request_help= t('.billing_request_help')
 
   %section.py-2
     .form-group
@@ -111,13 +112,15 @@
     .form-group
       %h3= t('.information')
 
+      %p= t('.information_help')
+
     .form-group
       = form.label :name
       = form.text_field :name, class: 'form-control', required: true
 
     .form-group
       = form.label :url
-      = form.text_field :url, class: 'form-control', required: true
+      = form.text_field :url, class: 'form-control', required: true, placeholder: 'https://...'
 
     .form-group
       = form.label :profile
@@ -127,6 +130,8 @@
     .form-group
       %h3= t('.logo')
 
+      %p= t('.logo_help')
+
     .form-group.sponsorships_form_asset_file{data: {session_endpoint: user_conference_sponsorship_asset_file_path, session_endpoint_method: sponsorship.asset_file&.persisted? ? 'PUT': 'POST'}}
       = form.hidden_field :asset_file_id
       .sponsorships_form_asset_file_form (Loading)
@@ -134,6 +139,8 @@
   %section.py-2
     .form-group
       %h3= t('.note')
+
+      %p= t('.others_help')
 
     = form.fields_for :note do |request_form|
       .form-group
