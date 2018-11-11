@@ -37,7 +37,6 @@ class SessionsController < ApplicationController
   def destroy
     session.delete(:sponsorship_id)
     session.delete(:session_token_id)
-    session.delete(:staff_id)
     redirect_to '/'
   end
 

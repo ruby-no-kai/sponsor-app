@@ -26,9 +26,10 @@
               %a.dropdown-item{href: url_for(params.to_unsafe_h.merge(only_path: true, hl: 'ja'))} Japanese
           - if current_staff
             %li.nav-item
-              %span.badge.badge-danger STAFF MODE
+              = link_to dashboard_path() do
+                %span.badge.badge-danger STAFF MODE
           %li.nav-item
-            - if current_sponsorship || current_staff
+            - if current_sponsorship
               = link_to t('.logout'), user_session_path, method: :delete, class: 'nav-link'
             - else
               -# back_to: url_for(params.to_unsafe_h.merge(only_path: true))

@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
   scope path: 'admin', module: 'admin' do
-    get '/' => 'dashboard#index'
+    get '/' => 'dashboard#index', as: :dashboard
     resources :conferences do
       resources :form_descriptions, except: %i(index)
       resources :plans, except: %i(index show)
