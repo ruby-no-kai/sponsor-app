@@ -1,6 +1,6 @@
 %h2= t('.header', name: @conference.name)
 
-.row
+.row.py-2
   .col-md-6
     .card
       .card-header= t('.your_application')
@@ -14,3 +14,12 @@
           = link_to t('.edit'), edit_user_conference_sponsorship_path(@conference), class: 'btn btn-primary'
           - if @conference.amendment_closes_at
             %p= t('.amendment_availability', ts: l(@conference.amendment_closes_at))
+
+.row.py-2
+  .col-md-12
+    .card
+      .card-header= t('.contact')
+      .card-body
+        %p.card-text= t('.contact_help')
+        %p.card-text
+          %a{href: "mailto:#{@conference.contact_email_address}"}= @conference.contact_email_address

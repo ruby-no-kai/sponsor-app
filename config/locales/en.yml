@@ -148,6 +148,8 @@ en:
       your_application: "Your application"
       edit: "Edit"
       amendment_availability: "You can amend your application until %{ts}."
+      contact: "Contact"
+      contact_help: "For any questions and inquiries, feel free to reach us at:"
     edit:
       amendment_availability: "You can amend your application until %{ts}."
 
