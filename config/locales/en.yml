@@ -36,7 +36,7 @@ en:
       sponsorship:
         name: 'Organization Name'
         url: 'URL'
-        profile: 'Profile text'
+        profile: 'Introduction text'
         booth_requested: 'Request a booth'
         policy_agreement: 'I confirmed and agree with the policies'
 
