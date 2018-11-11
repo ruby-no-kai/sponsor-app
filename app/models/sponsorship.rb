@@ -29,7 +29,9 @@ class Sponsorship < ApplicationRecord
   validates :asset_file, presence: true
 
   validate :validate_correct_plan
+  validate :validate_booth_eligibility
   validate :policy_agreement
+
 
   accepts_nested_attributes_for :contact, allow_destroy: true,reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :alternate_billing_contact, allow_destroy: true, reject_if: -> (attrs) { attrs['kind'].present? }
@@ -82,6 +84,12 @@ class Sponsorship < ApplicationRecord
   def validate_policy_agreement
     if !policy_agreement
       errors.add :policy_agreement, "must agree with the policy"
+    end
+  end
+
+  def validate_booth_eligibility
+    if booth_requested && !(plan&.booth_eligible?)
+      errors.add :booth_requested, :not_eligible
     end
   end
 end

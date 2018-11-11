@@ -98,7 +98,7 @@
                 , #{t('.plan_explanation.talk')}
         .form-check
           %label.form-check-label
-            = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && @sponsorship.persisted?, class: 'form-check-input', data: {other: '1'}
+            = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1'}
             Other
 
     = form.fields_for :customization_request do |request_form|

@@ -37,7 +37,7 @@ en:
         name: 'Organization Name'
         url: 'URL'
         profile: 'Introduction text'
-        booth_requested: 'Request a booth'
+        booth_requested: 'Booth Request'
         policy_agreement: 'I confirmed and agree with the policies'
 
       sponsorship/note: &note
@@ -59,12 +59,16 @@ en:
           attributes:
             organization:
               taken: "Exists: Looks like we already have received the sponsorship application from your organization. Contact us for details."
+            booth_requested:
+              not_eligible: "is not eligible in your selected plan."
 
   helpers:
     label:
       'sponsorship[billing_request_attributes]': *billing_request
       'sponsorship[customization_request_attributes]': *customization_request
       'sponsorship[note_attributes]': *note
+      sponsorship:
+        booth_requested: 'Request a Booth'
 
   layouts:
     application:
