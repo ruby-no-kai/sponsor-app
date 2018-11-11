@@ -6,4 +6,9 @@ class Plan < ApplicationRecord
   def booth_eligible?
     booth_size > 0
   end
+
+  def words_limit_hard
+    # TODO:
+    (words_limit || 0) * 1.1
+  end
 end

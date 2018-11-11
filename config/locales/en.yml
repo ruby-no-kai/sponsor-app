@@ -61,6 +61,8 @@ en:
               taken: "Exists: Looks like we already have received the sponsorship application from your organization. Contact us for details."
             booth_requested:
               not_eligible: "is not eligible in your selected plan."
+            profile:
+              too_long: "is too long; maximum is about %{maximum} words on your selected plan"
 
   helpers:
     label:

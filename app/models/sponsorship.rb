@@ -30,6 +30,7 @@ class Sponsorship < ApplicationRecord
 
   validate :validate_correct_plan
   validate :validate_booth_eligibility
+  validate :validate_word_count
   validate :policy_agreement
 
 
@@ -54,6 +55,10 @@ class Sponsorship < ApplicationRecord
 
   def plan_name
     customized? ? (customization_name || plan&.name) : plan&.name
+  end
+
+  def word_count
+    profile&.scan(/\w+/).size || 0
   end
 
   def policy_agreement
@@ -90,6 +95,13 @@ class Sponsorship < ApplicationRecord
   def validate_booth_eligibility
     if booth_requested && !(plan&.booth_eligible?)
       errors.add :booth_requested, :not_eligible
+    end
+  end
+
+  def validate_word_count
+    limit = plan&.words_limit_hard
+    if limit  && word_count > limit
+      errors.add :profile, :too_long, maximum: (plan.words_limit || 0)
     end
   end
 end
