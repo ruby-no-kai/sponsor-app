@@ -7,7 +7,7 @@ Rails.application.routes.draw do
       resources :form_descriptions, except: %i(index)
       resources :plans, except: %i(index show)
       resources :sponsorships, except: %i(index new create destroy) do
-        resources :sponsorship_editing_histories, as: :editing_histories, path: 'editing_histories', only: %i(index)
+        resources :sponsorship_editing_histories, as: :editing_histories, path: 'editing_history', only: %i(index)
         member do
           get :download_asset
         end
