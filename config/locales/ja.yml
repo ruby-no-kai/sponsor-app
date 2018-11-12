@@ -1,0 +1,124 @@
+ja:
+
+  activerecord:
+    attributes:
+      sponsorship:
+        name: '会社名/組織名 (英語)'
+        url: 'URL'
+        profile: '紹介文 (英語)'
+        booth_requested: 'ブース出展'
+        policy_agreement: 'ポリシーへ同意する'
+
+      sponsorship/note: &note
+        body: 'その他の連絡事項'
+      sponsorship/customization_request: &customization_request
+        body: 'スポンサープランについての詳細・連絡事項'
+      sponsorship/billing_request: &billing_request
+        body: '請求に関する連絡事項'
+
+      contact:
+        email: 'Eメールアドレス'
+        address: '住所'
+        organization: '会社名/組織名'
+        unit: '部署等'
+        name: '名前'
+    errors:
+      models:
+        sponsorship:
+          attributes:
+            organization:
+              taken: "の重複: 同じ組織から既にスポンサーシップを受け付けている可能性があります。詳細はお問い合わせください"
+            booth_requested:
+              not_eligible: "は選択されたスポンサープランでは対象外です"
+            profile:
+              too_long: "が長過ぎます。選択されたプランでは英文 %{maximum} ワード程度が上限となっています。"
+
+  helpers:
+    label:
+      'sponsorship[billing_request_attributes]': *billing_request
+      'sponsorship[customization_request_attributes]': *customization_request
+      'sponsorship[note_attributes]': *note
+      sponsorship:
+        booth_requested: 'ブース出展する'
+
+  layouts:
+    application:
+      brand: 'Sponsorships'
+      conferences: '全てのイベント'
+      login: 'ログイン'
+      logout: 'ログアウト'
+
+  sessions:
+    new:
+      header: Log in
+      description: "スポンサーシップ申し込みで利用したメールアドレスを入力してください。"
+      email_address: "Eメールアドレス"
+      submit: "進む"
+    create:
+      no_email_found: "入力されたEメールアドレスが確認できませんでした。再度入力していただくか、お問い合わせください。"
+      email_sent: "ログインに必要なリンクをメールで送信しました。"
+  session_token_mailer:
+    notify:
+      subject: "スポンサーポータル用のログインリンクをお届けします"
+      greeting: ""
+      explanation: "以下のリンクを利用してログインすることができます:"
+      expiry: "このリンクは %{ts} に失効しますが、失効するまで何度でも利用できます。"
+  sponsorship_accepted_mailer:
+    user_email:
+      subject: "スポンサーにお申し込みいただきありがとうございます"
+    admin_email:
+      subject: "New sponsorship application from: %{name}"
+
+  sponsorships:
+    form:
+      optional: '(任意)'
+      header: '%{name} スポンサーシップ申込フォーム'
+      contact: '連絡先'
+      billing: '請求情報'
+      specify_alternate_billing_contact: '請求に関して別の連絡・送付先を指定する'
+      billing_request_help: '請求に関しての要求、特に特別な契約や申込書のやり取りが必要、請求期日に関するご要望がある場合などがあれば、その旨ご記入ください。'
+      plan: 'スポンサープラン'
+      plans: 'プラン一覧:'
+      plan_explanation:
+        guests:
+          zero: 'ゲストなし'
+          one: 'ゲスト 1 人'
+          other: 'ゲスト %{count} 人'
+        talk: 'スポンサートーク'
+        booth:
+          zero: 'ブースなし'
+          one: 'ブースあり'
+          other: 'ブースあり'
+        words_limit:
+          zero: '英文 0 word'
+          one: '英文 1 word'
+          other: '英文およそ %{count} words'
+      booth: 'スポンサーブース'
+      booth_uneligible_plan_selected: '選択されたプランではブース出展はできません (%{plans} プランのみが対象となります)'
+      information: 'サイト掲載情報'
+      information_help: |
+        ウェブサイトや会場に掲載するためのスポンサーの情報をご提供ください。
+      logo: 'ロゴ'
+      logo_help: |
+        Web 掲載用ロゴファイルをアップロードしてください。形式はベクター形式 (.eps, .ai, .svg 等) でお願い致します。
+      others_help: |
+        その他に連絡事項があれば下記へご記入ください。
+      note: 'その他の連絡事項'
+      policies: 'ポリシー'
+      submit: '保存'
+    closed:
+      header: '申し込み期間ではありません'
+      closed: "スポンサーシップのお申し込みをご検討いただきありがとうございます。申し訳ありませんが、本イベントへのスポンサー申し込みは %{ts} に締め切られました。"
+      not_yet_open: "スポンサーシップのお申し込みをご検討いただきありがとうございます。申し訳ありませんが、本イベントへの申し込みはまだ開始しておりません。"
+    create:
+      notice: "スポンサーシップへお申込みいただきありがとうございます。入力いただいたメールアドレスへ確認メールを送信しました。"
+    show:
+      header: "%{name} スポンサーポータル"
+      your_application: "申込情報"
+      edit: "修正"
+      amendment_availability: "%{ts} まで修正することができます。"
+      contact: "問合せ"
+      contact_help: "質問や要望、相談はお気軽に下記へお問い合わせください。"
+    edit:
+      amendment_availability: "%{ts} まで修正することができます。"
+
