@@ -9,7 +9,7 @@ rails s
 
 - http://localhost:3000/
 
-### Enviroment variables
+### Environment variables
 
 (RubyKaigi organizers: see also https://rubykaigi.esa.io/posts/815)
 
