@@ -6,6 +6,7 @@ gem 'rails-i18n', '~> 5.1'
 gem 'rack-contrib'
 
 gem 'pg', '>= 0.18', '< 2.0'
+gem 'redis-rails'
 
 gem 'addressable'
 gem 'commonmarker'
