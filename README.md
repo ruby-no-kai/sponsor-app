@@ -8,6 +8,7 @@ rails s
 ```
 
 - http://localhost:3000/
+- http://localhost:3000/admin
 
 ### Environment variables
 
@@ -36,6 +37,8 @@ And you need to manually install the app to the repositories.
 - `GITHUB_CLIENT_ID`
 - `GITHUB_CLIENT_SECRET`
 - `GITHUB_CLIENT_PRIVATE_KEY`
+
+But during development, you can pass `$BACKDOOR_SECRET` to the application, then go http://localhost:3000/admin/session/new?backdoor=BACKDOOR_SECRET&login=YOUR_GITHUB_LOGIN to login without genuine OAuth2 dance.
 
 ## Roadmap
 
