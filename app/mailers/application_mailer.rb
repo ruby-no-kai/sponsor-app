@@ -1,5 +1,8 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: Rails.application.config.x.default_email_address
+  default(
+    from: Rails.application.config.x.default_email_address,
+    reply_to: Rails.application.config.x.default_email_reply_to,
+  )
   layout 'mailer'
 
   private

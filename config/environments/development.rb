@@ -66,6 +66,7 @@ Rails.application.configure do
   config.x.org_name = "RubyKaigi"
 
   config.x.default_email_address = 'sponsorapp@localhost'
+  config.x.default_email_reply_to = 'sponsorapp@localhost'
   config.x.default_email_host_part = 'localhost'
 
   config.x.github.repo = ENV['GITHUB_REPO']

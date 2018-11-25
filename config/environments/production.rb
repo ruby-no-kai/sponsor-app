@@ -5,6 +5,7 @@ Rails.application.configure do
     config.x.org_name = ENV.fetch('ORG_NAME')
 
     config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
+    config.x.default_email_reply_to = ENV.fetch('DEFAULT_EMAIL_REPLY_TO', config.x.default_email_address)
     config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST')
 
     config.x.github.repo = ENV.fetch('GITHUB_REPO')
