@@ -70,6 +70,9 @@ GEM
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.0)
     aws-sigv4 (1.0.3)
+    barnes (0.0.7)
+      multi_json (~> 1)
+      statsd-ruby (~> 1.1)
     builder (3.2.3)
     commonmarker (0.18.1)
       ruby-enum (~> 0.5)
@@ -218,6 +221,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
+    statsd-ruby (1.4.0)
     temple (0.8.0)
     thor (0.20.3)
     thread_safe (0.3.6)
@@ -239,6 +243,7 @@ DEPENDENCIES
   addressable
   aws-sdk-core
   aws-sdk-s3
+  barnes
   commonmarker
   haml (>= 5.0.0)
   hashdiff

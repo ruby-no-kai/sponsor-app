@@ -28,6 +28,9 @@ gem 'revision_plate'
 
 gem 'puma'
 
+group :production do
+  gem 'barnes'
+end
 
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 4.0'
