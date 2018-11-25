@@ -72,7 +72,7 @@ export default class SponsorshipAssetFileForm extends React.Component<Props, Sta
     if (!this.needUpload() && !this.uploadRequired()) return this.props.existingFileId;
     const form = this.formRef.current;
     if (!(form && form.reportValidity()))  return null;
-    if (!this.state.file) return null;
+    if (!(this.state.file)) return null;
 
     const uploader = new SponsorshipAssetFileUploader({
       file: this.state.file,

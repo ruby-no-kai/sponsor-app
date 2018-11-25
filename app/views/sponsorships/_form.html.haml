@@ -168,6 +168,6 @@
         = form.label :policy_agreement, "", class: 'form-check-label'
 
     .form-group
-      = form.submit t('.submit'), class: 'btn btn-primary'
+      = form.submit t('.submit'), class: 'btn btn-primary', data: {disable_with: false}
 
     .alert.alert-danger.submit_error.d-none

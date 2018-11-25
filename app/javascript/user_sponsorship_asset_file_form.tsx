@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
       dest) as SponsorshipAssetFileForm;
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
+        form.querySelectorAll('input[type=submit]:disabled').forEach((el) => (el as HTMLInputElement).disabled = true);
         try {
           errorElem.classList.add('d-none');
           const fileId = await component.startUpload();
