@@ -12,3 +12,23 @@ body
   
 .container
   margin: 48px auto
+
+.conference__list
+  list-style: none
+  display: flex
+  padding: 0
+  margin: 0
+  flex-wrap: wrap
+
+.conference__item
+  padding: 8px
+  width: 25%
+  +breakpoint-down(sm)
+    width: 100%
+  a
+    display: block
+    background: rgba($black, .4)
+    padding: 16px
+    width: 100%
+    &:hover
+      background: $black
