@@ -1,2 +1,14 @@
+body
+  display: flex
+  flex-direction: column
+  position: relative
+  background-image: linear-gradient($dark-purple, $purple)
+  background-size: 685px 230px
+  background-repeat: repeat-x
+  +ie11
+    *::-ms-backdrop,
+    &
+      display: block
+  
 .container
   margin: 48px auto
