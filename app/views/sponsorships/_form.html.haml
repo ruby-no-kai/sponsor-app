@@ -75,7 +75,7 @@
       .form-group
         = request_form.label :body
         = request_form.text_area :body, class: 'form-control', aria: {describedby: 'billing_request_help'}
-        %small.form-text.text-muted#billing_request_help= t('.billing_request_help')
+        %small.form-text#billing_request_help= t('.billing_request_help')
 
   %section.py-2
     .form-group
@@ -89,7 +89,7 @@
           %label.form-check-label
             = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit)}
             = plan.name
-            %small.text-muted<
+            %small<
               #{plan.price_text}
               , #{t('.plan_explanation.guests', count: plan.number_of_guests)}
               - if plan.booth_eligible?
@@ -134,7 +134,7 @@
     .form-group
       = form.label :profile
       = form.text_area :profile, class: 'form-control', required: true
-      %small.sponsorships_form_profile_help.form-text.text-muted
+      %small.sponsorships_form_profile_help.form-text
 
   %section.py-2
     .form-group
