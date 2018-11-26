@@ -10,8 +10,11 @@
   %strong Accepting amendment closes:
   = @conference.amendment_closes_at
 
-= link_to 'Edit', edit_conference_path(@conference), class: 'btn btn-primary'
-= link_to 'Preview Form', new_user_conference_sponsorship_path(@conference), class: 'btn btn-secondary'
+%p
+  = link_to 'Edit', edit_conference_path(@conference), class: 'btn btn-primary'
+  = link_to 'Preview Form', new_user_conference_sponsorship_path(@conference), class: 'btn btn-secondary'
+
+%hr
 
 %h3 Form descriptions
 
@@ -19,7 +22,8 @@
   - @conference.form_descriptions.select(:id, :locale).each do |desc|
     %li= link_to desc.locale, [@conference, desc]
 
-= link_to 'Add locale', new_conference_form_description_path(@conference), class: 'btn btn-default'
+%p
+  = link_to 'Add locale', new_conference_form_description_path(@conference), class: 'btn btn-default'
 
 %h3 Plans
 
@@ -27,7 +31,8 @@
   - @conference.plans.order(rank: :desc).select(:id, :name).each do |plan|
     %li= link_to plan.name, [@conference, plan]
 
-= link_to 'Add plan', new_conference_plan_path(@conference), class: 'btn btn-default'
+%p
+  = link_to 'Add plan', new_conference_plan_path(@conference), class: 'btn btn-default'
 
 %h4 Sponsorships
 
