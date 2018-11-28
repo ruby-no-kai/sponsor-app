@@ -20,7 +20,7 @@ class Sponsorship < ApplicationRecord
 
   has_many :editing_histories, -> { order(id: :desc) }, class_name: 'SponsorshipEditingHistory'
 
-  validates :organization, presence: true, uniqueness: true
+  validates :organization, presence: true, uniqueness: {scope: :conference_id}
 
   validates :contact, presence: true
 
