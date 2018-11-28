@@ -1,4 +1,7 @@
-%ul.conference__list
+.row.py-2
+
   - @conferences.each do |conference|
-    %li.conference__item
-      = link_to conference.name, user_conference_sponsorship_path(conference)
+    .col-md-6
+      .card.text-white.bg-dark
+        .card-body
+          = link_to conference.name, user_conference_sponsorship_path(conference)

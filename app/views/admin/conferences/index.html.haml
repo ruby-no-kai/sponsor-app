@@ -2,8 +2,10 @@
 
 = link_to 'New', new_conference_path, class: 'btn btn-default'
 
-%ul.conference__list
+.row.py-2
   - @conferences.each do |conference|
-    %li.conference__item
-      = link_to conference.name, conference
-  
+    .col-md-6
+      .card
+        .card-body
+          = link_to conference.name, conference
+    
