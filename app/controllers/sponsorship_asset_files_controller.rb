@@ -2,7 +2,7 @@ class SponsorshipAssetFilesController < ApplicationController
   def create
     return render(status: 403, json: {error: 403}) if current_sponsorship&.asset_file
     conference = Conference.find(params[:conference_id])
-    return render(status: 403, json: {error: 403}) unless conference&.amendment_open?
+    return render(status: 403, json: {error: 403}) if !conference&.amendment_open? && !current_staff
 
     asset_file = SponsorshipAssetFile.create!(prefix: "#{conference.id}/", extension: params[:extension])
     (session[:asset_file_ids] ||= []) << asset_file.id
