@@ -28,7 +28,10 @@ class SponsorshipsController < ApplicationController
 
   def create
     return render(status: 404, plain: '404') if current_sponsorship
-    @conference = Conference.application_open.find(params[:conference_id])
+
+    @conference = Conference.find(params[:conference_id])
+    return render(:closed, status: 403) if !@conference&.application_open? && !current_staff
+
     @sponsorship = Sponsorship.new(sponsorship_params)
     return render(status: 403, plain: '403') if session[:asset_file_ids] && !session[:asset_file_ids].include?(@sponsorship.asset_file.id)
 
