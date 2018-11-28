@@ -19,7 +19,7 @@ class Sponsorship < ApplicationRecord
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
   end
 
-  has_many :editing_histories, -> { order(id: :desc) }, class_name: 'SponsorshipEditingHistory'
+  has_many :editing_histories, -> { order(id: :desc) }, class_name: 'SponsorshipEditingHistory', dependent: :destroy
 
   validates :organization, presence: true, uniqueness: {scope: :conference_id}
 
