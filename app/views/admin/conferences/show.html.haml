@@ -25,7 +25,7 @@
 
 %ul
   - @conference.plans.order(rank: :desc).select(:id, :name).each do |plan|
-    %li= link_to plan.name, [@conference, plan]
+    %li= link_to plan.name, edit_conference_plan_path(@conference, plan)
 
 = link_to 'Add plan', new_conference_plan_path(@conference), class: 'btn btn-default'
 
