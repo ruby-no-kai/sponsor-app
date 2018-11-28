@@ -3,16 +3,17 @@ class Sponsorship < ApplicationRecord
   belongs_to :organization
   belongs_to :plan, optional: true
 
-  has_many :contacts
+  has_many :contacts, dependent: :destroy
   has_one :contact, -> { where(kind: :primary) }, class_name: 'Contact'
   has_one :alternate_billing_contact, -> { where(kind: :billing) }, class_name: 'Contact'
 
-  has_many :requests, class_name: 'SponsorshipRequest'
+  has_many :requests, dependent: :destroy, class_name: 'SponsorshipRequest'
   has_one :billing_request, -> { where(kind: :billing) }, class_name: 'SponsorshipRequest'
   has_one :customization_request, -> { where(kind: :customization) }, class_name: 'SponsorshipRequest'
   has_one :note, -> { where(kind: :note) }, class_name: 'SponsorshipRequest'
 
-  has_one :asset_file, class_name: 'SponsorshipAssetFile'
+  has_one :asset_file, class_name: 'SponsorshipAssetFile', dependent: :destroy
+
   def asset_file_id; self.asset_file&.id; end
   def asset_file_id=(other)
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
