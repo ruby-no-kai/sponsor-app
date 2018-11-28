@@ -7,5 +7,3 @@ import Rails from 'rails-ujs';
 Rails.start();
 
 import 'user_sponsorships_form';
-
-require('../../stylesheets/application');
