@@ -16,6 +16,7 @@ class SponsorshipAcceptedMailer < ApplicationMailer
     mail(
       to: @sponsorship.contact.email,
       subject: make_subject(),
+      reply_to: @email,
     )
   end
 
@@ -33,6 +34,7 @@ class SponsorshipAcceptedMailer < ApplicationMailer
     mail(
       to: @sponsorship.conference.contact_email_address,
       subject: make_subject(name: @sponsor_name),
+      reply_to: @sponsor_contact_email,
     )
   end
 
