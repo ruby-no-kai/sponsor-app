@@ -17,7 +17,7 @@
 
 - if @sponsorship.note&.body&.present?
   %pre
-    %code= @sponsorship.billing_request.body
+    %code= @sponsorship.note.body
 
 %p= link_to 'Download Asset', download_asset_conference_sponsorship_path(@conference, @sponsorship)
 
@@ -34,9 +34,9 @@
   - if @sponsorship.customized?
     %p Shown as: #{@sponsorship.customization_name}
 
-  - if @sponsorship.billing_request&.body&.present?
+  - if @sponsorship.customization_request&.body&.present?
     %pre
-      %code= @sponsorship.billing_request.body
+      %code= @sponsorship.customization_request.body
 
 %section.py-2
   %h4 Booth
