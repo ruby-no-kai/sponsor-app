@@ -48,7 +48,7 @@ class Admin::FormDescriptionsController < Admin::ApplicationController
   end
 
   def set_conference
-    @conference = Conference.find(params[:conference_id])
+    @conference = Conference.find_by!(slug: params[:conference_slug])
   end
 
   def set_form_description

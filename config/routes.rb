@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   scope path: 'admin', module: 'admin' do
     get '/' => 'dashboard#index', as: :dashboard
-    resources :conferences do
+    resources :conferences, param: :slug do
       resources :form_descriptions, except: %i(index)
       resources :plans, except: %i(index show)
       resources :sponsorships, except: %i(index new create destroy) do
@@ -26,7 +26,7 @@ Rails.application.routes.draw do
       get 'claim/:handle', action: :claim, as: :claim
     end
 
-    resources :conferences, only: %i(index) do
+    resources :conferences, param: :slug, only: %i(index) do
       resource :sponsorship, only: %i(new create show edit update)
       resource :sponsorship_asset_file, only: %i(create update)
     end

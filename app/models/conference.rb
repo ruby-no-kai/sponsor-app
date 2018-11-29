@@ -12,6 +12,10 @@ class Conference < ApplicationRecord
 
   before_validation :generate_slug
 
+  def to_param
+    slug
+  end
+
   def application_open?
     t = Time.now
     application_opens_at && application_opens_at <= t && (!application_closes_at || t < application_closes_at)
