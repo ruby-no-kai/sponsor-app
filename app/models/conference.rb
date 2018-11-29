@@ -10,6 +10,8 @@ class Conference < ApplicationRecord
   validates :slug, presence: true, uniqueness: true
   validates :contact_email_address, presence: true
 
+  before_validation :generate_slug
+
   def application_open?
     t = Time.now
     application_opens_at && application_opens_at <= t && (!application_closes_at || t < application_closes_at)
@@ -22,5 +24,9 @@ class Conference < ApplicationRecord
 
   def form_description_for_locale
     form_descriptions.find_by(locale: I18n.locale) || form_descriptions.find_by!(locale: 'en')
+  end
+
+  private def generate_slug
+    self.slug = name.remove(' ').parameterize if slug.blank?
   end
 end
