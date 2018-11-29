@@ -23,7 +23,7 @@ class SponsorshipAcceptedMailer < ApplicationMailer
     @sponsorship = params[:sponsorship]
 
     @sponsor_name = @sponsorship.contact.organization
-    @sponsor_org_name = @sponsorship.contact.organization
+    @sponsor_org_name = @sponsorship.name
     @sponsor_contact_name = @sponsorship.contact.name
     @sponsor_contact_email = @sponsorship.contact.email
 

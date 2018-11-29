@@ -40,6 +40,14 @@ And you need to manually install the app to the repositories.
 
 But during development, you can pass `$BACKDOOR_SECRET` to the application, then go http://localhost:3000/admin/session/new?backdoor=BACKDOOR_SECRET&login=YOUR_GITHUB_LOGIN to login without genuine OAuth2 dance.
 
+#### Slack
+
+- `SLACK_WEBHOOK_URL`
+
+#### Sentry (optional)
+
+- `SENTRY_DSN`
+
 ## Roadmap
 
 - [x] Accept application

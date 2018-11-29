@@ -72,4 +72,6 @@ Rails.application.configure do
   config.x.github.repo = ENV['GITHUB_REPO']
   config.x.github.client_id = ENV['GITHUB_CLIENT_ID']
   config.x.github.client_secret = ENV['GITHUB_CLIENT_SECRET']
+
+  config.x.slack.webhook_url = ENV['SLACK_WEBHOOK_URL']
 end
