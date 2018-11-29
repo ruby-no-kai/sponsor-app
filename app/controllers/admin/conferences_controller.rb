@@ -53,6 +53,7 @@ class Admin::ConferencesController < Admin::ApplicationController
   def conference_params
     params.require(:conference).permit(
       :name,
+      :slug,
       :application_opens_at,
       :application_closes_at,
       :amendment_closes_at,
