@@ -25,6 +25,7 @@ gem 'letter_opener_web', git: 'https://github.com/fgrehm/letter_opener_web', ref
 gem 'rspec-rails'
 
 gem 'revision_plate'
+gem "sentry-raven"
 
 gem 'puma'
 
