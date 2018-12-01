@@ -12,7 +12,7 @@ class SponsorshipAcceptanceJob < ApplicationJob
     ).admin_email.deliver_now
 
     SlackWebhookJob.perform_now(
-      text: ":heart: *New sponsorship* (#{sponsorship.plan_name || '*OTHER*'}): #{sponsorship.name}  <#{conference_sponsorship_url(sponsorship.conference, sponsorship)}|Open>",
+      text: ":tamago: *New sponsorship* (#{sponsorship.plan_name || '*OTHER*'}): #{sponsorship.name}  <#{conference_sponsorship_url(sponsorship.conference, sponsorship)}|Open>",
     )
   end
 end
