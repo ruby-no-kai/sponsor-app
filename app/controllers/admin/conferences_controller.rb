@@ -47,12 +47,13 @@ class Admin::ConferencesController < Admin::ApplicationController
   private
 
   def set_conference
-    @conference = Conference.find(params[:id])
+    @conference = Conference.find_by!(slug: params[:slug])
   end
 
   def conference_params
     params.require(:conference).permit(
       :name,
+      :slug,
       :application_opens_at,
       :application_closes_at,
       :amendment_closes_at,
