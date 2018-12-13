@@ -79,10 +79,10 @@
           %label.form-check-label
             = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input'
             = plan.name
-        .form-check
-          %label.form-check-label
-            = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && @sponsorship.persisted?, class: 'form-check-input'
-            Other
+      .form-check
+        %label.form-check-label
+          = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && @sponsorship.persisted?, class: 'form-check-input'
+          Other
 
     = form.fields_for :customization_request do |request_form|
       .form-group
