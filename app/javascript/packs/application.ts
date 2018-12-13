@@ -9,4 +9,4 @@ Rails.start();
 import 'user_sponsorships_form';
 import 'user_sponsorship_asset_file_form';
 
-require('../../stylesheets/application');
+import '../../stylesheets/application.sass';

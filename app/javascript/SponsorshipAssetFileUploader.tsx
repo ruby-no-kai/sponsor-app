@@ -70,7 +70,7 @@ export default class SponsorshipAssetFileUploader {
     if (this.s3) return this.s3;
     const session = await this.getSession();
     this.s3 = new S3({
-      useDualStack: true,
+      useDualstack: true,
       region: session.region,
       credentials: this.credentials,
     });
