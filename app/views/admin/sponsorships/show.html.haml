@@ -8,6 +8,7 @@
 
 = link_to "Edit", edit_conference_sponsorship_path(@conference, @sponsorship), class: 'btn btn-primary'
 = link_to "Edit History", conference_sponsorship_editing_histories_path(@conference, @sponsorship), class: 'btn btn-secondary'
+= link_to "Compose Email", front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address), class: 'btn btn-secondary', target: '_blank'
 
 %p
   = @sponsorship.name
