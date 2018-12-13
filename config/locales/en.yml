@@ -26,6 +26,8 @@ en:
       models:
         sponsorship:
           attributes:
+            plan:
+              sold_out: "is sold out."
             organization:
               taken: "Exists: Looks like we already have received the sponsorship application from your organization. Contact us for details."
             booth_requested:
@@ -93,6 +95,7 @@ en:
           zero: '0 word'
           one: 'About 1 word'
           other: 'About %{count} words'
+      plan_sold_out: 'Sold Out'
       booth: 'Sponsor Booth'
       booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
       information: 'Sponsor Information'

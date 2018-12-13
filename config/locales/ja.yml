@@ -26,6 +26,8 @@ ja:
       models:
         sponsorship:
           attributes:
+            plan:
+              sold_out: "は受付を終了しています"
             organization:
               taken: "の重複: 同じ組織から既にスポンサーシップを受け付けている可能性があります。詳細はお問い合わせください"
             booth_requested:
@@ -93,6 +95,7 @@ ja:
           zero: '英文 0 word'
           one: '英文 1 word'
           other: '英文およそ %{count} words'
+      plan_sold_out: '受付終了'
       booth: 'スポンサーブース'
       booth_uneligible_plan_selected: '選択されたプランではブース出展はできません (%{plans} プランのみが対象となります)'
       information: 'サイト掲載情報'
