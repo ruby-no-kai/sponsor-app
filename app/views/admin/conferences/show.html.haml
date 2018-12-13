@@ -40,7 +40,9 @@
 %h4 Sponsorships
 
 - @conference.sponsorships.group_by(&:plan).sort_by {|p, _| p&.rank || 9999 }.each do |plan, sponsorships|
-  %h5= plan&.name || 'Undetermined'
+  %h5
+    = plan&.name || 'Undetermined'
+    %span (#{sponsorships.size}/#{plan&.capacity})
   %ul
     - sponsorships.each do |sponsorship|
       %li
