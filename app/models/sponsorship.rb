@@ -32,6 +32,7 @@ class Sponsorship < ApplicationRecord
   validates :asset_file, presence: true
 
   validate :validate_correct_plan
+  validate :validate_plan_availability
   validate :validate_booth_eligibility
   validate :validate_word_count
   validate :policy_agreement
@@ -106,6 +107,12 @@ class Sponsorship < ApplicationRecord
   def validate_correct_plan
     if plan && plan.conference_id != self.conference_id
       errors.add :plan, "can't have a plan for an another conference"
+    end
+  end
+
+  def validate_plan_availability
+    if plan && plan_id_changed? && !plan.available?
+      errors.add :plan, :sold_out
     end
   end
 

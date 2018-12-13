@@ -87,7 +87,7 @@
       - conference.plans.each do |plan|
         .form-check
           %label.form-check-label
-            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit)}
+            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', disabled: !plan.available? && plan.id != @sponsorship.plan_id, data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit)}
             = plan.name
             %small<
               #{plan.price_text}
@@ -96,6 +96,8 @@
                 , #{t('.plan_explanation.booth', count: plan.booth_size)}
               - if plan.talkable?
                 , #{t('.plan_explanation.talk')}
+            - unless plan.available?
+              %small.badge.badge-danger= t('.plan_sold_out')
       .form-check
         %label.form-check-label
           = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1'}
