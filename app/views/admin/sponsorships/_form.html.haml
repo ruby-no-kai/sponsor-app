@@ -1,5 +1,5 @@
 - conference = sponsorship.conference
-= form_with(model: sponsorship, url: conference_sponsorship_path(conference, sponsorship), local: true) do |form|
+= form_with(model: sponsorship, url: conference_sponsorship_path(conference, sponsorship), class: 'sponsorships_form', local: true) do |form|
 
   - if sponsorship.errors.any?
     - I18n.with_options(scope: %i(errors template)) do |lo|
@@ -77,11 +77,19 @@
       - conference.plans.each do |plan|
         .form-check
           %label.form-check-label
-            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input'
+            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit)}
             = plan.name
+            %small<
+              #{plan.price_text}
+              , #{plan.number_of_guests}
+              - if plan.booth_eligible?
+                , #{plan.booth_size} booth
+              - if plan.talkable?
+                , Talk
+
       .form-check
         %label.form-check-label
-          = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && @sponsorship.persisted?, class: 'form-check-input'
+          = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1'}
           Other
 
     = form.fields_for :customization_request do |request_form|
@@ -104,10 +112,11 @@
     .form-group
       %h3 Booth
 
-    .form-group
+    .form-group.sponsorships_form_booth_request
       .form-check
         = form.check_box :booth_requested, class: 'form-check-input'
         = form.label :booth_requested, class: 'form-check-label'
+      %small.d-none.sponsorships_form_booth_request_uneligible.form-text.text-small.text-info Selected plan is uneligible for booth
 
     .form-group
       .form-check
@@ -129,6 +138,7 @@
     .form-group
       = form.label :profile
       = form.text_area :profile, class: 'form-control', required: true
+      %small.sponsorships_form_profile_help.form-text
 
   %section.py-2
     .form-group
