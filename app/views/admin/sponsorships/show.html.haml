@@ -68,19 +68,25 @@
             Requests
           .card-body
             - if @sponsorship.customization_request&.body&.present?
-              %h6.card-title Customization
-              %pre
-                %code= @sponsorship.customization_request.body
+              %h5.card-title Customization
+              %p.card-text
+                - @sponsorship.customization_request.body.each_line do |l|
+                  = l
+                  %br
 
             - if @sponsorship.billing_request&.body&.present?
-              %h6.card-title Billing
-              %pre
-                %code= @sponsorship.billing_request.body
+              %h5.card-title Billing
+              %p.card-text
+                - @sponsorship.billing_request.body.each_line do |l|
+                  = l
+                  %br
 
             - if @sponsorship.note&.body&.present?
-              %h6.card-title Others
-              %pre
-                %code= @sponsorship.note.body
+              %h5.card-title Others
+              %p.card-text
+                - @sponsorship.note.body.each_line do |l|
+                  = l
+                  %br
 
     .row
       .col-md-12
