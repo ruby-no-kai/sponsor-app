@@ -1,11 +1,23 @@
-There's a new sponsorship application:
+There's a new sponsorship application.
 
-- Name: <%= @sponsor_name %>
-  (<%= @sponsor_org_name %>)
+<%= @link %>
 
-- Contact: <%= @sponsor_contact_name %> <<%= @sponsor_contact_email %>>
+Name: <%= @sponsor_org_name %>
+Plan: <%= @sponsorship.plan_name || 'UNDETERMINED' %>
 
-Review at <%= @link %>
+## Contact
+
+<%= @sponsor_contact_name %> <<%= @sponsor_contact_email %>>
+(<%= @sponsor_org_name %>)
+
+## Requests
+
+<%- @sponsorship.requests.each do |request| -%>
+### <%= request.kind %>
+
+<%= request.body %>
+
+<%- end -%>
 
 ---
 The Sponsor App
