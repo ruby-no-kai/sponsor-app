@@ -11,7 +11,7 @@ class SponsorshipsController < ApplicationController
   def edit
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
-    raise ActiveRecord::RecordNotFound unless @conference&.amendment_open? && !current_staff
+    raise ActiveRecord::RecordNotFound if !@conference&.amendment_open? && !current_staff
 
     @sponsorship.build_nested_attributes_associations
   end
