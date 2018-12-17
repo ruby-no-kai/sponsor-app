@@ -4,97 +4,122 @@
     %li.breadcrumb-item Sponsorships
     %li.breadcrumb-item.active{aria: {current: 'page'}}= @sponsorship.name
 
-%h3 #{@sponsorship.name}
+.d-md-flex.justify-content-between
+  %h3 #{@sponsorship.name}
+  %div
+    = link_to "Edit", edit_conference_sponsorship_path(@conference, @sponsorship), class: 'btn btn-primary'
+    = link_to "History", conference_sponsorship_editing_histories_path(@conference, @sponsorship), class: 'btn btn-secondary'
+    = link_to "Compose Email", front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address), class: 'btn btn-info', target: '_blank'
 
-= link_to "Edit", edit_conference_sponsorship_path(@conference, @sponsorship), class: 'btn btn-primary'
-= link_to "Edit History", conference_sponsorship_editing_histories_path(@conference, @sponsorship), class: 'btn btn-secondary'
-= link_to "Compose Email", front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address), class: 'btn btn-secondary', target: '_blank'
+.row
+  .col-md-6
+    .card
+      %h5.card-header
+        Basic Information
+      .card-body
+        %h5.card-title Plan
 
-%p
-  = @sponsorship.name
-  %br
-  %a{href: @sponsorship.url}= @sponsorship.url
-%p= @sponsorship.profile
+        - if @sponsorship.plan
+          %p.card-text= @sponsorship.plan.name
+        - else @sponsorship.plan
+          %p.card-text
+            %span.badge.badge-danger UNDETERMINED
 
-- if @sponsorship.note&.body&.present?
-  %pre
-    %code= @sponsorship.note.body
+        - if @sponsorship.customized?
+          %p.card-text Shown as: #{@sponsorship.customization_name}
 
-%p= link_to 'Download Asset', download_asset_conference_sponsorship_path(@conference, @sponsorship)
+        %h5.card-title Booth
 
-%section.py-2
-  %h4 Plan
+        %p.card-text
+          - case
+          - when @sponsorship.booth_assigned && !@sponsorship.booth_requested
+            Assigned but Not requested (!?)
+          - when @sponsorship.plan&.booth_eligible? && (@sponsorship.booth_assigned)
+            Not Eligible but Assigned (!?)
+          - when @sponsorship.plan&.booth_eligible? && (@sponsorship.booth_requested)
+            Not Eligible but Requested (!?)
+          - when @sponsorship.booth_assigned
+            Assigned
+          - when @sponsorship.booth_requested
+            Requested
+          - when @sponsorship.plan&.booth_eligible?
+            Eligible
+          - else
+            N/A
 
-  - if @sponsorship.plan
-    %p
-      %strong= @sponsorship.plan.name
-  - else @sponsorship.plan
-    %p
-      %span.label.label-danger UNDETERMINED
+        %h5.card-title Locale
 
-  - if @sponsorship.customized?
-    %p Shown as: #{@sponsorship.customization_name}
+        %p.card-text= @sponsorship.locale
 
-  - if @sponsorship.customization_request&.body&.present?
-    %pre
-      %code= @sponsorship.customization_request.body
+        = link_to 'Download Asset', download_asset_conference_sponsorship_path(@conference, @sponsorship), class: 'card-link'
 
-%section.py-2
-  %h4 Booth
+    .card.mt-2
+      %h5.card-header
+        Organization
+      .card-body
+        %p.card-text
+          = @sponsorship.organization.name
 
-  - case
-  - when @sponsorship.booth_assigned && !@sponsorship.booth_requested
-    Assigned but Not requested (!?)
-  - when @sponsorship.booth_assigned
-    Assigned
-  - when @sponsorship.booth_requested
-    Requested
-  - else
-    - if @sponsorship.plan&.booth_eligible?
-      Applicable but Not requested
-    - else
-      N/A
+    .card.mt-2
+      %h5.card-header
+        Requests
+      .card-body
+        - if @sponsorship.customization_request&.body&.present?
+          %h6.card-title Customization
+          %pre
+            %code= @sponsorship.customization_request.body
 
-%section.py-2
-  %h4 Contact
+        - if @sponsorship.billing_request&.body&.present?
+          %h6.card-title Billing
+          %pre
+            %code= @sponsorship.billing_request.body
 
-  %p
-    #{@sponsorship.contact.name} (
-    %a{href: "mailto:#{@sponsorship.contact.email}"}= @sponsorship.contact.email
-    )
-  %p
-    - if @sponsorship.contact.unit
-      = @sponsorship.contact.unit
-      %br
-    = @sponsorship.contact.organization
-  %p= @sponsorship.contact.address
+        - if @sponsorship.note&.body&.present?
+          %h6.card-title Others
+          %pre
+            %code= @sponsorship.note.body
 
-  %p= @sponsorship.locale
 
-%section.py-2
-  %h4 Organization
+  .col-md-6
+    .card
+      %h5.card-header
+        Introduction
+      .card-body
+        %h5.card-title= @sponsorship.name
+        %p.card-text= @sponsorship.profile
+        .d-flex.justify-content-between
+          %a.card-link{href: @sponsorship.url, target: '_blank'}= @sponsorship.url
+          %small #{@sponsorship.word_count} / #{@sponsorship.plan&.words_limit} or #{@sponsorship&.plan.words_limit_hard.to_i}
 
-  %p
-    = @sponsorship.organization.name
-
-%section.py-2
-  %h4 Billing
-
-  - if @sponsorship.billing_request&.body&.present?
-    %pre
-      %code= @sponsorship.billing_request.body
-
-  %h5 Billing Contact
-  - if @sponsorship.alternate_billing_contact
-    %p
-      %span.label.label-danger Alternate billing contact specified
-  %p
-    #{@sponsorship.billing_contact.name} (
-    %a{href: "mailto:#{@sponsorship.billing_contact.email}"}= @sponsorship.billing_contact.email
-    )
-  %p
-    - if @sponsorship.billing_contact.unit
-      = @sponsorship.billing_contact.unit
-      %br
-    = @sponsorship.billing_contact.organization
-  %p= @sponsorship.billing_contact.address
+.row.mt-2
+  .col-md-6
+    .card
+      %h5.card-header Contact
+      .card-body
+        %p.card-text
+          #{@sponsorship.contact.name}
+          = link_to @sponsorship.contact.email, front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address), target: '_blank'
+        %p.card-text
+          - if @sponsorship.contact.unit
+            = @sponsorship.contact.unit
+            %br
+          = @sponsorship.contact.organization
+        %p.card-text
+          = @sponsorship.contact.address
+  .col-md-6
+    .card
+      %h5.card-header
+        Billing
+        - if @sponsorship.alternate_billing_contact
+          %span.badge.badge-danger Alternate billing contact specified
+      .card-body
+        %p.card-text
+          #{@sponsorship.billing_contact.name}
+          = link_to @sponsorship.billing_contact.email, front_mail_to_link(@sponsorship.billing_contact.email, from: @conference.contact_email_address), target: '_blank'
+        %p.card-text
+          - if @sponsorship.billing_contact.unit
+            = @sponsorship.billing_contact.unit
+            %br
+          = @sponsorship.billing_contact.organization
+        %p.card-text
+          = @sponsorship.billing_contact.address
