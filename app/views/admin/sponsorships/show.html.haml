@@ -12,90 +12,94 @@
     = link_to "Compose Email", front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address), class: 'btn btn-info', target: '_blank'
 
 .row
-  .col-md-6
-    .card
-      %h5.card-header
-        Basic Information
-      .card-body
-        %h5.card-title Plan
+  .col-md-8
+    .row
+      .col-md-6
+        .card
+          %h5.card-header
+            Basic Information
+          .card-body
+            %h5.card-title Plan
 
-        - if @sponsorship.plan
-          %p.card-text= @sponsorship.plan.name
-        - else @sponsorship.plan
-          %p.card-text
-            %span.badge.badge-danger UNDETERMINED
+            - if @sponsorship.plan
+              %p.card-text= @sponsorship.plan.name
+            - else @sponsorship.plan
+              %p.card-text
+                %span.badge.badge-danger UNDETERMINED
 
-        - if @sponsorship.customized?
-          %p.card-text Shown as: #{@sponsorship.customization_name}
+            - if @sponsorship.customized?
+              %p.card-text Shown as: #{@sponsorship.customization_name}
 
-        %h5.card-title Booth
+            %h5.card-title Booth
 
-        %p.card-text
-          - case
-          - when @sponsorship.booth_assigned && !@sponsorship.booth_requested
-            Assigned but Not requested (!?)
-          - when @sponsorship.plan&.booth_eligible? && (@sponsorship.booth_assigned)
-            Not Eligible but Assigned (!?)
-          - when @sponsorship.plan&.booth_eligible? && (@sponsorship.booth_requested)
-            Not Eligible but Requested (!?)
-          - when @sponsorship.booth_assigned
-            Assigned
-          - when @sponsorship.booth_requested
-            Requested
-          - when @sponsorship.plan&.booth_eligible?
-            Eligible
-          - else
-            N/A
+            %p.card-text
+              - case
+              - when @sponsorship.booth_assigned && !@sponsorship.booth_requested
+                Assigned but Not requested (!?)
+              - when @sponsorship.plan&.booth_eligible? && (@sponsorship.booth_assigned)
+                Not Eligible but Assigned (!?)
+              - when @sponsorship.plan&.booth_eligible? && (@sponsorship.booth_requested)
+                Not Eligible but Requested (!?)
+              - when @sponsorship.booth_assigned
+                Assigned
+              - when @sponsorship.booth_requested
+                Requested
+              - when @sponsorship.plan&.booth_eligible?
+                Eligible
+              - else
+                N/A
 
-        %h5.card-title Locale
+            %h5.card-title Locale
 
-        %p.card-text= @sponsorship.locale
+            %p.card-text= @sponsorship.locale
 
-        = link_to 'Download Asset', download_asset_conference_sponsorship_path(@conference, @sponsorship), class: 'card-link'
+            = link_to 'Download Asset', download_asset_conference_sponsorship_path(@conference, @sponsorship), class: 'card-link'
 
-    .card.mt-2
-      %h5.card-header
-        Organization
-      .card-body
-        %p.card-text
-          = @sponsorship.organization.name
+        .card.mt-2
+          %h5.card-header
+            Organization
+          .card-body
+            %p.card-text
+              = @sponsorship.organization.name
 
-    .card.mt-2
-      %h5.card-header
-        Requests
-      .card-body
-        - if @sponsorship.customization_request&.body&.present?
-          %h6.card-title Customization
-          %pre
-            %code= @sponsorship.customization_request.body
+      .col-md-6
+        .card
+          %h5.card-header
+            Requests
+          .card-body
+            - if @sponsorship.customization_request&.body&.present?
+              %h6.card-title Customization
+              %pre
+                %code= @sponsorship.customization_request.body
 
-        - if @sponsorship.billing_request&.body&.present?
-          %h6.card-title Billing
-          %pre
-            %code= @sponsorship.billing_request.body
+            - if @sponsorship.billing_request&.body&.present?
+              %h6.card-title Billing
+              %pre
+                %code= @sponsorship.billing_request.body
 
-        - if @sponsorship.note&.body&.present?
-          %h6.card-title Others
-          %pre
-            %code= @sponsorship.note.body
+            - if @sponsorship.note&.body&.present?
+              %h6.card-title Others
+              %pre
+                %code= @sponsorship.note.body
 
-
-  .col-md-6
-    .card
-      %h5.card-header
-        Introduction
-      .card-body
-        %h5.card-title= @sponsorship.name
-        %p.card-text= @sponsorship.profile
-        .d-flex.justify-content-between
-          %a.card-link{href: @sponsorship.url, target: '_blank'}= @sponsorship.url
-          %small #{@sponsorship.word_count} / #{@sponsorship.plan&.words_limit} or #{@sponsorship&.plan.words_limit_hard.to_i}
+    .row
+      .col-md-12
+        .card.mt-2
+          %h5.card-header
+            Introduction
+          .card-body
+            %h5.card-title= @sponsorship.name
+            %p.card-text= @sponsorship.profile
+            .d-flex.justify-content-between
+              %a.card-link{href: @sponsorship.url, target: '_blank'}= @sponsorship.url
+              %small #{@sponsorship.word_count} / #{@sponsorship.plan&.words_limit} or #{@sponsorship&.plan.words_limit_hard.to_i}
 
 .row.mt-2
-  .col-md-6
+  .col-md-4
     .card
       %h5.card-header Contact
       .card-body
+        .row
         %p.card-text
           #{@sponsorship.contact.name}
           = link_to @sponsorship.contact.email, front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address), target: '_blank'
@@ -106,7 +110,7 @@
           = @sponsorship.contact.organization
         %p.card-text
           = @sponsorship.contact.address
-  .col-md-6
+  .col-md-4
     .card
       %h5.card-header
         Billing
