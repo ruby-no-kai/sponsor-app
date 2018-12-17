@@ -36,9 +36,9 @@
               - case
               - when @sponsorship.booth_assigned && !@sponsorship.booth_requested
                 Assigned but Not requested (!?)
-              - when @sponsorship.plan&.booth_eligible? && (@sponsorship.booth_assigned)
+              - when !@sponsorship.plan&.booth_eligible? && (@sponsorship.booth_assigned)
                 Not Eligible but Assigned (!?)
-              - when @sponsorship.plan&.booth_eligible? && (@sponsorship.booth_requested)
+              - when !@sponsorship.plan&.booth_eligible? && (@sponsorship.booth_requested)
                 Not Eligible but Requested (!?)
               - when @sponsorship.booth_assigned
                 Assigned
