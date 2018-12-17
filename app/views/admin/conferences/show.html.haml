@@ -1,52 +1,66 @@
 %p
-  %strong Name:
-  = @conference.name
-%p
-  %strong Slug:
-  = @conference.slug
-%p
-  %strong Application opens:
-  = @conference.application_opens_at
-  til
-  = @conference.application_closes_at
-%p
-  %strong Accepting amendment closes:
-  = @conference.amendment_closes_at
 
-%p
-  = link_to 'Edit', edit_conference_path(@conference), class: 'btn btn-primary'
-  = link_to 'Preview Form', new_user_conference_sponsorship_path(@conference), class: 'btn btn-secondary'
+.d-md-flex.justify-content-between
+  %h2 Conference: #{@conference.name}
+  %div
+    = link_to 'Edit', edit_conference_path(@conference), class: 'btn btn-primary'
+    = link_to 'Preview', new_user_conference_sponsorship_path(@conference), class: 'btn btn-secondary'
 
-%hr
 
-%h3 Form descriptions
+.row.my-3
+  .col-md-4
+    .card
+      .card-body
+        %p.card-text
+          %strong Name:
+          = @conference.name
+        %p.card-text
+          %strong Slug:
+          = @conference.slug
+        %p.card-text
+          %strong Application opens:
+          = @conference.application_opens_at
+          til
+          = @conference.application_closes_at
+        %p.card-text
+          %strong Accepting amendment closes:
+          = @conference.amendment_closes_at
 
-%ul
-  - @conference.form_descriptions.select(:id, :locale).each do |desc|
-    %li= link_to desc.locale, [@conference, desc]
 
-%p
-  = link_to 'Add locale', new_conference_form_description_path(@conference), class: 'btn btn-default'
+  .col-md-4
+    .card
+      %h5.card-header
+        Form Descriptions
+      .card-body
+        %ul
+          - @conference.form_descriptions.select(:id, :locale).each do |desc|
+            %li= link_to desc.locale, [@conference, desc]
+        = link_to 'Add locale', new_conference_form_description_path(@conference), class: 'card-link'
 
-%h3 Plans
+  .col-md-4
+    .card
+      %h5.card-header
+        Plans
+      .card-body
+        %ul
+          - @conference.plans.order(rank: :desc).select(:id, :name).each do |plan|
+            %li= link_to plan.name, edit_conference_plan_path(@conference, plan)
+        = link_to 'Add plan', new_conference_plan_path(@conference), class: 'card-link'
 
-%ul
-  - @conference.plans.order(rank: :desc).select(:id, :name).each do |plan|
-    %li= link_to plan.name, edit_conference_plan_path(@conference, plan)
-
-%p
-  = link_to 'Add plan', new_conference_plan_path(@conference), class: 'btn btn-default'
-
-%h4 Sponsorships
-
-- @conference.sponsorships.group_by(&:plan).sort_by {|p, _| p&.rank || 9999 }.each do |plan, sponsorships|
-  %h5
-    = plan&.name || 'Undetermined'
-    %span (#{sponsorships.size}/#{plan&.capacity})
-  %ul
-    - sponsorships.each do |sponsorship|
-      %li
-        - if sponsorship.customized?
-          #{sponsorship.customization_name}:
-        = link_to sponsorship.name, [@conference, sponsorship]
+.row
+  .col-md-12
+    .card
+      %h5.card-header
+        Sponsorships
+      .card-body
+        - @conference.sponsorships.group_by(&:plan).sort_by {|p, _| p&.rank || 9999 }.each do |plan, sponsorships|
+          %h6
+            = plan&.name || 'Undetermined'
+            %span (#{sponsorships.size}/#{plan&.capacity})
+          %ul
+            - sponsorships.each do |sponsorship|
+              %li
+                - if sponsorship.customized?
+                  #{sponsorship.customization_name}:
+                = link_to sponsorship.name, [@conference, sponsorship]
 
