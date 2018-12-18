@@ -27,8 +27,13 @@
               %p.card-text
                 %span.badge.badge-danger UNDETERMINED
 
-            - if @sponsorship.customized?
+            - case 
+            - when @sponsorship.customized?
               %p.card-text Shown as: #{@sponsorship.customization_name}
+            - when @sponsorship.customization_planned?
+              %p.card-text
+                #{@sponsorship.customization_name}
+                %span.badge.badge-warning Custom Plan: Tentative
 
             %h5.card-title Booth
 

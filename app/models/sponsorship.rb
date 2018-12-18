@@ -59,6 +59,10 @@ class Sponsorship < ApplicationRecord
     customization && customization_name.present?
   end
 
+  def customization_planned?
+    !customization && customization_name.present?
+  end
+
   def plan_name
     customized? ? (customization_name || plan&.name) : plan&.name
   end
