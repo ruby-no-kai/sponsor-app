@@ -98,7 +98,10 @@
             %p.card-text= @sponsorship.profile
             .d-flex.justify-content-between
               %a.card-link{href: @sponsorship.url, target: '_blank'}= @sponsorship.url
-              %small #{@sponsorship.word_count} / #{@sponsorship.plan&.words_limit} or #{@sponsorship&.plan.words_limit_hard.to_i}
+              %small
+                #{@sponsorship.word_count} words
+                - if @sponsorship.plan&.words_limit
+                  #{@sponsorship.plan.words_limit} or #{@sponsorship.plan.words_limit_hard&.to_i}
   .col-md-4
     .card
       .card-header.d-flex.justify-content-between
