@@ -90,11 +90,13 @@ class Sponsorship < ApplicationRecord
 
   def to_h_for_history
     {
+      "conference_id" => conference&.id,
       "contact" => contact&.as_json&.slice("id", "name", "email", "organization", "unit", "address"),
       "alternate_billing_contact" => alternate_billing_contact&.as_json&.slice("id", "name", "email", "organization", "unit", "address"),
       "billing_request" => billing_request&.body,
       "plan_id" => plan&.id,
       "plan_name" => plan&.name,
+      "plan_display_name" => plan_name,
       "customization_name" => customization_name,
       "customized?" => customized?,
       "customization_planned?" => customization_planned?,
@@ -104,6 +106,9 @@ class Sponsorship < ApplicationRecord
       "name" => name,
       "url" => url,
       "profile" => profile,
+      "organization_id" => organization&.id,
+      "organization_name" => organization&.name,
+      "locale" => locale,
       "asset_file_id" => asset_file&.id,
       "note" => note&.body,
       "policy_agreement" => policy_agreement,
