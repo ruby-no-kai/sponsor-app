@@ -99,6 +99,7 @@ class Sponsorship < ApplicationRecord
       "plan_display_name" => plan_name,
       "customization_name" => customization_name,
       "customized?" => customized?,
+      "suspended?" => suspended?,
       "customization_planned?" => customization_planned?,
       "customization_request" => customization_request&.body,
       "booth_requested" => booth_requested,

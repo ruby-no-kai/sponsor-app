@@ -19,6 +19,10 @@
           %h5.card-header
             Basic Information
           .card-body
+            - if @sponsorship.suspended?
+              %p.card-text
+                %span.badge.badge-warning Presence Suspended
+
             %h5.card-title Plan
 
             - if @sponsorship.plan

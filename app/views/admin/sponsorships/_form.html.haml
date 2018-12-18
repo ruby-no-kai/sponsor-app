@@ -155,6 +155,16 @@
 
   %section.py-2
     .form-group
+      %h3 Administrative Flags
+
+    .form-group
+      .form-check
+        = form.check_box :suspended, class: 'form-check-input'
+        = form.label :suspended, class: 'form-check-label'
+        %small.form-text Use this to suspend a presence in web sites etc, due to any problem on sponsor's introduction text.
+
+  %section.py-2
+    .form-group
       = form.submit "Save", class: 'btn btn-primary'
 
 

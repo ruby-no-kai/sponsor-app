@@ -64,6 +64,9 @@
                 - when sponsorship.customization_name.present?
                   #{sponsorship.customization_name}:
                 = link_to sponsorship.name, [@conference, sponsorship]
+
                 - if sponsorship.customization_planned?
                   %span.badge.badge-warning Custom Plan: Tentative
+                - if sponsorship.suspended?
+                  %span.badge.badge-warning Suspended
 
