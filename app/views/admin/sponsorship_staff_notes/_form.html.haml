@@ -1,4 +1,4 @@
-- url = staff_note.persisted? ? conference_sponsorship_staff_note_path(staff_note.sponsorship.conference, staff_note.sponsorship, staff_note) : conference_sponsorship_staff_notes_path(staff_note.sponsorship.conference, staff_note.sponsorship)
+- url = staff_note.persisted? ? conference_sponsorship_staff_note_path(staff_note.sponsorship.conference, staff_note.sponsorship, staff_note) : conference_sponsorship_staff_notes_path(staff_note.sponsorship.conference, staff_note.sponsorship, staff_note)
 = form_with(model: staff_note, url: url, local: true) do |form|
   - if staff_note.errors.any?
     .alert.alert-danger
