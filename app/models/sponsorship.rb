@@ -20,6 +20,7 @@ class Sponsorship < ApplicationRecord
   end
 
   has_many :editing_histories, -> { order(id: :desc) }, class_name: 'SponsorshipEditingHistory', dependent: :destroy
+  has_many :staff_notes, class_name: 'SponsorshipStaffNote', dependent: :destroy
 
   validates :organization, presence: true, uniqueness: {scope: :conference_id}
 

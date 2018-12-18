@@ -2,6 +2,9 @@ class Admin::SponsorshipsController < Admin::ApplicationController
   before_action :set_sponsorship
 
   def show
+    @pinned_staff_notes = @sponsorship.staff_notes.where('stickiness > 0').order(stickiness: :desc, created_at: :desc).includes(:staff)
+    @staff_notes = @sponsorship.staff_notes.where('stickiness = 0').order(stickiness: :desc, created_at: :desc).includes(:staff).limit(5)
+    @new_staff_note = SponsorshipStaffNote.new(sponsorship: @sponsorship)
   end
 
   def download_asset

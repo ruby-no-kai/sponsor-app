@@ -1,0 +1,18 @@
+- url = staff_note.persisted? ? conference_sponsorship_staff_note_path(staff_note.sponsorship.conference, staff_note.sponsorship, staff_note) : conference_sponsorship_staff_notes_path(staff_note.sponsorship.conference, staff_note.sponsorship)
+= form_with(model: staff_note, url: url, local: true) do |form|
+  - if staff_note.errors.any?
+    .alert.alert-danger
+      %p #{pluralize(staff_note.errors.count, "error")} prohibited this from being saved:
+      %ul
+        - staff_note.errors.full_messages.each do |message|
+          %li= message
+
+  .form-group
+    = form.text_area :body, class: 'form-control', placeholder: '(Markdown)'
+
+  .form-group
+    .d-flex.justify-content-between
+      = form.submit "Add Note", class: 'btn btn-primary'
+      %div
+        = form.check_box :stickiness, {class: 'form-check-input'}, '1', '0'
+        = form.label :stickiness, "Pin", class: 'form-check-label'

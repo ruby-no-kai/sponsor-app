@@ -1,0 +1,9 @@
+.card-text{id: "sponsorship_staff_note-#{staff_note.id}"}= staff_note.html
+.d-flex.justify-content-between.card-link
+  .small
+    = staff_note.staff.login
+    = link_to l(staff_note.updated_at, format: :short), "#sponsorship_staff_note-#{staff_note.id}"
+    - if staff_note.pin?
+      (Pinned)
+  .small
+    = link_to "Edit", edit_conference_sponsorship_staff_note_path(staff_note.sponsorship.conference, staff_note.sponsorship, staff_note)

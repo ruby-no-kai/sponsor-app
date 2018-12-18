@@ -6,6 +6,8 @@ class SponsorshipsController < ApplicationController
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
     raise ActiveRecord::RecordNotFound unless @conference
+
+    @staff_notes = @sponsorship.staff_notes.order(stickiness: :desc, created_at: :desc).includes(:staff)
   end
 
   def edit

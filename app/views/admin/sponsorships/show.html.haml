@@ -99,6 +99,18 @@
             .d-flex.justify-content-between
               %a.card-link{href: @sponsorship.url, target: '_blank'}= @sponsorship.url
               %small #{@sponsorship.word_count} / #{@sponsorship.plan&.words_limit} or #{@sponsorship&.plan.words_limit_hard.to_i}
+  .col-md-4
+    .card
+      .card-header.d-flex.justify-content-between
+        %h5.my-auto Notes
+        = link_to "Show All", conference_sponsorship_staff_notes_path(@conference, @sponsorship), class: 'btn btn-default small'
+      %ul.list-group.list-group-flush
+        %li.list-group-item
+          = render 'admin/sponsorship_staff_notes/form', staff_note: @new_staff_note
+        - [*@pinned_staff_notes, *@staff_notes].each do |note|
+          %li.list-group-item
+            = render 'admin/sponsorship_staff_notes/item', staff_note: note
+
 
 .row.mt-2
   .col-md-4
@@ -116,6 +128,7 @@
           = @sponsorship.contact.organization
         %p.card-text
           = @sponsorship.contact.address
+
   .col-md-4
     .card
       %h5.card-header
