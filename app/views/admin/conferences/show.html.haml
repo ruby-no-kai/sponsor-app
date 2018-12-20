@@ -53,7 +53,7 @@
       %h5.card-header
         Sponsorships
       .card-body
-        - @conference.sponsorships.group_by(&:plan).sort_by {|p, _| p&.rank || 9999 }.each do |plan, sponsorships|
+        - @conference.sponsorships.includes(:plan).order(id: :asc).group_by(&:plan).sort_by {|p, _| [p&.rank || 9999, _.id] }.each do |plan, sponsorships|
           %h6
             = plan&.name || 'Undetermined'
             %span (#{sponsorships.size}/#{plan&.capacity})
