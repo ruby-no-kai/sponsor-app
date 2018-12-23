@@ -34,7 +34,21 @@ Rails.application.configure do
 
   config.active_job.queue_adapter = :inline
 
-  config.action_mailer.delivery_method = :letter_opener_web
+  if ENV['MAILGUN_SMTP_PASSWORD']
+    config.action_mailer.smtp_settings = {
+      :port           => ENV['MAILGUN_SMTP_PORT'],
+      :address        => ENV['MAILGUN_SMTP_SERVER'],
+      :user_name      => ENV['MAILGUN_SMTP_LOGIN'],
+      :password       => ENV['MAILGUN_SMTP_PASSWORD'],
+      :domain         => ENV.fetch('DEFAULT_EMAIL_HOST'),
+      :authentication => :plain,
+      enable_starttls_auto: true,
+    }
+    config.action_mailer.delivery_method = :smtp
+  else
+    config.action_mailer.delivery_method = :letter_opener_web
+  end
+
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
@@ -65,9 +79,9 @@ Rails.application.configure do
 
   config.x.org_name = "RubyKaigi"
 
-  config.x.default_email_address = 'sponsorapp@localhost'
-  config.x.default_email_reply_to = 'sponsorapp@localhost'
-  config.x.default_email_host_part = 'localhost'
+  config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS',  'sponsorapp@localhost')
+  config.x.default_email_reply_to = ENV.fetch('DEFAULT_EMAIL_REPLY_TO', config.x.default_email_address)
+  config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST', 'localhost')
 
   config.x.github.repo = ENV['GITHUB_REPO']
   config.x.github.client_id = ENV['GITHUB_CLIENT_ID']
