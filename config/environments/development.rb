@@ -33,6 +33,10 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   config.active_job.queue_adapter = :inline
+  if ENV['ENABLE_SIDEKIQ']
+    config.active_job.queue_name_prefix = "sponsor_app"
+    config.active_job.queue_adapter = :sidekiq
+  end
 
   if ENV['MAILGUN_SMTP_PASSWORD']
     config.action_mailer.smtp_settings = {

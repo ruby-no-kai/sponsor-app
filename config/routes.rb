@@ -1,3 +1,4 @@
+require 'sidekiq/web'
 Rails.application.routes.draw do
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
@@ -19,6 +20,13 @@ Rails.application.routes.draw do
     resource :session, only: %i(new destroy) do
       get :rise, as: :rise
     end
+
+
+    mount Sidekiq::Web => '/sidekiq', :constraints => Module.new {
+      def self.matches?(request)
+        request.session[:staff_id] && Staff.where(id: request.session[:staff_id]).exists?
+      end
+    }
   end
   get '/auth/:provider/callback' => 'admin/sessions#create'
 

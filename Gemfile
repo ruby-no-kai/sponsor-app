@@ -19,6 +19,8 @@ gem 'hashdiff'
 
 gem 'nokogiri'
 
+gem 'sidekiq'
+
 gem 'jbuilder', '~> 2.5'
 gem 'hamlit'
 gem 'webpacker', '>= 4.0.0.pre.3'
