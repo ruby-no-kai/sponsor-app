@@ -1,0 +1,25 @@
+%p There's a new sponsorship application.
+
+%p= link_to @link, @link
+
+%p
+  Name: #{@sponsor_org_name}
+  %br
+  Plan: #{@sponsorship.plan_name || 'UNDETERMINED'}
+
+%h3 Contact
+
+%p
+  #{ @sponsor_contact_name } (#{@sponsor_contact_email})
+  %br
+  = @sponsor_org_name
+
+%h3 Requests
+
+- @sponsorship.requests.each do |request|
+  - if request.body.present?
+    %h4= request.kind
+    %p
+      - request.body.each_line do |l|
+        = l
+        %br

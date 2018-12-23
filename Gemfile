@@ -17,9 +17,13 @@ gem 'omniauth-github'
 gem 'octokit'
 gem 'hashdiff'
 
+gem 'nokogiri'
+
 gem 'jbuilder', '~> 2.5'
 gem 'hamlit'
 gem 'webpacker', '>= 4.0.0.pre.3'
+
+gem 'premailer-rails'
 
 gem 'letter_opener_web', git: 'https://github.com/fgrehm/letter_opener_web', ref: 'ab50ad09a2af5350bdca9c079bba73523e64f4cd' # https://github.com/fgrehm/letter_opener_web/pull/83
 gem 'rspec-rails'

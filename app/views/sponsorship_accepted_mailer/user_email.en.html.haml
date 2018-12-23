@@ -1,0 +1,28 @@
+%p Hi,
+
+%p
+  Thank you for sponsoring us. We've received your sponsorship application.
+  If you've written any additional notes which requires our reaction, we'll
+  respond you to soon.
+
+%p
+  Also, the following link is a sign-in link for our sponsor's portal, which
+  allows you to amend your sponsorship application, and check our latest
+  announcement for sponsors at anytime.
+
+= link_to @login_link, @login_link
+
+%p
+  This link expires at #{l(@login_link_expiry)},
+  and you can use this link for multiple times until it expires.
+
+%p
+  Note that you can retrieve these links again from our website.
+
+%p
+  For any questions and inquiries, feel free to reach us at #{link_to @email, "mailto:#{@email}"}.
+
+%p
+  Kind regards,
+  %br
+  Team #{@team_name}

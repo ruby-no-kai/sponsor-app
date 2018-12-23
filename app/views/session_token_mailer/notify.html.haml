@@ -1,0 +1,7 @@
+%p= t('.greeting')
+
+%p= t('.explanation')
+
+%p= link_to claim_user_session_url(@token), claim_user_session_url(@token)
+
+%p= t('.expiry', ts: l(@token.expires_at))
