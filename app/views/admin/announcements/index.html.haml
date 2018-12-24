@@ -1,0 +1,33 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Announcements
+
+.d-md-flex.justify-content-between
+  %h3 Announcements
+  %div
+    = link_to "New", new_conference_announcement_path(@conference), class: 'btn btn-primary'
+
+
+- @announcements.each do |issue, anns|
+  - latest_revision = anns.max_by(&:revision).revision
+  .card.my-2
+    %ul.list-group.list-group-flush
+      - anns.each do |ann|
+        %li.list-group-item
+          .row
+            .col-1= ann.locale
+            .col-10
+              = link_to ann.title, conference_announcement_path(@conference, ann)
+              - if ann.pin?
+                %span.badge.badge-info
+                  Pin
+              - if ann.draft?
+                %span.badge.badge-warning
+                  Draft
+              - if ann.revision < latest_revision # revision_behind?
+                %span.badge.badge-danger
+                  Behind
+
+
+

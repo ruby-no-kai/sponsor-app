@@ -1,0 +1,44 @@
+= form_with(model: announcement, url: [@conference || @announcement.conference, announcement], local: true) do |form|
+  - if announcement.errors.any?
+    .alert.alert-danger
+      %p #{pluralize(announcement.errors.count, "error")} prohibited this from being saved:
+      %ul
+        - announcement.errors.full_messages.each do |message|
+          %li= message
+
+  = form.hidden_field :issue
+
+  - if @announcement.issue
+    .form-group
+      %p Other locales:
+      %p
+        %ul
+          - @announcement.all_locales.select(:id, :conference_id, :issue, :locale, :title).each do |ann|
+            = link_to "#{ann.locale}: #{ann.title}", conference_announcement_path(@conference, ann)
+
+  .form-group
+    = form.label :locale
+    = form.text_field :locale, class: 'form-control'
+
+  .form-group
+    = form.label :title
+    = form.text_field :title, class: 'form-control'
+
+  .form-group
+    = form.label :body
+    = form.text_area :body, class: 'form-control', placeholder: '(Markdown)', style: 'height: 20rem'
+
+  .form-group
+    .form-check-inline
+      = form.check_box :stickiness, {class: 'form-check-input'}, '1', '0'
+      = form.label :stickiness, "Pin", class: 'form-check-label'
+
+  .form-group
+    = form.submit "Save", class: 'btn btn-primary'
+    .form-check-inline
+      = form.check_box :published, class: 'form-check-input'
+      = form.label :published, "Publish", class: 'form-check-label'
+    .form-check-inline
+      = form.check_box :new_revision, class: 'form-check-input'
+      = form.label :new_revision, "Request translation", class: 'form-check-label'
+

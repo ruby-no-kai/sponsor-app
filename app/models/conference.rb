@@ -2,6 +2,7 @@ class Conference < ApplicationRecord
   has_many :form_descriptions, dependent: :destroy
   has_many :plans, -> { order(rank: :asc) }, dependent: :destroy
   has_many :sponsorships, dependent: :destroy
+  has_many :announcements, dependent: :destroy
 
   scope :application_open, -> { t = Time.now; where('application_opens_at <= ? AND (application_closes_at > ? OR application_closes_at IS NULL) AND application_opens_at IS NOT NULL', t, t) }
   scope :amendment_open, -> { t = Time.now; where('application_opens_at <= ? AND (amendment_closes_at > ? OR amendment_closes_at IS NULL) AND application_opens_at IS NOT NULL', t, t) }

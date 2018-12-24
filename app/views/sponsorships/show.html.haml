@@ -15,6 +15,20 @@
           - if @conference.amendment_closes_at
             %p= t('.amendment_availability', ts: l(@conference.amendment_closes_at))
 
+- unless @announcements.empty?
+  .row.py-2
+    .col-md-12
+      .card.text-dark
+        .card-header= t('.announcements')
+        %ul.list-group.list-group-flush
+          - @announcements.each do |announcement|
+            %li.list-group-item
+              %h5{id: "announcement-#{announcement.issue}"}= announcement.title
+              = announcement.html
+              .text-right
+                %small
+                  %a.text-muted{href: "#announcement-#{announcement.issue}"}= l(announcement.published_at, format: :short)
+
 .row.py-2
   .col-md-12
     .card.text-dark
@@ -23,3 +37,4 @@
         %p.card-text= t('.contact_help')
         %p.card-text
           %a{href: "mailto:#{@conference.contact_email_address}"}= @conference.contact_email_address
+

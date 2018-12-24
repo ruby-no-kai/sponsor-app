@@ -7,7 +7,7 @@ class SponsorshipsController < ApplicationController
     @conference = current_sponsorship&.conference
     raise ActiveRecord::RecordNotFound unless @conference
 
-    @staff_notes = @sponsorship.staff_notes.order(stickiness: :desc, created_at: :desc).includes(:staff)
+    @announcements = @sponsorship.conference.announcements.where(locale: I18n.locale).where('published_at IS NOT NULL').order('stickiness DESC, id DESC')
   end
 
   def edit

@@ -1,0 +1,20 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item= link_to "Announcements", conference_announcements_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}}= @announcement.issue
+
+%ul.nav.nav-tabs.mb-2
+  - @announcement.all_locales.order(locale: :asc).select(:id, :conference_id, :issue, :locale).each do |ann|
+    %li.nav-item
+      = link_to ann.locale, conference_announcement_path(@conference, ann), class: "nav-link #{ann.locale == @announcement.locale ? 'active' : ''}"
+  %li.nav-item
+    = link_to "+", new_conference_announcement_path(@conference, issue: @announcement.issue), class: 'nav-link'
+
+%section
+  .d-md-flex.justify-content-between
+    %h4= @announcement.title
+    %div
+      = link_to "Edit", edit_conference_announcement_path(@conference, @announcement), class: 'btn btn-primary'
+
+  = @announcement.html

@@ -16,6 +16,8 @@ Rails.application.routes.draw do
           get :download_asset
         end
       end
+
+      resources :announcements
     end
     resource :session, only: %i(new destroy) do
       get :rise, as: :rise
