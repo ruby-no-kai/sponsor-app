@@ -10,10 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_18_022315) do
+ActiveRecord::Schema.define(version: 2018_12_23_231943) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "announcements", force: :cascade do |t|
+    t.bigint "conference_id", null: false
+    t.string "issue", null: false
+    t.string "locale", null: false
+    t.string "title", null: false
+    t.text "body", null: false
+    t.integer "stickiness", default: 0, null: false
+    t.bigint "staff_id", null: false
+    t.datetime "published_at"
+    t.integer "revision", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conference_id", "issue", "id"], name: "index_announcements_on_conference_id_and_issue_and_id"
+    t.index ["conference_id", "issue", "locale"], name: "index_announcements_on_conference_id_and_issue_and_locale", unique: true
+    t.index ["conference_id", "issue", "revision"], name: "index_announcements_on_conference_id_and_issue_and_revision"
+    t.index ["conference_id", "locale", "stickiness", "id"], name: "idx_user_listing"
+    t.index ["conference_id"], name: "index_announcements_on_conference_id"
+    t.index ["staff_id"], name: "index_announcements_on_staff_id"
+  end
 
   create_table "conferences", force: :cascade do |t|
     t.string "name", null: false
@@ -177,6 +197,8 @@ ActiveRecord::Schema.define(version: 2018_12_18_022315) do
     t.index ["uid"], name: "index_staffs_on_uid", unique: true
   end
 
+  add_foreign_key "announcements", "conferences"
+  add_foreign_key "announcements", "staffs"
   add_foreign_key "contacts", "sponsorships"
   add_foreign_key "form_descriptions", "conferences"
   add_foreign_key "plans", "conferences"
