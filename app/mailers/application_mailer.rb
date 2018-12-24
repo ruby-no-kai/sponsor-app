@@ -37,8 +37,8 @@ class ApplicationMailer < ActionMailer::Base
     prefix = possible_admin_address.include?(mail.to) ? 'admin/' : ''
 
     tag "#{prefix}sponsorship:#{@sponsorship.id}"
-    tag "#{prefix}organization:#{@sponsorship.organization.id}"
-    tag "#{prefix}conference:#{@sponsorship.conference.id}"
+    #tag "#{prefix}organization:#{@sponsorship.organization.id}"
+    #tag "#{prefix}conference:#{@sponsorship.conference.id}"
   end
 
   def tag(*tags)
