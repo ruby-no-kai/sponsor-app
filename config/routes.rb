@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   scope path: 'admin', module: 'admin' do
     get '/' => 'dashboard#index', as: :dashboard
     get '/slacktown' => 'dashboard#slacktown', as: :slacktown
+    get '/mailtown' => 'dashboard#mailtown', as: :mailtown
 
     resources :conferences, param: :slug do
       resources :form_descriptions, except: %i(index)

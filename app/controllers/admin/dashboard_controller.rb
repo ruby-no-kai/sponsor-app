@@ -9,4 +9,10 @@ class Admin::DashboardController < Admin::ApplicationController
     )
     render plain: "Slack Slack Slack"
   end
+
+  def mailtown
+    AdminTestMailer.with(to: params[:to]).notify.deliver_later
+    render plain: "Mail Mail Mail"
+  end
+
 end
