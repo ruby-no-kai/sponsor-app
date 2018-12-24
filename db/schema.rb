@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_23_231943) do
+ActiveRecord::Schema.define(version: 2018_12_24_224810) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(version: 2018_12_23_231943) do
     t.string "contact_email_address"
     t.string "slug"
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
+    t.index ["slug"], name: "index_conferences_on_slug", unique: true
   end
 
   create_table "contacts", force: :cascade do |t|
