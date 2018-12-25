@@ -22,9 +22,9 @@ class Announcement < ApplicationRecord
 
   def generate_issue
     if conference && !self.persisted? && self.issue.blank?
-      while self.class.where(conference: conference, issue: issue).exists?
+      begin
         self.issue = SecureRandom.urlsafe_base64(8)
-      end
+      end while self.class.where(conference: conference, issue: issue).exists?
     end
   end
 
