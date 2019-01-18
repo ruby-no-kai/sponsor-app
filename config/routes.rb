@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     resources :conferences, param: :slug do
       resources :form_descriptions, except: %i(index)
       resources :plans, except: %i(index show)
+
       resources :sponsorships, except: %i(index new create destroy) do
         resources :sponsorship_editing_histories, as: :editing_histories, path: 'editing_history', only: %i(index)
         resources :sponsorship_staff_notes, as: :staff_notes, path: 'staff_notes', only: %i(index create edit update destroy)
@@ -19,6 +20,12 @@ Rails.application.routes.draw do
       end
 
       resources :announcements
+      resources :broadcasts do
+        resources :broadcast_deliveries, as: :deliveries, path: 'deliveries', only: %i(create destroy)
+        member do
+          post :dispatch_delivery
+        end
+      end
     end
     resource :session, only: %i(new destroy) do
       get :rise, as: :rise

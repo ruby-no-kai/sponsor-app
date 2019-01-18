@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_24_224810) do
+ActiveRecord::Schema.define(version: 2018_12_24_235234) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,6 +33,41 @@ ActiveRecord::Schema.define(version: 2018_12_24_224810) do
     t.index ["conference_id", "locale", "stickiness", "id"], name: "idx_user_listing"
     t.index ["conference_id"], name: "index_announcements_on_conference_id"
     t.index ["staff_id"], name: "index_announcements_on_staff_id"
+  end
+
+  create_table "broadcast_deliveries", force: :cascade do |t|
+    t.bigint "broadcast_id", null: false
+    t.bigint "sponsorship_id"
+    t.string "recipient", null: false
+    t.integer "status", null: false
+    t.jsonb "meta"
+    t.datetime "dispatched_at"
+    t.datetime "opened_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["broadcast_id", "id"], name: "index_broadcast_deliveries_on_broadcast_id_and_id"
+    t.index ["broadcast_id", "status"], name: "index_broadcast_deliveries_on_broadcast_id_and_status"
+    t.index ["broadcast_id"], name: "index_broadcast_deliveries_on_broadcast_id"
+    t.index ["recipient"], name: "index_broadcast_deliveries_on_recipient"
+    t.index ["sponsorship_id"], name: "index_broadcast_deliveries_on_sponsorship_id"
+  end
+
+  create_table "broadcasts", force: :cascade do |t|
+    t.bigint "conference_id", null: false
+    t.string "campaign", null: false
+    t.text "description", null: false
+    t.integer "status", null: false
+    t.string "title", null: false
+    t.text "body", null: false
+    t.bigint "staff_id", null: false
+    t.boolean "hidden", default: false, null: false
+    t.datetime "dispatched_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conference_id", "campaign"], name: "index_broadcasts_on_conference_id_and_campaign", unique: true
+    t.index ["conference_id", "id"], name: "index_broadcasts_on_conference_id_and_id"
+    t.index ["conference_id"], name: "index_broadcasts_on_conference_id"
+    t.index ["staff_id"], name: "index_broadcasts_on_staff_id"
   end
 
   create_table "conferences", force: :cascade do |t|
@@ -200,6 +235,10 @@ ActiveRecord::Schema.define(version: 2018_12_24_224810) do
 
   add_foreign_key "announcements", "conferences"
   add_foreign_key "announcements", "staffs"
+  add_foreign_key "broadcast_deliveries", "broadcasts"
+  add_foreign_key "broadcast_deliveries", "sponsorships"
+  add_foreign_key "broadcasts", "conferences"
+  add_foreign_key "broadcasts", "staffs"
   add_foreign_key "contacts", "sponsorships"
   add_foreign_key "form_descriptions", "conferences"
   add_foreign_key "plans", "conferences"

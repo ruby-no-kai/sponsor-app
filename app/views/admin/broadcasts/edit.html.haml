@@ -1,0 +1,9 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item= link_to "Broadcasts", conference_broadcasts_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}}= link_to @broadcast.campaign, conference_broadcast_path(@conference, @broadcast)
+
+%h1 Editing Broadcast
+
+= render 'form', broadcast: @broadcast

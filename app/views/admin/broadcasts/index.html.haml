@@ -1,0 +1,15 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Broadcasts
+
+.d-md-flex.justify-content-between
+  %h3 Broadcasts
+  %di
+    = link_to "New", new_conference_broadcast_path(@conference), class: 'btn btn-primary'
+
+%ul
+  - @broadcasts.each do |broadcast|
+    %li
+      = link_to broadcast.campaign, conference_broadcast_path(@conference, broadcast)
+      %span{class: status_badge_class(broadcast)}= broadcast.status

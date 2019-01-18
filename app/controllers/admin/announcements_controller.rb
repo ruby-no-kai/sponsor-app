@@ -48,7 +48,6 @@ class Admin::AnnouncementsController < Admin::ApplicationController
 
   def update
     a_params = announcement_params.except(:issue)
-    p a_params
     respond_to do |format|
       if @announcement.update(a_params)
         format.html { redirect_to conference_announcement_path(@conference, @announcement), notice: 'Announcement was successfully updated.' }

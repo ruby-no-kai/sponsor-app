@@ -1,0 +1,34 @@
+= form_with(model: broadcast, url: [@conference || @broadcast.conference, broadcast], local: true) do |form|
+  - if broadcast.errors.any?
+    .alert.alert-danger
+      %p #{pluralize(broadcast.errors.count, "error")} prohibited this from being saved:
+      %ul
+        - broadcast.errors.full_messages.each do |message|
+          %li= message
+
+  = form.hidden_field :issue
+
+  .form-group
+    = form.label :campaign
+    = form.text_field :campaign, class: 'form-control', placeholder: 'Name (internal facing)'
+
+  .form-group
+    = form.label :description
+    = form.text_field :description, class: 'form-control', placeholder: 'Description (internal facing)'
+
+  .form-group
+    = form.label :title
+    = form.text_field :title, class: 'form-control', placeholder: 'Email Title'
+
+  .form-group
+    = form.label :body
+    = form.text_area :body, class: 'form-control', placeholder: '(Markdown)', style: 'height: 20rem'
+
+  - unless broadcast.persisted?
+    .card
+      .card-header Recipients
+      .card-body
+        = render 'new_recipient_fields'
+
+  .form-group
+    = form.submit "Save & Review", class: 'btn btn-primary'

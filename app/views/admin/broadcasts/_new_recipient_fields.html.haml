@@ -1,0 +1,42 @@
+.broadcast_new_recipient_fields
+  .form-group
+    - opts = options_for_select([['None', 'none'], ['All Current Sponsors', 'all'], ['All Past Sponsors', 'past_sponsors'], ['Manual (Current Sponsors)', 'manual'], ['Raw', 'raw']])
+    = label_tag  "recipient_filter[kind]", 'Recipient Filter Type'
+    = select_tag "recipient_filter[kind]", opts, class: 'form-control form-control-lg broadcast_new_recipient_fields_selector'
+
+  %fieldset.broadcast_new_recipient_fields_kind__none
+
+  %fieldset.broadcast_new_recipient_fields_kind__all.d-none{disabled: true}
+    .form-group
+      = label_tag "recipient_filter[locale]", 'Locale'
+      = text_field_tag "recipient_filter[locale]", '', class: 'form-control'
+    .form-group
+      .form-check
+        = check_box_tag "recipient_filter[exhibitors]", '1', false, {class: 'form-check-input'}
+        = label_tag "recipient_filter[exhibitors]", "Exhibitors Only", class: 'form-check-label'
+
+  %fieldset.broadcast_new_recipient_fields_kind__past_sponsors.d-none{disabled: true}
+    .form-group
+      = select_tag "recipient_filter[id]", options_from_collection_for_select(Conference.order(id: :desc), 'id', 'name'), class: 'form-control'
+    .form-group
+      = label_tag "recipient_filter[locale]", 'Locale'
+      = text_field_tag "recipient_filter[locale]", '', class: 'form-control'
+    .form-group
+      .form-check
+        = check_box_tag "recipient_filter[exclude_current_sponsors]", '1', false, {class: 'form-check-input'}
+        = label_tag "recipient_filter[exclude_current_sponsors]", "Exclude current sponsors", class: 'form-check-label'
+
+  %fieldset.broadcast_new_recipient_fields_kind__manual.d-none{disabled: true}
+    .form-group
+      - @conference.sponsorships.order(name: :asc).pluck(:name, :id).each do |(name, id)|
+        .form-check
+          %label.form-check-label
+            = check_box_tag "recipient_filter[sponsorship_ids][]", id.to_s, false, {class: 'form-check-input'}
+            = name
+
+
+  %fieldset.broadcast_new_recipient_fields_kind__raw.d-none{disabled: true}
+    .form-group
+      = label_tag "recipient_filter[emails]", 'Email Addresses'
+      = text_area_tag "recipient_filter[emails]", '', class: 'form-control', placeholder: 'Email Address, per line'
+

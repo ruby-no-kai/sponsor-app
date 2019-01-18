@@ -8,6 +8,7 @@ class ApplicationMailer < ActionMailer::Base
 
   before_action :add_mailer_mailgun_tag
   after_action :commit_mailgun_tag
+  after_action :commit_mailgun_variables
   after_action :add_sponsorship_mailgun_tag
 
   private
@@ -25,6 +26,7 @@ class ApplicationMailer < ActionMailer::Base
 
   def add_mailer_mailgun_tag
     tag self.class.name
+    variable mailer: self.class.name
   end
 
   def add_sponsorship_mailgun_tag
@@ -46,11 +48,24 @@ class ApplicationMailer < ActionMailer::Base
     (@mailgun_tags ||= []).push(*tags)
   end
 
+  def variable(h)
+    raise "BUG: used after commit" if @mailgun_variables == :committed
+    (@mailgun_variables ||= {}).merge!(h)
+  end
+
   def commit_mailgun_tag
-    @mailgun_tags.uniq.each do |t|
+    (@mailgun_tags || []).uniq.each do |t|
       headers 'X-Mailgun-Tag' => t
     end
     @mailgun_tags = :committed
+  end
+
+  def commit_mailgun_variables
+    raise "BUG: used after commit" if @mailgun_variables == :committed
+    if @mailgun_variables
+      headers 'X-Mailgun-Variables' => @mailgun_variables.to_json
+    end
+    @mailgun_variables = :committed
   end
 
   def subject_prefix

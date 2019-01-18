@@ -1,0 +1,61 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item= link_to "Broadcast", conference_broadcasts_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}}= @broadcast.campaign
+
+%h3
+  = @broadcast.campaign
+
+%p
+  %span{class: status_badge_class(@broadcast)}= @broadcast.status
+%p
+  = @broadcast.description
+
+%section.card.mb-3
+  .card-header Email
+  .card-body
+    .d-md-flex.justify-content-between
+      %h4= @broadcast.title
+      %div
+        = link_to "Edit", edit_conference_broadcast_path(@conference, @broadcast), class: 'btn btn-primary'
+
+    = @broadcast.html
+
+%section.card.mb-2
+  .card-header Recipients
+  - if @broadcast.ready?
+    .card-body
+      = form_tag(conference_broadcast_deliveries_path(@conference, @broadcast)) do
+        = render 'new_recipient_fields'
+        .form-group
+          = submit_tag 'Add', class: 'btn btn-primary'
+  %table.table.table-hover
+    %thead
+      %tr
+        %th{scope: :col} Name
+        %th{scope: :col} Email
+        %th{scope: :col}
+        %th{scope: :col}
+    %tbody
+      - @broadcast.deliveries.includes(sponsorship: :conference).each do |delivery|
+        %tr
+          - if delivery.sponsorship
+            %td= link_to delivery.sponsorship.name, conference_sponsorship_path(delivery.sponsorship.conference, delivery.sponsorship)
+          -else
+            %td= delivery.recipient
+          %td= delivery.recipient
+          %td
+            %span{class: status_badge_class(delivery)}= delivery.status
+          %td
+            - if delivery.ready?
+              = link_to "Remove", conference_broadcast_delivery_path(@conference, @broadcast, delivery), method: 'DELETE'
+
+%section.card.border-danger
+  .card-header.bg-danger.text-white Danger Zone
+  .card-body
+    - if @broadcast.ready?
+      = link_to "Dispatch", dispatch_delivery_conference_broadcast_path(@conference, @broadcast), class: 'btn btn-danger', method: 'POST', data: {confirm: 'Are you sure?'}
+    - else 
+      %a.btn.btn-danger.disabled{href: '#'} Dispatch
+      (Status is not ready)
