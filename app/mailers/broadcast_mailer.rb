@@ -8,6 +8,7 @@ class BroadcastMailer < ApplicationMailer
     message_id_for "broadcasts/#{@broadcast.id}/deliveries/#{@delivery.id}"
     tag "broadcast:#{@broadcast.id}"
     variable broadcast_id: @broadcast.id, delivery_id: @delivery.id
+    list_name 'broadcast'
     mail(
       to: @delivery.recipient,
       subject: "#{subject_prefix}#{@broadcast.title}",

@@ -10,6 +10,7 @@ class ApplicationMailer < ActionMailer::Base
   after_action :commit_mailgun_tag
   after_action :commit_mailgun_variables
   after_action :add_sponsorship_mailgun_tag
+  after_action :commit_list_id
 
   private
 
@@ -53,6 +54,11 @@ class ApplicationMailer < ActionMailer::Base
     (@mailgun_variables ||= {}).merge!(h)
   end
 
+  def list_name(n)
+    raise "BUG: used after commit" if @list_name == :committed
+    (@list_name ||= []).push(n)
+  end
+
   def commit_mailgun_tag
     (@mailgun_tags || []).uniq.each do |t|
       headers 'X-Mailgun-Tag' => t
@@ -66,6 +72,20 @@ class ApplicationMailer < ActionMailer::Base
       headers 'X-Mailgun-Variables' => @mailgun_variables.to_json
     end
     @mailgun_variables = :committed
+  end
+
+  def commit_list_id
+    raise "BUG: used after commit" if @list_name == :committed
+    @list_name ||= []
+    if @conference && @conference.is_a?(Conference)
+      @list_name.push @conference.slug 
+    elsif @sponsorship && @sponsorship.is_a?(Sponsorship)
+      @list_name.push @sponsorship.conference.slug
+    end
+    unless @list_name.empty?
+      headers 'List-ID' => "<#{@list_name.join('.')}.#{Rails.application.config.x.default_email_host_part}>"
+    end
+    @list_name = :committed
   end
 
   def subject_prefix
