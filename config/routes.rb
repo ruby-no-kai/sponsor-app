@@ -51,6 +51,8 @@ Rails.application.routes.draw do
       resource :sponsorship, only: %i(new create show edit update)
       resource :sponsorship_asset_file, only: %i(create update)
     end
+
+    post '/webhooks/mailgun' => 'webhooks/mailgun#webhook'
   end
 
   get '/site/sha' => RevisionPlate::App.new(File.join(__dir__, '..', 'REVISION'))
