@@ -1,6 +1,12 @@
 Rails.application.configure do
   config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST', 'localhost:3000')
 
+  if ENV["RAILS_LOG_TO_STDOUT"].present?
+    logger           = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger    = ActiveSupport::TaggedLogging.new(logger)
+  end
+
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded on
