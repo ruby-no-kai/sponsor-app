@@ -13,6 +13,7 @@ class SponsorshipAcceptedMailer < ApplicationMailer
     @team_name = @sponsorship.conference.name
 
     message_id_for "sponsorships/#{@sponsorship.id}", "admin/sponsorships/#{@sponsorship.id}"
+    list_name 'welcome'
     mail(
       to: @sponsorship.contact.email,
       subject: make_subject(),
