@@ -120,6 +120,10 @@ class Sponsorship < ApplicationRecord
     }
   end
 
+  def total_number_of_attendees
+    (plan&.number_of_guests || 0) + (number_of_additional_attendees || 0)
+  end
+
   private 
 
   def validate_correct_plan

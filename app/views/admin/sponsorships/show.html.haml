@@ -28,6 +28,11 @@
                 %dt.col-sm-4 Locale
                 %dd.col-sm-8= @sponsorship.locale
               .row
+                %dt.col-sm-4 Attendees
+                %dd.col-sm-8
+                  = @sponsorship.total_number_of_attendees
+                  (#{@sponsorship&.plan.number_of_guests || 0} + #{@sponsorship.number_of_additional_attendees || 0})
+              .row
                 %dt.col-sm-4 Booth
                 %dd.col-sm-8
                   - case
