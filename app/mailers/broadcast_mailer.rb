@@ -17,6 +17,16 @@ class BroadcastMailer < ApplicationMailer
     )
   end
 
+  helper_method def login_url
+    if @sponsorship
+      token = SessionToken.create!(email: @sponsorship.contact.email, sponsorship: @sponsorship, expires_at: 2.weeks.from_now)
+      url = claim_user_session_url(token)
+    else
+      url = new_user_session_url()
+    end
+    "<a href=\"#{url}\">#{url}</a>".html_safe
+  end
+
   private
 
   def subject_prefix

@@ -23,6 +23,10 @@
   .form-group
     = form.label :body
     = form.text_area :body, class: 'form-control', placeholder: '(Markdown)', style: 'height: 20rem'
+    %small.form-text
+      You can use
+      %code @LOGIN@
+      to send the latest login link.
 
   - unless broadcast.persisted?
     .card
