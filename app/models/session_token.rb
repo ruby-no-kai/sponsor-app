@@ -21,6 +21,10 @@ class SessionToken < ApplicationRecord
     self.expires_at ||= Time.zone.now + 3.month
   end
 
+  def expired?(at: Time.zone.now)
+    self.expires_at < at
+  end
+
   def contacts
     self.email ? Contact.where(kind: :primary, email: self.email) : nil
   end

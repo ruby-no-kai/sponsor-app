@@ -18,7 +18,12 @@ class SessionsController < ApplicationController
   end
 
   def claim
-    @session_token = SessionToken.active.find_by!(handle: params[:handle])
+    @session_token = SessionToken.find_by!(handle: params[:handle])
+    if @session_token.expired?
+      flash[:alert] = t('.expired')
+      return render :new, status: 403
+    end
+
     @sponsorships = @session_token.sponsorships
 
     session[:staff_id] = @session_token.staff&.id

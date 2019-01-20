@@ -57,6 +57,8 @@ en:
       description: "Enter your email address used for your sponsorship application to proceed."
       email_address: Email Address
       submit: Proceed
+    claim:
+      expired: "The link has been expired. Please obtain a new link in this login form."
     create:
       no_email_found: "We're sorry but no applications found for the email address you entered. Please try again or contact us."
       email_sent: "We sent you an email with the link for logging in. Check your inbox."
