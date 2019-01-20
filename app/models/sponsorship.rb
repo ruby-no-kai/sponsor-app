@@ -51,6 +51,8 @@ class Sponsorship < ApplicationRecord
 
   around_save :create_history
 
+  attr_accessor :staff
+
   def build_nested_attributes_associations
     self.build_contact unless self.contact
     self.build_alternate_billing_contact unless self.alternate_billing_contact
@@ -164,6 +166,7 @@ class Sponsorship < ApplicationRecord
   def create_history
     yield
     @last_editing_history = editing_histories.create!(
+      staff: staff,
       raw: self.to_h_for_history,
     )
   end
