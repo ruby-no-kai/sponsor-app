@@ -37,9 +37,9 @@ class Sponsorship < ApplicationRecord
   validates_numericality_of :number_of_additional_attendees, allow_nil: true, greater_than_or_equal_to: 0, only_integer: true
 
   validate :validate_correct_plan
-  validate :validate_plan_availability
+  validate :validate_plan_availability, on: :update_by_user
   validate :validate_booth_eligibility
-  validate :validate_word_count
+  validate :validate_word_count, on: :update_by_user
   validate :policy_agreement
 
   accepts_nested_attributes_for :contact, allow_destroy: true,reject_if: -> (attrs) { attrs['kind'].present? }

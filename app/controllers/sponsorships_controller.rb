@@ -60,11 +60,13 @@ class SponsorshipsController < ApplicationController
     @conference = current_sponsorship&.conference
     raise ActiveRecord::RecordNotFound unless @conference&.amendment_open?
 
+    sp = sponsorship_params
+    sp.delete(:asset_file_id)
+    @sponsorship.assign_attributes(sp)
     @sponsorship.locale = I18n.locale
+
     respond_to do |format|
-      sp = sponsorship_params
-      sp.delete(:asset_file_id)
-      if @sponsorship.update(sp)
+      if @sponsorship.save(context: :update_by_user)
         ProcessSponsorshipEditJob.perform_later(@sponsorship.last_editing_history)
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: 'Your application was successfully updated.' }
       else
