@@ -14,17 +14,17 @@
   .col-12
     .card
       .card-header Table
-      %table.card-body.table.table-hover
+      %table.card-body.table.table-hover.text-right
         %thead
           %tr
-            %th{scope: :col} Sponsorship
+            %th.text-left{scope: :col} Sponsorship
             %th{scope: :col} Total
             %th{scope: :col} Included
             %th{scope: :col} Additional
         %tbody
           - sponsorships.each do |sponsorship|
             %tr
-              %td= link_to sponsorship.name, conference_sponsorship_path(@conference, sponsorship)
+              %td.text-left= link_to sponsorship.name, conference_sponsorship_path(@conference, sponsorship)
               %td= sponsorship.total_number_of_attendees
               %td= sponsorship.plan&.number_of_guests || 0
               %td= sponsorship.number_of_additional_attendees || 0
