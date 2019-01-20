@@ -9,6 +9,7 @@ class BroadcastMailer < ApplicationMailer
     tag "broadcast:#{@broadcast.id}"
     variable broadcast_id: @broadcast.id, delivery_id: @delivery.id
     list_name 'broadcast'
+    headers 'X-Auto-Response-Suppress' => 'All'
     mail(
       to: @delivery.recipient,
       subject: "#{subject_prefix}#{@broadcast.title}",
