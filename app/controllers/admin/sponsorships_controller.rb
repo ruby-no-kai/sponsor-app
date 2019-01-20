@@ -48,6 +48,8 @@ class Admin::SponsorshipsController < Admin::ApplicationController
 
       :suspended,
 
+      :number_of_additional_attendees,
+
       contact_attributes: %i(id email address organization unit name),
       alternate_billing_contact_attributes: %i(_keep id email address organization unit name),
 

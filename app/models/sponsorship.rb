@@ -116,7 +116,7 @@ class Sponsorship < ApplicationRecord
       "locale" => locale,
       "asset_file_id" => asset_file&.id,
       "note" => note&.body,
-      "policy_agreement" => policy_agreement,
+      "number_of_additional_attendees" => number_of_additional_attendees,
     }
   end
 
