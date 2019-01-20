@@ -7,6 +7,7 @@ ja:
         url: 'URL'
         profile: '紹介文 (英語)'
         booth_requested: 'ブース出展'
+        number_of_additional_attendees: '追加Attendeeチケット枚数'
         policy_agreement: 'ポリシーへ同意する'
 
       sponsorship/note: &note
@@ -104,6 +105,10 @@ ja:
       logo: 'ロゴ'
       logo_help: |
         Web 掲載用ロゴファイルをアップロードしてください。形式はベクター形式 (.eps, .ai, .svg 等) でお願い致します。
+      tickets: 'Attendee チケット'
+      tickets_included_in_plan: 'スポンサープランに含まれている枚数'
+      tickets_additionally_request: '追加する枚数'
+      tickets_total: '合計'
       others_help: |
         その他に連絡事項があれば下記へご記入ください。
       note: 'その他の連絡事項'

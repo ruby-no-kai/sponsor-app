@@ -18,6 +18,28 @@ document.addEventListener('DOMContentLoaded', () => {
       handleChange();
     });
 
+    const calculateTotalAttendees = () => {
+      const totalElem = formElem.querySelector('.sponsorships_form_tickets__total') as Element;
+      if (!totalElem) return;
+
+      const selectedPlanElem = formElem.querySelector('.sponsorships_form_plans input[type=radio]:checked') as HTMLInputElement;
+      const ticketsIncludedInPlanElem = formElem.querySelector('.sponsorships_form_tickets__included_in_plan')! as Element;
+      const additionalAttendeesElem = formElem.querySelector('.sponsorships_form_tickets__additional_attendees input')! as HTMLInputElement;
+
+      const numberOfGuests = selectedPlanElem ? parseInt(selectedPlanElem.dataset['guests']!, 10) : 0;
+      const additionalAttendees = additionalAttendeesElem.valueAsNumber;
+
+      const total = numberOfGuests + (isNaN(additionalAttendees) ? 0 : additionalAttendees);
+
+      ticketsIncludedInPlanElem.innerHTML = `${numberOfGuests}`;
+      totalElem.innerHTML = `${total}`;
+    };
+    formElem.querySelectorAll('.sponsorships_form_tickets__additional_attendees input').forEach((elem) => {
+      elem.addEventListener('change', () => calculateTotalAttendees());
+      elem.addEventListener('click', () => calculateTotalAttendees());
+    });
+    calculateTotalAttendees();
+
     formElem.querySelectorAll('.sponsorships_form_plans').forEach((elem) => {
       const boothCheckbox = formElem.querySelector('.sponsorships_form_booth_request input[type=checkbox]') as HTMLInputElement;
       const uneligibleHelpTextElem = formElem.querySelector('.sponsorships_form_booth_request_uneligible') as Element;
@@ -48,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
       elem.querySelectorAll('input[type=radio]').forEach((planRadioElem) => {
         const planRadio = planRadioElem as HTMLInputElement;
         planRadio.addEventListener('change', (e) => {
+          calculateTotalAttendees();
           handleChange(e.target as HTMLInputElement);
         });
       }); 

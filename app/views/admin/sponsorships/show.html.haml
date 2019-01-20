@@ -23,6 +23,34 @@
               %p.card-text
                 %span.badge.badge-warning Presence Suspended
 
+            %dl
+              .row
+                %dt.col-sm-4 Locale
+                %dd.col-sm-8= @sponsorship.locale
+              .row
+                %dt.col-sm-4 Attendees
+                %dd.col-sm-8
+                  = @sponsorship.total_number_of_attendees
+                  (#{@sponsorship&.plan.number_of_guests || 0} + #{@sponsorship.number_of_additional_attendees || 0})
+              .row
+                %dt.col-sm-4 Booth
+                %dd.col-sm-8
+                  - case
+                  - when @sponsorship.booth_assigned && !@sponsorship.booth_requested
+                    Assigned but Not requested (!?)
+                  - when !@sponsorship.plan&.booth_eligible? && (@sponsorship.booth_assigned)
+                    Not Eligible but Assigned (!?)
+                  - when !@sponsorship.plan&.booth_eligible? && (@sponsorship.booth_requested)
+                    Not Eligible but Requested (!?)
+                  - when @sponsorship.booth_assigned
+                    Assigned
+                  - when @sponsorship.booth_requested
+                    Requested
+                  - when @sponsorship.plan&.booth_eligible?
+                    Eligible
+                  - else
+                    N/A
+
             %h5.card-title Plan
 
             - if @sponsorship.plan
@@ -38,29 +66,6 @@
               %p.card-text
                 #{@sponsorship.customization_name}
                 %span.badge.badge-warning Custom Plan: Tentative
-
-            %h5.card-title Booth
-
-            %p.card-text
-              - case
-              - when @sponsorship.booth_assigned && !@sponsorship.booth_requested
-                Assigned but Not requested (!?)
-              - when !@sponsorship.plan&.booth_eligible? && (@sponsorship.booth_assigned)
-                Not Eligible but Assigned (!?)
-              - when !@sponsorship.plan&.booth_eligible? && (@sponsorship.booth_requested)
-                Not Eligible but Requested (!?)
-              - when @sponsorship.booth_assigned
-                Assigned
-              - when @sponsorship.booth_requested
-                Requested
-              - when @sponsorship.plan&.booth_eligible?
-                Eligible
-              - else
-                N/A
-
-            %h5.card-title Locale
-
-            %p.card-text= @sponsorship.locale
 
             = link_to 'Download Asset', download_asset_conference_sponsorship_path(@conference, @sponsorship), class: 'card-link'
 

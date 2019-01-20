@@ -44,6 +44,7 @@ class Admin::FormDescriptionsController < Admin::ApplicationController
       :plan_help,
       :booth_help,
       :policy_help,
+      :ticket_help,
     )
   end
 
