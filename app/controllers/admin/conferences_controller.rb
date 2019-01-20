@@ -1,11 +1,14 @@
 class Admin::ConferencesController < Admin::ApplicationController
-  before_action :set_conference, only: [:show, :edit, :update, :destroy]
+  before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper]
 
   def index
     @conferences = Conference.all
   end
 
   def show
+  end
+
+  def attendees_keeper
   end
 
   def new

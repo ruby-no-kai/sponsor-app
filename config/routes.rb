@@ -8,6 +8,9 @@ Rails.application.routes.draw do
     get '/mailtown' => 'dashboard#mailtown', as: :mailtown
 
     resources :conferences, param: :slug do
+      member do
+        get :attendees_keeper
+      end
       resources :form_descriptions, except: %i(index)
       resources :plans, except: %i(index show)
 

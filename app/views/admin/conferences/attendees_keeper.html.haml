@@ -1,0 +1,25 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Attendees Keeper
+
+.d-md-flex.justify-content-between
+  %h3 Attendees Keeper
+
+.row
+  .card
+    .card-header Table
+    %table.card-body.table.table-hover
+      %thead
+        %tr
+          %th{scope: :col} Sponsorship
+          %th{scope: :col} Total
+          %th{scope: :col} Included
+          %th{scope: :col} Additional
+      %tbody
+        - @conference.sponsorships.includes(:plan).to_a.sort_by{|_| -_.total_number_of_attendees }.each do |sponsorship|
+          %tr
+            %td= link_to sponsorship.name, conference_sponsorship_path(@conference, sponsorship)
+            %td= sponsorship.total_number_of_attendees
+            %td= sponsorship.plan&.number_of_guests || 0
+            %td= sponsorship.number_of_additional_attendees || 0
