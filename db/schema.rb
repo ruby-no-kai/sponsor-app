@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_24_235234) do
+ActiveRecord::Schema.define(version: 2019_01_20_111843) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -80,6 +80,7 @@ ActiveRecord::Schema.define(version: 2018_12_24_235234) do
     t.datetime "updated_at", null: false
     t.string "contact_email_address"
     t.string "slug"
+    t.boolean "additional_attendees_registration_open", default: false, null: false
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
     t.index ["slug"], name: "index_conferences_on_slug", unique: true
   end
@@ -112,6 +113,8 @@ ActiveRecord::Schema.define(version: 2018_12_24_235234) do
     t.text "policy_help_html"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "ticket_help"
+    t.text "ticket_help_html"
     t.index ["conference_id", "locale"], name: "index_form_descriptions_on_conference_id_and_locale", unique: true
     t.index ["conference_id"], name: "index_form_descriptions_on_conference_id"
   end
@@ -216,6 +219,7 @@ ActiveRecord::Schema.define(version: 2018_12_24_235234) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "suspended", default: false, null: false
+    t.integer "number_of_additional_attendees"
     t.index ["conference_id", "organization_id"], name: "index_sponsorships_on_conference_id_and_organization_id", unique: true
     t.index ["conference_id"], name: "index_sponsorships_on_conference_id"
     t.index ["organization_id"], name: "index_sponsorships_on_organization_id"

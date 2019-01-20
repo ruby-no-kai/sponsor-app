@@ -7,6 +7,7 @@ en:
         url: 'URL'
         profile: 'Introduction text'
         booth_requested: 'Booth Request'
+        number_of_additional_attendees: 'Number of Additional Attendees'
         policy_agreement: 'I confirmed and agree with the policies'
 
       sponsorship/note: &note
@@ -106,6 +107,10 @@ en:
         Upload your company logo file for the sponsors page in our website. Please make sure your file is in vector format (like .ai, .eps, .svg).
       others_help: |
         Use the following field for anything you want let us know in advance.
+      tickets: 'Attendee Tickets'
+      tickets_included_in_plan: 'Tickets included in the selected plan'
+      tickets_additionally_request: 'Additional Tickets'
+      tickets_total: 'Total number of Attendees'
       note: 'Others'
       policies: 'Policies'
       submit: 'Submit'

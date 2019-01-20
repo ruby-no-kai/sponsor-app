@@ -28,6 +28,10 @@
     = form.label :booth_capacity
     = form.number_field :booth_capacity, class: 'form-control'
 
+  .form-group
+    .form-check
+      = form.check_box :additional_attendees_registration_open, class: 'form-check-input'
+      = form.label :additional_attendees_registration_open, class: 'form-check-label'
 
   .form-group
     = form.submit class: 'btn btn-primary'

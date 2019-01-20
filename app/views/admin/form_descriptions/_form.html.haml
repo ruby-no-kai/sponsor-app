@@ -10,7 +10,7 @@
     = form.label :locale
     = form.text_field :locale, class: 'form-control'
 
-  - %i(head plan_help booth_help policy_help).each do |field|
+  - %i(head plan_help booth_help policy_help ticket_help).each do |field|
     .form-group
       = form.label field
       = form.text_area field, class: 'form-control'

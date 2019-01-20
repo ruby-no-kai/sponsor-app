@@ -87,7 +87,7 @@
       - conference.plans.each do |plan|
         .form-check
           %label.form-check-label
-            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', disabled: !plan.available? && plan.id != @sponsorship.plan_id, data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit)}
+            = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', disabled: !plan.available? && plan.id != @sponsorship.plan_id, data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit), guests: plan.number_of_guests}
             = plan.name
             %small<
               #{plan.price_text}
@@ -100,7 +100,7 @@
               %small.badge.badge-danger= t('.plan_sold_out')
       .form-check
         %label.form-check-label
-          = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1'}
+          = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1', guests: 0}
           Other
 
     = form.fields_for :customization_request do |request_form|
@@ -147,6 +147,29 @@
     .form-group.sponsorships_form_asset_file{data: {session_endpoint: user_conference_sponsorship_asset_file_path, session_endpoint_method: sponsorship.asset_file&.persisted? ? 'PUT': 'POST'}}
       = form.hidden_field :asset_file_id
       .sponsorships_form_asset_file_form (Loading)
+
+  - if conference.additional_attendees_registration_open
+    %section.py-2.sponsorships_form_tickets
+      .form-group
+        %h3= t('.tickets')
+
+        = desc.ticket_help_html&.html_safe
+
+      .form-group.row
+        .col-sm-5.text-sm-right
+          %label= t('.tickets_included_in_plan')
+        .col-sm-7
+          .sponsorships_form_tickets__included_in_plan{style: 'padding-left: 0.75rem;'} -
+      .form-group.row
+        .col-sm-5.text-sm-right
+          = form.label :number_of_additional_attendees, t('.tickets_additionally_request')
+        .col-sm-7.sponsorships_form_tickets__additional_attendees
+          = form.number_field :number_of_additional_attendees, class: 'form-control', min: 0
+      .form-group.row
+        .col-sm-5.text-sm-right
+          %label= t('.tickets_total')
+        .col-sm-7
+          .sponsorships_form_tickets__total{style: 'padding-left: 0.75rem;'} -
 
   %section.py-2
     .form-group

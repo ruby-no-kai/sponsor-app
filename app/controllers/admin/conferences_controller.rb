@@ -59,6 +59,7 @@ class Admin::ConferencesController < Admin::ApplicationController
       :amendment_closes_at,
       :booth_capacity,
       :contact_email_address,
+      :additional_attendees_registration_open,
     )
   end
 end

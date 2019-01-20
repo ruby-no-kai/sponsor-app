@@ -34,6 +34,8 @@ class Sponsorship < ApplicationRecord
 
   validates :asset_file, presence: true
 
+  validates_numericality_of :number_of_additional_attendees, allow_nil: true, greater_than_or_equal_to: 0, only_integer: true
+
   validate :validate_correct_plan
   validate :validate_plan_availability
   validate :validate_booth_eligibility
