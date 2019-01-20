@@ -124,7 +124,11 @@ class Sponsorship < ApplicationRecord
     (plan&.number_of_guests || 0) + (number_of_additional_attendees || 0)
   end
 
-  private 
+  def last_editing_history
+    @last_editing_history ||= editing_histories.order(id: :asc).last
+  end
+
+  private
 
   def validate_correct_plan
     if plan && plan.conference_id != self.conference_id
@@ -159,7 +163,7 @@ class Sponsorship < ApplicationRecord
 
   def create_history
     yield
-    editing_histories.create!(
+    @last_editing_history = editing_histories.create!(
       raw: self.to_h_for_history,
     )
   end

@@ -6,12 +6,15 @@ class SponsorshipEditingHistory < ApplicationRecord
 
   before_validation :calculate_diff
 
+  def diff_summary
+    diff.map{ |_| "#{_[0]}#{_[1]}" }
+  end
+
   private
 
   def calculate_diff
     if last_raw && !self.diff
       self.diff = HashDiff.diff(last_raw, raw)
-      p self.diff
     end
   end
 

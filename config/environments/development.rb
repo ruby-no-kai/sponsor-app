@@ -99,6 +99,7 @@ Rails.application.configure do
 
   config.x.slack.webhook_urls = {
     default: ENV['SLACK_WEBHOOK_URL'],
+    feed: ENV['SLACK_WEBHOOK_URL'],
   }
 
   config.x.mailgun.api_key = ENV['MAILGUN_API_KEY']

@@ -23,6 +23,7 @@ class Admin::SponsorshipsController < Admin::ApplicationController
   def update
     respond_to do |format|
       if @sponsorship.update(sponsorship_params)
+        ProcessSponsorshipEditJob.perform_later(@sponsorship.last_editing_history)
         format.html { redirect_to conference_sponsorship_path(@conference, @sponsorship), notice: 'Sponsorship was successfully updated.' }
       else
         format.html { render :edit }

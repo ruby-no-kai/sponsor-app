@@ -14,6 +14,7 @@ Rails.application.configure do
 
     config.x.slack.webhook_urls = {
       default: ENV.fetch('SLACK_WEBHOOK_URL'),
+      feed: ENV.fetch('SLACK_WEBHOOK_URL_FOR_FEED', ENV.fetch('SLACK_WEBHOOK_URL')),
     }
   end
 

@@ -65,6 +65,7 @@ class SponsorshipsController < ApplicationController
       sp = sponsorship_params
       sp.delete(:asset_file_id)
       if @sponsorship.update(sp)
+        ProcessSponsorshipEditJob.perform_later(@sponsorship.last_editing_history)
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: 'Your application was successfully updated.' }
       else
         format.html { render :edit }
