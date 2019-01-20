@@ -6,6 +6,10 @@
 .d-md-flex.justify-content-between
   %h3 Attendees Keeper
 
+- sponsorships = @conference.sponsorships.includes(:plan).to_a.sort_by{|_| -_.total_number_of_attendees }
+%p Sponsorship Attendees Total: #{sponsorships.map(&:total_number_of_attendees).inject(:+)}
+%p Additional Attendees Ticket Sold: #{sponsorships.map(&:number_of_additional_attendees).compact.inject(:+)}
+
 .row
   .card
     .card-header Table
@@ -17,7 +21,7 @@
           %th{scope: :col} Included
           %th{scope: :col} Additional
       %tbody
-        - @conference.sponsorships.includes(:plan).to_a.sort_by{|_| -_.total_number_of_attendees }.each do |sponsorship|
+        - sponsorships.each do |sponsorship|
           %tr
             %td= link_to sponsorship.name, conference_sponsorship_path(@conference, sponsorship)
             %td= sponsorship.total_number_of_attendees
