@@ -97,7 +97,10 @@ Rails.application.configure do
   config.x.github.client_id = ENV['GITHUB_CLIENT_ID']
   config.x.github.client_secret = ENV['GITHUB_CLIENT_SECRET']
 
-  config.x.slack.webhook_url = ENV['SLACK_WEBHOOK_URL']
+  config.x.slack.webhook_urls = {
+    default: ENV['SLACK_WEBHOOK_URL'],
+    feed: ENV['SLACK_WEBHOOK_URL'],
+  }
 
   config.x.mailgun.api_key = ENV['MAILGUN_API_KEY']
 end

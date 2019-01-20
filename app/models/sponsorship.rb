@@ -37,9 +37,9 @@ class Sponsorship < ApplicationRecord
   validates_numericality_of :number_of_additional_attendees, allow_nil: true, greater_than_or_equal_to: 0, only_integer: true
 
   validate :validate_correct_plan
-  validate :validate_plan_availability
+  validate :validate_plan_availability, on: :update_by_user
   validate :validate_booth_eligibility
-  validate :validate_word_count
+  validate :validate_word_count, on: :update_by_user
   validate :policy_agreement
 
   accepts_nested_attributes_for :contact, allow_destroy: true,reject_if: -> (attrs) { attrs['kind'].present? }
@@ -50,6 +50,8 @@ class Sponsorship < ApplicationRecord
   accepts_nested_attributes_for :note, reject_if: -> (attrs) { attrs['kind'].present? }
 
   around_save :create_history
+
+  attr_accessor :staff
 
   def build_nested_attributes_associations
     self.build_contact unless self.contact
@@ -116,7 +118,7 @@ class Sponsorship < ApplicationRecord
       "locale" => locale,
       "asset_file_id" => asset_file&.id,
       "note" => note&.body,
-      "policy_agreement" => policy_agreement,
+      "number_of_additional_attendees" => number_of_additional_attendees,
     }
   end
 
@@ -124,7 +126,11 @@ class Sponsorship < ApplicationRecord
     (plan&.number_of_guests || 0) + (number_of_additional_attendees || 0)
   end
 
-  private 
+  def last_editing_history
+    @last_editing_history ||= editing_histories.order(id: :asc).last
+  end
+
+  private
 
   def validate_correct_plan
     if plan && plan.conference_id != self.conference_id
@@ -159,7 +165,8 @@ class Sponsorship < ApplicationRecord
 
   def create_history
     yield
-    editing_histories.create!(
+    @last_editing_history = editing_histories.create!(
+      staff: staff,
       raw: self.to_h_for_history,
     )
   end

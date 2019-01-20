@@ -21,8 +21,11 @@ class Admin::SponsorshipsController < Admin::ApplicationController
   end
 
   def update
+    @sponsorship.assign_attributes(sponsorship_params)
+    @sponsorship.staff = current_staff
     respond_to do |format|
-      if @sponsorship.update(sponsorship_params)
+      if @sponsorship.save
+        ProcessSponsorshipEditJob.perform_later(@sponsorship.last_editing_history)
         format.html { redirect_to conference_sponsorship_path(@conference, @sponsorship), notice: 'Sponsorship was successfully updated.' }
       else
         format.html { render :edit }
@@ -46,6 +49,8 @@ class Admin::SponsorshipsController < Admin::ApplicationController
       :booth_assigned,
 
       :suspended,
+
+      :number_of_additional_attendees,
 
       contact_attributes: %i(id email address organization unit name),
       alternate_billing_contact_attributes: %i(_keep id email address organization unit name),
