@@ -6,4 +6,4 @@
 - %i(head_html plan_help_html booth_help_html policy_help_html ticket_help_html).each do |field|
   %div
     %h4 #{field}
-    = @form_description[field].html_safe
+    = @form_description[field]&.html_safe
