@@ -12,7 +12,9 @@ Rails.application.configure do
     config.x.github.client_id = ENV.fetch('GITHUB_CLIENT_ID')
     config.x.github.client_secret = ENV.fetch('GITHUB_CLIENT_SECRET')
 
-    config.x.slack.webhook_url = ENV.fetch('SLACK_WEBHOOK_URL')
+    config.x.slack.webhook_urls = {
+      default: ENV.fetch('SLACK_WEBHOOK_URL'),
+    }
   end
 
   # Settings specified here will take precedence over those in config/application.rb.
