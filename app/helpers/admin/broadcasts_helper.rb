@@ -9,11 +9,11 @@ module Admin::BroadcastsHelper
       :warning
     when :sending
       :warning
-    when :sent
+    when :sent, :accepted, :delivered
       :info
     when :failed, :rejected
       :danger
-    when :accepted, :delivered, :opened
+    when :opened, :clicked
       :success
     else
       :dark
