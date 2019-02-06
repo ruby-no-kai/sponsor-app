@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
           sessionEndpoint={sessionEndpoint}
           sessionEndpointMethod={sessionEndpointMethod}
         />,
-      dest) as SponsorshipAssetFileForm;
+      dest) as unknown as SponsorshipAssetFileForm;
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
         form.querySelectorAll('input[type=submit]:disabled').forEach((el) => (el as HTMLInputElement).disabled = true);
