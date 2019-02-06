@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.5.1' if ENV['STACK'] || ENV['IS_HEROKU']
+ruby '2.6.1' if ENV['STACK'] || ENV['IS_HEROKU']
 
 gem 'rails', '~> 5.2.1'
 gem 'rails-i18n', '~> 5.1'
