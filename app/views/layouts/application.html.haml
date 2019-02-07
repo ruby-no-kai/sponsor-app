@@ -8,6 +8,9 @@
     = csp_meta_tag
 
     = stylesheet_pack_tag 'application', media: 'all'
+
+    - if Rails.application.config.x.sentry.dsn.present?
+      %script= "window.SENTRY_DSN = '#{Rails.application.config.x.sentry.dsn}'"
   %body
     %nav.navbar.navbar-expand-lg.navbar-dark
       %a.navbar-brand{href: '/'}= t('.brand')

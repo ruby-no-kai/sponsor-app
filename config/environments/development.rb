@@ -103,4 +103,5 @@ Rails.application.configure do
   }
 
   config.x.mailgun.api_key = ENV['MAILGUN_API_KEY']
+  config.x.sentry.dsn = ENV['SENTRY_DSN']
 end

@@ -3,6 +3,7 @@
   "private": true,
   "dependencies": {
     "@rails/webpacker": "https://github.com/rails/webpacker",
+    "@sentry/browser": "^4.5.3",
     "@types/react": "^16.4.18",
     "@types/react-dom": "^16.0.9",
     "aws-sdk": "^2.350.0",

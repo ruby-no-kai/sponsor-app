@@ -128,4 +128,6 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   config.x.mailgun.api_key = ENV['MAILGUN_API_KEY']
+
+  config.x.sentry.dsn = ENV['SENTRY_DSN']
 end
