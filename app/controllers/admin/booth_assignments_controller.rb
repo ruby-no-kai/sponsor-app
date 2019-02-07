@@ -14,7 +14,11 @@ class Admin::BoothAssignmentsController < ::Admin::ApplicationController
     @sponsorships = @conference.sponsorships
     @sponsorships.each do |sponsorship|
       sponsorship.booth_assigned = booth_assignments_param[sponsorship.id.to_s] == '1'
-      sponsorship.save!(validate: false)
+      if sponsorship.booth_assigned_changed?
+        sponsorship.staff = current_staff
+        sponsorship.save!(validate: false)
+        ProcessSponsorshipEditJob.perform_later(sponsorship.last_editing_history)
+      end
     end
     redirect_to conference_booth_assignment_path(@conference), notice: 'Assignment updated'
   end
