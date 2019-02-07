@@ -12,6 +12,9 @@ class Announcement < ApplicationRecord
   before_validation :generate_issue
   before_validation :bump_revision
 
+  scope :for_sponsors, -> { where(exhibitors_only: false) }
+  scope :for_exhibitors, -> { where('1=1') }
+
   def to_param
     "#{issue}:#{locale}"
   end

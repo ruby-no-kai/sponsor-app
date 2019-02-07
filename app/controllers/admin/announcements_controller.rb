@@ -5,7 +5,7 @@ class Admin::AnnouncementsController < Admin::ApplicationController
   def index
     @announcements = @conference.announcements
       .order('issue ASC, id ASC')
-      .select(:id, :conference_id, :issue, :locale, :title, :stickiness, :revision, :staff_id, :published_at)
+      .select(:id, :conference_id, :issue, :locale, :title, :stickiness, :revision, :staff_id, :published_at, :exhibitors_only)
       .to_a.group_by(&:issue)
       .sort_by { |issue, locales| [-locales.max_by(&:stickiness).stickiness, -locales.min_by(&:id).id] }
   end
@@ -77,6 +77,7 @@ class Admin::AnnouncementsController < Admin::ApplicationController
       :stickiness,
       :published,
       :new_revision,
+      :exhibitors_only,
     )
   end
 end

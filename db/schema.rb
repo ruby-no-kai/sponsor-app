@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_20_111843) do
+ActiveRecord::Schema.define(version: 2019_02_07_015530) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 2019_01_20_111843) do
     t.integer "revision", default: 1, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "exhibitors_only", default: false, null: false
     t.index ["conference_id", "issue", "id"], name: "index_announcements_on_conference_id_and_issue_and_id"
     t.index ["conference_id", "issue", "locale"], name: "index_announcements_on_conference_id_and_issue_and_locale", unique: true
     t.index ["conference_id", "issue", "revision"], name: "index_announcements_on_conference_id_and_issue_and_revision"

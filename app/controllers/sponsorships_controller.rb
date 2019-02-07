@@ -7,7 +7,11 @@ class SponsorshipsController < ApplicationController
     @conference = current_sponsorship&.conference
     raise ActiveRecord::RecordNotFound unless @conference
 
-    @announcements = @sponsorship.conference.announcements.where(locale: I18n.locale).where('published_at IS NOT NULL').order('stickiness DESC, id DESC')
+    @announcements = @sponsorship.conference.announcements
+      .where(locale: I18n.locale)
+      .where('published_at IS NOT NULL')
+      .order('stickiness DESC, id DESC')
+      .merge(@sponsorship.exhibitor? ? Announcement.for_exhibitors : Announcement.for_sponsors)
   end
 
   def edit

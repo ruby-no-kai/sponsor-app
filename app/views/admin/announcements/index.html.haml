@@ -22,6 +22,9 @@
               - if ann.pin?
                 %span.badge.badge-info
                   Pin
+              - if ann.exhibitors_only?
+                %span.badge.badge-dark
+                  Exhibitors Only
               - if ann.draft?
                 %span.badge.badge-warning
                   Draft

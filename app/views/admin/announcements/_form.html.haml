@@ -33,6 +33,11 @@
       = form.check_box :stickiness, {class: 'form-check-input'}, '1', '0'
       = form.label :stickiness, "Pin", class: 'form-check-label'
 
+    .form-check-inline
+      = form.check_box :exhibitors_only, {class: 'form-check-input'}, '1', '0'
+      = form.label :exhibitors_only, "Exhibitors Only", class: 'form-check-label'
+
+
   .form-group
     = form.submit "Save", class: 'btn btn-primary'
     .form-check-inline

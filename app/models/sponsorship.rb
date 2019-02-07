@@ -138,6 +138,10 @@ class Sponsorship < ApplicationRecord
     booth_assigned? ? (plan&.booth_size || 0) : 0
   end
 
+  def exhibitor?
+    booth_assigned?
+  end
+
   private
 
   def validate_correct_plan
