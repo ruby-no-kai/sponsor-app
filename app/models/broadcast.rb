@@ -28,7 +28,7 @@ class Broadcast < ApplicationRecord
     case
     when statuses == %w(pending), statuses == %w(created pending)
       self.status = :pending
-    when (statuses - %w(sent failed rejected accepted delivered opened)).empty?
+    when (statuses - %w(sent failed rejected accepted delivered opened clicked)).empty?
       self.status = :sent
     else
       self.status = :sending
