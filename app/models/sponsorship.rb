@@ -130,6 +130,14 @@ class Sponsorship < ApplicationRecord
     @last_editing_history ||= editing_histories.order(id: :asc).last
   end
 
+  def booth_size
+    plan&.booth_size
+  end
+
+  def assigned_booth_size
+    booth_assigned? ? (plan&.booth_size || 0) : 0
+  end
+
   private
 
   def validate_correct_plan

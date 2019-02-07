@@ -1,0 +1,40 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Booth Assignments
+
+.d-md-flex.justify-content-between
+  %h3 Booth Assignments
+
+%section
+  %p
+    Booth requested: #{@sponsorships.size} sponsors (capacity #{@sponsorships.map(&:booth_size).compact.inject(:+)})
+    %br
+    Booth assigned: #{@exhibitors.size} sponsors (capacity #{@exhibitors.map(&:assigned_booth_size).compact.inject(:+)})
+
+%section.booth_assignment_form
+  %h4 Assignment
+  = form_tag conference_booth_assignment_path(@conference), method: 'PUT', class: 'my-2' do
+    %p
+      %button.booth_assignment_select_all_button.btn.btn-info Select All
+      %button.booth_assignment_select_none_button.btn.btn-secondary Select None
+
+    .row
+      .col-1
+        %strong Assign
+      .col-10
+        %strong Sponsorship
+
+    - @sponsorships.each do |sponsorship|
+      .row
+        .col-1.d-flex.align-items-center
+          = check_box_tag "booth_assignments[#{sponsorship.id}]", '1', sponsorship.booth_assigned?
+        .col-10
+          .row
+            .col-md-2
+              #{sponsorship.plan&.name} (#{sponsorship.plan&.booth_size || 0})
+            .col-md-10
+              = link_to sponsorship.name, conference_sponsorship_path(@conference, sponsorship)
+
+    %p.mt-3
+      = submit_tag "Update", class: 'btn btn-primary'

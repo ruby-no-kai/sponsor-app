@@ -11,6 +11,9 @@ Rails.application.routes.draw do
       member do
         get :attendees_keeper
       end
+
+      resource :booth_assignment, only: %i(show update)
+
       resources :form_descriptions, except: %i(index)
       resources :plans, except: %i(index show)
 
