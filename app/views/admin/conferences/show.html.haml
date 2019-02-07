@@ -73,6 +73,8 @@
                   #{sponsorship.customization_name}:
                 = link_to sponsorship.name, [@conference, sponsorship]
 
+                - if sponsorship.exhibitor?
+                  %span.badge.badge-info Booth
                 - if sponsorship.customization_planned?
                   %span.badge.badge-warning Custom Plan: Tentative
                 - if sponsorship.suspended?
