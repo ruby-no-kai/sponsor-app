@@ -1,7 +1,7 @@
 class SponsorshipAssetFilesController < ApplicationController
   def create
     return render(status: 403, json: {error: 403}) if current_sponsorship&.asset_file
-    conference = current_sponsorship.conference
+    conference = current_sponsorship ? current_sponsorship.sponsorship : Conference.find_by!(slug: params[:conference_slug])
     return render(status: 403, json: {error: 403}) if !conference&.amendment_open? && !current_staff
 
     asset_file = SponsorshipAssetFile.create!(prefix: "#{conference.id}/", extension: params[:extension])
