@@ -6,7 +6,7 @@
 .d-md-flex.justify-content-between
   %h3 Attendees Keeper
 
-- sponsorships = @conference.sponsorships.includes(:plan).to_a.sort_by{|_| -_.total_number_of_attendees }
+- sponsorships = @conference.sponsorships.active.includes(:plan).to_a.sort_by{|_| -_.total_number_of_attendees }
 %p Sponsorship Attendees Total: #{sponsorships.map(&:total_number_of_attendees).inject(:+)}
 %p Additional Attendees Ticket Sold: #{sponsorships.map(&:number_of_additional_attendees).compact.inject(:+)}
 

@@ -22,6 +22,9 @@
             - if @sponsorship.suspended?
               %p.card-text
                 %span.badge.badge-warning Presence Suspended
+            - if @sponsorship.withdrawn?
+              %p.card-text
+                %span.badge.badge-danger Withdrawn
 
             %dl
               .row
@@ -163,3 +166,15 @@
           = @sponsorship.billing_contact.organization
         %p.card-text
           = @sponsorship.billing_contact.address
+
+
+.row.mt-4
+  .col-md-8
+    %section.card.border-danger
+      .card-header.bg-danger.text-white Danger Zone
+      .card-body
+        %p.card-text
+          - if @sponsorship.withdrawn?
+          - else
+            = link_to "Withdraw", conference_sponsorship_path(@conference, @sponsorship), method: :delete, data: {confirm: 'Are you sure?'}, class: 'btn btn-danger'
+

@@ -22,6 +22,9 @@ class Sponsorship < ApplicationRecord
   has_many :editing_histories, -> { order(id: :desc) }, class_name: 'SponsorshipEditingHistory', dependent: :destroy
   has_many :staff_notes, class_name: 'SponsorshipStaffNote', dependent: :destroy
 
+  scope :active, -> { where(withdrawn_at: nil) }
+  scope :withdrawn, -> { where.not(withdrawn_at: nil) }
+  scope :have_presence, -> { where(suspended: false) }
   scope :exhibitor, -> { where(booth_assigned: true) }
 
   validates :organization, presence: true, uniqueness: {scope: :conference_id}
@@ -59,6 +62,10 @@ class Sponsorship < ApplicationRecord
     self.build_billing_request unless self.billing_request
     self.build_customization_request unless self.customization_request
     self.build_note unless self.note
+  end
+
+  def withdrawn?
+    !!withdrawn_at
   end
 
   def customized?
@@ -119,7 +126,9 @@ class Sponsorship < ApplicationRecord
       "asset_file_id" => asset_file&.id,
       "note" => note&.body,
       "number_of_additional_attendees" => number_of_additional_attendees,
-    }
+    }.tap do |h|
+      h["withdrawn_at"] = withdrawn_at if withdrawn_at
+    end
   end
 
   def total_number_of_attendees
@@ -140,6 +149,13 @@ class Sponsorship < ApplicationRecord
 
   def exhibitor?
     booth_assigned?
+  end
+
+  def withdraw
+    self.withdrawn_at = Time.zone.now
+    self.booth_assigned = false
+    self.plan = nil
+    return self
   end
 
   private

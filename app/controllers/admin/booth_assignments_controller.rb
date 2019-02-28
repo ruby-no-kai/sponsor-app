@@ -4,6 +4,7 @@ class Admin::BoothAssignmentsController < ::Admin::ApplicationController
   def show
     @sponsorships = @conference.sponsorships
       .includes(:plan)
+      .active
       .where(booth_requested: true)
       .or(Sponsorship.includes(:plan).where(booth_assigned: true))
       .order('plans.booth_size desc, sponsorships.name asc')
