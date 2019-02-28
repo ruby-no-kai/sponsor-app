@@ -15,6 +15,31 @@
           - if @conference.amendment_closes_at
             %p= t('.amendment_availability', ts: l(@conference.amendment_closes_at))
 
+  .col-md-6
+    .card.text-dark
+      .card-header= t('.your_sponsorship_plan')
+      .card-body
+        - if @sponsorship.plan
+          %h5.card-title= @sponsorship.plan.name
+          - if @sponsorship.customized?
+            %p.card-text #{t('.customized_plan')} (#{@sponsorship.customization_name})
+          - if @sponsorship.plan.talkable?
+            %p.card-text= t('.sponsor_talk_eligible')
+          - if @sponsorship.plan.number_of_guests
+            %p.card-text #{t('.included_guests')}: #{t('.guests_count', count: @sponsorship.plan.number_of_guests)}
+          - if @sponsorship.number_of_additional_attendees
+            %p.card-text #{t('.additional_guests')}: #{t('.guests_count', count: @sponsorship.number_of_additional_attendees)}
+          - case
+          - when @sponsorship.booth_assigned
+            %p.card-text= t('.booth.assigned')
+          - when @sponsorship.booth_requested
+            %p.card-text= t('.booth.requested')
+          - when @sponsorship.plan&.booth_eligible?
+            %p.card-text= t('.booth.eligible')
+        - else
+          %h5.card-title= t('.undetermined_plan')
+          %p.card-text= t('.undetermined_plan_help')
+
 - unless @announcements.empty?
   .row.py-2
     .col-md-12

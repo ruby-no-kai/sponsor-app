@@ -129,6 +129,22 @@ en:
       amendment_availability: "You can amend your application until %{ts}."
       contact: "Contact"
       contact_help: "For any questions and inquiries, feel free to reach us at:"
+      your_sponsorship_plan: "Your selected sponsorship plan"
+      customized_plan: "Customized"
+      sponsor_talk_eligible: "Includes a sponsor session"
+      included_guests: "Attendee tickets included in the plan"
+      additional_guests: "Additional tickets purchased"
+      guests_count:
+        zero: 'no guests'
+        one: '1 guest'
+        other: '%{count} guests'
+      booth:
+        assigned: 'Sponsor Booth Assigned'
+        requested: 'Sponsor Booth Requested'
+        eligible: 'Sponsor Booth Eligible'
+
+      undetermined_plan: 'Undetermined'
+      undetermined_plan_help: "You have not determined a sponsorship plan. Contact organizers team for help."
     edit:
       amendment_availability: "You can amend your application until %{ts}."
 

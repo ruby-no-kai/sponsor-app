@@ -129,6 +129,22 @@ ja:
       amendment_availability: "%{ts} まで修正することができます。"
       contact: "問合せ"
       contact_help: "質問や要望、相談はお気軽に下記へお問い合わせください。"
+      your_sponsorship_plan: "スポンサープラン"
+      customized_plan: "カスタム"
+      sponsor_talk_eligible: "スポンサーセッション有り"
+      included_guests: "プランに含まれているチケット"
+      additional_guests: "追加でお取り置きしているチケット"
+      guests_count:
+        zero: '0 枚'
+        one: '1 枚'
+        other: '%{count} 枚'
+      booth:
+        assigned: 'ブース有り'
+        requested: 'ブース対応 (申し込み済)'
+        eligible: 'ブース対応 (申し込み無し)'
+      undetermined_plan: '未決定'
+      undetermined_plan_help: "スポンサーシップのプランがまだ確定していません。運営チームとご相談ください。"
+
     edit:
       amendment_availability: "%{ts} まで修正することができます。"
 
