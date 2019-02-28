@@ -33,6 +33,17 @@ class Admin::SponsorshipsController < Admin::ApplicationController
     end
   end
 
+  def destroy
+    return render(status: 404, plain: '') if @sponsorship.withdrawn?
+    @sponsorship.staff = current_staff
+    respond_to do |format|
+      @sponsorship.withdraw
+      @sponsorship.save!
+      ProcessSponsorshipEditJob.perform_later(@sponsorship.last_editing_history)
+      format.html { redirect_to conference_sponsorship_path(@conference, @sponsorship), notice: 'Sponsorship was successfully withdrawn.' }
+    end
+  end
+
   private
 
   def sponsorship_params

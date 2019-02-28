@@ -61,6 +61,10 @@ class Sponsorship < ApplicationRecord
     self.build_note unless self.note
   end
 
+  def withdrawn?
+    !!withdrawn_at
+  end
+
   def customized?
     customization && customization_name.present?
   end
@@ -119,7 +123,9 @@ class Sponsorship < ApplicationRecord
       "asset_file_id" => asset_file&.id,
       "note" => note&.body,
       "number_of_additional_attendees" => number_of_additional_attendees,
-    }
+    }.tap do |h|
+      h["withdrawn_at"] = withdrawn_at if withdrawn_at
+    end
   end
 
   def total_number_of_attendees
@@ -140,6 +146,13 @@ class Sponsorship < ApplicationRecord
 
   def exhibitor?
     booth_assigned?
+  end
+
+  def withdraw
+    self.withdrawn_at = Time.zone.now
+    self.booth_assigned = false
+    self.plan = nil
+    return self
   end
 
   private
