@@ -40,10 +40,10 @@
         Plans
       .card-body
         %ul
-          - @conference.plans.order(rank: :desc).select(:id, :name, :capacity).each do |plan|
+          - @plans_with_count.each do |plan, count, capacity|
             %li
               = link_to plan.name, edit_conference_plan_path(@conference, plan)
-              %span (#{plan&.sponsorships&.size}/#{plan&.capacity})
+              %span (#{count}/#{capacity})
         = link_to 'Add plan', new_conference_plan_path(@conference), class: 'card-link'
 
   .col-md-4

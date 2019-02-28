@@ -6,6 +6,14 @@ class Admin::ConferencesController < Admin::ApplicationController
   end
 
   def show
+    @plans_with_count = @conference
+      .sponsorships
+      .group('plan_id')
+      .includes(:plan)
+      .select('plan_id, COUNT(plan_id) as cnt')
+      .where.not(plan_id: nil)
+      .map {|_| [_.plan, _.cnt, _.plan.capacity] }
+      .sort_by { |plan, _cnt, _capa| -plan.rank }
   end
 
   def attendees_keeper
