@@ -41,7 +41,7 @@ class Sponsorship < ApplicationRecord
 
   validate :validate_correct_plan
   validate :validate_plan_availability, on: :update_by_user
-  validate :validate_booth_eligibility
+  validate :validate_booth_eligibility, on: :update_by_user
   validate :validate_word_count, on: :update_by_user
   validate :policy_agreement
 
