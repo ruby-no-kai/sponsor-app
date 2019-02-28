@@ -44,7 +44,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
   def filter_recipients(kind, params)
     case kind.to_s
     when 'all'
-      scope = @broadcast.conference.sponsorships.includes(:contact)
+      scope = @broadcast.conference.sponsorships.active.includes(:contact)
       scope = scope.where(locale: params[:locale]) if params[:locale].present?
       scope = scope.exhibitor if params[:exhibitors].present?
       scope.map do |sponsorship|
@@ -55,7 +55,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
       end
     when 'past_sponsors'
       conference = Conference.find_by!(id: params[:id])
-      scope = conference.sponsorships.includes(:contact)
+      scope = conference.sponsorships.active.includes(:contact)
       scope = scope.where(locale: params[:locale]) if params[:locale].present?
       scope = scope.where.not(organization_id: @broadcast.conference.sponsorships.pluck(:organization_id)) if params[:exclude_current_sponsors]
       scope.map do |sponsorship|

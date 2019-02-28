@@ -63,7 +63,7 @@
       %h5.card-header
         Sponsorships
       .card-body
-        - @conference.sponsorships.includes(:plan).order(id: :asc).group_by(&:plan).sort_by {|p, _| p&.rank || 9999 }.each do |plan, sponsorships|
+        - @conference.sponsorships.active.includes(:plan).order(id: :asc).group_by(&:plan).sort_by {|p, _| p&.rank || 9999 }.each do |plan, sponsorships|
           %h6
             = plan&.name || 'Undetermined'
             %span (#{sponsorships.size}/#{plan&.capacity})
@@ -82,3 +82,13 @@
                 - if sponsorship.suspended?
                   %span.badge.badge-warning Suspended
 
+        - @conference.sponsorships.withdrawn.tap do |sponsorships|
+          %h6
+            Withdrawn
+          %ul
+            - sponsorships.sort_by(&:id).each do |sponsorship|
+              %li.text-muted
+                - case
+                - when sponsorship.customization_name.present?
+                  #{sponsorship.customization_name}:
+                = link_to sponsorship.name, [@conference, sponsorship]
