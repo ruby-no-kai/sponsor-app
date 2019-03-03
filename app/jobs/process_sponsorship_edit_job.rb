@@ -10,5 +10,7 @@ class ProcessSponsorshipEditJob < ApplicationJob
       },
       hook_name: :feed,
     )
+
+    GenerateSponsorsYamlFileJob.perform_now(@conference)
   end
 end

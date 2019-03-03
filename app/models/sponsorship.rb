@@ -80,6 +80,10 @@ class Sponsorship < ApplicationRecord
     customized? ? (customization_name || plan&.name) : plan&.name
   end
 
+  def slug
+    self.organization&.slug
+  end
+
   def word_count
     profile&.scan(/\w+/)&.size || 0
   end

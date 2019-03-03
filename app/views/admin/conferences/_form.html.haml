@@ -14,6 +14,11 @@
   .form-group
     = form.label :contact_email_address
     = form.email_field :contact_email_address, class: 'form-control', required: true
+  .form-group
+    = form.label :github_repo
+    = form.text_field :github_repo, class: 'form-control', required: true
+    %small.form-text
+      %code owner/repo[@branch]:path/to/file
 
   .form-group
     = form.label :application_opens_at

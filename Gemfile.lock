@@ -269,6 +269,7 @@ DEPENDENCIES
   hamlit
   hashdiff
   jbuilder (~> 2.5)
+  jwt
   letter_opener_web!
   nokogiri
   octokit

@@ -1,4 +1,10 @@
 class Conference < ApplicationRecord
+  GithubRepo = Struct.new(:raw, :name, :path, :branch, keyword_init: true) do
+    def to_s
+      raw
+    end
+  end
+
   has_many :form_descriptions, dependent: :destroy
   has_many :plans, -> { order(rank: :asc) }, dependent: :destroy
   has_many :sponsorships, dependent: :destroy
@@ -11,6 +17,7 @@ class Conference < ApplicationRecord
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
   validates :contact_email_address, presence: true
+  validate :validate_valid_github_repo
 
   before_validation :generate_slug
 
@@ -30,6 +37,30 @@ class Conference < ApplicationRecord
 
   def form_description_for_locale
     form_descriptions.find_by(locale: I18n.locale) || form_descriptions.find_by!(locale: 'en')
+  end
+
+  def github_repo
+    ghr = read_attribute(:github_repo)
+    if @github_repo&.raw != ghr
+      m = ghr.match(/^(.+?)(?:@(.+?))?(?::(.+?))$/)
+      @github_repo = m && GithubRepo.new(
+        raw: ghr,
+        name: m[1],
+        branch: m[2].presence,
+        path: m[3].presence,
+      )
+    end
+    @github_repo
+  end
+
+  def validate_valid_github_repo
+    if github_repo
+      unless github_repo.name.present? && github_repo.path.present?
+        errors.add :github_repo, :invalid
+      end
+    elsif read_attribute(:github_repo) && github_repo.nil?
+      errors.add :github_repo, :invalid
+    end
   end
 
   private def generate_slug

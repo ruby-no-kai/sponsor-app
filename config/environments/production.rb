@@ -11,6 +11,9 @@ Rails.application.configure do
     config.x.github.repo = ENV.fetch('GITHUB_REPO')
     config.x.github.client_id = ENV.fetch('GITHUB_CLIENT_ID')
     config.x.github.client_secret = ENV.fetch('GITHUB_CLIENT_SECRET')
+    config.x.github.app_id = ENV.fetch('GITHUB_APP_ID')
+    config.x.github.private_key = OpenSSL::PKey::RSA.new(ENV.fetch('GITHUB_CLIENT_PRIVATE_KEY').unpack1('m*'), '')
+
 
     config.x.slack.webhook_urls = {
       default: ENV.fetch('SLACK_WEBHOOK_URL'),

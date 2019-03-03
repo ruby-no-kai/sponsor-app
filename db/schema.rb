@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_28_165853) do
+ActiveRecord::Schema.define(version: 2019_03_03_130402) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -82,6 +82,7 @@ ActiveRecord::Schema.define(version: 2019_02_28_165853) do
     t.string "contact_email_address"
     t.string "slug"
     t.boolean "additional_attendees_registration_open", default: false, null: false
+    t.string "github_repo"
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
     t.index ["slug"], name: "index_conferences_on_slug", unique: true
   end

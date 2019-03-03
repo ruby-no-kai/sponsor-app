@@ -36,7 +36,10 @@ And you need to manually install the app to the repositories.
 - `GITHUB_REPO` specify in ":login/:repo" format; used for authorization.
 - `GITHUB_CLIENT_ID`
 - `GITHUB_CLIENT_SECRET`
-- `GITHUB_CLIENT_PRIVATE_KEY`
+- `GITHUB_APP_ID`
+- `GITHUB_CLIENT_PRIVATE_KEY` (Base64 encoded DER)
+  - `openssl pkey -in /path/to/private-key.pem -outform der | openssl base64 -A`
+  - (or concat Base64 part of PEM into a one line)
 
 But during development, you can pass `$BACKDOOR_SECRET` to the application, then go http://localhost:3000/admin/session/new?backdoor=BACKDOOR_SECRET&login=YOUR_GITHUB_LOGIN to login without genuine OAuth2 dance.
 

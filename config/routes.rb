@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     resources :conferences, param: :slug do
       member do
         get :attendees_keeper
+        get :sponsors_yml
       end
 
       resource :booth_assignment, only: %i(show update)
