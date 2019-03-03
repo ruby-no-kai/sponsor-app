@@ -30,14 +30,17 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
         [
           base_plan_slug,
           {
-            base_plan: sponsorships[0].plan.name,
+            base_plan: sponsorships[0].plan.name.downcase,
             plans: sponsorships.group_by { |_| _.plan_name.downcase.gsub(/[^a-z0-9]/, '_') }.map do |plan_slug, sponsors|
               [
                 plan_slug,
                 {
+                  plan_name: sponsors[0].plan_name,
                   sponsors: sponsors.map do |_|
                     {
                       id: _.id,
+                      asset_file_id: _.asset_file&.id,
+                      base_plan: _.plan.name.downcase,
                       plan_name: _.plan_name,
                       slug: _.slug,
                       name: _.name,
