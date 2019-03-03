@@ -20,7 +20,7 @@
             %th{scope: :col, style: 'width: 200px;'} Customization Request
             %th{scope: :col, style: 'width: 200px;'} Note
         %tbody
-          - sponsorships.each do |sponsorship|
+          - @sponsorships.each do |sponsorship|
             %tr
               %td.text-truncate.text-left= link_to sponsorship.name, conference_sponsorship_path(@conference, sponsorship)
               %td= sponsorship.plan&.name
