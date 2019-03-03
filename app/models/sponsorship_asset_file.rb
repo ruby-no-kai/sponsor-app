@@ -28,7 +28,7 @@ class SponsorshipAssetFile < ApplicationRecord
       bucket: BUCKET,
       key: object_key,
       expires_in: 3600,
-      response_content_disposition: "attachment; filename=\"S#{sponsorship&.id}_#{sponsorship&.name&.gsub(%r{ |　|/|:|,|\.},'_')}.#{extension}\"",
+      response_content_disposition: "attachment; filename=\"S#{id}_#{sponsorship&.slug}.#{extension}\"",
     )
   end
 
