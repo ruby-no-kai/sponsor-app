@@ -1,4 +1,10 @@
 class SponsorshipAssetFilesController < ApplicationController
+  def show
+    asset = current_sponsorship&.asset_file
+    raise ActiveRecord::RecordNotFound unless asset
+    redirect_to asset.download_url()
+  end
+
   def create
     return render(status: 403, json: {error: 403}) if current_sponsorship&.asset_file
     conference = current_sponsorship ? current_sponsorship.sponsorship : Conference.find_by!(slug: params[:conference_slug])

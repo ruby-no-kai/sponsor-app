@@ -105,6 +105,7 @@ en:
       information_help: |
         Please provide a short introduction of your company. Note that the length of the introduction will be vary depending on the sponsorship plan you chose.
       logo: 'Logo'
+      download_logo: '(Download previously uploaded file)'
       logo_help: |
         Upload your company logo file for the sponsors page in our website. Please make sure your file is in vector format (like .ai, .eps, .svg).
       others_help: |

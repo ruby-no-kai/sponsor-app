@@ -148,6 +148,9 @@
       = form.hidden_field :asset_file_id
       .sponsorships_form_asset_file_form (Loading)
 
+    - if sponsorship.persisted? && sponsorship.asset_file
+      %small.form-text= link_to t('.download_logo'), user_conference_sponsorship_asset_file_path
+
   - if conference.additional_attendees_registration_open
     %section.py-2.sponsorships_form_tickets
       .form-group

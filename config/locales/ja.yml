@@ -105,6 +105,7 @@ ja:
       information_help: |
         ウェブサイトや会場に掲載するためのスポンサーの情報をご提供ください。
       logo: 'ロゴ'
+      download_logo: '(以前にアップロードしたファイルをダウンロードする)'
       logo_help: |
         Web 掲載用ロゴファイルをアップロードしてください。形式はベクター形式 (.eps, .ai, .svg 等) でお願い致します。
       tickets: 'Attendee チケット'
