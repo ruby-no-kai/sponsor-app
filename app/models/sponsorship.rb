@@ -27,6 +27,9 @@ class Sponsorship < ApplicationRecord
   scope :have_presence, -> { where(suspended: false) }
   scope :exhibitor, -> { where(booth_assigned: true) }
 
+  scope :includes_contacts, -> { includes(:contact, :alternate_billing_contact) }
+  scope :includes_requests, -> { includes(:billing_contact, :customization_request, :note) }
+
   validates :organization, presence: true, uniqueness: {scope: :conference_id}
 
   validates :contact, presence: true

@@ -1,0 +1,30 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Table View
+
+.d-md-flex.justify-content-between
+  %h3 Table View
+
+.row
+  .col-12
+    .card.responsive-table
+      .card-header Table
+      %table.card-body.table.table-hover.table-small{style: 'table-layout: fixed;'}
+        %thead
+          %tr
+            %th{scope: :col, style: 'width: 150px;'} Sponsorship
+            %th{scope: :col, style: 'width: 80px;'} Plan
+            %th{scope: :col, style: 'width: 100px;'} Displayed Plan
+            %th{scope: :col, style: 'width: 200px;'} Billing Request
+            %th{scope: :col, style: 'width: 200px;'} Customization Request
+            %th{scope: :col, style: 'width: 200px;'} Note
+        %tbody
+          - sponsorships.each do |sponsorship|
+            %tr
+              %td.text-truncate.text-left= link_to sponsorship.name, conference_sponsorship_path(@conference, sponsorship)
+              %td= sponsorship.plan&.name
+              %td= sponsorship.plan_name
+              %td= sponsorship.billing_request&.body
+              %td= sponsorship.customization_request&.body
+              %td= sponsorship.note&.body
