@@ -21,6 +21,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       .order(id: :asc)
       .includes(:plan)
       .includes(:organization)
+      .includes(:asset_file)
       .group_by { |_| _.plan.name.downcase.gsub(/[^a-z0-9]/, '_') }
 
     @last_id = SponsorshipEditingHistory.where(sponsorship_id: sponsorships.each_value.flat_map { |_| _.map(&:id) }).order(id: :desc).limit(1).pluck(:id)[0]
