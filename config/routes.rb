@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       member do
         get :attendees_keeper
         get :sponsors_yml
+        get :asset_urls
       end
 
       resource :booth_assignment, only: %i(show update)

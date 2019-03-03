@@ -21,6 +21,10 @@ class SponsorshipAssetFile < ApplicationRecord
     Session.new(self).as_json
   end
 
+  def filename
+    "S#{id}_#{sponsorship&.slug}.#{extension}"
+  end
+
   def download_url
     presigner = Aws::S3::Presigner.new(client: Aws::S3::Client.new(use_dualstack_endpoint: true, region: REGION))
     presigner.presigned_url(
@@ -28,7 +32,7 @@ class SponsorshipAssetFile < ApplicationRecord
       bucket: BUCKET,
       key: object_key,
       expires_in: 3600,
-      response_content_disposition: "attachment; filename=\"S#{id}_#{sponsorship&.slug}.#{extension}\"",
+      response_content_disposition: "attachment; filename=\"#{filename}\"",
     )
   end
 

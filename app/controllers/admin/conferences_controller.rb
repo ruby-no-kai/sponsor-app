@@ -1,5 +1,5 @@
 class Admin::ConferencesController < Admin::ApplicationController
-  before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml]
+  before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :asset_urls]
 
   def index
     @conferences = Conference.all
@@ -21,6 +21,14 @@ class Admin::ConferencesController < Admin::ApplicationController
 
   def sponsors_yml
     render plain: GenerateSponsorsYamlFileJob.new(@conference, push: false).tap(&:perform_now).yaml_data
+  end
+
+  def asset_urls
+    render json: {
+      files: @conference.sponsorships.includes(:asset_file).map(&:asset_file).compact.map do |asset|
+        [asset.filename, asset.download_url]
+      end,
+    }.to_json
   end
 
   def new
