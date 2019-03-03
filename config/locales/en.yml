@@ -107,7 +107,7 @@ en:
       logo: 'Logo'
       download_logo: '(Download previously uploaded file)'
       logo_help: |
-        Upload your company logo file for the sponsors page in our website. Please make sure your file is in vector format (like .ai, .eps, .svg).
+        Upload your company logo file for the sponsors page in our website, and the venue onsite. Please make sure your file is in vector format (like .ai, .eps, .svg). If you have multiple files, archive them into a .zip file.
       others_help: |
         Use the following field for anything you want let us know in advance.
       tickets: 'Attendee Tickets'

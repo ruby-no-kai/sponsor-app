@@ -107,7 +107,8 @@ ja:
       logo: 'ロゴ'
       download_logo: '(以前にアップロードしたファイルをダウンロードする)'
       logo_help: |
-        Web 掲載用ロゴファイルをアップロードしてください。形式はベクター形式 (.eps, .ai, .svg 等) でお願い致します。
+        Webサイトや会場にて掲示するため、ロゴファイルをアップロードしてください。形式はベクター形式 (.ai, .svg, .eps, .pdf 等) でお願い致します。
+        複数ファイルになる場合、zip 形式で圧縮ください。
       tickets: 'Attendee チケット'
       tickets_included_in_plan: 'スポンサープランに含まれている枚数'
       tickets_additionally_request: '追加する枚数'
