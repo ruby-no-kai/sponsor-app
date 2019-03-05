@@ -193,7 +193,7 @@ class Sponsorship < ApplicationRecord
 
   def validate_word_count
     limit = plan&.words_limit_hard
-    if limit  && word_count > limit
+    if limit && word_count > limit
       errors.add :profile, :too_long, maximum: (plan.words_limit || 0)
     end
   end
