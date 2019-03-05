@@ -7,12 +7,11 @@ class Admin::ConferencesController < Admin::ApplicationController
 
   def show
     @plans_with_count = @conference
-      .sponsorships
-      .group('plan_id')
-      .includes(:plan)
-      .select('plan_id, COUNT(plan_id) as cnt')
-      .where.not(plan_id: nil)
-      .map {|_| [_.plan, _.cnt, _.plan.capacity] }
+      .plans
+      .left_joins(:sponsorships)
+      .group(:id)
+      .select('plans.*, COUNT(sponsorships.plan_id) as cnt')
+      .map {|_| [_, _.cnt, _.capacity] }
       .sort_by { |plan, _cnt, _capa| -plan.rank }
   end
 
