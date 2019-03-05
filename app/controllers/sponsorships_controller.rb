@@ -47,7 +47,7 @@ class SponsorshipsController < ApplicationController
 
 
     respond_to do |format|
-      if @sponsorship.save
+      if @sponsorship.save(context: :update_by_user)
         session[:asset_file_ids].delete(@sponsorship.asset_file.id)
         session[:sponsorship_id] = @sponsorship.id
         SponsorshipAcceptanceJob.perform_later(@sponsorship)
