@@ -6,7 +6,7 @@ class Plan < ApplicationRecord
   validates :price_text, presence: true
 
   def booth_eligible?
-    booth_size > 0
+    (booth_size || 0) > 0
   end
 
   def available?
