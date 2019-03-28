@@ -54,11 +54,8 @@ class Conference < ApplicationRecord
   end
 
   def validate_valid_github_repo
-    if github_repo
-      unless github_repo.name.present? && github_repo.path.present?
-        errors.add :github_repo, :invalid
-      end
-    elsif read_attribute(:github_repo) && github_repo.nil?
+    return unless read_attribute(:github_repo).present?
+    unless github_repo && github_repo.name.present? && github_repo.path.present?
       errors.add :github_repo, :invalid
     end
   end
