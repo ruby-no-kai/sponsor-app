@@ -1,4 +1,6 @@
 class Sponsorship < ApplicationRecord
+  include EditingHistoryTarget
+
   belongs_to :conference
   belongs_to :organization
   belongs_to :plan, optional: true
@@ -19,7 +21,6 @@ class Sponsorship < ApplicationRecord
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
   end
 
-  has_many :editing_histories, -> { order(id: :desc) }, class_name: 'SponsorshipEditingHistory', dependent: :destroy
   has_many :staff_notes, class_name: 'SponsorshipStaffNote', dependent: :destroy
 
   scope :active, -> { where(withdrawn_at: nil) }
@@ -54,10 +55,6 @@ class Sponsorship < ApplicationRecord
   accepts_nested_attributes_for :billing_request, reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :customization_request, reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :note, reject_if: -> (attrs) { attrs['kind'].present? }
-
-  around_save :create_history
-
-  attr_accessor :staff
 
   def build_nested_attributes_associations
     self.build_contact unless self.contact
@@ -142,10 +139,6 @@ class Sponsorship < ApplicationRecord
     (plan&.number_of_guests || 0) + (number_of_additional_attendees || 0)
   end
 
-  def last_editing_history
-    @last_editing_history ||= editing_histories.order(id: :asc).last
-  end
-
   def booth_size
     plan&.booth_size
   end
@@ -196,13 +189,5 @@ class Sponsorship < ApplicationRecord
     if limit && word_count > limit
       errors.add :profile, :too_long, maximum: (plan.words_limit || 0)
     end
-  end
-
-  def create_history
-    yield
-    @last_editing_history = editing_histories.create!(
-      staff: staff,
-      raw: self.to_h_for_history,
-    )
   end
 end
