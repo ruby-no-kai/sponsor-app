@@ -35,6 +35,8 @@ class ApplicationController < ActionController::Base
   end
 
   def require_sponsorship_session
-    # TODO:
+    unless current_sponsorship
+      redirect_to new_user_session_path(back_to: url_for(params.to_unsafe_h.merge(only_path: true)))
+    end
   end
 end

@@ -23,6 +23,8 @@ class Sponsorship < ApplicationRecord
 
   has_many :staff_notes, class_name: 'SponsorshipStaffNote', dependent: :destroy
 
+  has_one :exhibition
+
   scope :active, -> { where(withdrawn_at: nil) }
   scope :withdrawn, -> { where.not(withdrawn_at: nil) }
   scope :have_presence, -> { where(suspended: false) }

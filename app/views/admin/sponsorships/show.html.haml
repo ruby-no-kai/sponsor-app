@@ -105,6 +105,20 @@
                   = l
                   %br
 
+        - if @sponsorship.booth_assigned?
+          .card.mt-2
+            %h5.card-header
+              Booth Details
+            .card-body
+              - if @sponsorship.exhibition
+                %p.card-text
+                  - @sponsorship.exhibition.description.each_line do |l|
+                    = l
+                    %br
+              - else
+                %p.card-text
+                  %span.badge.badge-warning Not submitted
+
     .row
       .col-md-12
         .card.mt-2
