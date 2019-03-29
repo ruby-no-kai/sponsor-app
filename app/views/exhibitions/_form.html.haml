@@ -1,0 +1,20 @@
+- conference = current_sponsorship.conference
+= form_with(model: exhibition, url: user_conference_sponsorship_exhibition_path(conference), local: true) do |form|
+  - if exhibition.errors.any?
+    - I18n.with_options(scope: %i(errors template)) do |lo|
+      .alert.alert-danger
+        %p= lo.t :header, count: exhibition.errors.count, model: exhibition.class.name
+        %ul
+          - exhibition.errors.full_messages.each do |message|
+            %li= message
+
+  .form-group.py-2
+    %h3= t('.header')
+    %p.form-text= t('.help')
+
+  .form-group
+    = form.label :description
+    = form.text_area :description, class: 'form-control'
+
+  .form-group
+    = form.submit t('.submit'), class: 'btn btn-primary'

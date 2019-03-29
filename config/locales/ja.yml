@@ -23,6 +23,9 @@ ja:
         organization: '会社名/組織名'
         unit: '部署等'
         name: '名前'
+
+      exhibition:
+        description: 'ブース詳細'
     errors:
       models:
         sponsorship:
@@ -146,7 +149,20 @@ ja:
         eligible: 'ブース対応 (申し込み無し)'
       undetermined_plan: '未決定'
       undetermined_plan_help: "スポンサーシップのプランがまだ確定していません。運営チームとご相談ください。"
-
+      booth_details:
+        title: 'ブース詳細'
+        edit: '修正'
+        new: '申請する'
+        not_submitted: '未提出'
     edit:
       amendment_availability: "%{ts} まで修正することができます。"
+  exhibitions:
+    create:
+      notice: 'ブース詳細の提出を受け付けました。'
+    update:
+      notice: 'ブース詳細情報を更新しました。'
+    form:
+      header: 'ブース詳細'
+      help: '会場の利用ルールなどに抵触しないか事前に確認するため、ブース出展内容の詳細をお知らせください。何かしら確認が必要な内容があった場合はこちらからご連絡を差し上げます。'
+      submit: '送信'
 

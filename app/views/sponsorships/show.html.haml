@@ -40,6 +40,23 @@
           %h5.card-title= t('.undetermined_plan')
           %p.card-text= t('.undetermined_plan_help')
 
+    - if @sponsorship.booth_assigned?
+      .card.mt-2.text-dark
+        .card-header= t('.booth_details.title')
+        .card-body
+          - if @sponsorship.exhibition
+            %p.card-text
+              - @sponsorship.exhibition.description.each_line do |l|
+                = l
+                %br
+            %p.card-text= link_to t('.booth_details.edit'), edit_user_conference_sponsorship_exhibition_path(@conference), class: 'btn btn-primary'
+          - else
+            %p.card-text
+              %span.badge.badge-danger= t('.booth_details.not_submitted')
+            %p.card-text= link_to t('.booth_details.new'), new_user_conference_sponsorship_exhibition_path(@conference), class: 'btn btn-primary'
+
+
+
 - unless @announcements.empty?
   .row.py-2
     .col-md-12

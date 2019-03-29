@@ -23,6 +23,9 @@ en:
         organization: 'Organization Name'
         unit: 'Unit'
         name: 'Name'
+
+      exhibition:
+        description: 'Booth Plan'
     errors:
       models:
         sponsorship:
@@ -143,9 +146,21 @@ en:
         assigned: 'Sponsor Booth Assigned'
         requested: 'Sponsor Booth Requested'
         eligible: 'Sponsor Booth Eligible'
-
       undetermined_plan: 'Undetermined'
       undetermined_plan_help: "You have not determined a sponsorship plan. Contact organizers team for help."
+      booth_details:
+        title: 'Booth Details'
+        edit: 'Edit'
+        new: 'Edit'
+        not_submitted: 'Not Submitted Yet'
     edit:
       amendment_availability: "You can amend your application until %{ts}."
-
+  exhibitions:
+    create:
+      notice: 'The booth plan has been submitted.'
+    update:
+      notice: 'The booth plan has been updated.'
+    form:
+      header: 'Booth Details'
+      help: 'Please submit your booth plans in advance. Organizers will review your plan to ensure it complies with the venue rules. We may contact you if we have something to advise.'
+      submit: 'Submit'

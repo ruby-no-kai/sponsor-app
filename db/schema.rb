@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_03_130402) do
+ActiveRecord::Schema.define(version: 2019_03_28_181007) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -100,6 +100,27 @@ ActiveRecord::Schema.define(version: 2019_03_03_130402) do
     t.index ["email", "kind", "sponsorship_id"], name: "index_contacts_on_email_and_kind_and_sponsorship_id"
     t.index ["sponsorship_id", "kind"], name: "index_contacts_on_sponsorship_id_and_kind", unique: true
     t.index ["sponsorship_id"], name: "index_contacts_on_sponsorship_id"
+  end
+
+  create_table "exhibition_editing_histories", force: :cascade do |t|
+    t.bigint "exhibition_id"
+    t.bigint "staff_id"
+    t.string "comment"
+    t.jsonb "diff"
+    t.jsonb "raw"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["exhibition_id", "id"], name: "index_exhibition_editing_histories_on_exhibition_id_and_id"
+    t.index ["exhibition_id"], name: "index_exhibition_editing_histories_on_exhibition_id"
+    t.index ["staff_id"], name: "index_exhibition_editing_histories_on_staff_id"
+  end
+
+  create_table "exhibitions", force: :cascade do |t|
+    t.bigint "sponsorship_id"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sponsorship_id"], name: "index_exhibitions_on_sponsorship_id"
   end
 
   create_table "form_descriptions", force: :cascade do |t|
@@ -247,6 +268,9 @@ ActiveRecord::Schema.define(version: 2019_03_03_130402) do
   add_foreign_key "broadcasts", "conferences"
   add_foreign_key "broadcasts", "staffs"
   add_foreign_key "contacts", "sponsorships"
+  add_foreign_key "exhibition_editing_histories", "exhibitions"
+  add_foreign_key "exhibition_editing_histories", "staffs"
+  add_foreign_key "exhibitions", "sponsorships"
   add_foreign_key "form_descriptions", "conferences"
   add_foreign_key "plans", "conferences"
   add_foreign_key "sponsorship_asset_files", "sponsorships"
