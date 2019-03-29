@@ -26,9 +26,10 @@ class Sponsorship < ApplicationRecord
   has_one :exhibition
 
   scope :active, -> { where(withdrawn_at: nil) }
-  scope :withdrawn, -> { where.not(withdrawn_at: nil) }
-  scope :have_presence, -> { where(suspended: false) }
   scope :exhibitor, -> { where(booth_assigned: true) }
+  scope :plan_determined, -> { where.not(plan_id: nil) }
+  scope :withdrawn, -> { where.not(withdrawn_at: nil) }
+  scope :have_presence, -> { where(suspended: false).merge(Sponsorship.active).merge(Sponsorship.plan_determined) }
 
   scope :includes_contacts, -> { includes(:contact, :alternate_billing_contact) }
   scope :includes_requests, -> { includes(:billing_request, :customization_request, :note) }

@@ -17,7 +17,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     return @yaml_data if defined? @yaml_data
 
     sponsorships = @conference.sponsorships
-      .where.not(plan_id: nil, suspended: true)
+      .have_presence
       .order(id: :asc)
       .includes(:plan)
       .includes(:organization)
