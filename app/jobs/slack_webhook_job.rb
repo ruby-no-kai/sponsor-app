@@ -16,6 +16,6 @@ class SlackWebhookJob < ApplicationJob
   private
 
   def webhook_url(hook_name)
-    Rails.application.config.x.slack.webhook_urls[hook_name]
+    Rails.application.config.x.slack.webhook_urls[hook_name.to_sym]
   end
 end

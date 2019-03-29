@@ -14,6 +14,12 @@ class ExhibitionsController < ApplicationController
     @exhibition.sponsorship = current_sponsorship
 
     if @exhibition.save
+      SlackWebhookJob.perform_later(
+        {
+          text: ":customs: <#{conference_sponsorship_url(current_sponsorship.conference, current_sponsorship)}|#{current_sponsorship.name}> booth details submitted by sponsor",
+        },
+        hook_name: 'feed',
+      )
       redirect_to user_conference_sponsorship_path(), notice: t('.notice')
     else
       render :new
@@ -33,6 +39,12 @@ class ExhibitionsController < ApplicationController
     @exhibition = current_sponsorship.exhibition
     raise ActiveRecord::RecordNotFound unless @exhibition
     if @exhibition.update_attributes(exhibition_params)
+      SlackWebhookJob.perform_later(
+        {
+          text: ":customs: <#{conference_sponsorship_url(current_sponsorship.conference, current_sponsorship)}|#{current_sponsorship.name}> booth details edited by sponsor",
+        },
+        hook_name: 'feed',
+      )
       redirect_to user_conference_sponsorship_path(), notice: t('.notice')
     else
       render :edit
