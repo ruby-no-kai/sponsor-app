@@ -25,6 +25,8 @@ class Sponsorship < ApplicationRecord
 
   has_one :exhibition
 
+  has_many :broadcast_deliveries, dependent: :nullify
+
   scope :active, -> { where(withdrawn_at: nil) }
   scope :exhibitor, -> { where(booth_assigned: true) }
   scope :plan_determined, -> { where.not(plan_id: nil) }
