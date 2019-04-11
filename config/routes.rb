@@ -47,6 +47,21 @@ Rails.application.routes.draw do
       end
     }
   end
+
+  get '/t/:handle' => 'reception/registrations#short_show', as: :reception_ticket
+
+  scope as: :reception, path: 'reception', module: 'reception' do
+    get 'session/assume/:handle' => 'sessions#assume', as: :assume_session
+
+    resources :conferences, param: :slug, only: %i(show) do
+      member do
+        get :code
+      end
+
+      resources :registrations, param: :code, only: %i(new show update create)
+    end
+  end
+
   get '/auth/:provider/callback' => 'admin/sessions#create'
 
   get '/' => 'root#index'
@@ -61,10 +76,18 @@ Rails.application.routes.draw do
         resource :exhibition, only: %i(new create edit update)
       end
       resource :sponsorship_asset_file, only: %i(create update show)
+
+      resource :ticket, only: %i(new create show) do
+        get 'code' => 'tickets#code', as: :code
+        get 'new_code' => 'tickets#new_code', as: :new_code
+        get 'retrieve/:handle' => 'tickets#retrieve', as: :retrieve
+      end
     end
+
 
     post '/webhooks/mailgun' => 'webhooks/mailgun#webhook'
   end
+
 
   get '/site/sha' => RevisionPlate::App.new(File.join(__dir__, '..', 'REVISION'))
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   before_action :set_locale
 
+  private
+
   def set_locale
     case
     when params[:hl] 

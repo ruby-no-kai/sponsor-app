@@ -1,3 +1,5 @@
+require 'securerandom'
+
 class Sponsorship < ApplicationRecord
   include EditingHistoryTarget
 
@@ -26,6 +28,7 @@ class Sponsorship < ApplicationRecord
   has_one :exhibition
 
   has_many :broadcast_deliveries, dependent: :nullify
+  has_many :tickets, dependent: :destroy
 
   scope :active, -> { where(withdrawn_at: nil) }
   scope :exhibitor, -> { where(booth_assigned: true) }
@@ -46,6 +49,8 @@ class Sponsorship < ApplicationRecord
 
   validates :asset_file, presence: true
 
+  validates :ticket_key, presence: true
+
   validates_numericality_of :number_of_additional_attendees, allow_nil: true, greater_than_or_equal_to: 0, only_integer: true
 
   validate :validate_correct_plan
@@ -54,12 +59,15 @@ class Sponsorship < ApplicationRecord
   validate :validate_word_count, on: :update_by_user
   validate :policy_agreement
 
+
   accepts_nested_attributes_for :contact, allow_destroy: true,reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :alternate_billing_contact, allow_destroy: true, reject_if: -> (attrs) { attrs['kind'].present? }
 
   accepts_nested_attributes_for :billing_request, reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :customization_request, reject_if: -> (attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :note, reject_if: -> (attrs) { attrs['kind'].present? }
+
+  before_validation :generate_ticket_key
 
   def build_nested_attributes_associations
     self.build_contact unless self.contact
@@ -144,6 +152,10 @@ class Sponsorship < ApplicationRecord
     (plan&.number_of_guests || 0) + (number_of_additional_attendees || 0)
   end
 
+  def number_of_registered_attendees
+    tickets.where.not(kind: :attendee, checked_in_at: nil).count
+  end
+
   def booth_size
     plan&.booth_size
   end
@@ -193,6 +205,14 @@ class Sponsorship < ApplicationRecord
     limit = plan&.words_limit_hard
     if limit && word_count > limit
       errors.add :profile, :too_long, maximum: (plan.words_limit || 0)
+    end
+  end
+
+  def generate_ticket_key
+    if self.ticket_key.blank?
+      begin
+        self.ticket_key = SecureRandom.urlsafe_base64(64)
+      end while self.class.where(conference: conference, ticket_key: self.ticket_key).exists?
     end
   end
 end

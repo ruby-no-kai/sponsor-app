@@ -25,10 +25,6 @@
             %p.card-text #{t('.customized_plan')} (#{@sponsorship.customization_name})
           - if @sponsorship.plan.talkable?
             %p.card-text= t('.sponsor_talk_eligible')
-          - if @sponsorship.plan.number_of_guests
-            %p.card-text #{t('.included_guests')}: #{t('.guests_count', count: @sponsorship.plan.number_of_guests)}
-          - if @sponsorship.number_of_additional_attendees
-            %p.card-text #{t('.additional_guests')}: #{t('.guests_count', count: @sponsorship.number_of_additional_attendees)}
           - case
           - when @sponsorship.booth_assigned
             %p.card-text= t('.booth.assigned')
@@ -39,6 +35,32 @@
         - else
           %h5.card-title= t('.undetermined_plan')
           %p.card-text= t('.undetermined_plan_help')
+
+    - if @sponsorship.booth_assigned? || @sponsorship.total_number_of_attendees > 0
+      .card.mt-2.text-dark
+        .card-header= t('.tickets.title')
+        .card-body
+          %ul.card-text
+            %li
+              %strong #{t('.total_number_of_guests')}:
+              #{t('.guests_count', count: @sponsorship.total_number_of_attendees)}
+              %ul
+                - if @sponsorship.plan&.number_of_guests
+                  %li #{t('.included_guests')}: #{t('.guests_count', count: @sponsorship.plan.number_of_guests)}
+                - if @sponsorship.number_of_additional_attendees
+                  %li #{t('.additional_guests')}: #{t('.guests_count', count: @sponsorship.number_of_additional_attendees)}
+          %p.card-text
+            %strong #{t('.tickets.your_url')}:
+            %br
+            - url = user_conference_ticket_url(@conference, key: @sponsorship.ticket_key)
+            = link_to url, url
+          %ul.card-text
+            %li
+              %small= t('.tickets.help.direction')
+            %li
+              %small= t('.tickets.help.requirement')
+            %li
+              %small= t('.tickets.help.unique')
 
     - if @sponsorship.booth_assigned?
       .card.mt-2.text-dark

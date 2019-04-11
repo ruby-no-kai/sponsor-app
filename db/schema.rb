@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_28_181007) do
+ActiveRecord::Schema.define(version: 2019_04_09_233347) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -83,6 +83,7 @@ ActiveRecord::Schema.define(version: 2019_03_28_181007) do
     t.string "slug"
     t.boolean "additional_attendees_registration_open", default: false, null: false
     t.string "github_repo"
+    t.string "reception_key", null: false
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
     t.index ["slug"], name: "index_conferences_on_slug", unique: true
   end
@@ -244,6 +245,7 @@ ActiveRecord::Schema.define(version: 2019_03_28_181007) do
     t.boolean "suspended", default: false, null: false
     t.integer "number_of_additional_attendees"
     t.datetime "withdrawn_at"
+    t.string "ticket_key", null: false
     t.index ["conference_id", "organization_id"], name: "index_sponsorships_on_conference_id_and_organization_id", unique: true
     t.index ["conference_id"], name: "index_sponsorships_on_conference_id"
     t.index ["organization_id"], name: "index_sponsorships_on_organization_id"
@@ -259,6 +261,25 @@ ActiveRecord::Schema.define(version: 2019_03_28_181007) do
     t.string "avatar_url"
     t.index ["login"], name: "index_staffs_on_login", unique: true
     t.index ["uid"], name: "index_staffs_on_uid", unique: true
+  end
+
+  create_table "tickets", force: :cascade do |t|
+    t.bigint "conference_id", null: false
+    t.bigint "sponsorship_id", null: false
+    t.integer "kind", null: false
+    t.string "code", null: false
+    t.string "handle", null: false
+    t.string "name", null: false
+    t.string "email"
+    t.boolean "authorized", default: false, null: false
+    t.datetime "checked_in_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conference_id", "code"], name: "index_tickets_on_conference_id_and_code", unique: true
+    t.index ["conference_id", "handle"], name: "index_tickets_on_conference_id_and_handle", unique: true
+    t.index ["conference_id"], name: "index_tickets_on_conference_id"
+    t.index ["sponsorship_id", "kind", "checked_in_at"], name: "index_tickets_on_sponsorship_id_and_kind_and_checked_in_at"
+    t.index ["sponsorship_id"], name: "index_tickets_on_sponsorship_id"
   end
 
   add_foreign_key "announcements", "conferences"
@@ -281,4 +302,6 @@ ActiveRecord::Schema.define(version: 2019_03_28_181007) do
   add_foreign_key "sponsorships", "conferences"
   add_foreign_key "sponsorships", "organizations"
   add_foreign_key "sponsorships", "plans"
+  add_foreign_key "tickets", "conferences"
+  add_foreign_key "tickets", "sponsorships"
 end
