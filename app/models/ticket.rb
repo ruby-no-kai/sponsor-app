@@ -15,6 +15,7 @@ class Ticket < ApplicationRecord
 
   validate :check_availability
   validate :validate_correct_sponsorship
+  validate :deny_multiple_entry
 
   before_validation :assume_conference
   before_validation :generate_code
@@ -40,7 +41,6 @@ class Ticket < ApplicationRecord
   end
 
   def do_check_in(authorized: false)
-    return if self.checked_in?
     self.authorized = authorized
     self.checked_in_at = Time.zone.now
   end
@@ -92,6 +92,12 @@ class Ticket < ApplicationRecord
   private def validate_correct_sponsorship
     if sponsorship && sponsorship.conference_id != self.conference_id
       errors.add :plan, "can't belong to a sponsorship for an another conference"
+    end
+  end
+
+  private def deny_multiple_entry
+    if checked_in_at_changed? && !checked_in_at_was.nil?
+      errors.add :base, "already checked in"
     end
   end
 end
