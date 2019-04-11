@@ -14,7 +14,7 @@ class Reception::ApplicationController < ::ApplicationController
     case
     when current_staff
       return true
-    when @conference && session[:reception_access][@conference.id.to_s]
+    when @conference && session[:reception_access]&.fetch(@conference.id.to_s, nil)
       return true
     end
     render status: 403, plain: 'forbidden'
