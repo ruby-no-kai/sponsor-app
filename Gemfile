@@ -17,6 +17,7 @@ gem 'omniauth-github'
 gem 'octokit'
 gem 'jwt'
 gem 'hashdiff'
+gem 'rqrcode'
 
 gem 'nokogiri'
 

@@ -1,0 +1,32 @@
+= form_with(model: ticket, url: reception_conference_registrations_path(@conference), local: true) do |form|
+  - if ticket.errors.any?
+    .alert.alert-danger
+      %p #{pluralize(ticket.errors.count, "error")} prohibited this from being saved:
+      %ul
+        - ticket.errors.full_messages.each do |message|
+          %li= message
+
+  .form-group
+    = form.label :sponsorship_id
+    - sponsorships = @conference.sponsorships.active.order(name: :asc).pluck(:name, :id)
+    = form.select :sponsorship_id, sponsorships, {}, {class: 'form-control'}
+
+  .form-group
+    = form.label :name
+    = form.text_field :name, class: 'form-control text-dark', required: true
+  .form-group
+    = form.label :email
+    = form.email_field :email, class: 'form-control text-dark'
+
+  .form-group
+    = form.label :kind
+    .form-check
+      = form.radio_button :kind, :attendee, class: 'form-check-input', checked: @ticket.attendee? || !@ticket.persisted?
+      = form.label :kind, value: :attendee, class: 'form-check-label'
+    .form-check
+      = form.radio_button :kind, :booth_staff, class: 'form-check-input', checked: @ticket.booth_staff?
+      = form.label :kind, value: :booth_staff, class: 'form-check-label'
+
+  .form-group
+    = form.submit "Check in", class: 'btn btn-primary'
+    %small.form-text By using manual check-in, a warning email will be sent to the representative of the sponsor.

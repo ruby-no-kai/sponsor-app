@@ -1,0 +1,10 @@
+%p Hi,
+
+%p This is an reminder of your ticket for #{@conference.name}. Use the link below to retrieve your ticket again. Present the code shown in the page to the sponsor registration desk.
+
+%p= link_to @ticket_link, @ticket_link
+
+%p
+  See you soon,
+  %br
+  Team #{@team_name}
