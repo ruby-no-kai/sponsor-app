@@ -15,6 +15,21 @@
           - if @conference.amendment_closes_at
             %p= t('.amendment_availability', ts: l(@conference.amendment_closes_at))
 
+    - if @sponsorship.booth_assigned?
+      .card.mt-2.text-dark
+        .card-header= t('.booth_details.title')
+        .card-body
+          - if @sponsorship.exhibition
+            %p.card-text
+              - @sponsorship.exhibition.description.each_line do |l|
+                = l
+                %br
+            %p.card-text= link_to t('.booth_details.edit'), edit_user_conference_sponsorship_exhibition_path(@conference), class: 'btn btn-primary'
+          - else
+            %p.card-text
+              %span.badge.badge-danger= t('.booth_details.not_submitted')
+            %p.card-text= link_to t('.booth_details.new'), new_user_conference_sponsorship_exhibition_path(@conference), class: 'btn btn-primary'
+
   .col-md-6
     .card.text-dark
       .card-header= t('.your_sponsorship_plan')
@@ -61,23 +76,6 @@
               %small= t('.tickets.help.requirement')
             %li
               %small= t('.tickets.help.unique')
-
-    - if @sponsorship.booth_assigned?
-      .card.mt-2.text-dark
-        .card-header= t('.booth_details.title')
-        .card-body
-          - if @sponsorship.exhibition
-            %p.card-text
-              - @sponsorship.exhibition.description.each_line do |l|
-                = l
-                %br
-            %p.card-text= link_to t('.booth_details.edit'), edit_user_conference_sponsorship_exhibition_path(@conference), class: 'btn btn-primary'
-          - else
-            %p.card-text
-              %span.badge.badge-danger= t('.booth_details.not_submitted')
-            %p.card-text= link_to t('.booth_details.new'), new_user_conference_sponsorship_exhibition_path(@conference), class: 'btn btn-primary'
-
-
 
 - unless @announcements.empty?
   .row.py-2
