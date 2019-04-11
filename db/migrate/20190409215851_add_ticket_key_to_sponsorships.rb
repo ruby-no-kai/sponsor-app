@@ -2,6 +2,7 @@ class AddTicketKeyToSponsorships < ActiveRecord::Migration[5.2]
   def change
     add_column :sponsorships, :ticket_key, :string
 
+    Sponsorship.reset_column_information
     Sponsorship.find_each do |sponsorship|
       sponsorship.save! # validation assigns ticket_key
     end
