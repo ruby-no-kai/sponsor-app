@@ -68,7 +68,7 @@
             %strong #{t('.tickets.your_url')}:
             %br
             - url = new_user_conference_ticket_url(@conference, key: @sponsorship.ticket_key)
-            = link_to url, url
+            %small= link_to url, url
           %ul.card-text
             %li
               %small= t('.tickets.help.direction')
