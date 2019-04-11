@@ -77,6 +77,7 @@ Rails.application.configure do
     expire_after: 14.days,
     key: "_#{Rails.application.class.parent_name.downcase}_session",
     threadsafe: true,
+    secure: ENV.fetch('RK_SPONSOR_SECURE_COOKIE', '1') == '1',
   }
 
   # Use a real queuing backend for Active Job (and separate queues per environment)
