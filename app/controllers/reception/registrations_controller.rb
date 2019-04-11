@@ -1,5 +1,5 @@
 class Reception::RegistrationsController < ::Reception::ApplicationController
-  skip_before_action :set_conference, only: %i(short_show)
+  skip_before_action :set_conference, :require_reception_access, only: %i(short_show)
 
   # Ticket code links to this page
   def short_show
