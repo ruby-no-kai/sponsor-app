@@ -85,7 +85,8 @@ export default class ReceptionCheckinForm extends React.Component<Props, State> 
   private onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     this.setState({requested: true, requestError: null});
-    checkin(`${this.props.endpoint}/${this.state.code}`).then((resp) => {
+    const code = this.state.code.replace(/^.+\//, '');
+    checkin(`${this.props.endpoint}/${code}`).then((resp) => {
       this.setState({response: resp, requested: false, code: ''});
       if (this.inputRef.current) this.inputRef.current.focus();
     }).catch((e) => {
