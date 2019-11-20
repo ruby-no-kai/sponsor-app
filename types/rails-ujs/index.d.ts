@@ -1,4 +1,4 @@
-declare module 'rails-ujs' {
+declare module '@rails/ujs' {
   namespace Rails {
     export function start(): void;
     export function csrfParam(): string | null;

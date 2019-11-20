@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk/global';
 import S3 from 'aws-sdk/clients/s3';
 
-import Rails from 'rails-ujs';
+import Rails from '@rails/ujs';
 
 interface Params {
   file: File,
