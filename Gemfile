@@ -1,8 +1,8 @@
 source 'https://rubygems.org'
-ruby '2.6.1' if ENV['STACK'] || ENV['IS_HEROKU']
+ruby '~> 2.6.1' if ENV['STACK'] || ENV['IS_HEROKU']
 
-gem 'rails', '~> 5.2.1'
-gem 'rails-i18n', '~> 5.1'
+gem 'rails', '~> 6.0.0'
+gem 'rails-i18n', '~> 6.0'
 gem 'rack-contrib'
 
 gem 'pg', '>= 0.18', '< 2.0'
@@ -23,9 +23,9 @@ gem 'nokogiri'
 
 gem 'sidekiq'
 
-gem 'jbuilder', '~> 2.5'
+gem 'jbuilder', '~> 2.9'
 gem 'hamlit'
-gem 'webpacker', '>= 4.0.0.pre.3'
+gem 'webpacker', '>= 4.2.0'
 
 gem 'premailer-rails'
 
