@@ -5,7 +5,7 @@ import 'raven';
 
 import 'bootstrap';
 
-import * as Rails from 'rails-ujs';
+import Rails from '@rails/ujs';
 Rails.start();
 
 import 'reception_checkin_form';
