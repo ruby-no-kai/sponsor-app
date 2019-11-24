@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_09_233347) do
+ActiveRecord::Schema.define(version: 2019_11_24_025609) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -164,6 +164,7 @@ ActiveRecord::Schema.define(version: 2019_04_09_233347) do
     t.boolean "talkable"
     t.string "price_text"
     t.integer "words_limit"
+    t.boolean "auto_acceptance", default: true, null: false
     t.index ["conference_id", "rank"], name: "index_plans_on_conference_id_and_rank"
     t.index ["conference_id"], name: "index_plans_on_conference_id"
   end
@@ -246,8 +247,8 @@ ActiveRecord::Schema.define(version: 2019_04_09_233347) do
     t.integer "number_of_additional_attendees"
     t.datetime "withdrawn_at"
     t.string "ticket_key", null: false
+    t.datetime "accepted_at"
     t.index ["conference_id", "organization_id"], name: "index_sponsorships_on_conference_id_and_organization_id", unique: true
-    t.index ["conference_id", "ticket_key"], name: "index_sponsorships_on_conference_id_and_ticket_key", unique: true
     t.index ["conference_id"], name: "index_sponsorships_on_conference_id"
     t.index ["organization_id"], name: "index_sponsorships_on_organization_id"
     t.index ["plan_id"], name: "index_sponsorships_on_plan_id"

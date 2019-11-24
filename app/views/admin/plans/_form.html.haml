@@ -44,6 +44,11 @@
         = form.check_box :talkable, class: 'form-check-input'
         = form.label :talkable, "", class: 'form-check-label'
 
+  .form-group
+    .form-check
+      %label.form-check-label
+        = form.check_box :auto_acceptance, class: 'form-check-input'
+        = form.label :auto_acceptance, "", class: 'form-check-label'
 
   .form-group
     = form.submit class: 'btn btn-primary'

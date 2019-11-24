@@ -19,13 +19,15 @@
           %h5.card-header
             Basic Information
           .card-body
-            - if @sponsorship.suspended?
-              %p.card-text
+            %p.card-text
+              - if @sponsorship.suspended?
                 %span.badge.badge-warning Presence Suspended
-            - if @sponsorship.withdrawn?
-              %p.card-text
+              - if @sponsorship.withdrawn?
                 %span.badge.badge-danger Withdrawn
-
+              - if @sponsorship.accepted?
+                %span.badge.badge-info Accepted
+              - else
+                %span.badge.badge-dark Not accepted
             %dl
               .row
                 %dt.col-sm-4 Locale

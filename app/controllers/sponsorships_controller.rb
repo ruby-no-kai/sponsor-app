@@ -44,7 +44,7 @@ class SponsorshipsController < ApplicationController
     @sponsorship.locale = I18n.locale
     @sponsorship.conference = @conference
     @sponsorship.assume_organization
-
+    @sponsorship.accept if @sponsorship.plan&.auto_acceptance
 
     respond_to do |format|
       if @sponsorship.save(context: :update_by_user)

@@ -30,10 +30,12 @@ class Sponsorship < ApplicationRecord
   has_many :broadcast_deliveries, dependent: :nullify
   has_many :tickets, dependent: :destroy
 
-  scope :active, -> { where(withdrawn_at: nil) }
+  scope :active, -> { where(withdrawn_at: nil).where.not(accepted_at: nil) }
   scope :exhibitor, -> { where(booth_assigned: true) }
   scope :plan_determined, -> { where.not(plan_id: nil) }
   scope :withdrawn, -> { where.not(withdrawn_at: nil) }
+  scope :not_withdrawn, -> { where(withdrawn_at: nil) }
+  scope :accepted, -> { where.not(accepted_at: nil) }
   scope :have_presence, -> { where(suspended: false).merge(Sponsorship.active).merge(Sponsorship.plan_determined) }
 
   scope :includes_contacts, -> { includes(:contact, :alternate_billing_contact) }
@@ -75,6 +77,14 @@ class Sponsorship < ApplicationRecord
     self.build_billing_request unless self.billing_request
     self.build_customization_request unless self.customization_request
     self.build_note unless self.note
+  end
+
+  def accept
+    self.accepted_at = Time.zone.now
+  end
+
+  def accepted?
+    !!accepted_at
   end
 
   def withdrawn?
@@ -143,6 +153,7 @@ class Sponsorship < ApplicationRecord
       "asset_file_id" => asset_file&.id,
       "note" => note&.body,
       "number_of_additional_attendees" => number_of_additional_attendees,
+      "accepted_at" => accepted_at,
     }.tap do |h|
       h["withdrawn_at"] = withdrawn_at if withdrawn_at
     end

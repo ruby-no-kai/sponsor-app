@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
   helper_method def current_sponsorship
     return @current_sponsorship if defined? @current_sponsorship
     # XXX: active
-    @current_sponsorship = session[:sponsorship_id] && Sponsorship.active.find_by(id: session[:sponsorship_id])
+    @current_sponsorship = session[:sponsorship_id] && Sponsorship.not_withdrawn.find_by(id: session[:sponsorship_id])
   end
 
   def require_staff

@@ -14,7 +14,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
       when broadcast.modifying?
         broadcast.update!(status: :modifying)
       else
-        raise "Invalid state for CreateRemoteTaskExecutionsJob (broadcast_id=#{broadcast.id}, state=#{broadcast.status})"
+        raise "Invalid state for CreateBroadcastDeliveriesJob (broadcast_id=#{broadcast.id}, state=#{broadcast.status})"
       end
 
       existing_emails = broadcast.deliveries.pluck(:recipient)
@@ -44,9 +44,18 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
   def filter_recipients(kind, params)
     case kind.to_s
     when 'all'
-      scope = @broadcast.conference.sponsorships.active.includes(:contact)
+      scope = @broadcast.conference.sponsorships.not_withdrawn.includes(:contact)
       scope = scope.where(locale: params[:locale]) if params[:locale].present?
       scope = scope.exhibitor if params[:exhibitors].present?
+      case params[:status]
+      when 'all'
+        # do nothing
+      when 'not_accepted'
+        scope = scope.where(accepted_at: nil)
+      when 'accepted'
+        scope = scope.accepted
+      end
+
       scope.map do |sponsorship|
         Recipient.new(
           sponsorship: sponsorship,
@@ -55,9 +64,18 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
       end
     when 'past_sponsors'
       conference = Conference.find_by!(id: params[:id])
-      scope = conference.sponsorships.active.includes(:contact)
+      scope = conference.sponsorships.not_withdrawn.includes(:contact)
       scope = scope.where(locale: params[:locale]) if params[:locale].present?
       scope = scope.where.not(organization_id: @broadcast.conference.sponsorships.pluck(:organization_id)) if params[:exclude_current_sponsors]
+      case params[:status]
+      when 'all'
+        # do nothing
+      when 'not_accepted'
+        scope = scope.where(accepted_at: nil)
+      when 'accepted'
+        scope = scope.accepted
+      end
+
       scope.map do |sponsorship|
         Recipient.new(
           sponsorship: sponsorship,
@@ -73,7 +91,6 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         end
       end
     when 'manual'
-      p params
       scope = Sponsorship.where(id: [*params[:sponsorship_ids]])
       scope.map do |sponsorship|
         Recipient.new(
