@@ -1,4 +1,4 @@
-class SponsorshipAcceptedMailer < ApplicationMailer
+class SponsorshipWelcomeMailer < ApplicationMailer
   def user_email
     @sponsorship = params[:sponsorship]
     @session_token = params[:session_token]
