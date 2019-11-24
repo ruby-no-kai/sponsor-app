@@ -50,7 +50,7 @@ class SponsorshipsController < ApplicationController
       if @sponsorship.save(context: :update_by_user)
         session[:asset_file_ids].delete(@sponsorship.asset_file.id)
         session[:sponsorship_id] = @sponsorship.id
-        SponsorshipAcceptanceJob.perform_later(@sponsorship)
+        SponsorshipWelcomeJob.perform_later(@sponsorship)
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: t('.notice') }
       else
         @sponsorship.build_nested_attributes_associations

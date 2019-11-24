@@ -1,4 +1,4 @@
-class SponsorshipAcceptanceJob < ApplicationJob
+class SponsorshipWelcomeJob < ApplicationJob
   def perform(sponsorship)
     token = SessionToken.create!(email: sponsorship.contact.email, expires_at: Time.zone.now + 1.year)
 
