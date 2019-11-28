@@ -1,9 +1,16 @@
 %p Hi,
 
 %p
-  Thank you for sponsoring us. We've received your sponsorship application.
-  If you've written any additional notes which requires our reaction, we'll
-  respond you to soon.
+  Thank you for sponsoring us! We've received your sponsorship application.
+  If you wrote additional notes which requires our reaction, we'll
+  respond to you soon.
+
+- if @sponsorship.accepted?
+  %p
+    Your sponsorship application is accepted and finalized.
+- else
+  %p
+    Your sponsorship application is pending. We'll send an announcement email to you after the application closes.
 
 %p
   Also, the following link is a sign-in link for our sponsor's portal, which
@@ -15,9 +22,7 @@
 %p
   This link expires at #{l(@login_link_expiry)},
   and you can use this link for multiple times until it expires.
-
-%p
-  Note that you can retrieve these links again from our website.
+  After expiration, you can retrieve these links again from our website.
 
 %p
   For any questions and inquiries, feel free to reach us at #{link_to @email, "mailto:#{@email}"}.
