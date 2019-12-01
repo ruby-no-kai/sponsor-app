@@ -5,7 +5,7 @@ body
   font-size: 100%
 
 a
-  color: $blue
+  color: $black
   &:hover,
   &:focus
     color: lighten($blue, 10%)
@@ -16,5 +16,24 @@ img
 small
   font-size: 70%
 
-nav.navbar.navbar-expand-lg.navbar-dark
-  background-color: $black
+nav.navbar.navbar-expand-lg
+  background-color: lighten($vividpink, 42%)
+  border-bottom: 1px solid lighten($vividpink, 39%)
+
+nav.navbar.navbar-expand-lg a
+  color: $vividpink
+
+nav.navbar.navbar-expand-lg a
+  color: $black
+  &:hover,
+  &:focus
+    color: lighten($black, 20%)
+
+.btn-primary
+  background-color: $vividpink
+  border-color: darken($vividpink, 10%)
+
+.btn-primary
+  &:hover
+    background-color: darken($vividpink, 10%)
+    border-color: darken($vividpink, 20%)
