@@ -51,6 +51,13 @@
           %h5.card-title= t('.undetermined_plan')
           %p.card-text= t('.undetermined_plan_help')
 
+        %p.card-text
+          - if @sponsorship.accepted?
+            %span.badge.badge-info= t('.accepted')
+          - else
+            %span.badge.badge-danger= t('.pending')
+            %span= t('.pending_help')
+
     - if @sponsorship.booth_assigned? || @sponsorship.total_number_of_attendees > 0
       .card.mt-2.text-dark
         .card-header= t('.tickets.title')

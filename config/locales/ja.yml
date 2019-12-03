@@ -164,6 +164,9 @@ ja:
         eligible: 'ブース対応 (申し込み無し)'
       undetermined_plan: '未決定'
       undetermined_plan_help: "スポンサーシップのプランがまだ確定していません。運営チームとご相談ください。"
+      accepted: "確定済"
+      pending: "未確定"
+      pending_help: "申し込みはまだ未確定です。アナウンスをお待ちください。"
       booth_details:
         title: 'ブース詳細'
         edit: '修正'

@@ -163,6 +163,9 @@ en:
         eligible: 'Sponsor Booth Eligible'
       undetermined_plan: 'Undetermined'
       undetermined_plan_help: "You have not determined a sponsorship plan. Contact organizers team for help."
+      accepted: "Accepted / Finalized"
+      pending: "Pending"
+      pending_help: "Your sponsorship application is pending. Please wait for an further announcement."
       booth_details:
         title: 'Booth Details'
         edit: 'Edit'
