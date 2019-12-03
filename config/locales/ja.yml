@@ -36,7 +36,7 @@ ja:
         sponsorship:
           attributes:
             plan:
-              sold_out: "は受付を終了しています"
+              unavailable: "は受付を終了しています"
               unchangeable_after_finalization: "はスポンサーシップ確定後の変更は原則として受け付けていません"
             organization:
               taken: "の重複: 同じ組織から既にスポンサーシップを受け付けている可能性があります。詳細はお問い合わせください"
@@ -118,6 +118,7 @@ ja:
           one: '英文 1 word'
           other: '英文およそ %{count} words'
       plan_sold_out: '受付終了'
+      plan_closed: '受付期間終了'
       booth: 'スポンサーブース'
       booth_uneligible_plan_selected: '選択されたプランではブース出展はできません (%{plans} プランのみが対象となります)'
       information: 'サイト掲載情報'

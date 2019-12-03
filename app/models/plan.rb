@@ -9,8 +9,16 @@ class Plan < ApplicationRecord
     (booth_size || 0) > 0
   end
 
-  def available?
+  def available?(t = Time.zone.now)
+    !sold_out? && !closed?(t)
+  end
+
+  def sold_out?
     capacity && sponsorships.count < capacity
+  end
+
+  def closed?(t = Time.zone.now)
+    closes_at ? closes_at <= t : false
   end
 
   def words_limit_hard

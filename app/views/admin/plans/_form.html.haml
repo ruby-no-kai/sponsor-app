@@ -39,6 +39,10 @@
     = form.number_field :words_limit, class: 'form-control'
 
   .form-group
+    = form.label :closes_at
+    = form.datetime_local_field :closes_at, class: 'form-control'
+
+  .form-group
     .form-check
       %label.form-check-label
         = form.check_box :talkable, class: 'form-check-input'

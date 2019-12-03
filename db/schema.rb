@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_24_025609) do
+ActiveRecord::Schema.define(version: 2019_12_03_091935) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -165,6 +165,7 @@ ActiveRecord::Schema.define(version: 2019_11_24_025609) do
     t.string "price_text"
     t.integer "words_limit"
     t.boolean "auto_acceptance", default: true, null: false
+    t.datetime "closes_at"
     t.index ["conference_id", "rank"], name: "index_plans_on_conference_id_and_rank"
     t.index ["conference_id"], name: "index_plans_on_conference_id"
   end

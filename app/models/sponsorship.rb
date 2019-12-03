@@ -197,7 +197,7 @@ class Sponsorship < ApplicationRecord
 
   def validate_plan_availability
     if plan && plan_id_changed? && !plan.available?
-      errors.add :plan, :sold_out
+      errors.add :plan, :unavailable
     end
   end
 

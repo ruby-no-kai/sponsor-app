@@ -45,6 +45,7 @@ class Admin::PlansController < Admin::ApplicationController
       :booth_size,
       :words_limit,
       :auto_acceptance,
+      :closes_at,
     )
   end
 
