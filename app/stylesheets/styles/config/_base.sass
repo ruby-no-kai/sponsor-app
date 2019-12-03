@@ -16,18 +16,23 @@ img
 small
   font-size: 70%
 
-nav.navbar.navbar-expand-lg
+nav.navbar.navbar-expand-lg.navbar-dark
   background-color: lighten($vividpink, 30%)
-  border-bottom: 1px solid lighten($vividpink, 28%)
 
-nav.navbar.navbar-expand-lg a
-  color: $vividpink
-
-nav.navbar.navbar-expand-lg a
+nav.navbar.navbar-expand-lg a,
+nav.navbar.navbar-expand-lg a.dropdown-item,
+.navbar-dark .navbar-nav .nav-link
   color: $black
   &:hover,
   &:focus
-    color: lighten($black, 15%)
+    color: $grey
+
+nav.navbar.navbar-expand-lg a.dropdown-item
+.navbar-dark .navbar-nav .show > .nav-link
+  color: $black
+
+.navbar-toggler .navbar-toggler-icon
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E")
 
 .btn-primary
   background-color: $vividpink
