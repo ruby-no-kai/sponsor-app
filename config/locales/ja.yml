@@ -37,6 +37,7 @@ ja:
           attributes:
             plan:
               sold_out: "は受付を終了しています"
+              unchangeable_after_finalization: "はスポンサーシップ確定後の変更は原則として受け付けていません"
             organization:
               taken: "の重複: 同じ組織から既にスポンサーシップを受け付けている可能性があります。詳細はお問い合わせください"
             booth_requested:

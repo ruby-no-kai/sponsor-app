@@ -56,6 +56,7 @@ class Sponsorship < ApplicationRecord
   validates_numericality_of :number_of_additional_attendees, allow_nil: true, greater_than_or_equal_to: 0, only_integer: true
 
   validate :validate_correct_plan
+  validate :validate_plan_change, on: :update_by_user
   validate :validate_plan_availability, on: :update_by_user
   validate :validate_booth_eligibility, on: :update_by_user
   validate :validate_word_count, on: :update_by_user
@@ -197,6 +198,12 @@ class Sponsorship < ApplicationRecord
   def validate_plan_availability
     if plan && plan_id_changed? && !plan.available?
       errors.add :plan, :sold_out
+    end
+  end
+
+  def validate_plan_change
+    if plan_id_changed? && plan_id_was && accepted?
+      errors.add :plan, :unchangeable_after_finalization
     end
   end
 

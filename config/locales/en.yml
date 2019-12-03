@@ -37,6 +37,7 @@ en:
           attributes:
             plan:
               sold_out: "is sold out."
+              unchangeable_after_finalization: "cannot be changed once the sponsorship is finalized."
             organization:
               taken: "Exists: Looks like we already have received the sponsorship application from your organization. Contact us for details."
             booth_requested:
