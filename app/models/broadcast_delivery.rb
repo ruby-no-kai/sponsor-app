@@ -15,4 +15,8 @@ class BroadcastDelivery < ApplicationRecord
     mailgun_events << event
     mailgun_events.sort_by!{ |_| _['timestamp'] || 0 }
   end
+
+  def recipient_ccs
+    recipient_cc&.split(/[,;]\s*/) || []
+  end
 end

@@ -25,6 +25,11 @@
         = contact_form.email_field :email, class: 'form-control', required: true
 
       .form-group
+        = contact_form.label :email_cc
+        = contact_form.text_field :email_cc, class: 'form-control', placeholder: 'cc1@example.com, cc2@example.com, ... (optional)'
+        %small.form-text= t('.email_cc_help')
+
+      .form-group
         = contact_form.label :address
         = contact_form.text_field :address, class: 'form-control', required: true
 

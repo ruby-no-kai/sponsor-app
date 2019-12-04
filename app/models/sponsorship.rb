@@ -132,8 +132,8 @@ class Sponsorship < ApplicationRecord
   def to_h_for_history
     {
       "conference_id" => conference&.id,
-      "contact" => contact&.as_json&.slice("id", "name", "email", "organization", "unit", "address"),
-      "alternate_billing_contact" => alternate_billing_contact&.as_json&.slice("id", "name", "email", "organization", "unit", "address"),
+      "contact" => contact&.as_json&.slice("id", "name", "email", "email_cc", "organization", "unit", "address"),
+      "alternate_billing_contact" => alternate_billing_contact&.as_json&.slice("id", "name", "email", "email_cc", "organization", "unit", "address"),
       "billing_request" => billing_request&.body,
       "plan_id" => plan&.id,
       "plan_name" => plan&.name,

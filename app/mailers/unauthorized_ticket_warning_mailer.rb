@@ -10,6 +10,7 @@ class UnauthorizedTicketWarningMailer < ApplicationMailer
     headers 'X-Auto-Response-Suppress' => 'All'
     mail(
       to: @sponsorship.contact.email,
+      cc: @sponsorship.contact.email_ccs,
       subject: make_subject(),
       reply_to: @conference.contact_email_address,
     )

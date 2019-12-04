@@ -8,10 +8,24 @@ class Contact < ApplicationRecord
   validates :address, presence: true
   validates :name, presence: true
 
+  validate :validate_email_ccs
+
   attr_writer :_keep
 
   def _keep
     return @_keep if defined? @_keep
     @_keep = self.persisted?
+  end
+
+  def email_ccs
+    email_cc&.split(/[,;]\s*/) || []
+  end
+
+  def validate_email_ccs
+    email_ccs.each do |email|
+      unless email.include?('@')
+        errors.add :email_cc, "is invalid"
+      end
+    end
   end
 end

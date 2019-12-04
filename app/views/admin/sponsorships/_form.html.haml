@@ -19,6 +19,10 @@
         = contact_form.email_field :email, class: 'form-control', required: true
 
       .form-group
+        = contact_form.label :email_cc
+        = contact_form.email_field :email, class: 'form-control'
+
+      .form-group
         = contact_form.label :address
         = contact_form.text_field :address, class: 'form-control', required: true
 

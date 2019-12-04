@@ -12,6 +12,7 @@ class BroadcastMailer < ApplicationMailer
     headers 'X-Auto-Response-Suppress' => 'All'
     mail(
       to: @delivery.recipient,
+      cc: @delivery.recipient_ccs,
       subject: "#{subject_prefix}#{@broadcast.title}",
       reply_to: @broadcast.conference.contact_email_address,
     )

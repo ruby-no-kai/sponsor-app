@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_03_091935) do
+ActiveRecord::Schema.define(version: 2019_12_04_192953) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(version: 2019_12_03_091935) do
     t.datetime "opened_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "recipient_cc"
     t.index ["broadcast_id", "id"], name: "index_broadcast_deliveries_on_broadcast_id_and_id"
     t.index ["broadcast_id", "status"], name: "index_broadcast_deliveries_on_broadcast_id_and_status"
     t.index ["broadcast_id"], name: "index_broadcast_deliveries_on_broadcast_id"
@@ -98,6 +99,7 @@ ActiveRecord::Schema.define(version: 2019_12_03_091935) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "email_cc"
     t.index ["email", "kind", "sponsorship_id"], name: "index_contacts_on_email_and_kind_and_sponsorship_id"
     t.index ["sponsorship_id", "kind"], name: "index_contacts_on_sponsorship_id_and_kind", unique: true
     t.index ["sponsorship_id"], name: "index_contacts_on_sponsorship_id"

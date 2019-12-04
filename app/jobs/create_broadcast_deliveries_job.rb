@@ -1,5 +1,5 @@
 class CreateBroadcastDeliveriesJob < ApplicationJob
-  Recipient = Struct.new(:sponsorship, :email, keyword_init: true)
+  Recipient = Struct.new(:sponsorship, :email, :email_ccs, keyword_init: true)
 
   def perform(broadcast, recipient_filter_params)
     ApplicationRecord.transaction do
@@ -31,6 +31,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
           status: :ready,
           sponsorship: recipient.sponsorship,
           recipient: recipient.email,
+          recipient_cc: recipient.email_ccs.join(','),
         )
       end
 
@@ -60,6 +61,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         Recipient.new(
           sponsorship: sponsorship,
           email: sponsorship.contact.email,
+          email_ccs: sponsorship.contact.email_ccs,
         )
       end
     when 'past_sponsors'
@@ -80,6 +82,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         Recipient.new(
           sponsorship: sponsorship,
           email: sponsorship.contact.email,
+          email_ccs: sponsorship.contact.email_ccs,
         )
       end
     when 'raw'
@@ -96,6 +99,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         Recipient.new(
           sponsorship: sponsorship,
           email: sponsorship.contact.email,
+          email_ccs: sponsorship.contact.email_ccs,
         )
       end
     when 'none'

@@ -44,7 +44,14 @@
             %td= link_to delivery.sponsorship.name, conference_sponsorship_path(delivery.sponsorship.conference, delivery.sponsorship)
           -else
             %td= delivery.recipient
-          %td= delivery.recipient
+          %td
+            = delivery.recipient
+            - ccs = delivery.recipient_ccs
+            - if ccs && !ccs.empty?
+              %i
+                CC:
+                = delivery.recipient_ccs.join(',')
+
           %td
             %span{class: status_badge_class(delivery)}= delivery.status
           %td

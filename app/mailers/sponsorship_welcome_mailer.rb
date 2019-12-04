@@ -16,6 +16,7 @@ class SponsorshipWelcomeMailer < ApplicationMailer
     list_name 'welcome'
     mail(
       to: @sponsorship.contact.email,
+      cc: @sponsorship.contact.email_ccs,
       subject: make_subject(),
       reply_to: @email,
     )

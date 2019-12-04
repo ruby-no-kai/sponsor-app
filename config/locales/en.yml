@@ -19,6 +19,7 @@ en:
 
       contact:
         email: 'Email Address'
+        email_cc: 'Email Address (for CC)'
         address: 'Address'
         organization: 'Organization Name'
         unit: 'Unit'
@@ -97,6 +98,7 @@ en:
       optional: '(Optional)'
       header: '%{name} Sponsorship Application Form'
       contact: 'Point of Contact'
+      email_cc_help: "Enter alternate email addresses (comma separated). Announcements will be CC'd to these addresses. Note that these CC addresses cannot be used for logging into sponsor portal."
       billing: 'Billing Information'
       specify_alternate_billing_contact: 'Specify an alternate contact for billing'
       billing_request_help: 'Use this field especially if you have: requirement of contract or submitting form, explicit due date for a bill...'
