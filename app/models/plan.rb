@@ -14,7 +14,7 @@ class Plan < ApplicationRecord
   end
 
   def sold_out?
-    capacity && sponsorships.count < capacity
+    !capacity || sponsorships.active.count > capacity
   end
 
   def closed?(t = Time.zone.now)
