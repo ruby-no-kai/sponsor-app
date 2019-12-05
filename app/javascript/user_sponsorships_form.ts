@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const uneligibleHelpTextElem = formElem.querySelector('.sponsorships_form_booth_request_uneligible') as Element;
       const customizationRequestField = document.querySelector('.sponsorships_form_customization_request') as HTMLTextAreaElement;
       const profileFieldHelpElem = document.querySelector('.sponsorships_form_profile_help') as Element;
+      const acceptanceHelpElem = document.querySelector('.sponsorships_acceptance_help') as Element;
 
       const handleChange = (e: HTMLInputElement | null) => {
           if (!e) return;
@@ -61,6 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
             profileFieldHelpElem.innerHTML = wordsLimitHelp;
           } else {
             profileFieldHelpElem.innerHTML = '';
+          }
+
+          const acceptanceHelp =  e.dataset.acceptanceHelp;
+          if (acceptanceHelp) {
+            acceptanceHelpElem.innerHTML = acceptanceHelp;
+          } else {
+            acceptanceHelpElem.innerHTML = '';
           }
 
           customizationRequestField.required = e.dataset['other'] == '1';

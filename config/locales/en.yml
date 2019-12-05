@@ -118,6 +118,8 @@ en:
           zero: '0 word'
           one: 'About 1 word'
           other: 'About %{count} words'
+        not_auto_acceptance: 'Your sponsorship application will be finalized AFTER the application form closes (as your selected plan %{plan} is limited). Wait our further announcement after the form closes.'
+        auto_acceptance: "Your sponsorship application will be finalized immediately upon submit."
       plan_sold_out: 'Sold Out'
       plan_closed: 'Closed'
       booth: 'Sponsor Booth'

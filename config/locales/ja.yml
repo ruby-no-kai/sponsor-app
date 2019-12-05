@@ -119,6 +119,8 @@ ja:
           zero: '英文 0 word'
           one: '英文 1 word'
           other: '英文およそ %{count} words'
+        auto_acceptance: '選択されているプラン %{plan} では申し込み後即座に申し込みが確定となります。'
+        not_auto_acceptance: '選択されているプラン %{plan} ではスポンサー申込について後日確定となります。申し込み後のアナウンスをお待ちください。'
       plan_sold_out: '受付終了'
       plan_closed: '受付期間終了'
       booth: 'スポンサーブース'
