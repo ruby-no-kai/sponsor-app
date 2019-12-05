@@ -24,7 +24,7 @@ class SessionsController < ApplicationController
       return render :new, status: 403
     end
 
-    @sponsorships = @session_token.sponsorships.reject(&:withdrawn?)
+    @sponsorships = @session_token.sponsorships.order(id: :asc).reject(&:withdrawn?)
 
     session[:staff_id] = @session_token.staff&.id
     if (@session_token.staff && @sponsorships && !@sponsorships.empty?) || !@session_token.staff
