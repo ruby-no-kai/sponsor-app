@@ -113,8 +113,8 @@ ja:
         talk: 'スポンサートーク'
         booth:
           zero: 'ブースなし'
-          one: 'ブースあり'
-          other: 'ブースあり'
+          one: 'ブース出展可能'
+          other: 'ブース出展可能'
         words_limit:
           zero: '英文 0 word'
           one: '英文 1 word'

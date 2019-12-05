@@ -112,8 +112,8 @@ en:
         talk: 'Sponsor Talk'
         booth:
           zero: 'No booth'
-          one: 'Booth'
-          other: 'Booth'
+          one: 'Eligible for Booth'
+          other: 'Eligible for Booth'
         words_limit:
           zero: '0 word'
           one: 'About 1 word'
