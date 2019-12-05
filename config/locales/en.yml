@@ -126,7 +126,7 @@ en:
       booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
       information: 'Sponsor Information'
       information_help: |
-        Please provide a short introduction of your company. Note that the length of the introduction will be vary depending on the sponsorship plan you chose.
+        Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose.
       logo: 'Logo'
       download_logo: '(Download previously uploaded file)'
       logo_help: |
