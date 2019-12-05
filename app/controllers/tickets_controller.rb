@@ -48,6 +48,7 @@ class TicketsController < ApplicationController
 
   private def set_conference
     @conference = Conference.find_by!(slug: params[:conference_slug])
+    raise ActiveRecord::RecordNotFound unless @conference.distributing_ticket?
   end
 
   helper_method private def current_ticket

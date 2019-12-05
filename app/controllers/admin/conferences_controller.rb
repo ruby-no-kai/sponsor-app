@@ -84,6 +84,7 @@ class Admin::ConferencesController < Admin::ApplicationController
       :slug,
       :application_opens_at,
       :application_closes_at,
+      :ticket_distribution_starts_at,
       :amendment_closes_at,
       :booth_capacity,
       :contact_email_address,

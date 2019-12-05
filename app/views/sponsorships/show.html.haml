@@ -58,7 +58,7 @@
             %span.badge.badge-danger= t('.pending')
             %span= t('.pending_help')
 
-    - if @sponsorship.booth_assigned? || @sponsorship.total_number_of_attendees > 0
+    - if @conference.distributing_ticket? && (@sponsorship.booth_assigned? || @sponsorship.total_number_of_attendees > 0)
       .card.mt-2.text-dark
         .card-header= t('.tickets.title')
         .card-body

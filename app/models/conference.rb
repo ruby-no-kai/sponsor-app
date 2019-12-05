@@ -37,6 +37,11 @@ class Conference < ApplicationRecord
     application_opens_at && application_opens_at <= t && (!amendment_closes_at || t < amendment_closes_at)
   end
 
+  def distributing_ticket?
+    t = Time.now
+    ticket_distribution_starts_at && ticket_distribution_starts_at <= t
+  end
+
   def form_description_for_locale
     form_descriptions.find_by(locale: I18n.locale) || form_descriptions.find_by!(locale: 'en')
   end
