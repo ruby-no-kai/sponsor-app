@@ -63,7 +63,7 @@ class Admin::SponsorshipsController < Admin::ApplicationController
 
       :number_of_additional_attendees,
 
-      contact_attributes: %i(id email address organization unit name),
+      contact_attributes: %i(id email email_cc address organization unit name),
       alternate_billing_contact_attributes: %i(_keep id email address organization unit name),
 
       billing_request_attributes: %i(id body),
