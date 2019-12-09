@@ -30,7 +30,7 @@ class SessionToken < ApplicationRecord
   end
 
   def sponsorships
-    contacts && contacts.includes(:sponsorship).map(&:sponsorship)
+    contacts&.includes(:sponsorship).map(&:sponsorship).sort_by(&:id)
   end
 
   def to_param
