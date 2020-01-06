@@ -7,6 +7,7 @@ class Contact < ApplicationRecord
   validates :email, presence: true
   validates :address, presence: true
   validates :name, presence: true
+  validates :email_cc, format: { with: /(.+?@.+?(?:[,;]\s*|$))+/}, allow_blank: true
 
   validate :validate_email_ccs
 
@@ -18,7 +19,7 @@ class Contact < ApplicationRecord
   end
 
   def email_ccs
-    email_cc&.split(/[,;]\s*/) || []
+    email_cc&.strip&.split(/[,;]\s*/) || []
   end
 
   def validate_email_ccs
