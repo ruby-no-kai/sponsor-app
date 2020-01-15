@@ -15,6 +15,8 @@
         = check_box_tag "recipient_filter[exhibitors]", '1', false, {class: 'form-check-input'}
         = label_tag "recipient_filter[exhibitors]", "Exhibitors Only", class: 'form-check-label'
     .form-group
+      = select_tag "recipient_filter[plan_id]", options_from_collection_for_select(@conference.plans, 'id', 'name'), class: 'form-control', include_blank: true
+    .form-group
       .form-check
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'all', true, {class: 'form-check-input'}

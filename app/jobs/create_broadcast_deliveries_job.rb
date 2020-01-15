@@ -46,6 +46,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
     case kind.to_s
     when 'all'
       scope = @broadcast.conference.sponsorships.not_withdrawn.includes(:contact)
+      scope = scope.where(plan: @broadcast.conference.plans.find_by!(id: params[:plan_id])) if params[:plan_id].present?
       scope = scope.where(locale: params[:locale]) if params[:locale].present?
       scope = scope.exhibitor if params[:exhibitors].present?
       case params[:status]

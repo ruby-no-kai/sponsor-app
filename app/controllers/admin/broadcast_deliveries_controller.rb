@@ -47,6 +47,7 @@ class Admin::BroadcastDeliveriesController < Admin::ApplicationController
       :id,
       :exclude_current_sponsors,
       :emails,
+      :plan_id,
       sponsorship_ids: [],
     )
   end
