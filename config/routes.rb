@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       member do
         get :attendees_keeper
         get :sponsors_yml
+        get :sponsors_json
         get :asset_urls
         get :table_view
       end

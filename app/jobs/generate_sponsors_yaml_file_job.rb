@@ -13,9 +13,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     @conference.github_repo
   end
 
-  def yaml_data
-    return @yaml_data if defined? @yaml_data
-
+  def data
     sponsorships = @conference.sponsorships
       .have_presence
       .order(id: :asc)
@@ -25,37 +23,53 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       .group_by { |_| _.plan.name.downcase.gsub(/[^a-z0-9]/, '_') }
 
     @last_id = SponsorshipEditingHistory.where(sponsorship_id: sponsorships.each_value.flat_map { |_| _.map(&:id) }).order(id: :desc).limit(1).pluck(:id)[0]
+
+    sponsorships.map do |base_plan_slug, sponsorships|
+      [
+        base_plan_slug,
+        {
+          base_plan: sponsorships[0].plan.name.downcase,
+          plans: sponsorships.group_by { |_| _.plan_name.downcase.gsub(/[^a-z0-9]/, '_') }.map do |plan_slug, sponsors|
+            [
+              plan_slug,
+              {
+                plan_name: sponsors[0].plan_name,
+                sponsors: sponsors.map do |_|
+                {
+                  id: _.id,
+                  asset_file_id: _.asset_file&.id,
+                  base_plan: _.plan.name.downcase,
+                  plan_name: _.plan_name,
+                  slug: _.slug,
+                  name: _.name,
+                  url: _.url,
+                  profile: _.profile,
+                }
+              end,
+              },
+            ]
+          end.to_h,
+        },
+      ]
+    end.to_h
+  end
+
+  def yaml_data
+    return @yaml_data if defined? @yaml_data
+
+    data = self.data()
     @yaml_data = [
       "# last_editing_history: #{@last_id}",
-      sponsorships.map do |base_plan_slug, sponsorships|
-        [
-          base_plan_slug,
-          {
-            base_plan: sponsorships[0].plan.name.downcase,
-            plans: sponsorships.group_by { |_| _.plan_name.downcase.gsub(/[^a-z0-9]/, '_') }.map do |plan_slug, sponsors|
-              [
-                plan_slug,
-                {
-                  plan_name: sponsors[0].plan_name,
-                  sponsors: sponsors.map do |_|
-                    {
-                      id: _.id,
-                      asset_file_id: _.asset_file&.id,
-                      base_plan: _.plan.name.downcase,
-                      plan_name: _.plan_name,
-                      slug: _.slug,
-                      name: _.name,
-                      url: _.url,
-                      profile: _.profile,
-                    }
-                  end,
-                },
-              ]
-            end.to_h,
-          },
-        ]
-      end.to_h.to_yaml,
+      data.to_yaml,
+      "",
     ].join("\n")
+  end
+
+  def json_data
+    return @json_data if defined? @json_data
+
+    data = self.data()
+    @json_data = "#{data.to_json}\n"
   end
 
   def push_to_github

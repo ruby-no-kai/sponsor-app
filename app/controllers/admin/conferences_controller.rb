@@ -22,6 +22,10 @@ class Admin::ConferencesController < Admin::ApplicationController
     render plain: GenerateSponsorsYamlFileJob.new(@conference, push: false).tap(&:perform_now).yaml_data
   end
 
+  def sponsors_json
+    render plain: GenerateSponsorsYamlFileJob.new(@conference, push: false).tap(&:perform_now).json_data
+  end
+
   def table_view
     @sponsorships = @conference.sponsorships
       .includes_contacts
