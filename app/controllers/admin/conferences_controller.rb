@@ -1,5 +1,5 @@
 class Admin::ConferencesController < Admin::ApplicationController
-  before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :asset_urls, :table_view]
+  before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :sponsors_json, :asset_urls, :table_view]
 
   def index
     @conferences = Conference.all
