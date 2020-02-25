@@ -171,6 +171,10 @@
 
     .form-group
       .form-check
+        = form.check_box :accepted, class: 'form-check-input'
+        = form.label :accepted, class: 'form-check-label'
+
+      .form-check
         = form.check_box :suspended, class: 'form-check-input'
         = form.label :suspended, class: 'form-check-label'
         %small.form-text Use this to suspend a presence in web sites etc, due to any problem on sponsor's introduction text.

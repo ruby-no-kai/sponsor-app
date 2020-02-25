@@ -60,6 +60,7 @@ class Admin::SponsorshipsController < Admin::ApplicationController
       :booth_assigned,
 
       :suspended,
+      :accepted,
 
       :number_of_additional_attendees,
 

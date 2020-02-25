@@ -88,6 +88,21 @@ class Sponsorship < ApplicationRecord
     !!accepted_at
   end
 
+  def accepted
+    accepted?
+  end
+
+  def accepted=(x)
+    case
+    when !x || x == '0'
+      self.accepted_at = nil
+    when x && x != accepted?
+      self.accepted_at = Time.zone.now
+    else
+      accepted?
+    end
+  end
+
   def withdrawn?
     !!withdrawn_at
   end
