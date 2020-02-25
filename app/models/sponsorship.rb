@@ -96,7 +96,7 @@ class Sponsorship < ApplicationRecord
     case
     when !x || x == '0'
       self.accepted_at = nil
-    when x && x != accepted?
+    when x && !accepted?
       self.accepted_at = Time.zone.now
     else
       accepted?
