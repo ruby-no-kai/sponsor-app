@@ -25,8 +25,8 @@
           %li.nav-item.dropdown
             .nav-link.dropdown-toggle#navbarDropdownMenuLink{href: '#', role: 'button', data: {toggle: 'dropdown'}, aria: {haspopup: 'true', expanded: 'false'}} Language
             .dropdown-menu{aria: {labelledby: 'navbarDropdownMenuLink'}}
-              %a.dropdown-item{href: url_for(params.to_unsafe_h.merge(only_path: true, hl: 'en'))} English
-              %a.dropdown-item{href: url_for(params.to_unsafe_h.merge(only_path: true, hl: 'ja'))} Japanese
+              %a.dropdown-item{href: url_for(params.to_unsafe_h.except(:authenticity_token, :commit, :utf8, :_method, :script_name, :original_script_name).merge(only_path: true, hl: 'en'))} English
+              %a.dropdown-item{href: url_for(params.to_unsafe_h.except(:authenticity_token, :commit, :utf8, :_method, :script_name, :original_script_name).merge(only_path: true, hl: 'ja'))} Japanese
           - if current_staff
             %li.nav-item
               = link_to dashboard_path() do
@@ -45,5 +45,7 @@
         .alert.alert-danger.mt-5.mb-2= flash[:alert]
 
       %main
+        %p= params.to_unsafe_h.inspect
+        %a{href: url_for(params.to_unsafe_h.merge(only_path: true, mode: params[:mode], page: 1))} test
         = yield
     = javascript_pack_tag 'application'
