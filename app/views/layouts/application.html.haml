@@ -45,6 +45,5 @@
         .alert.alert-danger.mt-5.mb-2= flash[:alert]
 
       %main
-        %p= params.to_unsafe_h.inspect
         = yield
     = javascript_pack_tag 'application'
