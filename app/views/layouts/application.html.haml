@@ -46,6 +46,5 @@
 
       %main
         %p= params.to_unsafe_h.inspect
-        %a{href: url_for(params.to_unsafe_h.merge(only_path: true, mode: params[:mode], page: 1))} test
         = yield
     = javascript_pack_tag 'application'
