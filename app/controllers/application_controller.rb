@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  before_action :migrate_legacy_sponsorship_session
   before_action :set_locale
 
   private
@@ -26,8 +27,20 @@ class ApplicationController < ActionController::Base
 
   helper_method def current_sponsorship
     return @current_sponsorship if defined? @current_sponsorship
-    # XXX: active
-    @current_sponsorship = session[:sponsorship_id] && Sponsorship.not_withdrawn.find_by(id: session[:sponsorship_id])
+    return nil unless params[:conference_slug]
+    return nil unless session[:sponsorship_ids]
+
+    @current_sponsorship = Sponsorship.where(id: session[:sponsorship_ids])
+      .joins(:conference)
+      .merge(Conference.where(slug: params[:conference_slug]))
+      .not_withdrawn
+      .first
+  end
+
+  helper_method def current_available_sponsorships
+    return @current_available_sponsorships if defined? @current_available_sponsorships
+    return nil unless session[:sponsorship_ids]
+    @current_available_sponsorships = Sponsorship.includes(:conference).where(id: session[:sponsorship_ids]).not_withdrawn.order(id: :desc)
   end
 
   def require_staff
@@ -39,6 +52,14 @@ class ApplicationController < ActionController::Base
   def require_sponsorship_session
     unless current_sponsorship
       redirect_to new_user_session_path(back_to: url_for(params.to_unsafe_h.merge(only_path: true)))
+    end
+  end
+
+  def migrate_legacy_sponsorship_session
+    sponsorship_id = session.delete(:sponsorship_id)
+    if sponsorship_id
+      session_token = SessionToken.find_by(id: session[:session_token_id])
+      session[:sponsorship_ids] = session_token&.sponsorship_ids
     end
   end
 end

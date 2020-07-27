@@ -50,8 +50,8 @@ class SponsorshipsController < ApplicationController
 
     respond_to do |format|
       if @sponsorship.save(context: :update_by_user)
+        (session[:sponsorship_ids] ||= []).unshift @sponsorship.id
         session[:asset_file_ids].delete(@sponsorship.asset_file.id)
-        session[:sponsorship_id] = @sponsorship.id
         SponsorshipWelcomeJob.perform_later(@sponsorship)
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: t('.notice') }
       else

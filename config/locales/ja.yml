@@ -61,6 +61,7 @@ ja:
     application:
       brand: 'Sponsorships'
       conferences: '全てのイベント'
+      sponsorships_switch: '申込済みのスポンサーシップ'
       login: 'ログイン'
       logout: 'ログアウト'
 

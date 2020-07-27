@@ -24,21 +24,15 @@ class SessionsController < ApplicationController
       return render :new, status: 403
     end
 
-    @sponsorships = @session_token.sponsorships.reject(&:withdrawn?)
-
+    session[:session_token_id] = @session_token.id
+    session[:sponsorship_ids] = @session_token.sponsorship_ids
     session[:staff_id] = @session_token.staff&.id
-    if (@session_token.staff && @sponsorships && !@sponsorships.empty?) || !@session_token.staff
-      # TODO:
-      @sponsorship = @sponsorships.last
-    end
 
-    if @sponsorship
-      session[:sponsorship_id] = @sponsorship.id
-      session[:session_token_id] = @session_token.id
-    end
 
     set_back_to()
 
+    @sponsorships = @session_token.sponsorships.reject(&:withdrawn?)
+    @sponsorship = @sponsorships&.last
     if @sponsorship
       redirect_to session.delete(:back_to) || user_conference_sponsorship_path(@sponsorship.conference)
     else
@@ -47,6 +41,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
+    session.delete(:sponsorship_ids)
     session.delete(:sponsorship_id)
     session.delete(:session_token_id)
     redirect_to '/'
