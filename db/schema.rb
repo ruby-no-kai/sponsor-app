@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_04_233205) do
+ActiveRecord::Schema.define(version: 2020_07_27_205535) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -86,6 +86,8 @@ ActiveRecord::Schema.define(version: 2019_12_04_233205) do
     t.string "github_repo"
     t.string "reception_key", null: false
     t.datetime "ticket_distribution_starts_at"
+    t.boolean "hidden", default: false, null: false
+    t.string "invite_code"
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
     t.index ["slug"], name: "index_conferences_on_slug", unique: true
   end
@@ -253,7 +255,6 @@ ActiveRecord::Schema.define(version: 2019_12_04_233205) do
     t.string "ticket_key", null: false
     t.datetime "accepted_at"
     t.index ["conference_id", "organization_id"], name: "index_sponsorships_on_conference_id_and_organization_id", unique: true
-    t.index ["conference_id", "ticket_key"], name: "index_sponsorships_on_conference_id_and_ticket_key", unique: true
     t.index ["conference_id"], name: "index_sponsorships_on_conference_id"
     t.index ["organization_id"], name: "index_sponsorships_on_organization_id"
     t.index ["plan_id"], name: "index_sponsorships_on_plan_id"

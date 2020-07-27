@@ -1,6 +1,7 @@
 - conference = sponsorship.conference
 - desc = conference.form_description_for_locale
 = form_with(model: sponsorship, url: user_conference_sponsorship_path(conference), local: true, class: 'sponsorships_form') do |form|
+  = hidden_field_tag :invite_code, params[:invite_code]
 
   - if sponsorship.errors.any?
     - I18n.with_options(scope: %i(errors template)) do |lo|
@@ -118,7 +119,7 @@
         = request_form.label :body
         = request_form.text_area :body, class: 'form-control sponsorships_form_customization_request'
 
-  %section.py-2
+  %section.py-2{class: @conference.booth_capacity > 0 ? '' : 'd-none'}
     .form-group
       %h3= t('.booth')
       = desc.booth_help_html&.html_safe

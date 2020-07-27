@@ -14,6 +14,7 @@ class Conference < ApplicationRecord
 
   scope :application_open, -> { t = Time.now; where('application_opens_at <= ? AND (application_closes_at > ? OR application_closes_at IS NULL) AND application_opens_at IS NOT NULL', t, t) }
   scope :amendment_open, -> { t = Time.now; where('application_opens_at <= ? AND (amendment_closes_at > ? OR amendment_closes_at IS NULL) AND application_opens_at IS NOT NULL', t, t) }
+  scope :publicly_visible, -> { where(hidden: false) }
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
@@ -22,6 +23,7 @@ class Conference < ApplicationRecord
 
   before_validation :generate_slug
   before_validation :generate_reception_key
+  before_validation :generate_invite_code
 
   def to_param
     slug
@@ -67,11 +69,22 @@ class Conference < ApplicationRecord
     end
   end
 
+  def verify_invite_code(code)
+    return true unless hidden?
+    !code.blank? && Rack::Utils.secure_compare(code, invite_code)
+  end
+
   private def generate_slug
     self.slug = name.remove(' ').parameterize if slug.blank?
   end
 
   private def generate_reception_key
     self.reception_key ||= SecureRandom.urlsafe_base64(96)
+  end
+
+  private def generate_invite_code
+    if self.hidden?
+      self.invite_code ||= SecureRandom.urlsafe_base64(48)
+    end
   end
 end
