@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_27_205535) do
+ActiveRecord::Schema.define(version: 2020_07_28_011008) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -88,6 +88,7 @@ ActiveRecord::Schema.define(version: 2020_07_27_205535) do
     t.datetime "ticket_distribution_starts_at"
     t.boolean "hidden", default: false, null: false
     t.string "invite_code"
+    t.boolean "no_plan_allowed", default: true, null: false
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
     t.index ["slug"], name: "index_conferences_on_slug", unique: true
   end

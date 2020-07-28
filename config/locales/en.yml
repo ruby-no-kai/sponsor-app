@@ -39,6 +39,7 @@ en:
             plan:
               unavailable: "is sold out."
               unchangeable_after_finalization: "cannot be changed once the sponsorship is finalized."
+              no_plan_not_allowed: "must be chosen (cannot be 'Other')"
             organization:
               taken: "Exists: Looks like we already have received the sponsorship application from your organization. Contact us for details."
             booth_requested:

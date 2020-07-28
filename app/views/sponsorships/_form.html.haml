@@ -119,10 +119,11 @@
               - when plan.closed?
                 %small.badge.badge-danger= t('.plan_closed')
 
-        .form-check
-          %label.form-check-label
-            = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1', guests: 0}
-            Other
+        - if @conference.no_plan_allowed || (@sponsorship.persisted? && @sponsorship.plan_id == nil)
+          .form-check
+            %label.form-check-label
+              = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1', guests: 0}
+              Other
 
     = form.fields_for :customization_request do |request_form|
       .form-group

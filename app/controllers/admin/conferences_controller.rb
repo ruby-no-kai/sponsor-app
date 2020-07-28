@@ -95,6 +95,7 @@ class Admin::ConferencesController < Admin::ApplicationController
       :additional_attendees_registration_open,
       :github_repo,
       :hidden,
+      :no_plan_allowed,
     )
   end
 end
