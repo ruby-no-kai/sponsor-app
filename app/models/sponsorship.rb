@@ -23,6 +23,13 @@ class Sponsorship < ApplicationRecord
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
   end
 
+  # XXX: this can only hold a value, because authorization is mandatory in a controller
+  def asset_file_id_to_copy; @asset_file_id_to_copy; end
+  def asset_file_id_to_copy=(id)
+    raise "asset_file_id_to_copy= cannot be used for a persisted record" if id && self.persisted?
+    @asset_file_id_to_copy = id
+  end
+
   has_many :staff_notes, class_name: 'SponsorshipStaffNote', dependent: :destroy
 
   has_one :exhibition

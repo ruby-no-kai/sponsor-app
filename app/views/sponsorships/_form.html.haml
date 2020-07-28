@@ -16,6 +16,16 @@
       %h2= t('.header', name: conference.name)
       = desc.head_html&.html_safe
 
+  - if !sponsorship.persisted? && current_available_sponsorships
+    %section.py-3
+      .card
+        %h5.card-header
+          = t('.copy.header')
+        .card-body
+          %p.card-text= t('.copy.explanation')
+          .form-group
+            = select_tag "sponsorship_id_to_copy", options_for_select(current_available_sponsorships.map {|_| [_.conference.name, _.id] }, params[:sponsorship_id_to_copy]), class: 'form-control form-control-sm sponsorship_id_to_copy_selector', include_blank: true
+
   %section.py-2
     .form-group
       %h3= t('.contact')
@@ -157,6 +167,7 @@
 
     .form-group.sponsorships_form_asset_file{data: {session_endpoint: user_conference_sponsorship_asset_file_path, session_endpoint_method: sponsorship.asset_file&.persisted? ? 'PUT': 'POST'}}
       = form.hidden_field :asset_file_id
+      = form.hidden_field :asset_file_id_to_copy unless sponsorship.persisted?
       .sponsorships_form_asset_file_form (Loading)
 
     - if sponsorship.persisted? && sponsorship.asset_file
