@@ -4,6 +4,7 @@ class Plan < ApplicationRecord
 
   validates :name, presence: true
   validates :price_text, presence: true
+  validates :words_limit, presence: true
 
   def booth_eligible?
     (booth_size || 0) > 0
