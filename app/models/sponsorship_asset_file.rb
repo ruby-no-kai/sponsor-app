@@ -8,8 +8,20 @@ class SponsorshipAssetFile < ApplicationRecord
   belongs_to :sponsorship, optional: true
   validates :handle, presence: true
 
+  validate :validate_ownership_not_changed
+
   before_validation do
     self.handle ||= SecureRandom.urlsafe_base64(32)
+  end
+
+  def copy_to!(conference)
+    dst = self.class.create!(prefix: "c-#{conference.id}/", extension: self.extension)
+    Aws::S3::Client.new(logger: Rails.logger, region: REGION).copy_object(
+      bucket: BUCKET,
+      copy_source: "#{BUCKET}/#{object_key}",
+      key: dst.object_key,
+    )
+    dst
   end
 
   def object_key
@@ -34,6 +46,12 @@ class SponsorshipAssetFile < ApplicationRecord
       expires_in: 3600,
       response_content_disposition: "attachment; filename=\"#{filename}\"",
     )
+  end
+
+  private def validate_ownership_not_changed
+    if sponsorship_id_changed? && !sponsorship_id_was.nil?
+      errors.add :sponsorship_id, "cannot be changed"
+    end
   end
 
   class Session

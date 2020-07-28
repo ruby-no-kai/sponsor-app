@@ -39,6 +39,7 @@ ja:
             plan:
               unavailable: "は受付を終了しています"
               unchangeable_after_finalization: "はスポンサーシップ確定後の変更は原則として受け付けていません"
+              no_plan_not_allowed: "を選択してください (その他を選ぶことはできません)"
             organization:
               taken: "の重複: 同じ組織から既にスポンサーシップを受け付けている可能性があります。詳細はお問い合わせください"
             booth_requested:
@@ -61,6 +62,7 @@ ja:
     application:
       brand: 'Sponsorships'
       conferences: '全てのイベント'
+      sponsorships_switch: '申込済みのスポンサーシップ'
       login: 'ログイン'
       logout: 'ログアウト'
 
@@ -98,6 +100,9 @@ ja:
     form:
       optional: '(任意)'
       header: '%{name} スポンサーシップ申込フォーム'
+      copy:
+        header: '過去の申込情報を利用する'
+        explanation: '過去の申込情報を利用することができます。下記より既存のスポンサーシップ申込を選択してください。'
       contact: '連絡先'
       email_cc_help: '上記の E メールアドレスの他に、各種連絡において送信先として加えるアドレス (CC) を入力してください。複数のアドレスをカンマ (,) 区切りで入力できます。尚、CC 先のアドレスではスポンサーポータルへの新規ログインはできません。'
       billing: '請求情報'

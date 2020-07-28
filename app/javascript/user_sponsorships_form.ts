@@ -1,5 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.sponsorships_form').forEach((formElem) => {
+    formElem.querySelectorAll('select.sponsorship_id_to_copy_selector').forEach((elem_) => {
+      const elem = elem_ as HTMLSelectElement;
+      elem.addEventListener('change', () => {
+        const query = new URLSearchParams(location.search);
+        query.set('sponsorship_id_to_copy', elem.value);
+        location.search = query.toString();
+      });
+    });
+
+
     formElem.querySelectorAll('.sponsorships_form_billing_contact').forEach((elem) => {
       const checkbox = elem.querySelector('.form-check input[type=checkbox]') as HTMLInputElement;
       const fieldset = elem.querySelector('fieldset') as HTMLFieldSetElement;

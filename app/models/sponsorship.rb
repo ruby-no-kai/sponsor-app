@@ -23,6 +23,13 @@ class Sponsorship < ApplicationRecord
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
   end
 
+  # XXX: this can only hold a value, because authorization is mandatory in a controller
+  def asset_file_id_to_copy; @asset_file_id_to_copy; end
+  def asset_file_id_to_copy=(id)
+    raise "asset_file_id_to_copy= cannot be used for a persisted record" if id && self.persisted?
+    @asset_file_id_to_copy = id
+  end
+
   has_many :staff_notes, class_name: 'SponsorshipStaffNote', dependent: :destroy
 
   has_one :exhibition
@@ -60,6 +67,7 @@ class Sponsorship < ApplicationRecord
   validate :validate_plan_availability, on: :update_by_user
   validate :validate_booth_eligibility, on: :update_by_user
   validate :validate_word_count, on: :update_by_user
+  validate :validate_no_plan_allowance, on: :update_by_user
   validate :policy_agreement
 
 
@@ -238,6 +246,12 @@ class Sponsorship < ApplicationRecord
     limit = plan&.words_limit_hard
     if limit && word_count > limit
       errors.add :profile, :too_long, maximum: (plan.words_limit || 0)
+    end
+  end
+
+  def validate_no_plan_allowance
+    if !plan_id && conference && !conference.no_plan_allowed
+      errors.add :plan, :no_plan_not_allowed
     end
   end
 

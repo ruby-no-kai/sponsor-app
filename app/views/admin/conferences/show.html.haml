@@ -1,10 +1,11 @@
 %p
+  - application_form_url = new_user_conference_sponsorship_url(@conference, {invite_code: @conference.invite_code}.compact)
 
 .d-md-flex.justify-content-between
   %h2 Conference: #{@conference.name}
   %div
     = link_to 'Edit', edit_conference_path(@conference), class: 'btn btn-primary'
-    = link_to 'Preview', new_user_conference_sponsorship_path(@conference), class: 'btn btn-secondary'
+    = link_to 'Preview', application_form_url, class: 'btn btn-secondary'
 
 
 .row.my-3
@@ -25,6 +26,10 @@
         %p.card-text
           %strong Accepting amendment closes:
           = @conference.amendment_closes_at
+        - if @conference.hidden?
+          %p.card-text
+            %strong Form URL:
+            = link_to application_form_url, application_form_url
 
   .col-md-4
     .card

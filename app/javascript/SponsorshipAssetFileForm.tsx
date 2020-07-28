@@ -11,6 +11,7 @@ interface UploadState {
 
 interface Props {
   existingFileId: string | null,
+  needUpload: boolean,
   sessionEndpoint: string,
   sessionEndpointMethod: string,
 }
@@ -28,7 +29,7 @@ export default class SponsorshipAssetFileForm extends React.Component<Props, Sta
   constructor(props: Props) {
     super(props);
     this.state = {
-      needUpload: !this.props.existingFileId,
+      needUpload: this.props.needUpload,
       uploadState: undefined,
       file: null,
       filename: null,
@@ -65,11 +66,11 @@ export default class SponsorshipAssetFileForm extends React.Component<Props, Sta
   }
 
   public uploadRequired() {
-    return !this.props.existingFileId;
+    return this.props.needUpload;
   }
 
   public async startUpload(): Promise<string | null> {
-    if (!this.needUpload() && !this.uploadRequired()) return this.props.existingFileId;
+    if (!this.needUpload() && !this.uploadRequired()) return this.props.existingFileId || '';
     const form = this.formRef.current;
     if (!(form && form.reportValidity()))  return null;
     if (!(this.state.file)) return null;

@@ -11,9 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const elem = elem_ as HTMLDivElement;
       const dest = elem.querySelector('.sponsorships_form_asset_file_form');
 
-      const fileIdElem = elem.querySelector('input[type=hidden]') as HTMLInputElement;
+      const fileIdElem = elem.querySelector('input[type=hidden][name="sponsorship[asset_file_id]"]') as HTMLInputElement;
+      const fileIdToCopyElem = elem.querySelector('input[type=hidden][name="sponsorship[asset_file_id_to_copy]"]') as (HTMLInputElement | undefined);
       if (!fileIdElem) return;
       const existingFileId = fileIdElem.value.length > 0 ? fileIdElem.value : null;
+      const doCopy = (fileIdToCopyElem?.value ?? '').length > 0;
 
       const sessionEndpoint = elem.dataset.sessionEndpoint;
       const sessionEndpointMethod = elem.dataset.sessionEndpointMethod;
@@ -21,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const component = ReactDOM.render(
         <SponsorshipAssetFileForm
+          needUpload={doCopy ? false : !existingFileId}
           existingFileId={existingFileId}
           sessionEndpoint={sessionEndpoint}
           sessionEndpointMethod={sessionEndpointMethod}
@@ -32,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           errorElem.classList.add('d-none');
           const fileId = await component.startUpload();
-          if (fileId) {
+          if (fileId !== null) {
             fileIdElem.value = fileId;
             form.submit();
             return;

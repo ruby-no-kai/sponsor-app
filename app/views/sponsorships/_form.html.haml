@@ -1,6 +1,7 @@
 - conference = sponsorship.conference
 - desc = conference.form_description_for_locale
 = form_with(model: sponsorship, url: user_conference_sponsorship_path(conference), local: true, class: 'sponsorships_form') do |form|
+  = hidden_field_tag :invite_code, params[:invite_code]
 
   - if sponsorship.errors.any?
     - I18n.with_options(scope: %i(errors template)) do |lo|
@@ -14,6 +15,16 @@
     .form-group
       %h2= t('.header', name: conference.name)
       = desc.head_html&.html_safe
+
+  - if !sponsorship.persisted? && current_available_sponsorships
+    %section.py-3
+      .card
+        %h5.card-header
+          = t('.copy.header')
+        .card-body
+          %p.card-text= t('.copy.explanation')
+          .form-group
+            = select_tag "sponsorship_id_to_copy", options_for_select(current_available_sponsorships.map {|_| [_.conference.name, _.id] }, params[:sponsorship_id_to_copy]), class: 'form-control form-control-sm sponsorship_id_to_copy_selector', include_blank: true
 
   %section.py-2
     .form-group
@@ -108,17 +119,18 @@
               - when plan.closed?
                 %small.badge.badge-danger= t('.plan_closed')
 
-        .form-check
-          %label.form-check-label
-            = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1', guests: 0}
-            Other
+        - if @conference.no_plan_allowed || (@sponsorship.persisted? && @sponsorship.plan_id == nil)
+          .form-check
+            %label.form-check-label
+              = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1', guests: 0}
+              Other
 
     = form.fields_for :customization_request do |request_form|
       .form-group
         = request_form.label :body
         = request_form.text_area :body, class: 'form-control sponsorships_form_customization_request'
 
-  %section.py-2
+  %section.py-2{class: @conference.booth_capacity > 0 ? '' : 'd-none'}
     .form-group
       %h3= t('.booth')
       = desc.booth_help_html&.html_safe
@@ -156,6 +168,7 @@
 
     .form-group.sponsorships_form_asset_file{data: {session_endpoint: user_conference_sponsorship_asset_file_path, session_endpoint_method: sponsorship.asset_file&.persisted? ? 'PUT': 'POST'}}
       = form.hidden_field :asset_file_id
+      = form.hidden_field :asset_file_id_to_copy unless sponsorship.persisted?
       .sponsorships_form_asset_file_form (Loading)
 
     - if sponsorship.persisted? && sponsorship.asset_file

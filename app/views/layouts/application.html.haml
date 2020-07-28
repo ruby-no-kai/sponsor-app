@@ -1,5 +1,5 @@
 !!! 5
-%html
+%html{lang: I18n.locale}
   %head
     %meta{charset: 'utf-8'}
     %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, shrink-to-fit=no'}
@@ -19,6 +19,12 @@
       .collapse.navbar-collapse#navbarNavAltMarkup
         .navbar-nav
           %a.nav-item.nav-link{href: user_conferences_path}= t('.conferences')
+          - if current_available_sponsorships
+            .nav-item.dropdown
+              .nav-link.dropdown-toggle#navbarSponsorshipsSwitchDropdownMenuLink{href: '#', role: 'button', data: {toggle: 'dropdown'}, aria: {haspopup: 'true', expanded: 'false'}}= t('.sponsorships_switch')
+              .dropdown-menu{aria: {labelledby: 'navbarSponsorshipsSwitchDropdownMenuLink'}}
+                - current_available_sponsorships.each do |sponsorship|
+                  %a.dropdown-item{href: user_conference_sponsorship_path(sponsorship.conference)}= sponsorship.conference.name
 
       .collapse.navbar-collapse
         %ul.navbar-nav.ml-auto
@@ -32,7 +38,7 @@
               = link_to dashboard_path() do
                 %span.badge.badge-danger STAFF MODE
           %li.nav-item
-            - if current_sponsorship
+            - if current_available_sponsorships
               = link_to t('.logout'), user_session_path, method: :delete, class: 'nav-link'
             - else
               -# back_to: url_for(params.to_unsafe_h.merge(only_path: true))

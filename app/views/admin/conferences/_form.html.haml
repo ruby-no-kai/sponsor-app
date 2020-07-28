@@ -42,4 +42,14 @@
       = form.label :additional_attendees_registration_open, class: 'form-check-label'
 
   .form-group
+    .form-check
+      = form.check_box :hidden, class: 'form-check-input'
+      = form.label :hidden, class: 'form-check-label'
+
+  .form-group
+    .form-check
+      = form.check_box :no_plan_allowed, class: 'form-check-input'
+      = form.label :no_plan_allowed, class: 'form-check-label'
+
+  .form-group
     = form.submit class: 'btn btn-primary'

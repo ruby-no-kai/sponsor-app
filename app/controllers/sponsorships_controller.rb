@@ -26,9 +26,11 @@ class SponsorshipsController < ApplicationController
     return render(status: 404, plain: '404') if current_sponsorship
 
     @conference = Conference.find_by!(slug: params[:conference_slug])
+    return render(plain: '404', status: 404) unless @conference.verify_invite_code(params[:invite_code])
     return render(:closed, status: 403) if !@conference&.application_open? && !current_staff
 
-    @sponsorship = Sponsorship.new(conference: @conference)
+    @sponsorship = Sponsorship.new(copied_sponsorship_attributes)
+    @sponsorship.conference = @conference
     @sponsorship.build_nested_attributes_associations
   end
 
@@ -36,10 +38,16 @@ class SponsorshipsController < ApplicationController
     return render(status: 404, plain: '404') if current_sponsorship
 
     @conference = Conference.find_by!(slug: params[:conference_slug])
+    return render(plain: '404', status: 404) unless @conference.verify_invite_code(params[:invite_code])
     return render(:closed, status: 403) if !@conference&.application_open? && !current_staff
 
     @sponsorship = Sponsorship.new(sponsorship_params)
-    return render(status: 403, plain: '403') if session[:asset_file_ids] && !session[:asset_file_ids].include?(@sponsorship.asset_file.id)
+    return render(status: 403, plain: '403') if sponsorship_params[:asset_file_id].present? && (!session[:asset_file_ids] || !session[:asset_file_ids].include?(@sponsorship.asset_file&.id))
+
+    if sponsorship_params[:asset_file_id_to_copy].present? && !@sponsorship.asset_file
+      src_asset = SponsorshipAssetFile.where(sponsorship_id: current_available_sponsorships.map(&:id), id: sponsorship_params[:asset_file_id_to_copy]).first
+      @sponsorship.asset_file = src_asset.copy_to!(@conference)
+    end
 
     @sponsorship.locale = I18n.locale
     @sponsorship.conference = @conference
@@ -48,8 +56,8 @@ class SponsorshipsController < ApplicationController
 
     respond_to do |format|
       if @sponsorship.save(context: :update_by_user)
+        (session[:sponsorship_ids] ||= []).unshift @sponsorship.id
         session[:asset_file_ids].delete(@sponsorship.asset_file.id)
-        session[:sponsorship_id] = @sponsorship.id
         SponsorshipWelcomeJob.perform_later(@sponsorship)
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: t('.notice') }
       else
@@ -88,6 +96,7 @@ class SponsorshipsController < ApplicationController
       :url,
       :profile,
       :asset_file_id,
+      :asset_file_id_to_copy,
       :booth_requested,
       :number_of_additional_attendees,
       contact_attributes: %i(id email email_cc address organization unit name),
@@ -109,5 +118,21 @@ class SponsorshipsController < ApplicationController
         end
       end
     end
+  end
+
+  def copied_sponsorship_attributes
+    return {} unless params[:sponsorship_id_to_copy].present?
+    return {} unless session[:sponsorship_ids].include?(params[:sponsorship_id_to_copy].to_i)
+    src = Sponsorship.find_by(id: params[:sponsorship_id_to_copy])
+    return {} unless src
+    {
+      name: src.name,
+      url: src.url,
+      profile: src.profile,
+      asset_file_id_to_copy: src.asset_file_id,
+      contact_attributes: src.contact.attributes.except('id', 'kind'),
+      alternate_billing_contact_attributes: src.alternate_billing_contact&.attributes&.except('id', 'kind')&.merge(_keep: '1'),
+      billing_request_attributes: src.billing_request&.attributes&.except('id', 'kind'),
+    }.compact
   end
 end

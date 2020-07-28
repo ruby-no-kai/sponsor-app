@@ -39,6 +39,7 @@ en:
             plan:
               unavailable: "is sold out."
               unchangeable_after_finalization: "cannot be changed once the sponsorship is finalized."
+              no_plan_not_allowed: "must be chosen (cannot be 'Other')"
             organization:
               taken: "Exists: Looks like we already have received the sponsorship application from your organization. Contact us for details."
             booth_requested:
@@ -61,6 +62,7 @@ en:
     application:
       brand: 'Sponsorships'
       conferences: 'All Conferences'
+      sponsorships_switch: 'Your Sponsorships'
       login: 'Log in'
       logout: 'Log out'
 
@@ -97,6 +99,9 @@ en:
     form:
       optional: '(Optional)'
       header: '%{name} Sponsorship Application Form'
+      copy:
+        header: 'Filling the same information with your sponsorship application in past?'
+        explanation: 'Select an existing application from below, then the existing data will be filled in.'
       contact: 'Point of Contact'
       email_cc_help: "Enter alternate email addresses (comma separated). Announcements will be CC'd to these addresses. Note that these CC addresses cannot be used for logging into sponsor portal."
       billing: 'Billing Information'
