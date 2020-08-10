@@ -75,6 +75,21 @@ class SponsorshipAssetFile < ApplicationRecord
               s3:PutObject
             ),
             Resource: "arn:aws:s3:::#{BUCKET}/#{file.object_key}",
+            Condition: {
+              StringEqualsIfExists: {
+                "s3:x-amz-storage-class" => "STANDARD",
+              },
+              Null: {
+                "s3:x-amz-server-side-encryption" => true,
+                "s3:x-amz-server-side-encryption-aws-kms-key-id" => true,
+                "s3:x-amz-website-redirect-location" => true,
+                # These cannot be applied unless a bucket has ObjectLockConfiguration, but to ensure safety
+                "s3:object-lock-legal-hold" => true,
+                "s3:object-lock-retain-until-date" => true,
+                "s3:object-lock-remaining-retention-days" => true,
+                # ACLs cannot be applied unless s3:PutObjectAcl
+              },
+            },
           },
         ],
       }
