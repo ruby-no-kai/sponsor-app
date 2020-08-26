@@ -32,6 +32,7 @@ class Admin::BroadcastDeliveriesController < Admin::ApplicationController
 
   def set_broadcast
     @conference = Conference.find_by!(slug: params[:conference_slug])
+    check_staff_conference_authorization!(@conference)
     @broadcast = @conference.broadcasts.find_by!(id: params[:broadcast_id])
   end
 

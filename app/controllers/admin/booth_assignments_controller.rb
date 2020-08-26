@@ -27,6 +27,7 @@ class Admin::BoothAssignmentsController < ::Admin::ApplicationController
 
   def set_conference
     @conference = Conference.find_by!(slug: params[:conference_slug])
+    check_staff_conference_authorization!(@conference)
   end
 
   def booth_assignments_param

@@ -33,16 +33,24 @@ class Admin::SessionsController < ::ApplicationController
     auth = request.env['omniauth.auth']
     case auth[:provider]
     when 'github'
-      unless staff_member?(auth.fetch('credentials').fetch('token'))
-        return render(status: 403, plain: "Forbidden (You have to be in any of these repo: #{Rails.application.config.x.github.repo}")
+      token = auth.fetch('credentials').fetch('token')
+      all_privileges = staff_member?(token)
+      restricted_privileges = nil
+      unless all_privileges
+        restricted_privileges = github_find_accessible_repos(token, Conference.where(allow_restricted_access: true).map(&:github_repo).compact.map(&:name).uniq)
+        if restricted_privileges.empty?
+          return render(status: 403, plain: "Forbidden (You have to be in any of these repo: #{Rails.application.config.x.github.repo}")
+        end
       end
 
-      staff = Staff.create_with(
+      staff = Staff.find_or_initialize_by(
+        uid: auth.fetch('uid'),
+      )
+      staff.update_attributes!(
         name: auth.fetch('info').fetch('name') || auth.fetch('info').fetch('nickname'),
         avatar_url: auth.fetch('info').fetch('image'),
         login: auth.fetch('info').fetch('nickname'),
-      ).find_or_create_by!(
-        uid: auth.fetch('uid'),
+        restricted_repos: restricted_privileges,
       )
     else
       render status: 404, plain: "Unsupported provider: #{auth[:provider]}"
@@ -65,5 +73,15 @@ class Admin::SessionsController < ::ApplicationController
     )
 
     octo.repository?(Rails.application.config.x.github.repo)
+  end
+
+  def github_find_accessible_repos(access_token, repos)
+    octo = Octokit::Client.new(
+      access_token: access_token,
+    )
+
+    repos.select do |repo|
+      octo.repository?(repo)
+    end
   end
 end

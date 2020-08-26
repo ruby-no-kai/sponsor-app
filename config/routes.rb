@@ -44,7 +44,7 @@ Rails.application.routes.draw do
 
     mount Sidekiq::Web => '/sidekiq', :constraints => Module.new {
       def self.matches?(request)
-        request.session[:staff_id] && Staff.where(id: request.session[:staff_id]).exists?
+        request.session[:staff_id] && Staff.where(id: request.session[:staff_id], restricted_repos: nil).exists?
       end
     }
   end

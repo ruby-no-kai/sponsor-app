@@ -1,4 +1,5 @@
 class Admin::SponsorshipStaffNotesController < Admin::ApplicationController
+  before_action :set_conference
   before_action :set_staff_note, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -75,10 +76,14 @@ class Admin::SponsorshipStaffNotesController < Admin::ApplicationController
 
   private
 
+  def set_conference
+    @conference = Conference.find_by!(slug: params[:conference_slug])
+    check_staff_conference_authorization!(@conference)
+  end
+
   def set_staff_note
-    @staff_note = SponsorshipStaffNote.find(params[:id])
+    @staff_note = SponsorshipStaffNote.where(conference: @conference).find(params[:id])
     @sponsorship = @staff_note.sponsorship
-    @conference = @sponsorship.conference
   end
 
   def staff_note_params
