@@ -50,9 +50,10 @@ class Admin::FormDescriptionsController < Admin::ApplicationController
 
   def set_conference
     @conference = Conference.find_by!(slug: params[:conference_slug])
+    check_staff_conference_authorization!(@conference)
   end
 
   def set_form_description
-    @form_description = FormDescription.find(params[:id])
+    @form_description = FormDescription.where(confernece: @conference).find(params[:id])
   end
 end

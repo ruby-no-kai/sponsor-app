@@ -1,4 +1,5 @@
 class Admin::ConferencesController < Admin::ApplicationController
+  before_action :require_unrestricted_staff, only: [:index, :new, :create]
   before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :sponsors_json, :asset_urls, :table_view]
 
   def index
@@ -80,6 +81,7 @@ class Admin::ConferencesController < Admin::ApplicationController
 
   def set_conference
     @conference = Conference.find_by!(slug: params[:slug])
+    check_staff_conference_authorization!(@conference)
   end
 
   def conference_params

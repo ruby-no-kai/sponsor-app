@@ -1,4 +1,5 @@
 class Admin::SponsorshipsController < Admin::ApplicationController
+  before_action :set_conference
   before_action :set_sponsorship
 
   def show
@@ -86,8 +87,12 @@ class Admin::SponsorshipsController < Admin::ApplicationController
     end
   end
 
+  def set_conference
+    @conference = Conference.find_by!(slug: params[:conference_slug])
+    check_staff_conference_authorization!(@conference)
+  end
+
   def set_sponsorship
-    @sponsorship = Sponsorship.find(params[:id])
-    @conference = @sponsorship.conference
+    @sponsorship = Sponsorship.where(conference: @conference).find(params[:id])
   end
 end
