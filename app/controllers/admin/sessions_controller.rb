@@ -37,7 +37,7 @@ class Admin::SessionsController < ::ApplicationController
       all_privileges = staff_member?(token)
       restricted_privileges = nil
       unless all_privileges
-        restricted_privileges = github_find_accessible_repos(token, Conference.all.map(&:github_repo).compact.map(&:name).uniq)
+        restricted_privileges = github_find_accessible_repos(token, Conference.where(allow_restricted_access: true).map(&:github_repo).compact.map(&:name).uniq)
         if restricted_privileges.empty?
           return render(status: 403, plain: "Forbidden (You have to be in any of these repo: #{Rails.application.config.x.github.repo}")
         end
@@ -75,7 +75,7 @@ class Admin::SessionsController < ::ApplicationController
     octo.repository?(Rails.application.config.x.github.repo)
   end
 
-  def github_repos_accessible_any?(access_token, repos)
+  def github_find_accessible_repos(access_token, repos)
     octo = Octokit::Client.new(
       access_token: access_token,
     )

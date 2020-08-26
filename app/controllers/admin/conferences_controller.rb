@@ -61,8 +61,10 @@ class Admin::ConferencesController < Admin::ApplicationController
   end
 
   def update
+    @conference.assign_attributes(conference_params)
+    @conference.allow_restricted_access = true if current_staff.restricted_repos
     respond_to do |format|
-      if @conference.update(conference_params)
+      if @conference.save
         format.html { redirect_to @conference, notice: 'Conference was successfully updated.' }
       else
         format.html { render :edit }
@@ -98,6 +100,7 @@ class Admin::ConferencesController < Admin::ApplicationController
       :github_repo,
       :hidden,
       :no_plan_allowed,
+      :allow_restricted_access,
     )
   end
 end

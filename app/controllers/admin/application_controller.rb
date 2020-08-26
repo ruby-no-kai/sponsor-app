@@ -10,6 +10,7 @@ class Admin::ApplicationController < ::ApplicationController
 
   private def check_staff_conference_authorization!(conference)
     if current_staff.restricted_repos
+      raise RestrictedAccessForbidden unless conference.allow_restricted_access
       raise RestrictedAccessForbidden unless current_staff.restricted_repos.include?(conference.github_repo&.name)
     end
   end

@@ -52,4 +52,9 @@
       = form.label :no_plan_allowed, class: 'form-check-label'
 
   .form-group
+    .form-check
+      = form.check_box :allow_restricted_access, class: 'form-check-input'
+      = form.label :allow_restricted_access, class: 'form-check-label'
+
+  .form-group
     = form.submit class: 'btn btn-primary'
