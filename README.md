@@ -56,20 +56,37 @@ But during development, you can pass `$BACKDOOR_SECRET` to the application, then
 - [x] Accept application
   - [x] Logo upload
   - [x] Confirmation Email
-  - [x] Authentication
+  - [x] Authentication by one-time email
+  - [x] Separate billing contact
+  - [x] i18n
+  - [x] Unlisted forms
+  - [x] Reuse a past application to fill the form
 - [ ] Organizer Dashboard
   - [x] Authentication
-- [ ] Editing history
-- [ ] Sponsor Portal
-  - [ ] Announcements
-  - [ ] Additional tickets submission
-  - [ ] Booth details submission (?)
+- [x] Editing history
+  - [x] Slack notification
+- [x] Sponsor Management
+  - [x] Announcements
+    - [x] i18n
+  - [x] Portal 
+  - [x] Additional tickets application
+  - [x] Booth details submission
+- [x] Sponsor coorination
+  - [x] Email Broadcasts
+  - [x] Staff notes
+  - [x] Manage booth allotments
+  - [x] Manage custom sponsorship packages
 - [ ] CRM
+  - [ ] Manage past applications
   - [ ] GitHub integration
   - [ ] Front integration
   - [ ] Esa integration
+- [x] On-site
+  - [x] Attendee Registration Desk for sponsorship attendee tickets
 - [ ] Invoicing
   - [ ] Export to Google Spreadsheet(?)
+- [x] Permissions
+  - [x] Staff with restricted access to a specific conference
 
 ### Oversights
 
