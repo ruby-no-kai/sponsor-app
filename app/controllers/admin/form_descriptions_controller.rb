@@ -54,6 +54,6 @@ class Admin::FormDescriptionsController < Admin::ApplicationController
   end
 
   def set_form_description
-    @form_description = FormDescription.where(confernece: @conference).find(params[:id])
+    @form_description = FormDescription.where(conference: @conference).find(params[:id])
   end
 end
