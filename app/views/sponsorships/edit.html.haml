@@ -1,4 +1,7 @@
 - if @conference.amendment_closes_at
   %p= t('.amendment_availability', ts: l(@conference.amendment_closes_at))
 
-= render 'form', sponsorship: @sponsorship
+- if @conference.allow_restricted_access
+  = render 'free-plan-form', sponsorship: @sponsorship
+- else
+  = render 'form', sponsorship: @sponsorship

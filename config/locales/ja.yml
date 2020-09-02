@@ -97,7 +97,7 @@ ja:
 
 
   sponsorships:
-    form:
+    form: &form
       optional: '(任意)'
       header: '%{name} スポンサーシップ申込フォーム'
       copy:
@@ -147,6 +147,7 @@ ja:
       note: 'その他の連絡事項'
       policies: 'ポリシー'
       submit: '送信'
+    free-plan-form: *form
     closed:
       header: '申し込み期間ではありません'
       closed: "スポンサーシップのお申し込みをご検討いただきありがとうございます。申し訳ありませんが、本イベントへのスポンサー申し込みは %{ts} に締め切られました。"
@@ -225,4 +226,3 @@ ja:
       guide2: "このチケットを再表示するためのリンクは記入されたメールアドレスへ送信されています。"
       reissue_guide: "複数登録する場合、また記入ミスがあった場合のチケットの再登録は"
       reissue_link: "こちらから可能です。"
-

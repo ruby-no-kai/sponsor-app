@@ -1,0 +1,170 @@
+- conference = sponsorship.conference
+- desc = conference.form_description_for_locale
+= form_with(model: sponsorship, url: user_conference_sponsorship_path(conference), local: true, class: 'sponsorships_form') do |form|
+  = hidden_field_tag :invite_code, params[:invite_code]
+
+  - if sponsorship.errors.any?
+    - I18n.with_options(scope: %i(errors template)) do |lo|
+      .alert.alert-danger
+        %p= lo.t :header, count: sponsorship.errors.count, model: sponsorship.class.name
+        %ul
+          - sponsorship.errors.full_messages.each do |message|
+            %li= message
+
+  %section.py-2
+    .form-group
+      %h2= t('.header', name: conference.name)
+      = desc.head_html&.html_safe
+
+  - if !sponsorship.persisted? && current_available_sponsorships
+    %section.py-3
+      .card
+        %h5.card-header
+          = t('.copy.header')
+        .card-body
+          %p.card-text= t('.copy.explanation')
+          .form-group
+            = select_tag "sponsorship_id_to_copy", options_for_select(current_available_sponsorships.map {|_| [_.conference.name, _.id] }, params[:sponsorship_id_to_copy]), class: 'form-control form-control-sm sponsorship_id_to_copy_selector', include_blank: true
+
+  %section.py-2
+    .form-group
+      %h3= t('.contact')
+
+    = form.fields_for :contact do |contact_form|
+      .form-group
+        = contact_form.label :email
+        = contact_form.email_field :email, class: 'form-control', required: true
+
+      .form-group
+        = contact_form.label :email_cc
+        = contact_form.text_field :email_cc, class: 'form-control', placeholder: 'cc1@example.com, cc2@example.com, ... (optional)'
+        %small.form-text= t('.email_cc_help')
+
+      .form-group
+        = contact_form.label :address
+        = contact_form.text_field :address, class: 'form-control', required: true
+
+      .form-group
+        = contact_form.label :organization
+        = contact_form.text_field :organization, class: 'form-control', required: true
+
+      .form-group
+        = contact_form.label :unit
+        = contact_form.text_field :unit, class: 'form-control', placeholder: t('.optional')
+
+      .form-group
+        = contact_form.label :name
+        = contact_form.text_field :name, class: 'form-control', required: true
+
+  %section.py-2
+    .form-group
+      %h3= t('.plan')
+      = desc.plan_help_html&.html_safe
+
+    %fieldset{disabled: @sponsorship.accepted?}
+      .form-group.sponsorships_form_plans
+        %h5= t('.plans')
+        - conference.plans.each do |plan|
+          .form-check
+            %label.form-check-label
+              = form.radio_button :plan_id, plan.id, checked: 'checked', class: 'form-check-input', disabled: !plan.available? && plan.id != @sponsorship.plan_id, data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit), acceptance_help: plan.auto_acceptance ? t('.plan_explanation.auto_acceptance', plan: plan.name) : t('.plan_explanation.not_auto_acceptance', plan: plan.name), guests: plan.number_of_guests}
+              = plan.name
+              - case
+              - when plan.sold_out?
+                %small.badge.badge-danger= t('.plan_sold_out')
+              - when plan.closed?
+                %small.badge.badge-danger= t('.plan_closed')
+
+  %section.py-2{class: @conference.booth_capacity > 0 ? '' : 'd-none'}
+    .form-group
+      %h3= t('.booth')
+      = desc.booth_help_html&.html_safe
+
+    .form-group.sponsorships_form_booth_request
+      .form-check
+        = form.check_box :booth_requested, class: 'form-check-input'
+        = form.label :booth_requested, class: 'form-check-label'
+      %small.d-none.sponsorships_form_booth_request_uneligible.form-text.text-small.text-info= t('.booth_uneligible_plan_selected', plans: conference.plans.select(&:booth_eligible?).map(&:name).join(', '))
+
+  %section.py-2
+    .form-group
+      %h3= t('.information')
+
+      %p= t('.information_help')
+
+    .form-group
+      = form.label :name
+      = form.text_field :name, class: 'form-control', required: true
+
+    .form-group
+      = form.label :url
+      = form.text_field :url, class: 'form-control', required: true, placeholder: 'https://...'
+
+    .form-group
+      = form.label :profile
+      = form.text_area :profile, class: 'form-control', required: true
+      %small.sponsorships_form_profile_help.form-text
+
+  %section.py-2
+    .form-group
+      %h3= t('.logo')
+
+      %p= t('.logo_help')
+
+    .form-group.sponsorships_form_asset_file{data: {session_endpoint: user_conference_sponsorship_asset_file_path, session_endpoint_method: sponsorship.asset_file&.persisted? ? 'PUT': 'POST'}}
+      = form.hidden_field :asset_file_id
+      = form.hidden_field :asset_file_id_to_copy unless sponsorship.persisted?
+      .sponsorships_form_asset_file_form (Loading)
+
+    - if sponsorship.persisted? && sponsorship.asset_file
+      %small.form-text= link_to t('.download_logo'), user_conference_sponsorship_asset_file_path
+
+  - if conference.additional_attendees_registration_open
+    %section.py-2.sponsorships_form_tickets
+      .form-group
+        %h3= t('.tickets')
+
+        = desc.ticket_help_html&.html_safe
+
+      .form-group.row
+        .col-sm-5.text-sm-right
+          %label= t('.tickets_included_in_plan')
+        .col-sm-7
+          .sponsorships_form_tickets__included_in_plan{style: 'padding-left: 0.75rem;'} -
+      .form-group.row
+        .col-sm-5.text-sm-right
+          = form.label :number_of_additional_attendees, t('.tickets_additionally_request')
+        .col-sm-7.sponsorships_form_tickets__additional_attendees
+          = form.number_field :number_of_additional_attendees, class: 'form-control', min: 0
+      .form-group.row
+        .col-sm-5.text-sm-right
+          %label= t('.tickets_total')
+        .col-sm-7
+          .sponsorships_form_tickets__total{style: 'padding-left: 0.75rem;'} -
+
+  %section.py-2
+    .form-group
+      %h3= t('.note')
+
+      %p= t('.others_help')
+
+    = form.fields_for :note do |request_form|
+      .form-group
+        = request_form.label :body
+        = request_form.text_area :body, class: 'form-control'
+
+  %section.py-2
+    .form-group
+      %h3= t('.policies')
+
+      %p= desc.policy_help_html&.html_safe
+
+      .form-check
+        = form.check_box :policy_agreement, class: 'form-check-input', required: true
+        = form.label :policy_agreement, "", class: 'form-check-label'
+
+    .form-group
+      = form.submit t('.submit'), class: 'btn btn-primary', data: {disable_with: false}
+      %small.form-text.sponsorships_acceptance_help
+
+    .alert.alert-danger.submit_error.d-none
