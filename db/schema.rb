@@ -257,6 +257,7 @@ ActiveRecord::Schema.define(version: 2020_08_26_203120) do
     t.string "ticket_key", null: false
     t.datetime "accepted_at"
     t.index ["conference_id", "organization_id"], name: "index_sponsorships_on_conference_id_and_organization_id", unique: true
+    t.index ["conference_id", "ticket_key"], name: "index_sponsorships_on_conference_id_and_ticket_key", unique: true
     t.index ["conference_id"], name: "index_sponsorships_on_conference_id"
     t.index ["organization_id"], name: "index_sponsorships_on_organization_id"
     t.index ["plan_id"], name: "index_sponsorships_on_plan_id"
