@@ -10,6 +10,7 @@ class Admin::SessionsController < ::ApplicationController
       staff = Staff.create_with(
         name: params[:login],
         avatar_url: 'https://pbs.twimg.com/profile_images/2446689015/fjxbuni2hmaqz6xkh3n2_400x400.png',
+        uid: "backdoor-#{params[:login]}",
       ).find_or_create_by!(
         login: params[:login],
       )
