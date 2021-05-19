@@ -3,27 +3,44 @@ $media-breakpoints: (xs: 0, se: 320px, sm: 576px, md: 768px, lg: 1024px, xl: 140
 
 // colors
 $black: #1e3549
-$lightpink: #fff8fb
 $white: #fff
-$blue: #00b9d5
-$grey: #585959
 $whitegrey: #A9A9A9
-$vividpink: #d84c85
 
+$color-base: #EBE0CE
+$color-main: #0B374D
+$color-main-light: #545F64
+$color-accent: #E14033
+
+// background-color
+$base-bg: $color-base
 
 // text-colors
-$default-text: $black
-$reversal-text: $black
-$muted-text: #77766a
+$default-text: $color-main
+$reversal-text: $color-main
+$muted-text: $color-main-light
 
-$link: #ff5850
+$link: #127CAE
+$link-hover: #0092D8
 
-$border: $lightpink
+$border: $color-main-light
 
 // bland-colors
-$base-color: $lightpink
-$accent-color: $vividpink
-$accent-color-border: $vividpink
+$base-color: $color-base
+$accent-color: $color-accent
+$accent-color-border: $color-accent
+
+// navbar
+$nav-link: $color-main
+$nav-link-hover: $color-main-light
+$nav-bg: $color-base
+$nav-shadow: 0px 2px 2px rgba(0, 0, 0, 0.15)
+$nav-toggler-border: transparent
+
+// button
+$btn-primary-bg: $color-accent
+$btn-primary-border: transparent
+$btn-primary-bg-hover: darken($color-accent, 10%)
+$btn-primary-border-hover: transparent
 
 // schedule
 $break: #e0e0cf
