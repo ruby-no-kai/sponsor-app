@@ -37,6 +37,16 @@ class Sponsorship < ApplicationRecord
   has_many :broadcast_deliveries, dependent: :nullify
   has_many :tickets, dependent: :destroy
 
+  has_many :tito_discount_codes, dependent: :destroy
+
+  def tito_attendee_discount_code
+    @tito_attendee_discount_code ||= tito_discount_codes.where(kind: 'attendee').first
+  end
+
+  def tito_booth_staff_discount_code
+    @tito_booth_staff_discount_code ||= tito_discount_codes.where(kind: 'booth_staff').first
+  end
+
   scope :active, -> { where(withdrawn_at: nil).where.not(accepted_at: nil) }
   scope :exhibitor, -> { where(booth_assigned: true) }
   scope :plan_determined, -> { where.not(plan_id: nil) }
@@ -86,6 +96,10 @@ class Sponsorship < ApplicationRecord
     self.build_billing_request unless self.billing_request
     self.build_customization_request unless self.customization_request
     self.build_note unless self.note
+  end
+
+  def active?
+    accepted? && !withdrawn?
   end
 
   def accept
@@ -184,7 +198,15 @@ class Sponsorship < ApplicationRecord
   end
 
   def total_number_of_attendees
-    (plan&.number_of_guests || 0) + (number_of_additional_attendees || 0)
+    if active?
+      (plan&.number_of_guests || 0) + (number_of_additional_attendees || 0)
+    else
+      0
+    end
+  end
+  
+  def total_number_of_booth_staff
+    (active? && booth_assigned?) ? 4 : 0 # FIXME:
   end
 
   def number_of_registered_attendees

@@ -33,13 +33,6 @@
                 %dt.col-sm-4 Locale
                 %dd.col-sm-8= @sponsorship.locale
               .row
-                %dt.col-sm-4 Attendees
-                %dd.col-sm-4
-                  = @sponsorship.total_number_of_attendees
-                  (#{@sponsorship.plan&.number_of_guests || 0} + #{@sponsorship.number_of_additional_attendees || 0})
-                %dd.col-sm-4
-                  = link_to "Ticket", new_user_conference_ticket_path(@conference, key: @sponsorship.ticket_key)
-              .row
                 %dt.col-sm-4 Booth
                 %dd.col-sm-8
                   - case
@@ -84,6 +77,39 @@
               = @sponsorship.organization.name
 
       .col-md-6
+        .card
+          %h5.card-header
+            Invitations
+          .card-body
+            .row
+              %dt.col-sm-4 Included
+              %dd.col-sm-4= @sponsorship.plan&.number_of_guests || 0
+            .row
+              %dt.col-sm-4 Additional
+              %dd.col-sm-4= @sponsorship.number_of_additional_attendees || 0
+            .row
+              %dt.col-sm-4 Total
+              %dd.col-sm-4= @sponsorship.total_number_of_attendees
+            - if @conference.tito_slug.present?
+              .row
+                .col-sm-12
+                  %strong Tito Registration:
+                  - if @sponsorship.tito_attendee_discount_code
+                    = link_to "Attendee", @sponsorship.tito_attendee_discount_code.url
+                  - if @sponsorship.tito_booth_staff_discount_code
+                    = link_to "Booth Staff", @sponsorship.tito_booth_staff_discount_code.url
+              .row
+                .col-sm-12
+                  %strong Tito Admin:
+                  - if @sponsorship.tito_attendee_discount_code
+                    = link_to "Attendee", @sponsorship.tito_attendee_discount_code.dashboard_orders_url
+                  - if @sponsorship.tito_booth_staff_discount_code
+                    = link_to "Booth Staff", @sponsorship.tito_booth_staff_discount_code.dashboard_orders_url
+            - else
+              .row
+                .col-sm-12
+                  %strong Registration:
+                  = link_to "Ticket (sponsor-app)", new_user_conference_ticket_path(@conference, key: @sponsorship.ticket_key)
         .card
           %h5.card-header
             Requests

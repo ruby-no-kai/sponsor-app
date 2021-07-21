@@ -186,6 +186,8 @@ ja:
       tickets:
         title: 'スポンサーチケット'
         your_url: 'チケット取得URL'
+        attendee_url: '招待 URL'
+        booth_staff_url: 'ブーススタッフ招待 URL'
         help:
           direction: '受付のために、上記 URL の指示に従ってください。'
           requirement: 'ブーススタッフを含む全参加者について上記 URL から各々チケットを取得する必要があります。御社内の参加者へ上記 URL を忘れずに共有してください。'

@@ -98,6 +98,7 @@ class Admin::ConferencesController < Admin::ApplicationController
       :contact_email_address,
       :additional_attendees_registration_open,
       :github_repo,
+      :tito_slug,
       :hidden,
       :no_plan_allowed,
       :allow_restricted_access,

@@ -107,6 +107,8 @@ GEM
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.1.0)
+    faraday_middleware (1.0.0)
+      faraday (~> 1.0)
     ffi (1.15.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
@@ -303,6 +305,8 @@ DEPENDENCIES
   aws-sdk-s3
   barnes
   commonmarker
+  faraday
+  faraday_middleware
   hamlit
   hashdiff
   jbuilder (~> 2.9)
