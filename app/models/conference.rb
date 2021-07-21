@@ -19,6 +19,7 @@ class Conference < ApplicationRecord
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
   validates :contact_email_address, presence: true
+  validates :tito_slug, format: { with: %r{\A[^/]+/[^/]+\z}, message: "must be :account_slug/:event_slug", allow_blank: true }
   validate :validate_valid_github_repo
 
   before_validation :generate_slug

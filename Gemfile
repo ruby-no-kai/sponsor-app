@@ -18,6 +18,8 @@ gem 'octokit'
 gem 'jwt'
 gem 'hashdiff'
 gem 'rqrcode'
+gem 'faraday'
+gem 'faraday_middleware'
 
 gem 'nokogiri'
 

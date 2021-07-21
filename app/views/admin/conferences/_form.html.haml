@@ -19,7 +19,11 @@
     = form.text_field :github_repo, class: 'form-control'
     %small.form-text
       %code owner/repo[@branch]:path/to/file
-
+  .form-group
+    = form.label :tito_slug
+    = form.text_field :tito_slug, class: 'form-control'
+    %small.form-text
+      %code account_slug/event_slug
   .form-group
     = form.label :application_opens_at
     = form.datetime_local_field :application_opens_at, class: 'form-control'

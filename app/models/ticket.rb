@@ -81,7 +81,7 @@ class Ticket < ApplicationRecord
             when 'attendee'
               sponsorship.total_number_of_attendees
             when 'booth_staff'
-              sponsorship.booth_assigned? ? 4 : 0 # FIXME:
+              sponsorship.total_number_of_booth_staff
             end
     used = sponsorship.tickets.where(kind: kind).checked_in.count
     if used >= total

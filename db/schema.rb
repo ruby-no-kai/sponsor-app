@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_26_203120) do
+ActiveRecord::Schema.define(version: 2021_07_20_121933) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -90,6 +90,7 @@ ActiveRecord::Schema.define(version: 2020_08_26_203120) do
     t.string "invite_code"
     t.boolean "no_plan_allowed", default: true, null: false
     t.boolean "allow_restricted_access"
+    t.string "tito_slug"
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"
     t.index ["slug"], name: "index_conferences_on_slug", unique: true
   end
@@ -294,6 +295,18 @@ ActiveRecord::Schema.define(version: 2020_08_26_203120) do
     t.index ["sponsorship_id"], name: "index_tickets_on_sponsorship_id"
   end
 
+  create_table "tito_discount_codes", force: :cascade do |t|
+    t.bigint "sponsorship_id", null: false
+    t.integer "kind", null: false
+    t.string "tito_discount_code_id", null: false
+    t.string "code", null: false
+    t.integer "quantity", default: 0, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["kind", "sponsorship_id"], name: "kind_sponsorship", unique: true
+    t.index ["sponsorship_id"], name: "index_tito_discount_codes_on_sponsorship_id"
+  end
+
   add_foreign_key "announcements", "conferences"
   add_foreign_key "announcements", "staffs"
   add_foreign_key "broadcast_deliveries", "broadcasts"
@@ -316,4 +329,5 @@ ActiveRecord::Schema.define(version: 2020_08_26_203120) do
   add_foreign_key "sponsorships", "plans"
   add_foreign_key "tickets", "conferences"
   add_foreign_key "tickets", "sponsorships"
+  add_foreign_key "tito_discount_codes", "sponsorships"
 end
