@@ -40,11 +40,11 @@ class Sponsorship < ApplicationRecord
   has_many :tito_discount_codes, dependent: :destroy
 
   def tito_attendee_discount_code
-    tito_discount_codes.where(kind: 'attendee').first
+    @tito_attendee_discount_code ||= tito_discount_codes.where(kind: 'attendee').first
   end
 
   def tito_booth_staff_discount_code
-    tito_discount_codes.where(kind: 'booth_staff').first
+    @tito_booth_staff_discount_code ||= tito_discount_codes.where(kind: 'booth_staff').first
   end
 
   scope :active, -> { where(withdrawn_at: nil).where.not(accepted_at: nil) }

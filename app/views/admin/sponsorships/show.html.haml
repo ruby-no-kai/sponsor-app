@@ -39,6 +39,21 @@
                   (#{@sponsorship.plan&.number_of_guests || 0} + #{@sponsorship.number_of_additional_attendees || 0})
                 %dd.col-sm-4
                   = link_to "Ticket", new_user_conference_ticket_path(@conference, key: @sponsorship.ticket_key)
+              - if @conference.tito_slug.present?
+                .row
+                  %dt.col-sm-4 Tito Reg
+                  %dd.col-sm-8
+                    - if @sponsorship.tito_attendee_discount_code
+                      = link_to "Attendee", @sponsorship.tito_attendee_discount_code.url
+                    - if @sponsorship.tito_booth_staff_discount_code
+                      = link_to "Booth Staff", @sponsorship.tito_booth_staff_discount_code.url
+                .row
+                  %dt.col-sm-4 Tito Adm
+                  %dd.col-sm-8
+                    - if @sponsorship.tito_attendee_discount_code
+                      = link_to "Attendee", @sponsorship.tito_attendee_discount_code.dashboard_orders_url
+                    - if @sponsorship.tito_booth_staff_discount_code
+                      = link_to "Booth Staff", @sponsorship.tito_booth_staff_discount_code.dashboard_orders_url
               .row
                 %dt.col-sm-4 Booth
                 %dd.col-sm-8
