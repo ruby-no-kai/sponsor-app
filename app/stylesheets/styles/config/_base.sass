@@ -1,6 +1,9 @@
 body
   color: $default-text
   background-color: $base-bg
+  background-image: url('/images/background.png')
+  background-position: center top
+  background-repeat: repeat !important
   min-height: 100vh
   font-size: 100%
 
@@ -24,9 +27,11 @@ nav.navbar.navbar-expand-lg a,
 nav.navbar.navbar-expand-lg a.dropdown-item,
 .navbar-dark .navbar-nav .nav-link
   color: $nav-link
+  transition: all .2s ease-out
   &:hover,
-  &:focus
     color: $nav-link-hover
+  &:focus
+    color: $reversal-text
 
 nav.navbar.navbar-expand-lg a.dropdown-item
 .navbar-dark .navbar-nav .show > .nav-link
@@ -41,8 +46,31 @@ nav.navbar.navbar-expand-lg a.dropdown-item
 .btn-primary
   background-color: $btn-primary-bg
   border-color: $btn-primary-border
-
-.btn-primary
   &:hover
     background-color: $btn-primary-bg-hover
     border-color: $btn-primary-border-hover
+
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle
+  background-color: $btn-primary-bg-hover
+  border-color: $btn-primary-border-hover
+
+.btn-primary:focus, .btn-primary.focus,
+.btn-primary:not(:disabled):not(.disabled):active:focus,
+.btn-primary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-primary.dropdown-toggle:focus
+  background-color: $btn-primary-bg-hover
+  border-color: $btn-primary-border-hover
+  box-shadow: 0 0 0 0.2rem rgba($btn-primary-bg, .5)
+
+.dropdown-item.active, .dropdown-item:active
+  color: #fff
+  background-color: $btn-primary-bg
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6
+  font-weight: 600
+
+.form-group
+  label
+    font-weight: 600
