@@ -7,6 +7,7 @@
     = csrf_meta_tags
     = csp_meta_tag
 
+    = stylesheet_pack_tag 'vendor', media: 'all'
     = stylesheet_pack_tag 'reception', media: 'all'
 
     - if Rails.application.config.x.sentry.dsn.present?
@@ -28,4 +29,5 @@
         - if notice
           .alert.alert-success= notice
         = yield
+    = javascript_pack_tag 'vendor'
     = javascript_pack_tag 'reception'

@@ -22,12 +22,13 @@ gem 'faraday'
 gem 'faraday_middleware'
 
 gem 'nokogiri'
+gem 'rexml' # letter-opener
 
 gem 'sidekiq'
 
 gem 'jbuilder', '~> 2.9'
 gem 'hamlit'
-gem 'webpacker', '>= 4.2.0'
+gem 'simpacker'
 
 gem 'premailer-rails'
 
