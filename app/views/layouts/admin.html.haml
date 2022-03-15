@@ -8,7 +8,7 @@
     = csp_meta_tag
 
     = stylesheet_pack_tag 'vendor', media: 'all'
-    = stylesheet_pack_tag 'admin', media: 'all'
+    = begin; stylesheet_pack_tag 'admin', media: 'all'; rescue Simpacker::Manifest::MissingEntryError; end
 
     - if Rails.application.config.x.sentry.dsn.present?
       %script= "window.SENTRY_DSN = '#{Rails.application.config.x.sentry.dsn}'".html_safe
