@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby '~> 3.0.3' if ENV['STACK'] || ENV['IS_HEROKU']
 
-gem 'rails', '~> 6.0.0'
+gem 'rails', '~> 6.1.0'
 gem 'rails-i18n', '~> 6.0'
 gem 'rack-contrib'
 
