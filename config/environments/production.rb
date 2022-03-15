@@ -72,8 +72,7 @@ Rails.application.configure do
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
   config.cache_store = :redis_cache_store, { url: [ENV['REDIS_URL']], pool_size: 5, pool_timeout: 5 }
-
-  config.session_store = :cache_store, {
+  config.session_store :cache_store, {
     expire_in: 14.days,
   }
 
