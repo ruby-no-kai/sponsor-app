@@ -71,14 +71,10 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
-  config.cache_store = :redis_store, ENV['REDIS_URL'], {}
+  config.cache_store = :redis_cache_store, { url: [ENV['REDIS_URL']], pool_size: 5, pool_timeout: 5 }
 
-  config.session_store = :redis_store, {
-    servers: [ENV['REDIS_URL']],
-    expire_after: 14.days,
-    key: "_#{Rails.application.class.parent_name.downcase}_session",
-    threadsafe: true,
-    secure: ENV.fetch('RK_SPONSOR_SECURE_COOKIE', '1') == '1',
+  config.session_store = :cache_store, {
+    expire_in: 14.days,
   }
 
   # Use a real queuing backend for Active Job (and separate queues per environment)

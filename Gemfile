@@ -6,7 +6,7 @@ gem 'rails-i18n', '~> 6.0'
 gem 'rack-contrib'
 
 gem 'pg', '>= 0.18', '< 2.0'
-gem 'redis-rails'
+gem 'connection_pool'
 
 gem 'addressable'
 gem 'commonmarker'
