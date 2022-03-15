@@ -47,7 +47,7 @@ class Admin::SessionsController < ::ApplicationController
       staff = Staff.find_or_initialize_by(
         uid: auth.fetch('uid'),
       )
-      staff.update_attributes!(
+      staff.update!(
         name: auth.fetch('info').fetch('name') || auth.fetch('info').fetch('nickname'),
         avatar_url: auth.fetch('info').fetch('image'),
         login: auth.fetch('info').fetch('nickname'),

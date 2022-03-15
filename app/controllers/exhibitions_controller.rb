@@ -38,7 +38,7 @@ class ExhibitionsController < ApplicationController
 
     @exhibition = current_sponsorship.exhibition
     raise ActiveRecord::RecordNotFound unless @exhibition
-    if @exhibition.update_attributes(exhibition_params)
+    if @exhibition.update(exhibition_params)
       SlackWebhookJob.perform_later(
         {
           text: ":customs: <#{conference_sponsorship_url(current_sponsorship.conference, current_sponsorship)}|#{current_sponsorship.name}> booth details edited by sponsor",
