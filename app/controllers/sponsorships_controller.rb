@@ -73,7 +73,7 @@ class SponsorshipsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @conference&.amendment_open?
 
     sp = sponsorship_params
-    sp.delete(:asset_file_id)
+    sp.delete(:asset_file_id) if @sponsorship.asset_file_id
     @sponsorship.assign_attributes(sp)
     @sponsorship.locale = I18n.locale
 
