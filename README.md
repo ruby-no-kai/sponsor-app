@@ -4,7 +4,7 @@
 
 ```
 rails s
-./bin/webpack --watch
+yarn run watch
 ```
 
 - http://localhost:3000/
