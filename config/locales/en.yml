@@ -83,7 +83,7 @@ en:
       greeting: "Hi,"
       explanation: "Use the following link to log into our sponsor's portal:"
       expiry: "This link expires at %{ts}. You can use this link for multiple times until it expires."
-  sponsorship_accepted_mailer:
+  sponsorship_welcome_mailer:
     user_email:
       subject: "Thank you for sponsoring us"
     admin_email:

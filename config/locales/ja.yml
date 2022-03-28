@@ -83,9 +83,9 @@ ja:
       greeting: ""
       explanation: "以下のリンクを利用してログインすることができます:"
       expiry: "このリンクは %{ts} に失効しますが、失効するまで何度でも利用できます。"
-  sponsorship_accepted_mailer:
+  sponsorship_welcome_mailer:
     user_email:
-      subject: "スポンサーにお申し込みいただきありがとうございます"
+      subject: "スポンサーシップ申込確認"
     admin_email:
       subject: "New sponsorship application from: %{name}"
   ticket_retrieval_mailer:

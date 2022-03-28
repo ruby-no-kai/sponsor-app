@@ -2,6 +2,7 @@ class SponsorshipWelcomeMailer < ApplicationMailer
   def user_email
     @sponsorship = params[:sponsorship]
     @session_token = params[:session_token]
+    @conference_name = @sponsorship.conference.name
 
     @sponsor_org_name = @sponsorship.contact.organization
     @sponsor_contact_name = @sponsorship.contact.name

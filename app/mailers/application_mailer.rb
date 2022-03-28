@@ -12,6 +12,8 @@ class ApplicationMailer < ActionMailer::Base
   after_action :add_sponsorship_mailgun_tag
   after_action :commit_list_id
 
+  default subject: -> { make_subject }
+
   private
 
   def message_id_for(local, reference = nil)
