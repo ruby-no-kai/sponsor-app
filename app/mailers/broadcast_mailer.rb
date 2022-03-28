@@ -18,12 +18,17 @@ class BroadcastMailer < ApplicationMailer
     )
   end
 
-  helper_method def login_url
+  helper_method def form_url()
+    path = Addressable::URI.parse(new_user_conference_sponsorship_url(@conference)).request_uri
+    login_url(back_to: path)
+  end
+
+  helper_method def login_url(**additional_params)
     if @sponsorship
       token = SessionToken.create!(email: @sponsorship.contact.email, sponsorship: @sponsorship, expires_at: 2.weeks.from_now)
-      url = claim_user_session_url(token)
+      url = claim_user_session_url(token, **additional_params)
     else
-      url = new_user_session_url()
+      url = new_user_session_url(**additional_params)
     end
     "<a href=\"#{url}\">#{url}</a>".html_safe
   end

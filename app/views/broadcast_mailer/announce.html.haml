@@ -1,1 +1,1 @@
-= @broadcast.html.gsub(/@LOGIN@/) { login_url }.html_safe
+= @broadcast.html.gsub(/@LOGIN@/) { login_url }.gsub(/@FORM@/) { form_url }.html_safe
