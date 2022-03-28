@@ -23,6 +23,10 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       .group_by { |_| _.plan.name.downcase.gsub(/[^a-z0-9]/, '_') }
 
     @last_id = SponsorshipEditingHistory.where(sponsorship_id: sponsorships.each_value.flat_map { |_| _.map(&:id) }).order(id: :desc).limit(1).pluck(:id)[0]
+    unless @last_id # this is falsy if no sponsorships have presense
+      Rails.logger.warn "Conference #{@conference.slug} (#{@conference.id}) have no sponsorships with presense, resulting null sponsors data"
+      return nil
+    end
 
     sponsorships.map do |base_plan_slug, sponsorships|
       [
@@ -58,23 +62,23 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     return @yaml_data if defined? @yaml_data
 
     data = self.data()
-    @yaml_data = [
+    @yaml_data = data ? [
       "# last_editing_history: #{@last_id}",
       data.to_yaml,
       "",
-    ].join("\n")
+    ].join("\n") : nil
   end
 
   def json_data
     return @json_data if defined? @json_data
 
     data = self.data()
-    @json_data = "#{data.to_json}\n"
+    @json_data = data ? "#{data.to_json}\n" : nil
   end
 
   def push_to_github
     return unless repo
-    yaml_data # to generate
+    return if yaml_data.nil? # to generate
     @branch_name = "sponsor-app/#{@last_id}"
     @filepath = repo.path
 
