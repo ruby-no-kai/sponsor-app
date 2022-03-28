@@ -24,6 +24,14 @@ default: &default
 development:
   <<: *default
   database: sponsor_app2_development
+<% docker_port = (ENV['DATABASE_URL'].nil? ? IO.popen([*%w(docker-compose port db 5432), err: File::NULL], 'r', &:read).chomp.split(?:)&.last : nil) || '' %>
+<% unless docker_port.empty? %>
+  host: 127.0.0.1
+  port: <%= docker_port %>
+  username: takeoutapp
+  password: takeoutapp
+<% end %>
+
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
