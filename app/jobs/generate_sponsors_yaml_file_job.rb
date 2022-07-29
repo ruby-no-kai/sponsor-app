@@ -4,8 +4,12 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
   def perform(conference, push: true)
     @conference = conference
 
+    yaml_data # to generate
     if push
-      push_to_github
+      ApplicationRecord.transaction do
+        @last&.lock!
+        push_to_github
+      end
     end
   end
 
@@ -22,11 +26,12 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       .includes(:asset_file)
       .group_by { |_| _.plan.name.downcase.gsub(/[^a-z0-9]/, '_') }
 
-    @last_id = SponsorshipEditingHistory.where(sponsorship_id: sponsorships.each_value.flat_map { |_| _.map(&:id) }).order(id: :desc).limit(1).pluck(:id)[0]
-    unless @last_id # this is falsy if no sponsorships have presense
+    @last = SponsorshipEditingHistory.where(sponsorship_id: sponsorships.each_value.flat_map { |_| _.map(&:id) }).order(id: :desc).first
+    unless @last # this is falsy if no sponsorships have presense
       Rails.logger.warn "Conference #{@conference.slug} (#{@conference.id}) have no sponsorships with presense, resulting null sponsors data"
       return nil
     end
+    @last_id = @last.id
 
     sponsorships.map do |base_plan_slug, sponsorships|
       [
