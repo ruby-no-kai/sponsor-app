@@ -51,7 +51,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
                   plan_name: _.plan_name,
                   slug: _.slug,
                   name: _.name,
-                  url: _.url,
+                  url: _.url.strip,
                   profile: _.profile,
                 }
               end,
