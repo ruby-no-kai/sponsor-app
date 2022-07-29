@@ -206,7 +206,8 @@ class Sponsorship < ApplicationRecord
   end
   
   def total_number_of_booth_staff
-    (active? && booth_assigned?) ? 4 : 0 # FIXME:
+    #(active? && booth_assigned?) ? [3, booth_size ? booth_size*2 : 0].max : 0 # FIXME:
+    (active? && booth_assigned?) ? 3 : 0 # FIXME:
   end
 
   def number_of_registered_attendees
