@@ -15,6 +15,10 @@ class TitoApi
     get("#{slug}/releases/#{escape(release_slug)}").body
   end
 
+  def list_releases(slug)
+    get("#{slug}/releases").body
+  end
+
   def get_discount_code(slug, discount_code_id)
     get("#{slug}/discount_codes/#{escape(discount_code_id.to_s)}").body
   end
@@ -25,6 +29,14 @@ class TitoApi
 
   def update_discount_code(slug, id, code:, type:, value:, **kwargs)
     put("#{slug}/discount_codes/#{escape(id.to_s)}", discount_code: kwargs.merge(code: code, type: type, value: value)).body
+  end
+
+  def get_ticket(account_event_slug, ticket_slug)
+    get("#{account_event_slug}/tickets/#{escape(ticket_slug)}").body
+  end
+
+  def patch_ticket(account_event_slug, ticket_slug, **kwargs)
+    patch("#{account_event_slug}/tickets/#{escape(ticket_slug)}", ticket: kwargs).body
   end
 
   def default_headers
@@ -52,6 +64,10 @@ class TitoApi
 
   def put(path, params: {}, body: nil, headers: nil, **bodyhash)
     request(:put, path, params, body || bodyhash, headers: headers)
+  end
+
+  def patch(path, params: {}, body: nil, headers: nil, **bodyhash)
+    request(:patch, path, params, body || bodyhash, headers: headers)
   end
 
   def post(path, params: {}, body: nil, headers: nil, timeout: 20, **bodyhash)
