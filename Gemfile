@@ -27,7 +27,7 @@ gem 'rexml' # letter-opener
 gem 'sidekiq'
 
 gem 'jbuilder', '~> 2.9'
-gem 'hamlit'
+gem 'haml'
 gem 'simpacker'
 
 gem 'premailer-rails'

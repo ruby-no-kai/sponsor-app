@@ -130,7 +130,7 @@ GEM
     ffi (1.15.5)
     globalid (1.1.0)
       activesupport (>= 5.0)
-    hamlit (3.0.3)
+    haml (6.1.1)
       temple (>= 0.8.2)
       thor
       tilt
@@ -330,7 +330,7 @@ DEPENDENCIES
   connection_pool
   faraday
   faraday_middleware
-  hamlit
+  haml
   hashdiff
   jbuilder (~> 2.9)
   jwt
