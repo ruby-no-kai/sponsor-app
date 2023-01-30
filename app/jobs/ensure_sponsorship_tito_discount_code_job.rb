@@ -37,7 +37,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
       only_show_attached: true,
       reveal_secret: true,
       quantity: quantity,
-      release_ids: quantity > 0 ? [release_id] : nil,
+      release_ids: quantity > 0 ? release_ids : nil,
       description_for_organizer: "sponsorship=#{@sponsorship.id}, domain=#{@sponsorship.organization&.domain}, plan=#{@sponsorship.plan&.name}",
     }
   end
@@ -56,15 +56,17 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     }.fetch(@kind)
   end
 
-  def release_slug
+  def release_slugs
     {
-      'attendee' => 'sponsor',
-      'booth_staff' => 'booth-staff',
+      'attendee' => %w(sponsor sponsor-virtual-only),
+      'booth_staff' => %w(booth-staff),
     }.fetch(@kind)
   end
 
-  def release_id
-    @release_id ||= tito.get_release(@conference.tito_slug, release_slug).fetch(:release).fetch(:id)
+  def release_ids
+    @release_ids ||= release_slugs.map do |slug|
+      tito.get_release(@conference.tito_slug, slug).fetch(:release).fetch(:id)
+    end
   end
 
   def tito
