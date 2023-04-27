@@ -12,7 +12,7 @@ gem 'addressable'
 gem 'commonmarker'
 gem 'aws-sdk-core' # STS
 gem 'aws-sdk-s3'
-gem 'omniauth', '< 2'
+gem 'omniauth', '< 3'
 gem 'omniauth-github'
 gem 'octokit'
 gem 'jwt'
