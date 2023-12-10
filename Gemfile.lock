@@ -190,13 +190,14 @@ GEM
     octokit (6.0.1)
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
-    omniauth (1.9.2)
+    omniauth (2.1.1)
       hashie (>= 3.4.6)
-      rack (>= 1.6.2, < 3)
-    omniauth-github (1.4.0)
-      omniauth (~> 1.5)
-      omniauth-oauth2 (>= 1.4.0, < 2.0)
-    omniauth-oauth2 (1.7.3)
+      rack (>= 2.2.3)
+      rack-protection
+    omniauth-github (2.0.1)
+      omniauth (~> 2.0)
+      omniauth-oauth2 (~> 1.8)
+    omniauth-oauth2 (1.8.0)
       oauth2 (>= 1.4, < 3)
       omniauth (>= 1.9, < 3)
     pg (1.4.5)
@@ -339,7 +340,7 @@ DEPENDENCIES
   listen
   nokogiri
   octokit
-  omniauth (< 2)
+  omniauth
   omniauth-github
   pg (>= 0.18, < 2.0)
   premailer-rails
