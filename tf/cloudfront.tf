@@ -1,9 +1,10 @@
 resource "aws_cloudfront_distribution" "prd" {
   comment = "sponsor-app"
 
-  enabled      = true
-  http_version = "http2and3"
-  price_class  = "PriceClass_All"
+  enabled         = true
+  is_ipv6_enabled = true
+  http_version    = "http2and3"
+  price_class     = "PriceClass_All"
 
   aliases = ["sponsorships.rubykaigi.org"]
 
