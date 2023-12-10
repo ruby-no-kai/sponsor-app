@@ -3,3 +3,4 @@
 /tmp/
 /public/packs
 vendor/
+.terraform/
