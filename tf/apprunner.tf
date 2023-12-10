@@ -22,10 +22,9 @@ resource "aws_apprunner_service" "prd" {
     auto_deployments_enabled = false
   }
 
-  # minimum
   instance_configuration {
-    cpu    = "256"
-    memory = "512"
+    cpu    = "512"
+    memory = "1024"
 
     instance_role_arn = aws_iam_role.SponsorApp.arn
   }
