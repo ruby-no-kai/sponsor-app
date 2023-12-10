@@ -12,6 +12,7 @@ gem 'addressable'
 gem 'commonmarker'
 gem 'aws-sdk-core' # STS
 gem 'aws-sdk-s3'
+gem 'aws-sdk-sqs'
 gem 'omniauth'
 gem 'omniauth-github'
 gem 'octokit'
@@ -24,7 +25,7 @@ gem 'faraday_middleware'
 gem 'nokogiri'
 gem 'rexml' # letter-opener
 
-gem 'sidekiq'
+gem 'shoryuken'
 
 gem 'jbuilder', '~> 2.9'
 gem 'haml'
@@ -37,7 +38,6 @@ gem 'rspec-rails'
 
 gem 'revision_plate'
 gem "sentry-ruby"
-gem "sentry-sidekiq"
 gem "sentry-rails"
 
 gem 'puma'
@@ -45,9 +45,6 @@ gem 'puma'
 group :production do
   gem 'barnes'
 end
-
-# Redis cache store
-gem 'redis', '~> 4.0'
 
 group :development, :test do
   # gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
