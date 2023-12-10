@@ -88,6 +88,5 @@ test:
 #
 production:
   <<: *default
-  database: sponsor_app2_production
-  username: sponsor_app2
-  password: <%= ENV['SPONSOR_APP2_DATABASE_PASSWORD'] %>
+  url: <%= ENV['DATABASE_URL'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>

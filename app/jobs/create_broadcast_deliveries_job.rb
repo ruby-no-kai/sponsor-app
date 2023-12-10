@@ -31,7 +31,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
           status: :ready,
           sponsorship: recipient.sponsorship,
           recipient: recipient.email,
-          recipient_cc: recipient.email_ccs.join(','),
+          recipient_cc: recipient.email_ccs&.join(','),
         )
       end
 
@@ -91,6 +91,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         email_lines.to_s.each_line.map do |email|
           Recipient.new(
             email: email.chomp,
+            email_ccs: [],
           )
         end
       end

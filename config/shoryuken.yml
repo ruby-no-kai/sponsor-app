@@ -1,0 +1,4 @@
+concurrency: <%= ENV.fetch('SPONSOR_APP_SHORYUKEN_CONCURRENCY', 4) %>
+# ActiveJob prefixes queue name, the default delimiter is `_`
+queues:
+  - <%= ENV.fetch('SPONSOR_APP_SHORYUKEN_QUEUE') %>

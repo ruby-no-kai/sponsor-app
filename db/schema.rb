@@ -296,7 +296,7 @@ ActiveRecord::Schema.define(version: 2021_07_20_121933) do
   end
 
   create_table "tito_discount_codes", force: :cascade do |t|
-    t.integer "sponsorship_id", null: false
+    t.bigint "sponsorship_id", null: false
     t.integer "kind", null: false
     t.string "tito_discount_code_id", null: false
     t.string "code", null: false

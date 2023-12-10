@@ -71,7 +71,7 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
-  config.cache_store = :redis_cache_store, { url: [ENV['REDIS_URL']], pool_size: 5, pool_timeout: 5 }
+  # config.cache_store = :redis_cache_store, { url: [ENV['REDIS_URL']], pool_size: 5, pool_timeout: 5 }
 
   config.session_store(:cookie_store,
     expire_after: 14.days,
@@ -83,7 +83,7 @@ Rails.application.configure do
 
   # Use a real queuing backend for Active Job (and separate queues per environment)
   # config.active_job.queue_adapter     = :resque
-  config.active_job.queue_adapter = ENV.fetch('DISABLE_SIDEKIQ', '0') == '1' ? :inline : :sidekiq
+  config.active_job.queue_adapter = ENV.fetch('ENABLE_SHORYUKEN', '1') == '1' ? :shoryuken : :inline
   # config.active_job.queue_name_prefix = "sponsor_app2_production"
 
   config.action_mailer.perform_caching = false

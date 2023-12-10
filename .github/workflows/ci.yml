@@ -1,0 +1,82 @@
+name: ci
+on:
+  push:
+    branches:
+      - master
+      - test
+
+jobs:
+  build:
+    name: build
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: "${{ steps.login-ecr.outputs.registry }}/sponsor-app:${{ github.sha }}"
+    steps:
+      - uses: docker/setup-buildx-action@v2
+      - uses: actions/checkout@v4
+      #- uses: ruby/setup-ruby@v1
+      #  with:
+      #    ruby-version: '3.1'
+      #    bundler-cache: true
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: "us-west-2"
+          role-skip-session-tagging: true
+          role-to-assume: "arn:aws:iam::005216166247:role/GhaDockerPush"
+          mask-aws-account-id: false
+      - id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - run: "echo '${{ github.sha }}' > REVISION"
+      - name: 'Build Docker image'
+        uses: 'docker/build-push-action@v3'
+        with:
+          context: '.'
+          load: true
+          tags: "sponsor-app-test:latest,${{ steps.login-ecr.outputs.registry }}/sponsor-app:${{ github.sha }},${{ steps.login-ecr.outputs.registry }}/sponsor-app:latest"
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: 'Push Docker image'
+        uses: 'docker/build-push-action@v3'
+        with:
+          context: '.'
+          push: true
+          tags: "${{ steps.login-ecr.outputs.registry }}/sponsor-app:${{ github.sha }},${{ steps.login-ecr.outputs.registry }}/sponsor-app:latest"
+
+  deploy-prod:
+    if: "${{ success() && github.event_name == 'push' }}"
+    name: deploy-prod
+    needs: ["build"]
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    concurrency:
+      group: production
+      cancel-in-progress: true
+    environment:
+      name: production
+      url: https://sponsorships.rubykaigi.org
+    env:
+      BUNDLE_GEMFILE: "${{ github.workspace }}/deploy/Gemfile"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: "us-west-2"
+          role-skip-session-tagging: true
+          role-to-assume: "arn:aws:iam::005216166247:role/GhaSponsorDeploy"
+          mask-aws-account-id: false
+      - name: 'Run pre-deploy task'
+        run: "bundle exec hako oneshot --tag '${{ github.sha }}' ./deploy/hako/sponsor-app-batch.jsonnet bundle exec rake db:migrate"
+      - name: "Deploy sponsor-app-worker (ECS)"
+        run: "bundle exec hako deploy --tag '${{ github.sha }}' ./deploy/hako/sponsor-app-worker.jsonnet"
+      - name: "Deploy sponsor-app (App Runner)"
+        working-directory: '${{ github.workspace }}/tf/'
+        run: "terraform init && terraform apply -target=aws_apprunner_service.prd -auto-approve"
