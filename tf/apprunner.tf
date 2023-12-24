@@ -23,8 +23,8 @@ resource "aws_apprunner_service" "prd" {
   }
 
   instance_configuration {
-    cpu    = "512"
-    memory = "1024"
+    cpu    = "256"
+    memory = "512"
 
     instance_role_arn = aws_iam_role.SponsorApp.arn
   }
