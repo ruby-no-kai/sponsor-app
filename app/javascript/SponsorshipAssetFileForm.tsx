@@ -42,9 +42,16 @@ export default class SponsorshipAssetFileForm extends React.Component<
 
   public render() {
     if (this.needUpload()) {
-      return <form action='#' ref={this.formRef}>
-        <input type="file" onChange={this.onFileSelection.bind(this)} required={this.uploadRequired()} />
-      </form>
+      return (
+        <form action="#" ref={this.formRef}>
+          <input
+            type="file"
+            onChange={this.onFileSelection.bind(this)}
+            required={this.uploadRequired()}
+            accept="image/svg,application/pdf,application/zip,.ai,.eps"
+          />
+        </form>
+      );
     } else {
       return (
         <button
