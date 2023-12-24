@@ -1,27 +1,27 @@
-import AWS from 'aws-sdk/global';
-import S3 from 'aws-sdk/clients/s3';
+import AWS from "aws-sdk/global";
+import S3 from "aws-sdk/clients/s3";
 
-import Rails from '@rails/ujs';
+import Rails from "@rails/ujs";
 
 interface Params {
-  file: File,
-  sessionEndpoint: string,
-  sessionEndpointMethod: string,
+  file: File;
+  sessionEndpoint: string;
+  sessionEndpointMethod: string;
   onProgress?: (progress: S3.ManagedUpload.Progress) => any;
 }
 
 export interface SessionCredentials {
-  access_key_id: string,
-  secret_access_key: string,
-  session_token?: string,
+  access_key_id: string;
+  secret_access_key: string;
+  session_token?: string;
 }
 
 export interface SessionData {
-  id: string,
-  region: string,
-  bucket: string,
-  key: string,
-  credentials: SessionCredentials,
+  id: string;
+  region: string;
+  bucket: string;
+  key: string;
+  credentials: SessionCredentials;
 }
 
 export default class SponsorshipAssetFileUploader {
@@ -48,9 +48,13 @@ export default class SponsorshipAssetFileUploader {
     if (this.session) return this.session;
 
     const sessionPayload = new FormData();
-    sessionPayload.append('extension', this.file.name.split('.').pop() || '');
-    sessionPayload.append(Rails.csrfParam() || '', Rails.csrfToken() || '');
-    const sessionResp = await fetch(this.sessionEndpoint, {method: this.sessionEndpointMethod, credentials: 'include', body: sessionPayload});
+    sessionPayload.append("extension", this.file.name.split(".").pop() || "");
+    sessionPayload.append(Rails.csrfParam() || "", Rails.csrfToken() || "");
+    const sessionResp = await fetch(this.sessionEndpoint, {
+      method: this.sessionEndpointMethod,
+      credentials: "include",
+      body: sessionPayload,
+    });
     if (sessionResp.ok) {
       const session: SessionData = await sessionResp.json();
       this.session = session;
@@ -91,14 +95,14 @@ export default class SponsorshipAssetFileUploader {
         Body: this.file,
       },
     });
-    if (this.onProgress) uploader.on('httpUploadProgress', this.onProgress);
+    if (this.onProgress) uploader.on("httpUploadProgress", this.onProgress);
 
     this.uploader = uploader;
     return this.uploader;
   }
 
   public async perform() {
-    const {bucket, key} = await this.getSession();
+    const { bucket, key } = await this.getSession();
     const uploader = await this.getUploader();
     const s3 = await this.getS3();
 

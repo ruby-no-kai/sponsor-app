@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .querySelectorAll(".sponsorships_form_billing_contact")
       .forEach((elem) => {
         const checkbox = elem.querySelector(
-          ".form-check input[type=checkbox]"
+          ".form-check input[type=checkbox]",
         ) as HTMLInputElement;
         const fieldset = elem.querySelector("fieldset") as HTMLFieldSetElement;
 
@@ -36,18 +36,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const calculateTotalAttendees = () => {
       const totalElem = formElem.querySelector(
-        ".sponsorships_form_tickets__total"
+        ".sponsorships_form_tickets__total",
       ) as Element;
       if (!totalElem) return;
 
       const selectedPlanElem = formElem.querySelector(
-        ".sponsorships_form_plans input[type=radio]:checked"
+        ".sponsorships_form_plans input[type=radio]:checked",
       ) as HTMLInputElement;
       const ticketsIncludedInPlanElem = formElem.querySelector(
-        ".sponsorships_form_tickets__included_in_plan"
+        ".sponsorships_form_tickets__included_in_plan",
       )! as Element;
       const additionalAttendeesElem = formElem.querySelector(
-        ".sponsorships_form_tickets__additional_attendees input"
+        ".sponsorships_form_tickets__additional_attendees input",
       )! as HTMLInputElement;
 
       const numberOfGuests = selectedPlanElem
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     formElem
       .querySelectorAll(
-        ".sponsorships_form_tickets__additional_attendees input"
+        ".sponsorships_form_tickets__additional_attendees input",
       )
       .forEach((elem) => {
         elem.addEventListener("change", () => calculateTotalAttendees());
@@ -73,19 +73,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     formElem.querySelectorAll(".sponsorships_form_plans").forEach((elem) => {
       const boothCheckbox = formElem.querySelector(
-        ".sponsorships_form_booth_request input[type=checkbox]"
+        ".sponsorships_form_booth_request input[type=checkbox]",
       ) as HTMLInputElement;
       const uneligibleHelpTextElem = formElem.querySelector(
-        ".sponsorships_form_booth_request_uneligible"
+        ".sponsorships_form_booth_request_uneligible",
       ) as Element;
       const customizationRequestField = document.querySelector(
-        ".sponsorships_form_customization_request"
+        ".sponsorships_form_customization_request",
       ) as HTMLTextAreaElement;
       const profileFieldHelpElem = document.querySelector(
-        ".sponsorships_form_profile_help"
+        ".sponsorships_form_profile_help",
       ) as Element;
       const acceptanceHelpElem = document.querySelector(
-        ".sponsorships_acceptance_help"
+        ".sponsorships_acceptance_help",
       ) as Element;
 
       const handleChange = (e: HTMLInputElement | null) => {
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
         customizationRequestField.required = e.dataset["other"] == "1";
       };
       handleChange(
-        elem.querySelector("input[type=radio]:checked") as HTMLInputElement
+        elem.querySelector("input[type=radio]:checked") as HTMLInputElement,
       );
 
       elem.querySelectorAll("input[type=radio]").forEach((planRadioElem) => {
