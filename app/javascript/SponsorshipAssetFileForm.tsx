@@ -1,29 +1,32 @@
-import S3 from 'aws-sdk/clients/s3';
-import * as React from 'react';
+import S3 from "aws-sdk/clients/s3";
+import * as React from "react";
 
-import SponsorshipAssetFileUploader from './SponsorshipAssetFileUploader';
+import SponsorshipAssetFileUploader from "./SponsorshipAssetFileUploader";
 
 interface UploadState {
-  uploader?: SponsorshipAssetFileUploader,
-  progress?: S3.ManagedUpload.Progress | null,
-  error?: string | null,
+  uploader?: SponsorshipAssetFileUploader;
+  progress?: S3.ManagedUpload.Progress | null;
+  error?: string | null;
 }
 
 interface Props {
-  existingFileId: string | null,
-  needUpload: boolean,
-  sessionEndpoint: string,
-  sessionEndpointMethod: string,
+  existingFileId: string | null;
+  needUpload: boolean;
+  sessionEndpoint: string;
+  sessionEndpointMethod: string;
 }
 
 interface State {
-  needUpload: boolean,
+  needUpload: boolean;
   uploadState?: UploadState;
-  file: File | null,
-  filename: string | null,
+  file: File | null;
+  filename: string | null;
 }
 
-export default class SponsorshipAssetFileForm extends React.Component<Props, State> {
+export default class SponsorshipAssetFileForm extends React.Component<
+  Props,
+  State
+> {
   private formRef: React.RefObject<HTMLFormElement>;
 
   constructor(props: Props) {
@@ -33,7 +36,7 @@ export default class SponsorshipAssetFileForm extends React.Component<Props, Sta
       uploadState: undefined,
       file: null,
       filename: null,
-    }
+    };
     this.formRef = React.createRef();
   }
 
@@ -43,14 +46,21 @@ export default class SponsorshipAssetFileForm extends React.Component<Props, Sta
         <input type="file" onChange={this.onFileSelection.bind(this)} required={this.uploadRequired()} />
       </form>
     } else {
-      return <button className='btn btn-info' onClick={this.onReuploadClick.bind(this)}>Re-upload</button>
+      return (
+        <button
+          className="btn btn-info"
+          onClick={this.onReuploadClick.bind(this)}
+        >
+          Re-upload
+        </button>
+      );
     }
   }
 
   private onReuploadClick(e: React.MouseEvent<HTMLButtonElement>) {
     this.setState({
       needUpload: true,
-    })
+    });
   }
 
   private onFileSelection(e: React.ChangeEvent<HTMLInputElement>) {
@@ -70,10 +80,11 @@ export default class SponsorshipAssetFileForm extends React.Component<Props, Sta
   }
 
   public async startUpload(): Promise<string | null> {
-    if (!this.needUpload() && !this.uploadRequired()) return this.props.existingFileId || '';
+    if (!this.needUpload() && !this.uploadRequired())
+      return this.props.existingFileId || "";
     const form = this.formRef.current;
-    if (!(form && form.reportValidity()))  return null;
-    if (!(this.state.file)) return null;
+    if (!(form && form.reportValidity())) return null;
+    if (!this.state.file) return null;
 
     const uploader = new SponsorshipAssetFileUploader({
       file: this.state.file,
@@ -81,7 +92,7 @@ export default class SponsorshipAssetFileForm extends React.Component<Props, Sta
       sessionEndpointMethod: this.props.sessionEndpointMethod,
     });
     this.setState({
-      uploadState: {uploader: uploader},
+      uploadState: { uploader: uploader },
     });
 
     await uploader.perform();
