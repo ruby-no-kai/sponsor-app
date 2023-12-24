@@ -50,6 +50,7 @@ data "aws_iam_policy_document" "SponsorApp" {
     actions = [
       "sqs:SendMessage",
       "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
       "sqs:ChangeMessageVisibility",
       "sqs:GetQueueAttributes",
       "sqs:GetQueueUrl",
