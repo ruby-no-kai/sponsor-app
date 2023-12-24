@@ -98,7 +98,7 @@
       %h3= t('.plan')
       = desc.plan_help_html&.html_safe
 
-    %fieldset{disabled: @sponsorship.accepted?}
+    %fieldset{disabled: @sponsorship.persisted? && @sponsorship.accepted?}
       .form-group.sponsorships_form_plans
         %h5= t('.plans')
         - conference.plans.each do |plan|
