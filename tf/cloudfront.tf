@@ -81,7 +81,7 @@ resource "aws_cloudfront_distribution" "prd" {
     viewer_protocol_policy = "redirect-to-https"
 
     forwarded_values {
-      headers                 = ["x-csrf-token", "User-Agent", "Origin"]
+      headers                 = ["x-csrf-token", "User-Agent", "Origin", "CloudFront-Viewer-Country"]
       query_string            = true
       query_string_cache_keys = []
       cookies {
