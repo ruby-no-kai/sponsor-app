@@ -48,7 +48,7 @@ export default class SponsorshipAssetFileForm extends React.Component<
             type="file"
             onChange={this.onFileSelection.bind(this)}
             required={this.uploadRequired()}
-            accept="image/svg,application/pdf,application/zip,.ai,.eps"
+            accept="image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"
           />
         </form>
       );
