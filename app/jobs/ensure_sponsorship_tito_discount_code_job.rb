@@ -58,7 +58,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
 
   def release_slugs
     {
-      'attendee' => %w(sponsor sponsor-virtual-only),
+      'attendee' => %w(sponsor),
       'booth_staff' => %w(booth-staff),
     }.fetch(@kind)
   end
