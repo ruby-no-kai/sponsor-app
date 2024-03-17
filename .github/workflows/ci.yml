@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     name: build
+    if: "${{ github.repository == 'ruby-no-kai/sponsor-app' }}"
     permissions:
       contents: read
       id-token: write
@@ -46,7 +47,7 @@ jobs:
           tags: "${{ steps.login-ecr.outputs.registry }}/sponsor-app:${{ github.sha }},${{ steps.login-ecr.outputs.registry }}/sponsor-app:latest"
 
   deploy-prod:
-    if: "${{ success() && github.event_name == 'push' }}"
+    if: "${{ success() && github.event_name == 'push' && github.repository == 'ruby-no-kai/sponsor-app' }}"
     name: deploy-prod
     needs: ["build"]
     permissions:
