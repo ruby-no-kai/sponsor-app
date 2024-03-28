@@ -16,5 +16,6 @@ class SponsorshipWelcomeJob < ApplicationJob
     )
 
     EnsureSponsorshipTitoDiscountCodeJob.perform_later(sponsorship, 'attendee')
+    GenerateSponsorsYamlFileJob.perform_later(sponsorship.conference)
   end
 end
