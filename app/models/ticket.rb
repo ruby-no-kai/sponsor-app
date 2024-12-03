@@ -4,7 +4,7 @@ class Ticket < ApplicationRecord
   belongs_to :conference
   belongs_to :sponsorship
 
-  enum kind: %i(attendee booth_staff)
+  enum :kind, %i(attendee booth_staff)
 
   scope :checked_in, -> { where.not(checked_in_at: nil) }
   scope :unused, -> { where(checked_in_at: nil) }
