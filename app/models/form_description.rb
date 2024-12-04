@@ -12,7 +12,30 @@ class FormDescription < ApplicationRecord
       policy_help
       ticket_help
     ).each do |field|
-      self[:"#{field}_html"] = CommonMarker.render_html(self[field], %i(GITHUB_PRE_LANG), %i(tagfilter autolink table strikethrough))
+      self[:"#{field}_html"] = Commonmarker.to_html(
+        self[field],
+        options: {
+          render: {
+            unsafe: true,
+          },
+          extension: {
+            strikethrough: true,
+            tagfilter: false,
+            table: true,
+            autolink: true,
+            tasklist: true,
+            superscript: true,
+            header_ids: "#{self.id}--",
+            footnotes: true,
+            description_lists: true,
+            front_matter_delimiter: '---',
+            shortcodes: true,
+          },
+        },
+        plugins: {
+          syntax_highlighter: nil,
+        },
+      )
     end
   end
 end
