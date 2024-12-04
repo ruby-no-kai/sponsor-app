@@ -26,7 +26,9 @@ yarn run watch
 - `S3_FILES_BUCKET` S3 bucket name
 - `S3_FILES_PREFIX` (optional)
 - `S3_FILES_ROLE` IAM Role ARN which allows `s3:PutBucket` to all objects on the bucket
-  - You also have to supply a valid AWS credentials to the app in a standard SDK way, e.g. IAM instance profile, ECS task IAM role, and `ENV['AWS_ACCESS_KEY_ID']`.
+  - RubyKaigi staff can use `arn:aws:iam::005216166247:role/SponsorAppDevUser`
+
+You also have to supply a valid AWS credentials to the app in a standard SDK way. RubyKaigi staff refer to https://rubykaigi.org/go/aws for setup access.
 
 #### GitHub
 

@@ -5,7 +5,7 @@ class BroadcastDelivery < ApplicationRecord
   validates :recipient, presence: true
   validates :status, presence: true
 
-  enum status: %i(created preparing ready pending sending sent failed rejected accepted delivered opened clicked)
+  enum :status, %i(created preparing ready pending sending sent failed rejected accepted delivered opened clicked)
 
   def mailgun_events
     (self.meta ||= {})['mailgun_events'] ||= []

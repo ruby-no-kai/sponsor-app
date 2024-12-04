@@ -6,7 +6,7 @@ class Broadcast < ApplicationRecord
 
   has_many :deliveries, class_name: 'BroadcastDelivery', dependent: :destroy
 
-  enum status: %i(created preparing modifying ready pending sending sent failed)
+  enum :status, %i(created preparing modifying ready pending sending sent failed)
 
   validates :campaign, presence: true
   validates :status, presence: true

@@ -21,7 +21,7 @@ default: &default
   # http://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
-development:
+development: &development
   <<: *default
   database: sponsor_app2_development
 <% docker_port = (ENV['DATABASE_URL'].nil? ? IO.popen([*%w(docker-compose port db 5432), err: File::NULL], 'r', &:read).chomp.split(?:)&.last : nil) || '' %>
@@ -64,7 +64,7 @@ development:
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  <<: *default
+  <<: *development
   database: sponsor_app2_test
 
 # As with config/secrets.yml, you never want to store sensitive information,
