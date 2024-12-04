@@ -1,6 +1,6 @@
 class Admin::FormDescriptionsController < Admin::ApplicationController
   before_action :set_conference
-  before_action :set_form_description, only: [:show, :edit, :update, :destroy]
+  before_action :set_form_description, only: [:show, :edit, :update]
 
   def show
   end
