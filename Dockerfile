@@ -13,7 +13,7 @@ RUN yarn run build
 FROM public.ecr.aws/sorah/ruby:3.2-dev as builder
 
 RUN apt-get update \
-    && apt-get install -y libpq-dev git-core \
+    && apt-get install  --no-install-recommends -y libpq-dev git-core libyaml-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -27,7 +27,7 @@ RUN bundle install --path /gems --jobs 100 --deployment --without development:te
 FROM public.ecr.aws/sorah/ruby:3.2
 
 RUN apt-get update \
-    && apt-get install -y libpq5 \
+    && apt-get install --no-install-recommends -y libpq5 libyaml-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
