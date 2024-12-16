@@ -8,6 +8,29 @@ module MarkdownBody
   end
 
   def render_html
-    CommonMarker.render_html(body, %i(GITHUB_PRE_LANG), %i(tagfilter autolink table strikethrough))
+    Commonmarker.to_html(
+      body,
+      options: {
+        render: {
+          unsafe: true,
+        },
+        extension: {
+          strikethrough: true,
+          tagfilter: false,
+          table: true,
+          autolink: true,
+          tasklist: true,
+          superscript: true,
+          header_ids: "#{self.id}--",
+          footnotes: true,
+          description_lists: true,
+          front_matter_delimiter: '---',
+          shortcodes: true,
+        },
+      },
+      plugins: {
+        syntax_highlighter: nil,
+      },
+    )
   end
 end
