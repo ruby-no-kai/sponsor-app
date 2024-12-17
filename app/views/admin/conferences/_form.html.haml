@@ -39,6 +39,8 @@
   .form-group
     = form.label :booth_capacity
     = form.number_field :booth_capacity, class: 'form-control'
+    %small.form-text
+      %code must be 1+ to activate booth request form
 
   .form-group
     .form-check
