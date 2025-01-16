@@ -2,6 +2,11 @@ class Admin::BoothAssignmentsController < ::Admin::ApplicationController
   before_action :set_conference
 
   def show
+    @not_withdrawn_sponsorships = @conference.sponsorships
+      .includes(:plan)
+      .not_withdrawn
+      .where(booth_requested: true)
+      .order('plans.booth_size desc, sponsorships.name asc')
     @sponsorships = @conference.sponsorships
       .includes(:plan)
       .active

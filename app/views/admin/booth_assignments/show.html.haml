@@ -8,7 +8,7 @@
 
 %section
   %p
-    Booth requested: #{@sponsorships.size} sponsors (capacity #{@sponsorships.map(&:booth_size).compact.inject(:+)})
+    Booth requested: #{@sponsorships.size} sponsors (capacity #{@sponsorships.map(&:booth_size).compact.inject(:+)}) (including non accepted sponsors: #{@not_withdrawn_sponsorships.size})
     %br
     Booth assigned: #{@exhibitors.size} sponsors (capacity #{@exhibitors.map(&:assigned_booth_size).compact.inject(:+)})
 
