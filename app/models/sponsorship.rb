@@ -47,12 +47,17 @@ class Sponsorship < ApplicationRecord
     @tito_booth_staff_discount_code ||= tito_discount_codes.where(kind: 'booth_staff').first
   end
 
-  scope :active, -> { where(withdrawn_at: nil).where.not(accepted_at: nil) }
+  scope :active, -> { accepted.not_withdrawn }
+  scope :pending, -> { not_accepted.not_withdrawn }
+
   scope :exhibitor, -> { where(booth_assigned: true) }
   scope :plan_determined, -> { where.not(plan_id: nil) }
+
   scope :withdrawn, -> { where.not(withdrawn_at: nil) }
   scope :not_withdrawn, -> { where(withdrawn_at: nil) }
   scope :accepted, -> { where.not(accepted_at: nil) }
+  scope :not_accepted, -> { where(accepted_at: nil) }
+
   scope :have_presence, -> { where(suspended: false).merge(Sponsorship.active).merge(Sponsorship.plan_determined) }
 
   scope :includes_contacts, -> { includes(:contact, :alternate_billing_contact) }
