@@ -20,13 +20,22 @@
       .form-check
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'all', true, {class: 'form-check-input'}
-          All applications (where not withdrawn)
+          All
+        %label.form-check-label
+          = radio_button_tag "recipient_filter[status]", 'pending', false, {class: 'form-check-input'}
+          Pending
+        %label.form-check-label
+          = radio_button_tag "recipient_filter[status]", 'active', false, {class: 'form-check-input'}
+          Active
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'not_accepted', false, {class: 'form-check-input'}
-          Not accepted only
+          Not accepted (incl. withdrawn)
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'accepted', false, {class: 'form-check-input'}
-          Accepted only
+          Accepted (incl. withdrawn)
+        %label.form-check-label
+          = radio_button_tag "recipient_filter[status]", 'withdrawn', false, {class: 'form-check-input'}
+          Withdrawn
 
   %fieldset.broadcast_new_recipient_fields_kind__past_sponsors.d-none{disabled: true}
     .form-group
@@ -42,13 +51,24 @@
       .form-check
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'all', true, {class: 'form-check-input'}
-          All applications (where not withdrawn)
+          All
+        %label.form-check-label
+          = radio_button_tag "recipient_filter[status]", 'pending', false, {class: 'form-check-input'}
+          Pending
+        %label.form-check-label
+          = radio_button_tag "recipient_filter[status]", 'active', false, {class: 'form-check-input'}
+          Active
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'not_accepted', false, {class: 'form-check-input'}
-          Not accepted only
+          Not accepted (incl. withdrawn)
         %label.form-check-label
           = radio_button_tag "recipient_filter[status]", 'accepted', false, {class: 'form-check-input'}
-          Accepted only
+          Accepted (incl. withdrawn)
+        %label.form-check-label
+          = radio_button_tag "recipient_filter[status]", 'withdrawn', false, {class: 'form-check-input'}
+          Withdrawn
+
+
 
   %fieldset.broadcast_new_recipient_fields_kind__manual.d-none{disabled: true}
     .form-group

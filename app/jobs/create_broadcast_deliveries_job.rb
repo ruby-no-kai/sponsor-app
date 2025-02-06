@@ -19,9 +19,9 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         when 'all', nil
           Sponsorship.all
         when 'not_accepted'
-          Sponsorship.where(accepted_at: nil)
+          Sponsorship.not_accepted
         when 'pending'
-          Sponsorship.where(accepted_at: nil).not_withdrawn
+          Sponsorship.pending
         when 'accepted'
           Sponsorship.accepted
         when 'active'

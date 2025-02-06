@@ -46,11 +46,11 @@ RSpec.describe CreateBroadcastDeliveriesJob, type: :job do
           end
         end
 
-        context "not_accepted" do
-          let(:params) { {status: 'not_accepted'} }
+        context "active" do
+          let(:params) { {status: 'active'} }
           specify do
             expect(sponsorships).to eq(
-              Sponsorship.where(conference:, accepted_at: nil).order(id: :asc).to_a
+              Sponsorship.where(conference:, withdrawn_at: nil).where.not(accepted_at: nil).order(id: :asc).to_a
             )
           end
         end
@@ -117,20 +117,20 @@ RSpec.describe CreateBroadcastDeliveriesJob, type: :job do
       end
 
       describe "composite" do
-        context "ja not_accepted plan" do
-          let(:params) { {locale: 'ja', status: 'not_accepted', plan_id: plan1} }
+        context "ja pending plan" do
+          let(:params) { {locale: 'ja', status: 'pending', plan_id: plan1} }
           specify do
             expect(sponsorships).to eq(
-              Sponsorship.where(conference:, plan: plan1, accepted_at: nil, locale: 'ja').order(id: :asc).to_a
+              Sponsorship.where(conference:, plan: plan1, accepted_at: nil, withdrawn_at: nil, locale: 'ja').order(id: :asc).to_a
             )
           end
         end
 
-        context "ja accepted plan" do
-          let(:params) { {locale: 'ja', status: 'accepted', plan_id: plan2} }
+        context "ja active plan" do
+          let(:params) { {locale: 'ja', status: 'active', plan_id: plan2} }
           specify do
             expect(sponsorships).to eq(
-              Sponsorship.where(conference:, plan: plan2, locale: 'ja').accepted.order(id: :asc).to_a
+              Sponsorship.where(conference:, plan: plan2, locale: 'ja', withdrawn_at: nil).where.not(accepted_at: nil).order(id: :asc).to_a
             )
           end
         end
