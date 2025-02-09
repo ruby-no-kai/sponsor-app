@@ -11,7 +11,7 @@ class Admin::SponsorshipsController < Admin::ApplicationController
   def download_asset
     asset = @sponsorship.asset_file
     raise ActiveRecord::RecordNotFound unless asset
-    redirect_to asset.download_url()
+    redirect_to(asset.download_url(), allow_other_host: true)
   end
 
   def edit
