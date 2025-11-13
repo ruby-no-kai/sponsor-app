@@ -3,9 +3,12 @@ on:
   push:
     branches:
       - master
+      - main
       - test
 
 jobs:
+  test:
+    uses: ./.github/workflows/_test.yml
   build:
     name: build
     permissions:
@@ -46,7 +49,7 @@ jobs:
           tags: "${{ steps.login-ecr.outputs.registry }}/sponsor-app:${{ github.sha }},${{ steps.login-ecr.outputs.registry }}/sponsor-app:latest"
 
   deploy-prod:
-    if: "${{ success() && github.event_name == 'push' }}"
+    if: "${{ success() && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}"
     name: deploy-prod
     needs: ["build"]
     permissions:
