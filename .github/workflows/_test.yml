@@ -9,9 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - run: docker compose up -d --wait db
-      - uses: sorah-rbpkg/actions@v2
+      - uses: ruby/setup-ruby@v1
         with:
-          ruby-version-file: .ruby-version
           bundler-cache: true
       - run: bundle exec rspec -f j -o tmp/rspec_results.json -f d spec
       - uses: SonicGarden/rspec-report-action@v6
