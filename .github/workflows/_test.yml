@@ -12,6 +12,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+      - run: bundle exec rails db:create db:migrate RAILS_ENV=test
       - run: bundle exec rspec -f j -o tmp/rspec_results.json -f d spec
       - uses: SonicGarden/rspec-report-action@v6
         if: always()
