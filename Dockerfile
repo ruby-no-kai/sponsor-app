@@ -10,11 +10,12 @@ RUN yarn run build
 
 ###
 
-FROM public.ecr.aws/sorah/ruby:3.2-dev as builder
+FROM public.ecr.aws/sorah/ruby:3.4-dev as builder
 
-RUN apt-get update \
-    && apt-get install  --no-install-recommends -y libpq-dev git-core libyaml-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update \
+ && apt-get install  --no-install-recommends -y libpq-dev git-core libyaml-dev \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY Gemfile /app/
@@ -24,11 +25,12 @@ RUN bundle install --path /gems --jobs 100 --deployment --without development:te
 
 ###
 
-FROM public.ecr.aws/sorah/ruby:3.2
+FROM public.ecr.aws/sorah/ruby:3.4
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y libpq5 libyaml-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update \
+ && apt-get install --no-install-recommends -y libpq5 libyaml-dev \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=builder /gems /gems
