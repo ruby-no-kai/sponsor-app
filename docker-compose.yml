@@ -1,15 +1,19 @@
-version: '3.1'
 services:
   db:
-    image: postgres:15-bookworm
+    image: public.ecr.aws/docker/library/postgres:17-trixie
     restart: always
     environment:
       POSTGRES_USER: takeoutapp
       POSTGRES_PASSWORD: takeoutapp
       POSTGRES_DB: takeout_app_development
     volumes:
-      - 'postgres15:/var/lib/postgresql/data'
+      - 'postgres17:/var/lib/postgresql/data'
     ports:
       - '127.0.0.1::5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 volumes:
-  postgres15: {}
+  postgres17: {}
