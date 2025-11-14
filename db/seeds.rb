@@ -92,10 +92,10 @@ ApplicationRecord.transaction do
 
     # Organizations
     organizations = [
-      { name: "ふつうのRubyの株式会社", domain: "ordinary-ruby.example.jp", locale: "ja", plan: "Ruby", request: :customization },
-      { name: "Great Ruby Inc.", domain: "great-ruby.example.com", locale: "en", plan: "Platinum", request: :billing, billing_contact: true },
-      { name: "合同会社ゆかいなRubyists", domain: "cheerfull-rubyists.example.jp", locale: "ja", plan: "Gold", billing_contact: true },
-      { name: "Little Rubyists LLC", domain: "little-rubyists.example.com", locale: "en", plan: "Silver", request: :note },
+      { name: "ふつうのRubyの株式会社", domain: "ordinary-ruby.invalid", locale: "ja", plan: "Ruby", request: :customization },
+      { name: "Great Ruby Inc.", domain: "great-ruby.invalid", locale: "en", plan: "Platinum", request: :billing, billing_contact: true },
+      { name: "合同会社ゆかいなRubyists", domain: "cheerfull-rubyists.invalid", locale: "ja", plan: "Gold", billing_contact: true },
+      { name: "Little Rubyists LLC", domain: "little-rubyists.invalid", locale: "en", plan: "Silver", request: :note },
     ]
 
     puts "Creating organizations and sponsorships for #{conference.name}..."
