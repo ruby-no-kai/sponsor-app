@@ -26,8 +26,9 @@ class SessionsController < ApplicationController
 
     session[:session_token_id] = @session_token.id
     session[:sponsorship_ids] = @session_token.sponsorship_ids
-    session[:staff_id] = @session_token.staff&.id
 
+    staff_id = @session_token.staff&.id
+    session[:staff_id] = staff_id if staff_id
 
     set_back_to()
 
