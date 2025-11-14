@@ -35,6 +35,7 @@ gem 'premailer-rails'
 gem 'revision_plate'
 gem "sentry-ruby"
 gem "sentry-rails"
+gem 'rails_semantic_logger'
 
 gem 'puma'
 
