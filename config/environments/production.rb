@@ -1,28 +1,26 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
-  unless ENV['STACK'] # not during heroku build
-    config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST')
+  config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST')
 
-    config.x.org_name = ENV.fetch('ORG_NAME')
+  config.x.org_name = ENV.fetch('ORG_NAME')
 
-    config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
-    config.x.default_email_reply_to = ENV.fetch('DEFAULT_EMAIL_REPLY_TO', config.x.default_email_address)
-    config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST')
+  config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
+  config.x.default_email_reply_to = ENV.fetch('DEFAULT_EMAIL_REPLY_TO', config.x.default_email_address)
+  config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST')
 
-    config.x.github.repo = ENV.fetch('GITHUB_REPO')
-    config.x.github.client_id = ENV.fetch('GITHUB_CLIENT_ID')
-    config.x.github.client_secret = ENV.fetch('GITHUB_CLIENT_SECRET')
-    config.x.github.app_id = ENV.fetch('GITHUB_APP_ID')
-    config.x.github.private_key = OpenSSL::PKey::RSA.new(ENV.fetch('GITHUB_CLIENT_PRIVATE_KEY').unpack1('m*'), '')
+  config.x.github.repo = ENV.fetch('GITHUB_REPO')
+  config.x.github.client_id = ENV.fetch('GITHUB_CLIENT_ID')
+  config.x.github.client_secret = ENV.fetch('GITHUB_CLIENT_SECRET')
+  config.x.github.app_id = ENV.fetch('GITHUB_APP_ID')
+  config.x.github.private_key = OpenSSL::PKey::RSA.new(ENV.fetch('GITHUB_CLIENT_PRIVATE_KEY').unpack1('m*'), '')
 
-    config.x.tito.token = ENV.fetch('TITO_API_TOKEN')
+  config.x.tito.token = ENV.fetch('TITO_API_TOKEN')
 
-    config.x.slack.webhook_urls = {
-      default: ENV.fetch('SLACK_WEBHOOK_URL'),
-      feed: ENV.fetch('SLACK_WEBHOOK_URL_FOR_FEED', ENV.fetch('SLACK_WEBHOOK_URL')),
-    }
-  end
+  config.x.slack.webhook_urls = {
+    default: ENV.fetch('SLACK_WEBHOOK_URL'),
+    feed: ENV.fetch('SLACK_WEBHOOK_URL_FOR_FEED', ENV.fetch('SLACK_WEBHOOK_URL')),
+  }
 
   # Settings specified here will take precedence over those in config/application.rb.
 
