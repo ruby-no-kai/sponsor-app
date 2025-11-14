@@ -27,11 +27,6 @@ en:
 
       exhibition:
         description: 'Booth Plan'
-
-      ticket:
-        name: 'Your Name'
-        kind: 'Ticket Type'
-        email: 'Email Address'
     errors:
       models:
         sponsorship:
@@ -54,9 +49,6 @@ en:
       'sponsorship[note_attributes]': *note
       sponsorship:
         booth_requested: 'Request a Booth'
-    submit:
-      ticket:
-        create: 'Submit'
 
   layouts:
     application:
@@ -88,12 +80,6 @@ en:
       subject: "Thank you for sponsoring us"
     admin_email:
       subject: "New sponsorship application from: %{name}"
-  ticket_retrieval_mailer:
-    notify:
-      subject: 'Reminder of Your sponsor ticket'
-  unauthorized_ticket_warning_mailer:
-    notify:
-      subject: 'There was an unverified attendee from your organization'
 
   sponsorships:
     form:
@@ -138,10 +124,6 @@ en:
         Upload your company logo file for the sponsors page in our website, and the venue onsite. Please make sure your file is in vector format (like .ai, .eps, .svg). If you have multiple files, archive them into a .zip file.
       others_help: |
         Use the following field for anything you want let us know in advance.
-      tickets: 'Attendee Tickets'
-      tickets_included_in_plan: 'Tickets included in the selected plan'
-      tickets_additionally_request: 'Additional Tickets'
-      tickets_total: 'Total number of Attendees'
       note: 'Others'
       policies: 'Policies'
       submit: 'Submit'
@@ -161,8 +143,6 @@ en:
       your_sponsorship_plan: "Your selected sponsorship plan"
       customized_plan: "Customized"
       sponsor_talk_eligible: "Includes a sponsor session"
-      included_guests: "Attendee tickets included in the plan"
-      additional_guests: "Additional tickets purchased"
       total_number_of_guests: "Total"
       guests_count:
         zero: 'no guests'
@@ -184,11 +164,9 @@ en:
         not_submitted: 'Not Submitted Yet'
       tickets:
         title: 'Invitations'
-        your_url: 'Invitation URL'
         attendee_url: 'Attendee invitation URL'
         booth_staff_url: 'Booth staff invitation URL'
         help:
-          direction: 'To register, follow the instructions shown in the ticket page.'
           requirement: 'All attendees who use a sponsor ticket must retrieve their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
           unique: 'This URL is unique and bound to you, and there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
     edit:
@@ -202,27 +180,3 @@ en:
       header: 'Booth Details'
       help: 'Please submit your booth plans in advance. Organizers will review your plan to ensure it complies with the venue rules. We may contact you if we have something to advise.'
       submit: 'Submit'
-  tickets:
-    new:
-      header: '%{name} Sponsorship Ticket Registration'
-      desc1: "Welcome! At this page, you can register yourself for %{conference} as an attendee using your sponsor ticket. By submitting the following form you'll get a QR code for the reception. You can:"
-      onsite:
-        head: 'Register using mobile device:'
-        desc: "You can visit this page using your mobile device and submit the form in advance, or while you are waiting in the registration queue."
-      print_in_advance:
-        head: 'Print in advance:'
-        desc: "Otherwise, you can submit the form now, then print the QR code out and bring it to the reception."
-      desc2: "Retrieving the ticket using mobile device is strongly recommended. See you soon at the venue!"
-      code_desc: "Use this code to open this page on your mobile device"
-      form:
-        from: 'from %{sponsorship}'
-        email_help: 'Optional (recommended). We will send a email to retrieve your code again.'
-        attendee_help: "Attend to the event as an attendee. Choose this if you're in doubt."
-        booth_staff_help: "Booth passes are not allowed to attend the sessions."
-        policy_help: "By submitting this form you agree to the following policy."
-        submit_help: "Note: submitting your information doesn't consume your organization's sponsor tickets immediately. Sponsor ticket will become used upon the registration in the venue."
-    show:
-      guide1: "Present this page to the sponsor registration desk. You can use mobile device, or you may print this page out in advance and bring to the desk."
-      guide2: "The link to this page is sent to your email address."
-      reissue_guide: "You need an another ticket or made a mistake in your information?"
-      reissue_link: "Click here to register again"

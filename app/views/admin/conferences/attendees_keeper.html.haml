@@ -6,8 +6,7 @@
 .d-md-flex.justify-content-between
   %h3 Attendees Keeper
 
-- sponsorships = @conference.sponsorships.active.includes(:plan, :tickets).to_a.sort_by{|_| -_.total_number_of_attendees }
-- checked_in_tickets = @conference.tickets.checked_in
+- sponsorships = @conference.sponsorships.active.includes(:plan).to_a.sort_by{|_| -_.total_number_of_attendees }
 
 %ul
   %li
@@ -15,12 +14,6 @@
     %ul
       %li Included: #{sponsorships.map {|_| _.plan&.number_of_guests }.compact.inject(:+)}
       %li Additionally Sold: #{sponsorships.map(&:number_of_additional_attendees).compact.inject(:+)}
-  %li
-    Registered at the venue: #{checked_in_tickets.size}
-    %ul
-      %li Attendee: #{checked_in_tickets.select(&:attendee?).size}
-      %li Booth staff: #{checked_in_tickets.select(&:booth_staff?).size}
-      %li (Manually checked in: #{checked_in_tickets.reject(&:authorized).size})
 .row
   .col-12
     .card
@@ -32,8 +25,6 @@
             %th{scope: :col} Total
             %th{scope: :col} Included
             %th{scope: :col} Additional
-            %th{scope: :col} Checked In
-            %th{scope: :col} Booth Pass
         %tbody
           - sponsorships.each do |sponsorship|
             %tr
@@ -41,5 +32,3 @@
               %td= sponsorship.total_number_of_attendees
               %td= sponsorship.plan&.number_of_guests || 0
               %td= sponsorship.number_of_additional_attendees || 0
-              %td= sponsorship.tickets.select(&:checked_in?).select(&:attendee?).size || 0
-              %td= sponsorship.tickets.select(&:checked_in?).select(&:booth_staff?).size || 0

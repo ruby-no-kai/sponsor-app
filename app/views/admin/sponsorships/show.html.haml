@@ -105,11 +105,6 @@
                     = link_to "Attendee", @sponsorship.tito_attendee_discount_code.dashboard_orders_url
                   - if @sponsorship.tito_booth_staff_discount_code
                     = link_to "Booth Staff", @sponsorship.tito_booth_staff_discount_code.dashboard_orders_url
-            - else
-              .row
-                .col-sm-12
-                  %strong Registration:
-                  = link_to "Ticket (sponsor-app)", new_user_conference_ticket_path(@conference, key: @sponsorship.ticket_key)
         .card
           %h5.card-header
             Requests

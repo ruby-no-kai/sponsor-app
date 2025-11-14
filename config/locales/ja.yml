@@ -27,11 +27,6 @@ ja:
 
       exhibition:
         description: 'ブース詳細'
-
-      ticket:
-        name: '名前'
-        kind: 'チケット種別'
-        email: 'メールアドレス'
     errors:
       models:
         sponsorship:
@@ -54,9 +49,6 @@ ja:
       'sponsorship[note_attributes]': *note
       sponsorship:
         booth_requested: 'ブース出展する'
-    submit:
-      ticket:
-        create: '登録'
 
   layouts:
     application:
@@ -88,13 +80,6 @@ ja:
       subject: "スポンサーシップ申込確認"
     admin_email:
       subject: "New sponsorship application from: %{name}"
-  ticket_retrieval_mailer:
-    notify:
-      subject: 'スポンサーチケット URL のお知らせ'
-  unauthorized_ticket_warning_mailer:
-    notify:
-      subject: 'スポンサーチケット忘れの参加者を受付しました'
-
 
   sponsorships:
     form:
@@ -138,10 +123,6 @@ ja:
       logo_help: |
         Webサイトや会場にて掲示するため、ロゴファイルをアップロードしてください。形式はベクター形式 (.ai, .svg, .eps, .pdf 等) でお願い致します。
         複数ファイルになる場合、zip 形式で圧縮ください。
-      tickets: 'Attendee チケット'
-      tickets_included_in_plan: 'スポンサープランに含まれている枚数'
-      tickets_additionally_request: '追加する枚数'
-      tickets_total: '合計'
       others_help: |
         その他に連絡事項があれば下記へご記入ください。
       note: 'その他の連絡事項'
@@ -163,8 +144,6 @@ ja:
       your_sponsorship_plan: "スポンサープラン"
       customized_plan: "カスタム"
       sponsor_talk_eligible: "スポンサーセッション有り"
-      included_guests: "プランに含まれているチケット"
-      additional_guests: "追加でお取り置きしているチケット"
       guests_count:
         zero: '0 枚'
         one: '1 枚'
@@ -185,11 +164,9 @@ ja:
         not_submitted: '未提出'
       tickets:
         title: 'スポンサーチケット'
-        your_url: 'チケット取得URL'
         attendee_url: '招待 URL'
         booth_staff_url: 'ブーススタッフ招待 URL'
         help:
-          direction: '受付のために、上記 URL の指示に従ってください。'
           requirement: 'ブーススタッフを含む全参加者について上記 URL から各々チケットを取得する必要があります。御社内の参加者へ上記 URL を忘れずに共有してください。'
           unique: '本 URL についてはスポンサーごと固有のものとなり、スポンサーチケット利用にあたり認証や身元確認はありません。URL の取り扱いには気をつけていただくようお願い致します。'
     edit:
@@ -203,28 +180,4 @@ ja:
       header: 'ブース詳細'
       help: '会場の利用ルールなどに抵触しないか事前に確認するため、ブース出展内容の詳細をお知らせください。何かしら確認が必要な内容があった場合はこちらからご連絡を差し上げます。'
       submit: '送信'
-  tickets:
-    new:
-      header: '%{name} スポンサーチケット登録'
-      desc1: "このページで %{conference} のスポンサーチケットを取得できます。"
-      onsite:
-        head: 'スマートフォンを利用して登録する:'
-        desc: "このページをスマートフォンで表示して登録を行い、表示された QR コードを受付へ提示してください。登録は直前でも大丈夫です。"
-      print_in_advance:
-        head: '事前に印刷する:'
-        desc: "もしくは今登録の上、表示された QR コードを印刷してそれを受付に提示することも可能です。"
-      desc2: "スマートフォンでの登録を推奨します。"
-      code_desc: "上記コードでこのページを開くことができます"
-      form:
-        from: '(%{sponsorship})'
-        email_help: '任意(推奨)。記入されたメールアドレスへチケットのリンクが送信されます。'
-        attendee_help: "一般参加者のチケットです。通常はこれを選択してください。"
-        booth_staff_help: "スポンサーブース用のブースパスです。ブースパスではセッション聴講をすることはできません。"
-        policy_help: "下記「登録」ボタンをもって下記ポリシーへ同意したものとみなします。"
-        submit_help: "このフォームを送信した時点ではスポンサーチケットの利用とはなりません。会場での受付をもってスポンサーチケットを利用したものとみなされます。"
-    show:
-      guide1: "本ページを受付へ提示してください。スマートフォンで表示することを推奨しますが、このページを印刷したものを提示することもできます。"
-      guide2: "このチケットを再表示するためのリンクは記入されたメールアドレスへ送信されています。"
-      reissue_guide: "複数登録する場合、また記入ミスがあった場合のチケットの再登録は"
-      reissue_link: "こちらから可能です。"
 

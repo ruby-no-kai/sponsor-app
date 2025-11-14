@@ -66,11 +66,6 @@
             %li
               %strong #{t('.total_number_of_guests')}:
               #{t('.guests_count', count: @sponsorship.total_number_of_attendees)}
-              %ul
-                - if @sponsorship.plan&.number_of_guests
-                  %li #{t('.included_guests')}: #{t('.guests_count', count: @sponsorship.plan.number_of_guests)}
-                - if @sponsorship.number_of_additional_attendees
-                  %li #{t('.additional_guests')}: #{t('.guests_count', count: @sponsorship.number_of_additional_attendees)}
           - if @conference.tito_slug.present?
             - if @sponsorship.tito_attendee_discount_code
               %p.card-text
@@ -82,15 +77,7 @@
                 %strong #{t('.tickets.booth_staff_url')}:
                 %br
                 %small= link_to @sponsorship.tito_booth_staff_discount_code.url, @sponsorship.tito_booth_staff_discount_code.url
-          - else
-            %p.card-text
-              %strong #{t('.tickets.your_url')}:
-              %br
-              - url = new_user_conference_ticket_url(@conference, key: @sponsorship.ticket_key)
-              %small= link_to url, url
           %ul.card-text
-            %li
-              %small= t('.tickets.help.direction')
             %li
               %small= t('.tickets.help.requirement')
             %li

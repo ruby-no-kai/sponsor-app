@@ -35,7 +35,6 @@ class Sponsorship < ApplicationRecord
   has_one :exhibition
 
   has_many :broadcast_deliveries, dependent: :nullify
-  has_many :tickets, dependent: :destroy
 
   has_many :tito_discount_codes, dependent: :destroy
 
@@ -72,8 +71,6 @@ class Sponsorship < ApplicationRecord
   validates :profile, presence: true
 
   validates :asset_file, presence: true
-
-  validates :ticket_key, presence: true
 
   validates_numericality_of :number_of_additional_attendees, allow_nil: true, greater_than_or_equal_to: 0, only_integer: true
 
@@ -215,10 +212,6 @@ class Sponsorship < ApplicationRecord
     (active? && booth_assigned?) ? 3 : 0 # FIXME:
   end
 
-  def number_of_registered_attendees
-    tickets.where.not(kind: :attendee, checked_in_at: nil).count
-  end
-
   def booth_size
     plan&.booth_size
   end
@@ -283,6 +276,8 @@ class Sponsorship < ApplicationRecord
     end
   end
 
+  # NOTE: Ticket functionality removed; this method kept for historical data preservation.
+  # The ticket_key column is referenced by TitoDiscountCode and contains historical data.
   def generate_ticket_key
     if self.ticket_key.blank?
       begin
