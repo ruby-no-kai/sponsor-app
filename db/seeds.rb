@@ -8,15 +8,26 @@ puts "Creating Conferences..."
 ApplicationRecord.transaction do
   conferences = [
     {
+      name: "RubyKaigi 2048",
+      contact_email_address: "2048@rubykaigi.invalid",
+      tito_slug: nil,
+      application_opens_at: Time.zone.now - 1.month - 1.year,
+      application_closes_at: Time.zone.now + 1.month - 1.year,
+      amendment_closes_at: Time.zone.now + 2.months - 1.year,
+      ticket_distribution_starts_at: Time.zone.now - 1.day - 1.year,
+      github_repo: nil,
+      hidden: false,
+    },
+    {
       name: "RubyKaigi 4096",
-      contact_email_address: "4096@rubyconf.org",
-      tito_slug: "rubykaigi/rubykaigi4096",
+      contact_email_address: "4096@rubykaigi.invalid",
+      tito_slug: nil,
       application_opens_at: Time.zone.now - 1.month,
       application_closes_at: Time.zone.now + 1.month,
       amendment_closes_at: Time.zone.now + 2.months,
-      ticket_distribution_starts_at: Time.zone.now + 1.week,
-      github_repo: "ruby-no-kai/rubykaigi.org:data/year_4096/sponsors.yml",
-      hidden: false
+      ticket_distribution_starts_at: Time.zone.now - 1.day,
+      github_repo: nil,
+      hidden: false,
     }
   ]
 
