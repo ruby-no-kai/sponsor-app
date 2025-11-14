@@ -121,10 +121,9 @@ ApplicationRecord.transaction do
       sponsorship = Sponsorship.new(sponsorship_params)
 
       # Asset Files
-      asset_file = sponsorship.build_asset_file(
-        prefix: "sponsorships/",
+      sponsorship.build_asset_file(
+        prefix: "c-#{conference.id}/",
         extension: "zip",
-        handle: SecureRandom.urlsafe_base64(32)
       )
 
       # Contacts (:primary)
