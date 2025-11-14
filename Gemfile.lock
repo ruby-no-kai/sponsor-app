@@ -243,6 +243,7 @@ GEM
     omniauth-oauth2 (1.8.0)
       oauth2 (>= 1.4, < 3)
       omniauth (~> 2.0)
+    openssl (3.3.2)
     pg (1.6.2)
     pp (0.6.3)
       prettyprint
@@ -415,6 +416,7 @@ DEPENDENCIES
   octokit
   omniauth
   omniauth-github
+  openssl
   pg (>= 0.18, < 2.0)
   premailer-rails
   puma
