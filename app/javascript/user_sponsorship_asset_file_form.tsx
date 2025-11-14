@@ -1,7 +1,26 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import SponsorshipAssetFileForm from "./SponsorshipAssetFileForm";
+import SponsorshipAssetFileForm, {
+  SponsorshipAssetFileFormAPI,
+} from "./SponsorshipAssetFileForm";
+
+declare global {
+  interface Window {
+    rksSponsorshipAssetFileForms: React.RefObject<SponsorshipAssetFileFormAPI>[];
+    rksTriggerAllUploads: () => Promise<(string | null)[]>;
+  }
+}
+
+window.rksSponsorshipAssetFileForms = [];
+
+window.rksTriggerAllUploads = async () => {
+  return Promise.all(
+    window.rksSponsorshipAssetFileForms.map((ref) =>
+      ref.current?.ensureUpload(),
+    ),
+  );
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".sponsorships_form").forEach((formElem) => {
@@ -26,15 +45,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const sessionEndpointMethod = elem.dataset.sessionEndpointMethod;
       if (!sessionEndpoint || !sessionEndpointMethod) return;
 
-      const component = ReactDOM.render(
+      const componentRef = React.createRef<SponsorshipAssetFileFormAPI>();
+      ReactDOM.render(
         <SponsorshipAssetFileForm
+          ref={componentRef}
           needUpload={doCopy ? false : !existingFileId}
           existingFileId={existingFileId}
           sessionEndpoint={sessionEndpoint}
           sessionEndpointMethod={sessionEndpointMethod}
         />,
         dest,
-      ) as unknown as SponsorshipAssetFileForm;
+      );
+      if (componentRef.current) {
+        console.log("Mounted SponsorshipAssetFileForm", componentRef.current);
+        window.rksSponsorshipAssetFileForms.push(componentRef);
+      }
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
         form
@@ -42,7 +67,10 @@ document.addEventListener("DOMContentLoaded", () => {
           .forEach((el) => ((el as HTMLInputElement).disabled = true));
         try {
           errorElem.classList.add("d-none");
-          const fileId = await component.startUpload();
+          if (!componentRef.current) {
+            throw new Error("SponsorshipAssetFileForm ref is not available");
+          }
+          const fileId = await componentRef.current.ensureUpload();
           if (fileId !== null) {
             fileIdElem.value = fileId;
             form.submit();

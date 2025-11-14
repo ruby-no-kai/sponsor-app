@@ -1,5 +1,6 @@
 import S3 from "aws-sdk/clients/s3";
 import * as React from "react";
+import { useState, useRef, useImperativeHandle, forwardRef } from "react";
 
 import SponsorshipAssetFileUploader from "./SponsorshipAssetFileUploader";
 
@@ -9,6 +10,13 @@ interface UploadState {
   error?: string | null;
 }
 
+export interface SponsorshipAssetFileFormAPI {
+  startUpload: () => Promise<string | null>;
+  ensureUpload: () => Promise<string | null>;
+  needUpload: () => boolean;
+  uploadRequired: () => boolean;
+}
+
 interface Props {
   existingFileId: string | null;
   needUpload: boolean;
@@ -16,93 +24,111 @@ interface Props {
   sessionEndpointMethod: string;
 }
 
-interface State {
-  needUpload: boolean;
-  uploadState?: UploadState;
-  file: File | null;
-  filename: string | null;
-}
+const SponsorshipAssetFileForm = forwardRef<
+  SponsorshipAssetFileFormAPI,
+  Props
+>((props, ref) => {
+  const [needUpload, setNeedUpload] = useState(props.needUpload);
+  const [uploadState, setUploadState] = useState<UploadState | undefined>(
+    undefined,
+  );
+  const [file, setFile] = useState<File | null>(null);
+  const [filename, setFilename] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const uploadPromiseRef = useRef<Promise<string | null> | null>(null);
+  const cachedResultRef = useRef<string | null | undefined>(undefined);
 
-export default class SponsorshipAssetFileForm extends React.Component<
-  Props,
-  State
-> {
-  private formRef: React.RefObject<HTMLFormElement>;
+  const needUploadFn = () => needUpload;
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      needUpload: this.props.needUpload,
-      uploadState: undefined,
-      file: null,
-      filename: null,
-    };
-    this.formRef = React.createRef();
-  }
+  const uploadRequiredFn = () => props.needUpload;
 
-  public render() {
-    if (this.needUpload()) {
-      return (
-        <form action="#" ref={this.formRef}>
-          <input
-            type="file"
-            onChange={this.onFileSelection.bind(this)}
-            required={this.uploadRequired()}
-            accept="image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"
-          />
-        </form>
-      );
-    } else {
-      return (
-        <button
-          className="btn btn-info"
-          onClick={this.onReuploadClick.bind(this)}
-        >
-          Re-upload
-        </button>
-      );
+  const startUpload = async (): Promise<string | null> => {
+    if (!needUploadFn() && !uploadRequiredFn())
+      return props.existingFileId || "";
+    const form = formRef.current;
+    if (!(form && form.reportValidity())) {
+      console.log("Form is invalid, cannot start upload");
+      return null;
     }
-  }
-
-  private onReuploadClick(e: React.MouseEvent<HTMLButtonElement>) {
-    this.setState({
-      needUpload: true,
-    });
-  }
-
-  private onFileSelection(e: React.ChangeEvent<HTMLInputElement>) {
-    if (!(e.target.files && e.target.files[0])) return;
-    this.setState({
-      file: e.target.files[0],
-      filename: e.target.files[0].name,
-    });
-  }
-
-  public needUpload() {
-    return this.state.needUpload;
-  }
-
-  public uploadRequired() {
-    return this.props.needUpload;
-  }
-
-  public async startUpload(): Promise<string | null> {
-    if (!this.needUpload() && !this.uploadRequired())
-      return this.props.existingFileId || "";
-    const form = this.formRef.current;
-    if (!(form && form.reportValidity())) return null;
-    if (!this.state.file) return null;
+    if (!file) {
+      console.log("No file selected, cannot start upload");
+      return null;
+    }
 
     const uploader = new SponsorshipAssetFileUploader({
-      file: this.state.file,
-      sessionEndpoint: this.props.sessionEndpoint,
-      sessionEndpointMethod: this.props.sessionEndpointMethod,
+      file,
+      sessionEndpoint: props.sessionEndpoint,
+      sessionEndpointMethod: props.sessionEndpointMethod,
     });
-    this.setState({
-      uploadState: { uploader: uploader },
-    });
+    setUploadState({ uploader });
 
     await uploader.perform();
     return uploader.fileId || null;
+  };
+
+  const ensureUpload = async (): Promise<string | null> => {
+    if (cachedResultRef.current !== undefined) {
+      return cachedResultRef.current;
+    }
+
+    if (uploadPromiseRef.current) {
+      return uploadPromiseRef.current;
+    }
+
+    const promise = startUpload();
+    uploadPromiseRef.current = promise;
+
+    try {
+      const result = await promise;
+      cachedResultRef.current = result;
+      return result;
+    } finally {
+      uploadPromiseRef.current = null;
+    }
+  };
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      startUpload,
+      ensureUpload,
+      needUpload: needUploadFn,
+      uploadRequired: uploadRequiredFn,
+    }),
+    [file, needUpload, props.existingFileId],
+  );
+
+  const onReuploadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setNeedUpload(true);
+  };
+
+  const onFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!(e.target.files && e.target.files[0])) return;
+    console.log("Selected file:", e.target.files[0]);
+    setFile(e.target.files[0]);
+    setFilename(e.target.files[0].name);
+  };
+
+  if (needUploadFn()) {
+    return (
+      <form action="#" ref={formRef}>
+        <input
+          type="file"
+          onChange={onFileSelection}
+          required={uploadRequiredFn()}
+          accept="image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"
+        />
+      </form>
+    );
+  } else {
+    return (
+      <button className="btn btn-info" onClick={onReuploadClick}>
+        Re-upload
+      </button>
+    );
   }
-}
+});
+
+SponsorshipAssetFileForm.displayName = "SponsorshipAssetFileForm";
+
+export default SponsorshipAssetFileForm;
