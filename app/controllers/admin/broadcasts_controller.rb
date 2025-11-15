@@ -1,6 +1,6 @@
 class Admin::BroadcastsController < Admin::ApplicationController
   before_action :set_conference
-  before_action :set_broadcast, only: %i(show edit update destroy dispatch_delivery)
+  before_action :set_broadcast, only: %i(show edit update dispatch_delivery)
 
   def index
     @broadcasts = @conference.broadcasts.order(id: :desc)

@@ -1,6 +1,6 @@
 class Admin::AnnouncementsController < Admin::ApplicationController
   before_action :set_conference
-  before_action :set_announcement, only: %i(show edit update destroy)
+  before_action :set_announcement, only: %i(show edit update)
 
   def index
     @announcements = @conference.announcements

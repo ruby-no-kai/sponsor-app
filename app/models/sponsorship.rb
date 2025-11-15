@@ -166,7 +166,7 @@ class Sponsorship < ApplicationRecord
   end
 
   def assume_organization
-    self.organization = Organization.create_with(name: self.name).find_or_initialize_by(domain: self.contact&.email&.split(?@, 2).last)
+    self.organization = Organization.create_with(name: self.name).find_or_initialize_by(domain: self.contact&.email&.split(?@, 2)&.last&.downcase)
   end
 
   def to_h_for_history

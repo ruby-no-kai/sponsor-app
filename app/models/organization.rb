@@ -6,4 +6,8 @@ class Organization < ApplicationRecord
   def slug
     domain
   end
+
+  def to_param
+    domain
+  end
 end
