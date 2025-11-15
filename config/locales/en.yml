@@ -89,8 +89,10 @@ en:
         header: 'Filling the same information with your sponsorship application in past?'
         explanation: 'Select an existing application from below, then the existing data will be filled in.'
       contact: 'Point of Contact'
+      email_help: "We recommend using a mailing list (group address) as a primary, and specify an individual email address to CC. It will help referencing past informations in future conferences."
       email_cc_help: "Enter alternate email addresses (comma separated). Announcements will be CC'd to these addresses. Note that these CC addresses cannot be used for logging into sponsor portal."
       billing: 'Billing Information'
+      billing_help: 'Please provide billing information for invoicing. If you have any special requests, use the additional note field below. Note that we will issue invoices in PDF format via email; No hardcopy will be sent.'
       specify_alternate_billing_contact: 'Specify an alternate contact for billing'
       billing_request_help: 'Use this field especially if you have: requirement of contract or submitting form, explicit due date for a bill...'
       plan: 'Sponsorship Package'
