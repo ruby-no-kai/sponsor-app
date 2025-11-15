@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_15_223529) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_15_231613) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -311,6 +311,17 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_15_223529) do
     t.datetime "updated_at", null: false
     t.index ["kind", "sponsorship_id"], name: "kind_sponsorship", unique: true
     t.index ["sponsorship_id"], name: "index_tito_discount_codes_on_sponsorship_id"
+  end
+
+  create_table "tito_sources", force: :cascade do |t|
+    t.bigint "conference_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "sponsorship_id"
+    t.string "tito_source_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conference_id"], name: "index_tito_sources_on_conference_id"
+    t.index ["sponsorship_id"], name: "index_tito_sources_on_sponsorship_id", unique: true
+    t.index ["tito_source_id"], name: "index_tito_sources_on_tito_source_id", unique: true
   end
 
   add_foreign_key "announcements", "conferences"

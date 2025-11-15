@@ -18,6 +18,8 @@ class Sponsorship < ApplicationRecord
 
   has_one :asset_file, class_name: 'SponsorshipAssetFile', dependent: :destroy
 
+  has_one :tito_source
+
   def asset_file_id; self.asset_file&.id; end
   def asset_file_id=(other)
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)

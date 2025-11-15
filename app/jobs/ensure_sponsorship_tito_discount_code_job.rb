@@ -39,6 +39,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
       block_registrations_if_not_applicable: @kind != 'attendee',
       quantity: quantity,
       release_ids: quantity > 0 ? release_ids : nil,
+      source_id: tito_source.tito_source_id,
       description_for_organizer: "sponsorship=#{@sponsorship.id}, domain=#{@sponsorship.organization&.domain}, plan=#{@sponsorship.plan&.name}",
     }
     if @kind == 'booth_paid'
@@ -72,6 +73,22 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
       'booth_staff' => %w(exhibitor),
       'booth_paid' => %w(exhibitor-paid),
     }.fetch(@kind)
+  end
+
+  def tito_source
+    @tito_source ||= @sponsorship.tito_source || begin
+      source = tito.create_source(
+        @conference.tito_slug,
+        code: "ss_#{@sponsorship.id}",
+        name: "Sponsor: #{@sponsorship.name} (#{@sponsorship.id})",
+        description: "Sponsor: #{@sponsorship.organization}, Conference: #{@conference.name} (#{@conference.id})",
+      ).fetch(:source).fetch(:id)
+      TitoSource.create!(
+        conference: @conference,
+        sponsorship: @sponsorship,
+        tito_source_id: source.to_s,
+      )
+    end
   end
 
   def release_ids

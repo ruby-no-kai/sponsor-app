@@ -39,6 +39,10 @@ class TitoApi
     patch("#{account_event_slug}/tickets/#{escape(ticket_slug)}", ticket: kwargs).body
   end
 
+  def create_source(slug, name:, code:, description: '', **kwargs)
+    post("#{slug}/sources", source: kwargs.merge(name:, code:, description:)).body
+  end
+
   def default_headers
     {
       'Authorization' => "Token token=#{token}",
