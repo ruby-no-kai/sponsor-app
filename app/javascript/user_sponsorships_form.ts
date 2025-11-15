@@ -127,6 +127,77 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
+    formElem
+      .querySelectorAll<HTMLSelectElement>(
+        'select[name="sponsorship[fallback_option]"]',
+      )
+      .forEach((fallbackOptionSelect) => {
+        const updateFallbackOptions = () => {
+          const selectedPlanElem = formElem.querySelector<HTMLInputElement>(
+            ".sponsorships_form_plans input[type=radio]:checked",
+          );
+          const boothCheckbox = formElem.querySelector<HTMLInputElement>(
+            ".sponsorships_form_booth_request input[type=checkbox]",
+          );
+
+          const boothRequested = boothCheckbox?.checked || false;
+          const selectedPlanName = selectedPlanElem?.dataset.planName;
+
+          Array.from(fallbackOptionSelect.options).forEach((option) => {
+            if (option.value === "") {
+              // Always show blank option
+              option.hidden = false;
+              return;
+            }
+
+            const boothRequestRequired = option.dataset.boothRequest === "true";
+            const allowedPlansStr = option.dataset.plans;
+
+            let shouldShow = true;
+
+            // Check booth request condition
+            if (boothRequestRequired && !boothRequested) {
+              shouldShow = false;
+            }
+
+            // Check plans condition
+            if (allowedPlansStr) {
+              const allowedPlans = allowedPlansStr.split(",");
+              if (
+                selectedPlanName &&
+                !allowedPlans.includes(selectedPlanName)
+              ) {
+                shouldShow = false;
+              }
+            }
+
+            option.hidden = !shouldShow;
+            if (!shouldShow && option.selected) {
+              // If current selection is hidden, reset to blank
+              fallbackOptionSelect.value = "";
+            }
+          });
+        };
+
+        updateFallbackOptions();
+
+        formElem
+          .querySelectorAll<HTMLInputElement>(
+            ".sponsorships_form_plans input[type=radio]",
+          )
+          .forEach((planRadio) => {
+            planRadio.addEventListener("change", updateFallbackOptions);
+          });
+
+        formElem
+          .querySelectorAll<HTMLInputElement>(
+            ".sponsorships_form_booth_request input[type=checkbox]",
+          )
+          .forEach((boothCheckbox) => {
+            boothCheckbox.addEventListener("change", updateFallbackOptions);
+          });
+      });
+
     const ENGLISH_REGEX =
       /^(?:[\p{Script=Latin}\p{Script=Zyyy}\p{Sc}\p{Sk}\p{Sm}\p{So}])*$/u;
     formElem.querySelectorAll(".sponsorships_form_info").forEach((elem) => {

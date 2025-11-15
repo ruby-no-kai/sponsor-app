@@ -1,10 +1,16 @@
 class FormDescription < ApplicationRecord
-  FallbackOption = Data.define(:value, :name) do
+  FallbackOption = Data.define(:value, :name, :booth_request, :plans) do
     def valid?
       value.present? && name.present?
     end
 
-    def as_json = to_h
+    def as_json = to_h.compact
+
+    def to_dataset
+      dataset = to_h.except(:value, :name).compact
+      dataset[:plans] = dataset[:plans].join(',') if dataset[:plans].is_a?(Array)
+      dataset
+    end
   end
 
   belongs_to :conference
@@ -29,7 +35,7 @@ class FormDescription < ApplicationRecord
         begin
           JSON.parse(value)
         rescue JSON::ParserError
-          @fallback_options_json_error = true
+          @fallback_options_error = true
           return value
         end
       end
@@ -55,13 +61,18 @@ class FormDescription < ApplicationRecord
 
   private def build_fallback_options(raw_array)
     if raw_array.is_a?(Hash)
-      return raw_array.map { |value, name|  FallbackOption.new(value:, name:) }
+      return raw_array.map { |value, name|  FallbackOption.new(value:, name:, booth_request: nil, plans: nil) }
     end
 
     return [] if raw_array.blank?
 
     raw_array.map do |opt|
-      FallbackOption.new(value: opt['value'], name: opt['name'])
+      FallbackOption.new(
+        value: opt['value'],
+        name: opt['name'],
+        booth_request: opt['booth_request'],
+        plans: opt['plans']
+      )
     end
   end
 

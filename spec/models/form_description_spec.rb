@@ -81,7 +81,7 @@ RSpec.describe FormDescription, type: :model do
       form.fallback_options = '{invalid json}'
 
       expect(form).not_to be_valid
-      expect(form.errors[:fallback_options]).to include('must be valid JSON')
+      expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
     end
 
     it 'handles nil as is (uses default)' do
@@ -97,7 +97,7 @@ RSpec.describe FormDescription, type: :model do
       form.fallback_options = '{"key": "value"}'
 
       expect(form).not_to be_valid
-      expect(form.errors[:fallback_options]).to include('must be an array of objects with "value" and "name" keys')
+      expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
     end
 
     it 'adds validation error for array items missing required keys' do
@@ -105,7 +105,7 @@ RSpec.describe FormDescription, type: :model do
       form.fallback_options = '[{"value": "option1"}]'
 
       expect(form).not_to be_valid
-      expect(form.errors[:fallback_options]).to include('must be an array of objects with "value" and "name" keys')
+      expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
     end
 
     it 'adds validation error for array with non-hash items' do
@@ -113,7 +113,7 @@ RSpec.describe FormDescription, type: :model do
       form.fallback_options = '["string1", "string2"]'
 
       expect(form).not_to be_valid
-      expect(form.errors[:fallback_options]).to include('must be an array of objects with "value" and "name" keys')
+      expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
     end
   end
 end

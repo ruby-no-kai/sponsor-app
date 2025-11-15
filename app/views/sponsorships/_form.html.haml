@@ -106,7 +106,7 @@
         - conference.plans.each do |plan|
           .form-check
             %label.form-check-label
-              = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', disabled: !plan.available? && plan.id != @sponsorship.plan_id, data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit), acceptance_help: plan.auto_acceptance ? t('.plan_explanation.auto_acceptance', plan: plan.name) : t('.plan_explanation.not_auto_acceptance', plan: plan.name), guests: plan.number_of_guests}
+              = form.radio_button :plan_id, plan.id, checked: plan.id == @sponsorship.plan_id, class: 'form-check-input', disabled: !plan.available? && plan.id != @sponsorship.plan_id, data: {booth: plan.booth_eligible? ? '1' : '0', words_limit_help: t('.plan_explanation.words_limit', count: plan.words_limit), acceptance_help: plan.auto_acceptance ? t('.plan_explanation.auto_acceptance', plan: plan.name) : t('.plan_explanation.not_auto_acceptance', plan: plan.name), guests: plan.number_of_guests, plan_name: plan.name}
               = plan.name
               %small<
                 #{plan.price_text}
@@ -124,7 +124,7 @@
         - if @conference.no_plan_allowed || (@sponsorship.persisted? && @sponsorship.plan_id == nil)
           .form-check
             %label.form-check-label
-              = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1', guests: 0}
+              = form.radio_button :plan_id, '', checked: @sponsorship.plan_id == nil && (@sponsorship.persisted? || @sponsorship.errors.any?), class: 'form-check-input', data: {other: '1', guests: 0, plan_name: 'Other'}
               Other
 
     = form.fields_for :customization_request do |request_form|
@@ -150,7 +150,7 @@
 
       .form-group
         = form.label :fallback_option
-        = form.select :fallback_option, options_for_select(desc.fallback_options.map {|opt| [opt.name, opt.value] }, sponsorship.fallback_option), {include_blank: t('.fallback_option_blank')}, class: 'form-control', required: true
+        = form.select :fallback_option, options_for_select(desc.fallback_options.map {|opt| [opt.name, opt.value, {data: opt.to_dataset}] }, sponsorship.fallback_option), {include_blank: t('.fallback_option_blank')}, class: 'form-control', required: true
         %small.form-text= t('.fallback_option_help')
 
   %section.py-2.sponsorships_form_info
