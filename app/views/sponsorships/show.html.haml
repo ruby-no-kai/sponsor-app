@@ -77,6 +77,11 @@
                 %strong #{t('.tickets.booth_staff_url')}:
                 %br
                 %small= link_to @sponsorship.tito_booth_staff_discount_code.url, @sponsorship.tito_booth_staff_discount_code.url
+            - if @sponsorship.tito_booth_paid_discount_code
+              %p.card-text
+                %strong #{t('.tickets.booth_paid_url')}:
+                %br
+                %small= link_to @sponsorship.tito_booth_paid_discount_code.url, @sponsorship.tito_booth_paid_discount_code.url
           %ul.card-text
             %li
               %small= t('.tickets.help.requirement')

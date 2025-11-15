@@ -25,6 +25,9 @@
     %small.form-text
       %code account_slug/event_slug
   .form-group
+    = form.label :tito_booth_paid_flat_discount_amount
+    = form.number_field :tito_booth_paid_flat_discount_amount, class: 'form-control', step: '0.01'
+  .form-group
     = form.label :application_opens_at
     = form.datetime_local_field :application_opens_at, class: 'form-control'
   .form-group

@@ -329,7 +329,7 @@ RSpec.describe Sponsorship, type: :model do
     it 'returns 3 when active and booth_assigned' do
       sponsorship = FactoryBot.create(:sponsorship, conference:, plan:, booth_assigned: true)
       sponsorship.update!(accepted_at: Time.current)
-      expect(sponsorship.total_number_of_booth_staff).to eq(3)
+      expect(sponsorship.total_number_of_booth_staff).to eq(2)
     end
 
     it 'returns 0 when not active' do

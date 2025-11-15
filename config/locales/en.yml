@@ -194,9 +194,10 @@ en:
         new: 'Edit'
         not_submitted: 'Not Submitted Yet'
       tickets:
-        title: 'Invitations'
-        attendee_url: 'Attendee invitation URL'
-        booth_staff_url: 'Booth staff invitation URL'
+        title: 'Invitation and Passes'
+        attendee_url: 'Conference invitations'
+        booth_staff_url: 'Booth passes redemption'
+        booth_paid_url: 'Purchase additional booth passes'
         help:
           requirement: 'All attendees who use a sponsor ticket must retrieve their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
           unique: 'This URL is unique and bound to you, and there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'

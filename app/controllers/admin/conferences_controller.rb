@@ -99,6 +99,7 @@ class Admin::ConferencesController < Admin::ApplicationController
       :additional_attendees_registration_open,
       :github_repo,
       :tito_slug,
+      :tito_booth_paid_flat_discount_amount,
       :hidden,
       :no_plan_allowed,
       :allow_restricted_access,

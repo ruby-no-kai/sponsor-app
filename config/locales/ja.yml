@@ -196,8 +196,9 @@ ja:
         not_submitted: '未提出'
       tickets:
         title: 'スポンサーチケット'
-        attendee_url: '招待 URL'
-        booth_staff_url: 'ブーススタッフ招待 URL'
+        attendee_url: '本編チケット'
+        booth_staff_url: 'ブースパス(無償)'
+        booth_paid_url: 'ブースパス(有償)'
         help:
           requirement: 'ブーススタッフを含む全参加者について上記 URL から各々チケットを取得する必要があります。御社内の参加者へ上記 URL を忘れずに共有してください。'
           unique: '本 URL についてはスポンサーごと固有のものとなり、スポンサーチケット利用にあたり認証や身元確認はありません。URL の取り扱いには気をつけていただくようお願い致します。'

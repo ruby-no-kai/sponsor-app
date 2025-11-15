@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_15_142638) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_15_223529) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -88,6 +88,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_15_142638) do
     t.string "reception_key", null: false
     t.string "slug"
     t.datetime "ticket_distribution_starts_at"
+    t.decimal "tito_booth_paid_flat_discount_amount", precision: 8, scale: 2, default: "0.0", null: false
     t.string "tito_slug"
     t.datetime "updated_at", null: false
     t.index ["application_opens_at"], name: "index_conferences_on_application_opens_at"

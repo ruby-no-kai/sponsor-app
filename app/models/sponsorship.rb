@@ -46,6 +46,10 @@ class Sponsorship < ApplicationRecord
     @tito_booth_staff_discount_code ||= tito_discount_codes.where(kind: 'booth_staff').first
   end
 
+  def tito_booth_paid_discount_code
+    @tito_booth_paid_discount_code ||= tito_discount_codes.where(kind: 'booth_paid').first
+  end
+
   scope :active, -> { accepted.not_withdrawn }
   scope :pending, -> { not_accepted.not_withdrawn }
 
@@ -215,7 +219,7 @@ class Sponsorship < ApplicationRecord
   
   def total_number_of_booth_staff
     #(active? && booth_assigned?) ? [3, booth_size ? booth_size*2 : 0].max : 0 # FIXME:
-    (active? && booth_assigned?) ? 3 : 0 # FIXME:
+    (active? && booth_assigned?) ? 2 : 0 # FIXME:
   end
 
   def booth_size
@@ -296,8 +300,6 @@ class Sponsorship < ApplicationRecord
     end
   end
 
-  # NOTE: Ticket functionality removed; this method kept for historical data preservation.
-  # The ticket_key column is referenced by TitoDiscountCode and contains historical data.
   def generate_ticket_key
     if self.ticket_key.blank?
       begin
