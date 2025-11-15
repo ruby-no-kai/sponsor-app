@@ -3,14 +3,17 @@ import "font-awesome/css/font-awesome";
 
 // Provide jQuery globally for Bootstrap 4
 import jquery from "jquery";
+
+declare global {
+  interface Window {
+    $: typeof jquery;
+    jQuery: typeof jquery;
+  }
+}
+
 window.$ = window.jQuery = jquery;
 
-import * as Sentry from "@sentry/react";
-import { SENTRY_DSN } from "../meta";
-
-Sentry.init({
-  dsn: SENTRY_DSN,
-});
+import "../sentry";
 
 import "bootstrap";
 

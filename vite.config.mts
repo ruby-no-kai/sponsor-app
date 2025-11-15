@@ -1,22 +1,14 @@
 import { defineConfig } from "vite";
 import RubyPlugin from "vite-plugin-ruby";
 import FullReload from "vite-plugin-full-reload";
+import checker from "vite-plugin-checker";
 
 export default defineConfig({
-  plugins: [FullReload(["config/routes.rb", "app/views/**/*"]), RubyPlugin()],
-  esbuild: {
-    jsx: "transform",
-    jsxFactory: "React.createElement",
-    jsxFragment: "React.Fragment",
-  },
-  css: {
-    preprocessorOptions: {
-      sass: {
-        // Use modern compiler API with sass 1.94+
-        api: "modern-compiler",
-      },
-    },
-  },
+  plugins: [
+    checker({ typescript: true }),
+    FullReload(["config/routes.rb", "app/views/**/*"]),
+    RubyPlugin(),
+  ],
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".jsx", ".css", ".scss", ".sass"],
   },

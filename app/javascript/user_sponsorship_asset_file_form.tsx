@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 import SponsorshipAssetFileForm, {
   SponsorshipAssetFileFormAPI,
@@ -7,7 +7,7 @@ import SponsorshipAssetFileForm, {
 
 declare global {
   interface Window {
-    rksSponsorshipAssetFileForms: React.RefObject<SponsorshipAssetFileFormAPI>[];
+    rksSponsorshipAssetFileForms: React.RefObject<SponsorshipAssetFileFormAPI | null>[];
     rksTriggerAllUploads: () => Promise<(string | null)[]>;
   }
 }
@@ -73,7 +73,14 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       const componentRef = React.createRef<SponsorshipAssetFileFormAPI>();
-      ReactDOM.render(
+
+      if (!dest) {
+        console.error("Destination element not found for SponsorshipAssetFileForm");
+        return;
+      }
+
+      const root = createRoot(dest);
+      root.render(
         <SponsorshipAssetFileForm
           ref={componentRef}
           needUpload={doCopy ? false : !existingFileId}
@@ -81,13 +88,12 @@ document.addEventListener("DOMContentLoaded", () => {
           sessionEndpoint={sessionEndpoint}
           sessionEndpointMethod={sessionEndpointMethod}
           onFileChange={onFileChange}
-        />,
-        dest,
+        />
       );
-      if (componentRef.current) {
-        console.log("Mounted SponsorshipAssetFileForm", componentRef.current);
-        window.rksSponsorshipAssetFileForms.push(componentRef);
-      }
+
+      // Add ref to global array - it will be populated when component mounts
+      window.rksSponsorshipAssetFileForms.push(componentRef);
+      console.log("Registered SponsorshipAssetFileForm (ref will be available after mount)");
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
         form

@@ -12,8 +12,8 @@
     = csp_meta_tag
     = vite_stylesheet_tag 'application.css'
 
-    - if Rails.application.config.x.sentry.dsn.present?
-      %meta{name: 'rkto:sentry-dsn', content: Rails.application.config.x.sentry.dsn}
+    %meta{name: 'rk:sentry-dsn', content: Rails.configuration.x.sentry.dsn}
+    %meta{name: 'rk:release', content: Rails.configuration.x.release.release}
 
     = vite_client_tag
   %body
