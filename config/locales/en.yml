@@ -7,6 +7,7 @@ en:
         url: 'URL'
         profile: 'Introduction text'
         booth_requested: 'Booth Request'
+        fallback_option: 'Fallback Option'
         number_of_additional_attendees: 'Number of Additional Attendees'
         policy_agreement: 'I confirmed and agree with the policies'
 
@@ -24,6 +25,9 @@ en:
         organization: 'Organization Name'
         unit: 'Unit'
         name: 'Name'
+
+      form_description:
+        fallback_options: 'Fallback Options'
 
       exhibition:
         description: 'Booth Plan'
@@ -117,6 +121,9 @@ en:
       plan_closed: 'Closed'
       booth: 'Sponsor Booth'
       booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
+      fallback_option: 'Fallback Option'
+      fallback_option_blank: '-- Please select --'
+      fallback_option_help: 'Please select your preferred option.'
       information: 'Sponsor Information'
       information_help: |
         Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose. If you submit a preliminary information or prefer to submit later, let us know via [Others] field below. We'll hold the information from publication on our website.

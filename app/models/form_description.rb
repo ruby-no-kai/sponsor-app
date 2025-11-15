@@ -4,6 +4,35 @@ class FormDescription < ApplicationRecord
 
   before_save :render_markdown
 
+  def fallback_options=(value)
+    @fallback_options_json_error = false
+    case value
+    when String
+      if value.blank?
+        write_attribute(:fallback_options, {})
+      else
+        begin
+          write_attribute(:fallback_options, JSON.parse(value))
+        rescue JSON::ParserError
+          @fallback_options_json_error = true
+          write_attribute(:fallback_options, value)
+        end
+      end
+    when nil
+      write_attribute(:fallback_options, {})
+    else
+      write_attribute(:fallback_options, value)
+    end
+  end
+
+  validate :validate_fallback_options_json
+
+  def validate_fallback_options_json
+    if @fallback_options_json_error
+      errors.add(:fallback_options, 'must be valid JSON')
+    end
+  end
+
   def render_markdown
     %i(
       head

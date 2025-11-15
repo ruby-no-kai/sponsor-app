@@ -131,8 +131,6 @@ RSpec.describe Sponsorship, type: :model do
   end
 
   describe 'validations' do
-
-
     it 'requires unique organization per conference' do
       organization = FactoryBot.create(:organization)
       FactoryBot.create(:sponsorship, conference:)
@@ -391,6 +389,13 @@ RSpec.describe Sponsorship, type: :model do
       expect(hash['plan_id']).to eq(plan.id)
       expect(hash['plan_name']).to eq(plan.name)
       expect(hash['accepted_at']).to be_present
+    end
+
+    it 'includes fallback_option' do
+      sponsorship = FactoryBot.create(:sponsorship, conference:, plan:, fallback_option: 'option1')
+
+      hash = sponsorship.to_h_for_history
+      expect(hash['fallback_option']).to eq('option1')
     end
 
     it 'includes withdrawn_at when present' do

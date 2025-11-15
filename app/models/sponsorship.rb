@@ -80,6 +80,7 @@ class Sponsorship < ApplicationRecord
   validate :validate_booth_eligibility, on: :update_by_user
   validate :validate_word_count, on: :update_by_user
   validate :validate_no_plan_allowance, on: :update_by_user
+  validate :validate_fallback_option, on: :update_by_user
   validate :policy_agreement
 
 
@@ -196,6 +197,7 @@ class Sponsorship < ApplicationRecord
       "asset_file.checksum_sha256" => asset_file&.checksum_sha256,
       "asset_file.last_modified_at" => asset_file&.last_modified_at,
       "note" => note&.body,
+      "fallback_option" => fallback_option,
       "number_of_additional_attendees" => number_of_additional_attendees,
       "accepted_at" => accepted_at,
     }.tap do |h|
@@ -277,6 +279,20 @@ class Sponsorship < ApplicationRecord
   def validate_no_plan_allowance
     if !plan_id && conference && !conference.no_plan_allowed
       errors.add :plan, :no_plan_not_allowed
+    end
+  end
+
+  def validate_fallback_option
+    form_desc = conference&.form_description_for_locale
+    return unless form_desc
+
+    fallback_options = form_desc.fallback_options
+    if fallback_options.present? && fallback_options.any?
+      if fallback_option.blank?
+        errors.add :fallback_option, :blank
+      elsif !fallback_options.key?(fallback_option)
+        errors.add :fallback_option, :invalid
+      end
     end
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_15_003832) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_15_081757) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -136,6 +136,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_15_003832) do
     t.text "booth_help_html"
     t.bigint "conference_id", null: false
     t.datetime "created_at", null: false
+    t.jsonb "fallback_options", default: {}, null: false
     t.text "head"
     t.text "head_html"
     t.string "locale", null: false
@@ -248,6 +249,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_15_003832) do
     t.datetime "created_at", null: false
     t.boolean "customization", default: false, null: false
     t.string "customization_name"
+    t.string "fallback_option", default: "", null: false
     t.string "locale", null: false
     t.string "name", null: false
     t.integer "number_of_additional_attendees"

@@ -1,9 +1,9 @@
 = form_with(model: form_description, url: [@conference, form_description], local: true) do |form|
   - if form_description.errors.any?
     .alert.alert-danger
-      %p #{pluralize(conference.errors.count, "error")} prohibited this from being saved:
+      %p #{pluralize(form_description.errors.count, "error")} prohibited this from being saved:
       %ul
-        - conference.errors.full_messages.each do |message|
+        - form_description.errors.full_messages.each do |message|
           %li= message
 
   .form-group
@@ -14,6 +14,11 @@
     .form-group
       = form.label field
       = form.text_area field, class: 'form-control'
+
+  .form-group
+    = form.label :fallback_options
+    = form.text_area :fallback_options, class: 'form-control', value: JSON.pretty_generate(form_description.fallback_options), rows: 10
+    %small.form-text JSON format: {"key1": "Display Value 1", "key2": "Display Value 2"}
 
   .form-group
     = form.submit class: 'btn btn-primary'

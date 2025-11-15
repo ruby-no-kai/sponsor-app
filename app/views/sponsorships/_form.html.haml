@@ -143,6 +143,16 @@
         = form.label :booth_requested, class: 'form-check-label'
       %small.d-none.sponsorships_form_booth_request_uneligible.form-text.text-small.text-info= t('.booth_uneligible_plan_selected', plans: conference.plans.select(&:booth_eligible?).map(&:name).join(', '))
 
+  - if desc.fallback_options.present? && desc.fallback_options.any?
+    %section.py-2
+      .form-group
+        %h3= t('.fallback_option')
+
+      .form-group
+        = form.label :fallback_option
+        = form.select :fallback_option, options_for_select(desc.fallback_options.map {|k, v| [v, k] }, sponsorship.fallback_option), {include_blank: t('.fallback_option_blank')}, class: 'form-control', required: true
+        %small.form-text= t('.fallback_option_help')
+
   %section.py-2.sponsorships_form_info
     .form-group
       %h3= t('.information')

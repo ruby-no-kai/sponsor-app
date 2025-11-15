@@ -7,3 +7,10 @@
   %div
     %h4 #{field}
     = @form_description[field]&.html_safe
+
+%div
+  %h4 fallback_options
+  - if @form_description.fallback_options.present? && @form_description.fallback_options.any?
+    %pre= JSON.pretty_generate(@form_description.fallback_options)
+  - else
+    %em (not configured)
