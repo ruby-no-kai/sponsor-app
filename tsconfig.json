@@ -1,12 +1,25 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "moduleResolution": "node",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
     "sourceMap": true,
-    "strict": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "jsx": "react",
-    "typeRoots": ["./node_modules/@types", "./types"],
-    "allowSyntheticDefaultImports": true
-  },
-  "exclude": [ "node_modules", "vendor/bundle", "public" ]
+
+    /* Linting */
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "allowSyntheticDefaultImports": true,
+
+    "typeRoots": ["./node_modules/@types", "./types"]
+  }
 }

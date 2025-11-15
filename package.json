@@ -21,7 +21,7 @@
     "react-dom": "^16.6.1",
     "sass": "^1.49.9",
     "ts-loader": "^9.2.8",
-    "typescript": "^3.1.6",
+    "typescript": "^5.9.3",
     "util": "^0.12.4"
   },
   "devDependencies": {
