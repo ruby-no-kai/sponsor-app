@@ -28,6 +28,7 @@ type Props = {
 const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
   (props, ref) => {
     const [needUpload, setNeedUpload] = useState(props.needUpload);
+    const [willReplace, setWillReplace] = useState(false);
     const [uploadState, setUploadState] = useState<UploadState | undefined>(
       undefined,
     );
@@ -101,6 +102,15 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
 
     const onReuploadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       setNeedUpload(true);
+      setWillReplace(true);
+    };
+
+    const onCancelClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      setNeedUpload(false);
+      setWillReplace(false);
+      setFile(null);
+      setFilename(null);
     };
 
     const onFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,19 +122,29 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
 
     if (needUploadFn()) {
       return (
-        <form action="#" ref={formRef}>
-          <input
-            type="file"
-            onChange={onFileSelection}
-            required={uploadRequiredFn()}
-            accept="image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"
-          />
-        </form>
+        <div>
+          <form action="#" ref={formRef}>
+            <input
+              type="file"
+              onChange={onFileSelection}
+              required={uploadRequiredFn()}
+              accept="image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"
+            />
+          </form>
+          {willReplace && (
+            <button
+              className="btn btn-secondary btn-sm mt-1"
+              onClick={onCancelClick}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       );
     } else {
       return (
         <button className="btn btn-info" onClick={onReuploadClick}>
-          Re-upload
+          Replace
         </button>
       );
     }
