@@ -1,12 +1,15 @@
-FROM public.ecr.aws/docker/library/node:20-bookworm-slim as nodebuilder
+FROM public.ecr.aws/docker/library/node:24-trixie-slim as nodebuilder
 WORKDIR /app
 
-COPY package.json /app/
-COPY yarn.lock /app/
-RUN yarn install --frozen-lockfile
+COPY package.json yarn.lock /app/
+RUN yarn install --immutable
 
-COPY . /app/
-RUN yarn run build
+COPY package.json yarn.lock tsconfig.json vite.config.mts /app
+COPY config/vite.json /app/config/
+COPY app/javascript /app/app/javascript
+COPY app/stylesheets /app/app/stylesheets
+
+RUN APP_ENV=production NODE_ENV=production VITE_BUILD=1 yarn run build
 
 ###
 
@@ -35,7 +38,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,t
 WORKDIR /app
 COPY --from=builder /gems /gems
 COPY --from=builder /app/.bundle /app/.bundle
-COPY --from=nodebuilder /app/public/packs /app/public/packs
+COPY --from=nodebuilder /app/public/vite /app/public/vite
 COPY . /app/
 
 ENV PORT 3000

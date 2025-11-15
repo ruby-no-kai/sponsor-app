@@ -11,11 +11,12 @@
     = csrf_meta_tags
     = csp_meta_tag
 
-    = stylesheet_pack_tag 'vendor', media: 'all'
-    = stylesheet_pack_tag 'application', media: 'all'
-
     - if Rails.application.config.x.sentry.dsn.present?
-      %script= "window.SENTRY_DSN = '#{Rails.application.config.x.sentry.dsn}'".html_safe
+      %meta{name: 'rkto:sentry-dsn', content: Rails.application.config.x.sentry.dsn}
+
+    = vite_client_tag
+    = vite_typescript_tag 'application'
+    = vite_stylesheet_tag 'application.css'
   %body
     %nav.navbar.navbar-expand-lg.navbar-dark
       %a.navbar-brand{href: '/'}= t('.brand')
@@ -57,5 +58,3 @@
 
       %main
         = yield
-    = javascript_pack_tag 'vendor'
-    = javascript_pack_tag 'application'

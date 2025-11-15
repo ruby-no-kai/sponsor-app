@@ -2,9 +2,11 @@
 
 ## Development
 
+__`overmind start`__ or run the following commands concurrently:
+
 ```
 rails s
-yarn run watch
+bin/vite dev
 ```
 
 - http://localhost:3000/
