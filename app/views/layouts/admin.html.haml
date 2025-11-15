@@ -6,13 +6,13 @@
     %title= yield(:title) || 'sponsor-app admin'
     = csrf_meta_tags
     = csp_meta_tag
+    = vite_stylesheet_tag 'application.css'
 
     - if Rails.application.config.x.sentry.dsn.present?
       %meta{name: 'rkto:sentry-dsn', content: Rails.application.config.x.sentry.dsn}
 
     = vite_client_tag
     = vite_typescript_tag 'admin'
-    = vite_stylesheet_tag 'application.css'
   %body
     %nav.navbar.navbar-expand-lg.navbar-light.bg-light
       %a.navbar-brand{href: '/'} Sponsorships Admin
