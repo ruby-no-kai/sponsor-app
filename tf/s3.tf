@@ -70,24 +70,21 @@ resource "aws_s3_bucket_cors_configuration" "files-dev" {
     allowed_headers = ["*"]
     allowed_methods = ["DELETE", "GET", "HEAD", "POST", "PUT"]
     allowed_origins = ["http://localhost:13000"]
-    expose_headers  = ["ETag"]
-    id              = null
+    expose_headers  = ["ETag", "x-amz-version-id"]
     max_age_seconds = 0
   }
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["DELETE", "GET", "HEAD", "POST", "PUT"]
     allowed_origins = ["http://localhost:13010"]
-    expose_headers  = ["ETag"]
-    id              = null
+    expose_headers  = ["ETag", "x-amz-version-id"]
     max_age_seconds = 0
   }
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["DELETE", "GET", "HEAD", "POST", "PUT"]
     allowed_origins = ["http://localhost:3000"]
-    expose_headers  = ["ETag"]
-    id              = null
+    expose_headers  = ["ETag", "x-amz-version-id"]
     max_age_seconds = 0
   }
 }
@@ -99,8 +96,7 @@ resource "aws_s3_bucket_cors_configuration" "files-prd" {
     allowed_headers = ["*"]
     allowed_methods = ["DELETE", "GET", "HEAD", "POST", "PUT"]
     allowed_origins = ["https://sponsorships.rubykaigi.org"]
-    expose_headers  = ["ETag"]
-    id              = null
+    expose_headers  = ["ETag", "x-amz-version-id"]
     max_age_seconds = 0
   }
 }

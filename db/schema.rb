@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2021_07_20_121933) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_15_003832) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -192,12 +192,15 @@ ActiveRecord::Schema[8.1].define(version: 2021_07_20_121933) do
   end
 
   create_table "sponsorship_asset_files", force: :cascade do |t|
+    t.string "checksum_sha256", default: "", null: false
     t.datetime "created_at", null: false
     t.string "extension"
     t.string "handle", null: false
+    t.datetime "last_modified_at"
     t.string "prefix", null: false
     t.bigint "sponsorship_id"
     t.datetime "updated_at", null: false
+    t.string "version_id", default: "", null: false
     t.index ["handle"], name: "index_sponsorship_asset_files_on_handle"
     t.index ["sponsorship_id"], name: "index_sponsorship_asset_files_on_sponsorship_id"
   end

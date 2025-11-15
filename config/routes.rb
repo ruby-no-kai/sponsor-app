@@ -54,7 +54,11 @@ Rails.application.routes.draw do
       resource :sponsorship, only: %i(new create show edit update) do
         resource :exhibition, only: %i(new create edit update)
       end
-      resource :sponsorship_asset_file, only: %i(create update show)
+      resources :sponsorship_asset_files, only: %i(create update show) do
+        member do
+          post :initiate_update
+        end
+      end
     end
 
 

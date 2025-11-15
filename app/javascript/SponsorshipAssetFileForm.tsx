@@ -18,12 +18,12 @@ export interface SponsorshipAssetFileFormAPI {
   uploadRequired: () => boolean;
 }
 
-interface Props {
+type Props = {
   existingFileId: string | null;
   needUpload: boolean;
   sessionEndpoint: string;
   sessionEndpointMethod: string;
-}
+};
 
 const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
   (props, ref) => {

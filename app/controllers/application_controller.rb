@@ -36,6 +36,12 @@ class ApplicationController < ActionController::Base
       .first
   end
 
+  helper_method def current_conference
+    return @current_conference if defined? @current_conference
+    return nil unless params[:conference_slug]
+    @current_conference = current_sponsorship&.conference || Conference.find_by(slug: params[:conference_slug])
+  end
+
   helper_method def current_available_sponsorships
     return @current_available_sponsorships if defined? @current_available_sponsorships
     return nil unless session[:sponsorship_ids]

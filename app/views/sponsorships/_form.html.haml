@@ -166,13 +166,13 @@
 
       %p= t('.logo_help')
 
-    .form-group.sponsorships_form_asset_file{data: {session_endpoint: user_conference_sponsorship_asset_file_path, session_endpoint_method: sponsorship.asset_file&.persisted? ? 'PUT' : 'POST'}}
+    .form-group.sponsorships_form_asset_file{data: {session_endpoint: sponsorship.asset_file&.persisted? ? initiate_update_user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file) : user_conference_sponsorship_asset_files_path, session_endpoint_method: 'POST'}}
       = form.hidden_field :asset_file_id
       = form.hidden_field :asset_file_id_to_copy unless sponsorship.persisted?
       .sponsorships_form_asset_file_form (Loading)
 
     - if sponsorship.persisted? && sponsorship.asset_file
-      %small.form-text= link_to t('.download_logo'), user_conference_sponsorship_asset_file_path
+      %small.form-text= link_to t('.download_logo'), user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file)
 
   - if conference.additional_attendees_registration_open
     %section.py-2.sponsorships_form_tickets

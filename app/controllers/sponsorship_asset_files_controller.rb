@@ -1,26 +1,55 @@
 class SponsorshipAssetFilesController < ApplicationController
+  before_action :set_conference
+  before_action :set_asset_file, only: [:show, :update, :initiate_update]
+
   def show
-    asset = current_sponsorship&.asset_file
-    raise ActiveRecord::RecordNotFound unless asset
-    redirect_to asset.download_url()
+    redirect_to @asset_file.download_url(), allow_other_host: true
   end
 
   def create
     return render(status: 403, json: {error: 403}) if current_sponsorship&.asset_file
-    conference = current_sponsorship ? current_sponsorship.conference : Conference.find_by!(slug: params[:conference_slug])
-    return render(status: 403, json: {error: 403}) if !conference&.amendment_open? && !current_staff
-
-    extension = params[:extension]&.then { _1.downcase.gsub(/[^a-z0-9]/,'') } || 'unknown'
-    asset_file = SponsorshipAssetFile.create!(prefix: "c-#{conference.id}/", extension:)
-    (session[:asset_file_ids] ||= []) << asset_file.id
-    render json: asset_file.make_session
+    return render(status: 403, json: {error: 403}) if !@conference&.amendment_open? && !current_staff
+    @asset_file = SponsorshipAssetFile.create!(prefix: "c-#{@conference.id}/")
+    (session[:asset_file_ids] ||= []) << @asset_file.id
+    render json: make_session
   end
 
   def update
-    return render(status: 401, json: {error: 401}) unless current_sponsorship
-    return render(status: 404, json: {error: 404}) unless current_sponsorship.asset_file
-    asset_file = current_sponsorship.asset_file
-    asset_file.update!(extension: params[:extension])
-    render json: current_sponsorship.asset_file.make_session
+    @asset_file.assign_attributes(params.permit(:version_id))
+    @asset_file.extension = params[:extension]&.then { _1.downcase.gsub(/[^a-z0-9]/,'') } || 'unknown'
+
+    @asset_file.update_object_header()
+
+    if @asset_file.save
+      render json: {ok: true}
+    else
+      render status: 422, json: {ok: false, messages: @asset_file.errors.full_messages}
+    end
+  end
+
+  def initiate_update
+    return render(status: 403, json: {error: 403}) if !@conference&.amendment_open? && !current_staff
+    render json: make_session
+  end
+
+  private def set_conference
+    @conference = current_conference
+  end
+
+  private def set_asset_file
+    @asset_file = SponsorshipAssetFile
+      .where(id: params[:id])
+      .merge(
+        SponsorshipAssetFile
+          .where(sponsorship_id: nil, id: session[:asset_file_ids] || [])
+          .or(SponsorshipAssetFile.where(sponsorship_id: [current_sponsorship&.id].compact))
+      )
+      .first!
+  end
+
+  private def make_session
+    @asset_file.make_session.merge(
+      report_to: user_conference_sponsorship_asset_file_path(@conference, @asset_file)
+    )
   end
 end

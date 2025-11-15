@@ -8,7 +8,7 @@ import SponsorshipAssetFileForm, {
 declare global {
   interface Window {
     rksSponsorshipAssetFileForms: React.RefObject<SponsorshipAssetFileFormAPI>[];
-    rksTriggerAllUploads: () => Promise<(string | null | undefined)[]>;
+    rksTriggerAllUploads: () => Promise<(string | null)[]>;
   }
 }
 
@@ -16,8 +16,8 @@ window.rksSponsorshipAssetFileForms = [];
 
 window.rksTriggerAllUploads = async () => {
   return Promise.all(
-    window.rksSponsorshipAssetFileForms.map((ref) =>
-      ref.current?.ensureUpload(),
+    window.rksSponsorshipAssetFileForms.map(
+      (ref) => ref.current?.ensureUpload() ?? Promise.resolve(null),
     ),
   );
 };
