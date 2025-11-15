@@ -125,7 +125,7 @@ en:
       logo_help: |
         Upload your company logo file for the sponsors page in our website, and the venue onsite. Please make sure your file is in vector format (like .ai, .eps, .svg).
       logo_zip_help: |
-         If you have multiple files, archive all files in .zip file; This is useful in case you want us to follow a guideline, or use a separate file such as different color mode (RGB/CMYK) for website and printing purpose.
+         If you have multiple files, archive all files in .zip file; This is useful in case you want us to follow a guideline, or use a separate file such as different color mode (RGB/CMYK) for website and printing purpose. If you submit a single file, please choose a one in RGB color mode.
       others_help: |
         Use the following field for anything you want let us know in advance.
       note: 'Others'
