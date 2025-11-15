@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_15_231613) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_15_233620) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -299,6 +299,15 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_15_231613) do
     t.index ["conference_id"], name: "index_tickets_on_conference_id"
     t.index ["sponsorship_id", "kind", "checked_in_at"], name: "index_tickets_on_sponsorship_id_and_kind_and_checked_in_at"
     t.index ["sponsorship_id"], name: "index_tickets_on_sponsorship_id"
+  end
+
+  create_table "tito_cached_releases", force: :cascade do |t|
+    t.bigint "conference_id", null: false
+    t.datetime "created_at", null: false
+    t.string "tito_release_id", null: false
+    t.string "tito_release_slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conference_id", "tito_release_slug"], name: "idx_on_conference_id_tito_release_slug_d52024ab34", unique: true
   end
 
   create_table "tito_discount_codes", force: :cascade do |t|

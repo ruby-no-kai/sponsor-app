@@ -81,7 +81,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
         @conference.tito_slug,
         code: "ss_#{@sponsorship.id}",
         name: "Sponsor: #{@sponsorship.name} (#{@sponsorship.id})",
-        description: "Sponsor: #{@sponsorship.organization}, Conference: #{@conference.name} (#{@conference.id})",
+        description: "Sponsor: #{@sponsorship.organization.name}, Conference: #{@conference.name} (#{@conference.id})",
       ).fetch(:source).fetch(:id)
       TitoSource.create!(
         conference: @conference,
@@ -92,8 +92,17 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
   end
 
   def release_ids
-    @release_ids ||= release_slugs.map do |slug|
-      tito.get_release(@conference.tito_slug, slug).fetch(:release).fetch(:id)
+    @release_ids ||= TitoCachedRelease.transaction do
+      release_slugs.map do |slug|
+        TitoCachedRelease.where(conference: @conference, tito_release_slug: slug).first&.tito_release_id or begin
+          id = tito.get_release(@conference.tito_slug, slug).fetch(:release).fetch(:id)
+          TitoCachedRelease.create!(
+            conference: @conference,
+            tito_release_slug: slug,
+            tito_release_id: id.to_s,
+          ).tito_release_id
+          end
+      end
     end
   end
 
