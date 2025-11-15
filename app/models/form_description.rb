@@ -1,35 +1,73 @@
 class FormDescription < ApplicationRecord
-  belongs_to :conference
-  validates :conference, presence: true
-
-  before_save :render_markdown
-
-  def fallback_options=(value)
-    @fallback_options_json_error = false
-    case value
-    when String
-      if value.blank?
-        write_attribute(:fallback_options, {})
-      else
-        begin
-          write_attribute(:fallback_options, JSON.parse(value))
-        rescue JSON::ParserError
-          @fallback_options_json_error = true
-          write_attribute(:fallback_options, value)
-        end
-      end
-    when nil
-      write_attribute(:fallback_options, {})
-    else
-      write_attribute(:fallback_options, value)
+  FallbackOption = Data.define(:value, :name) do
+    def valid?
+      value.present? && name.present?
     end
+
+    def as_json = to_h
   end
+
+  belongs_to :conference
 
   validate :validate_fallback_options_json
 
-  def validate_fallback_options_json
-    if @fallback_options_json_error
-      errors.add(:fallback_options, 'must be valid JSON')
+  before_save :render_markdown
+
+  def fallback_options
+    build_fallback_options(read_attribute(:fallback_options))
+  end
+
+  def fallback_options=(value)
+    @fallback_options_error = false
+
+    # Parse input into array
+    parsed_value = case value
+    when String
+      if value.blank?
+        []
+      else
+        begin
+          JSON.parse(value)
+        rescue JSON::ParserError
+          @fallback_options_json_error = true
+          return value
+        end
+      end
+    when nil
+      []
+    else
+      value
+    end
+
+    unless parsed_value.is_a?(Array)
+      @fallback_options_error = true
+      return value
+    end
+
+    options = build_fallback_options(parsed_value)
+    unless options.all?(&:valid?)
+      @fallback_options_error = true
+      return value
+    end
+
+    write_attribute(:fallback_options, parsed_value)
+  end
+
+  private def build_fallback_options(raw_array)
+    if raw_array.is_a?(Hash)
+      return raw_array.map { |value, name|  FallbackOption.new(value:, name:) }
+    end
+
+    return [] if raw_array.blank?
+
+    raw_array.map do |opt|
+      FallbackOption.new(value: opt['value'], name: opt['name'])
+    end
+  end
+
+  private def validate_fallback_options_json
+    if @fallback_options_error
+      errors.add(:fallback_options, 'must be valid JSON struct')
     end
   end
 

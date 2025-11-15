@@ -150,7 +150,7 @@
 
       .form-group
         = form.label :fallback_option
-        = form.select :fallback_option, options_for_select(desc.fallback_options.map {|k, v| [v, k] }, sponsorship.fallback_option), {include_blank: t('.fallback_option_blank')}, class: 'form-control', required: true
+        = form.select :fallback_option, options_for_select(desc.fallback_options.map {|opt| [opt.name, opt.value] }, sponsorship.fallback_option), {include_blank: t('.fallback_option_blank')}, class: 'form-control', required: true
         %small.form-text= t('.fallback_option_help')
 
   %section.py-2.sponsorships_form_info

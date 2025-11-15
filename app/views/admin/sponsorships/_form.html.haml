@@ -135,7 +135,7 @@
     - if form_desc&.fallback_options&.any?
       .form-group
         = form.label :fallback_option
-        = form.select :fallback_option, options_for_select(form_desc.fallback_options.map {|k, v| [v, k] }, sponsorship.fallback_option), {include_blank: '(none)'}, class: 'form-control'
+        = form.select :fallback_option, options_for_select(form_desc.fallback_options.map {|opt| [opt.name, opt.value] }, sponsorship.fallback_option), {include_blank: '(none)'}, class: 'form-control'
 
   %section.py-2
     .form-group

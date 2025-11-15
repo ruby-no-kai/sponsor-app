@@ -40,34 +40,40 @@ RSpec.describe FormDescription, type: :model do
   describe '#fallback_options=' do
     it 'accepts JSON string and parses it' do
       form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '{"option1": "First Option", "option2": "Second Option"}'
+      form.fallback_options = '[{"value": "option1", "name": "First Option"}, {"value": "option2", "name": "Second Option"}]'
       form.save!
 
-      expect(form.fallback_options).to eq({'option1' => 'First Option', 'option2' => 'Second Option'})
+      expect(form.fallback_options).to all(be_a(FormDescription::FallbackOption))
+      expect(form.fallback_options[0].value).to eq('option1')
+      expect(form.fallback_options[0].name).to eq('First Option')
+      expect(form.fallback_options[1].value).to eq('option2')
+      expect(form.fallback_options[1].name).to eq('Second Option')
     end
 
-    it 'accepts hash directly' do
+    it 'accepts array directly' do
       form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = {'option1' => 'First Option', 'option2' => 'Second Option'}
+      form.fallback_options = [{'value' => 'option1', 'name' => 'First Option'}, {'value' => 'option2', 'name' => 'Second Option'}]
       form.save!
 
-      expect(form.fallback_options).to eq({'option1' => 'First Option', 'option2' => 'Second Option'})
+      expect(form.fallback_options).to all(be_a(FormDescription::FallbackOption))
+      expect(form.fallback_options[0].value).to eq('option1')
+      expect(form.fallback_options[0].name).to eq('First Option')
     end
 
-    it 'handles blank string as empty hash' do
+    it 'handles blank string as empty array' do
       form = FactoryBot.build(:form_description, conference:, locale: 'en')
       form.fallback_options = ''
       form.save!
 
-      expect(form.fallback_options).to eq({})
+      expect(form.fallback_options).to eq([])
     end
 
-    it 'handles empty string as empty hash' do
+    it 'handles empty string as empty array' do
       form = FactoryBot.build(:form_description, conference:, locale: 'en')
       form.fallback_options = '   '
       form.save!
 
-      expect(form.fallback_options).to eq({})
+      expect(form.fallback_options).to eq([])
     end
 
     it 'adds validation error for invalid JSON' do
@@ -83,7 +89,31 @@ RSpec.describe FormDescription, type: :model do
       form.fallback_options = nil
       form.save!
 
-      expect(form.fallback_options).to eq({})
+      expect(form.fallback_options).to eq([])
+    end
+
+    it 'adds validation error for non-array JSON' do
+      form = FactoryBot.build(:form_description, conference:, locale: 'en')
+      form.fallback_options = '{"key": "value"}'
+
+      expect(form).not_to be_valid
+      expect(form.errors[:fallback_options]).to include('must be an array of objects with "value" and "name" keys')
+    end
+
+    it 'adds validation error for array items missing required keys' do
+      form = FactoryBot.build(:form_description, conference:, locale: 'en')
+      form.fallback_options = '[{"value": "option1"}]'
+
+      expect(form).not_to be_valid
+      expect(form.errors[:fallback_options]).to include('must be an array of objects with "value" and "name" keys')
+    end
+
+    it 'adds validation error for array with non-hash items' do
+      form = FactoryBot.build(:form_description, conference:, locale: 'en')
+      form.fallback_options = '["string1", "string2"]'
+
+      expect(form).not_to be_valid
+      expect(form.errors[:fallback_options]).to include('must be an array of objects with "value" and "name" keys')
     end
   end
 end

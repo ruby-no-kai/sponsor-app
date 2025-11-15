@@ -17,8 +17,8 @@
 
   .form-group
     = form.label :fallback_options
-    = form.text_area :fallback_options, class: 'form-control', value: JSON.pretty_generate(form_description.fallback_options), rows: 10
-    %small.form-text JSON format: {"key1": "Display Value 1", "key2": "Display Value 2"}
+    = form.text_area :fallback_options, class: 'form-control', value: JSON.pretty_generate(form_description.fallback_options.map(&:as_json)), rows: 10
+    %small.form-text JSON format: [{"value": "key1", "name": "Display Value 1"}, {"value": "key2", "name": "Display Value 2"}]
 
   .form-group
     = form.submit class: 'btn btn-primary'

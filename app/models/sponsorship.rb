@@ -290,7 +290,7 @@ class Sponsorship < ApplicationRecord
     if fallback_options.present? && fallback_options.any?
       if fallback_option.blank?
         errors.add :fallback_option, :blank
-      elsif !fallback_options.key?(fallback_option)
+      elsif !fallback_options.any? { |opt| opt.value == fallback_option }
         errors.add :fallback_option, :invalid
       end
     end
