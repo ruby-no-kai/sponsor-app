@@ -165,6 +165,7 @@
       %h3= t('.logo')
 
       %p= t('.logo_help')
+      %p= t('.logo_zip_help')
 
     .form-group.sponsorships_form_asset_file{data: {session_endpoint: sponsorship.asset_file&.persisted? ? initiate_update_user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file) : user_conference_sponsorship_asset_files_path, session_endpoint_method: 'POST'}}
       = form.hidden_field :asset_file_id
@@ -173,6 +174,21 @@
 
     - if sponsorship.persisted? && sponsorship.asset_file
       %small.form-text= link_to t('.download_logo'), user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file)
+
+    %div.py-3.sponsorships_form_asset_file_form__warning.d-none{data: {warning_kind: 'zip_asset'}}
+      .card
+        %h5.card-header= t('.warnings.zip_asset.header')
+        .card-body
+          %ul.card-text
+            %li= t('.warnings.zip_asset.item0')
+            %li= t('.warnings.zip_asset.item1')
+            %li= t('.warnings.zip_asset.item2')
+            %li= t('.warnings.zip_asset.item3')
+          .form-group.mb-0
+            .form-check
+              %input.form-check-input#sponsorships_form_zip_asset_ack{type: 'checkbox'}
+              %label.form-check-label{for: 'sponsorships_form_zip_asset_ack'}
+                = t('.warnings.zip_asset.acknowledge')
 
   - if conference.additional_attendees_registration_open
     %section.py-2.sponsorships_form_tickets

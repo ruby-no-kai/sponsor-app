@@ -121,12 +121,22 @@ en:
       logo: 'Logo'
       download_logo: '(Download previously uploaded file)'
       logo_help: |
-        Upload your company logo file for the sponsors page in our website, and the venue onsite. Please make sure your file is in vector format (like .ai, .eps, .svg). If you have multiple files, archive them into a .zip file.
+        Upload your company logo file for the sponsors page in our website, and the venue onsite. Please make sure your file is in vector format (like .ai, .eps, .svg).
+      logo_zip_help: |
+         If you have multiple files, archive all files in .zip file; This is useful in case you want us to follow a guideline, or use a separate file such as different color mode (RGB/CMYK) for website and printing purpose.
       others_help: |
         Use the following field for anything you want let us know in advance.
       note: 'Others'
       policies: 'Policies'
       submit: 'Submit'
+      warnings:
+        zip_asset:
+          header: 'Verify your .zip archive meets our requirements'
+          item0: 'This .zip archive is not encrypted'
+          item1: 'This .zip archive contains vector files (like .ai, .svg, .pdf) for logos'
+          item2: 'This .zip archive contains a guideline if applicable'
+          item3: 'If multiple logos are included: Specify the file names in [Others] field below'
+          acknowledge: 'Yes, I have confirmed these requirements.'
     closed:
       header: 'Application form is not open'
       closed: "Thank you for your interest. But we're sorry, we have closed the sponsorship application for this conference at %{ts}."

@@ -23,6 +23,7 @@ type Props = {
   needUpload: boolean;
   sessionEndpoint: string;
   sessionEndpointMethod: string;
+  onFileChange?: (file: File | null) => void;
 };
 
 const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
@@ -110,13 +111,16 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
       setWillReplace(false);
       setFile(null);
       setFilename(null);
+      props.onFileChange?.(null);
     };
 
     const onFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!(e.target.files && e.target.files[0])) return;
-      console.log("Selected file:", e.target.files[0]);
-      setFile(e.target.files[0]);
-      setFilename(e.target.files[0].name);
+      const selectedFile = e.target.files[0];
+      console.log("Selected file:", selectedFile);
+      setFile(selectedFile);
+      setFilename(selectedFile.name);
+      props.onFileChange?.(selectedFile);
     };
 
     if (needUpload) {

@@ -45,6 +45,33 @@ document.addEventListener("DOMContentLoaded", () => {
       const sessionEndpointMethod = elem.dataset.sessionEndpointMethod;
       if (!sessionEndpoint || !sessionEndpointMethod) return;
 
+      const onFileChange = (file: File | null) => {
+        console.log("File changed:", file?.type);
+        const warningsToShow = new Map<string, boolean>();
+
+        if (
+          file?.type === "application/zip" ||
+          file?.type === "application/x-zip-compressed" ||
+          file?.name.endsWith(".zip")
+        ) {
+          warningsToShow.set("zip_asset", true);
+        }
+
+        const warningElems = form.querySelectorAll<HTMLElement>(
+          ".sponsorships_form_asset_file_form__warning",
+        );
+
+        warningElems.forEach((w) => {
+          if (warningsToShow.has(w.dataset.warningKind || "")) {
+            w.classList.remove("d-none");
+            w.querySelectorAll("input").forEach((i) => (i.required = true));
+          } else {
+            w.classList.add("d-none");
+            w.querySelectorAll("input").forEach((i) => (i.required = false));
+          }
+        });
+      };
+
       const componentRef = React.createRef<SponsorshipAssetFileFormAPI>();
       ReactDOM.render(
         <SponsorshipAssetFileForm
@@ -53,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
           existingFileId={existingFileId}
           sessionEndpoint={sessionEndpoint}
           sessionEndpointMethod={sessionEndpointMethod}
+          onFileChange={onFileChange}
         />,
         dest,
       );
