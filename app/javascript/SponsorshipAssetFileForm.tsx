@@ -55,8 +55,11 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
         file,
         sessionEndpoint: props.sessionEndpoint,
         sessionEndpointMethod: props.sessionEndpointMethod,
+        onProgress: (progress) => {
+          setUploadState({ uploader, progress });
+        },
       });
-      setUploadState({ uploader });
+      setUploadState({ uploader, progress: null });
 
       await uploader.perform();
       return uploader.fileId || null;
@@ -117,6 +120,13 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
     };
 
     if (needUpload) {
+      const progressPercentage =
+        uploadState?.progress && uploadState.progress.total > 0
+          ? Math.round(
+              (uploadState.progress.loaded / uploadState.progress.total) * 100,
+            )
+          : null;
+
       return (
         <div>
           <form action="#" ref={formRef}>
@@ -125,9 +135,26 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
               onChange={onFileSelection}
               required={props.needUpload}
               accept="image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"
+              disabled={!!uploadState}
             />
           </form>
-          {willReplace && (
+          {progressPercentage !== null && (
+            <div className="mt-2">
+              <div className="progress" style={{ height: "25px" }}>
+                <div
+                  className="progress-bar progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  aria-valuenow={progressPercentage}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  style={{ width: `${progressPercentage}%` }}
+                >
+                  {progressPercentage}%
+                </div>
+              </div>
+            </div>
+          )}
+          {willReplace && !uploadState && (
             <button
               className="btn btn-secondary btn-sm mt-1"
               onClick={onCancelClick}
