@@ -88,7 +88,7 @@ Uses Shoryuken (AWS SQS) for background processing:
   - `booth_assignments`: Admin UI for booth allocation
   - `broadcast_new_recipient_fields`: Dynamic form for email targeting
 
-- Webpack-based build via simpacker gem
+- Vite-based build via vite_rails gem
 - Bootstrap 4 for styling
 
 ### External Integrations

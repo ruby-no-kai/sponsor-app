@@ -28,7 +28,6 @@ gem 'shoryuken'
 
 gem 'jbuilder', '~> 2.9'
 gem 'haml'
-gem 'simpacker'
 gem 'vite_rails'
 
 gem 'premailer-rails'
