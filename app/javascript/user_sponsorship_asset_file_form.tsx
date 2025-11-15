@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
         form
-          .querySelectorAll("input[type=submit]:disabled")
+          .querySelectorAll("input[type=submit]")
           .forEach((el) => ((el as HTMLInputElement).disabled = true));
         try {
           errorElem.classList.add("d-none");
