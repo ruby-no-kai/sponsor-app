@@ -15,6 +15,7 @@ ApplicationRecord.transaction do
       application_closes_at: Time.zone.now + 1.month - 1.year,
       amendment_closes_at: Time.zone.now + 2.months - 1.year,
       ticket_distribution_starts_at: Time.zone.now - 1.day - 1.year,
+      booth_capacity: 50,
       github_repo: nil,
       hidden: false,
     },
@@ -26,6 +27,7 @@ ApplicationRecord.transaction do
       application_closes_at: Time.zone.now + 1.month,
       amendment_closes_at: Time.zone.now + 2.months,
       ticket_distribution_starts_at: Time.zone.now - 1.day,
+      booth_capacity: 50,
       github_repo: nil,
       hidden: false,
     }

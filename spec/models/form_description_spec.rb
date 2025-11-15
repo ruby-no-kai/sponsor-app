@@ -40,24 +40,68 @@ RSpec.describe FormDescription, type: :model do
   describe '#fallback_options=' do
     it 'accepts JSON string and parses it' do
       form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '[{"value": "option1", "name": "First Option"}, {"value": "option2", "name": "Second Option"}]'
+      form.fallback_options = '[{"value": "option1", "name": "First Option", "conditions": [{"plans": ["Ruby"]}]}, {"value": "option2", "name": "Second Option", "conditions": [{"booth_request": true}]}]'
       form.save!
 
       expect(form.fallback_options).to all(be_a(FormDescription::FallbackOption))
       expect(form.fallback_options[0].value).to eq('option1')
       expect(form.fallback_options[0].name).to eq('First Option')
+      expect(form.fallback_options[0].conditions).to all(be_a(FormDescription::FallbackOptionCondition))
+      expect(form.fallback_options[0].conditions[0].plans).to eq(['Ruby'])
       expect(form.fallback_options[1].value).to eq('option2')
       expect(form.fallback_options[1].name).to eq('Second Option')
+      expect(form.fallback_options[1].conditions[0].booth_request).to eq(true)
     end
 
     it 'accepts array directly' do
       form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = [{'value' => 'option1', 'name' => 'First Option'}, {'value' => 'option2', 'name' => 'Second Option'}]
+      form.fallback_options = [{'value' => 'option1', 'name' => 'First Option', 'conditions' => [{'plans' => ['Ruby']}]}, {'value' => 'option2', 'name' => 'Second Option'}]
       form.save!
 
       expect(form.fallback_options).to all(be_a(FormDescription::FallbackOption))
       expect(form.fallback_options[0].value).to eq('option1')
       expect(form.fallback_options[0].name).to eq('First Option')
+      expect(form.fallback_options[0].conditions).to all(be_a(FormDescription::FallbackOptionCondition))
+    end
+
+    it 'accepts options without conditions' do
+      form = FactoryBot.build(:form_description, conference:, locale: 'en')
+      form.fallback_options = '[{"value": "option1", "name": "First Option"}]'
+      form.save!
+
+      expect(form.fallback_options[0].conditions).to be_nil
+    end
+
+    it 'accepts multiple conditions (OR logic)' do
+      form = FactoryBot.build(:form_description, conference:, locale: 'en')
+      form.fallback_options = '[{"value": "option1", "name": "First Option", "conditions": [{"plans": ["Ruby"]}, {"booth_request": true}]}]'
+      form.save!
+
+      expect(form.fallback_options[0].conditions.size).to eq(2)
+      expect(form.fallback_options[0].conditions[0].plans).to eq(['Ruby'])
+      expect(form.fallback_options[0].conditions[1].booth_request).to eq(true)
+    end
+
+    it 'converts conditions to JSON in to_dataset' do
+      form = FactoryBot.build(:form_description, conference:, locale: 'en')
+      form.fallback_options = '[{"value": "option1", "name": "First Option", "conditions": [{"plans": ["Ruby"]}]}]'
+      form.save!
+
+      dataset = form.fallback_options[0].to_dataset
+      expect(dataset[:conditions]).to be_a(String)
+      parsed = JSON.parse(dataset[:conditions])
+      expect(parsed).to eq([{'plans' => ['Ruby']}])
+    end
+
+    it 'converts priority_human to JSON in to_dataset' do
+      form = FactoryBot.build(:form_description, conference:, locale: 'en')
+      form.fallback_options = '[{"value": "option1", "name": "First Option", "priority_human": ["Gold", "Silver"]}]'
+      form.save!
+
+      dataset = form.fallback_options[0].to_dataset
+      expect(dataset[:priority_human]).to be_a(String)
+      parsed = JSON.parse(dataset[:priority_human])
+      expect(parsed).to eq(['Gold', 'Silver'])
     end
 
     it 'handles blank string as empty array' do

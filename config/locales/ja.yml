@@ -7,7 +7,7 @@ ja:
         url: 'URL'
         profile: '紹介文 (英語)'
         booth_requested: 'ブース出展'
-        fallback_option: 'フォールバックオプション'
+        fallback_option: '優先順位'
         number_of_additional_attendees: '追加Attendeeチケット枚数'
         policy_agreement: 'ポリシーへ同意する'
 
@@ -27,7 +27,7 @@ ja:
         name: '名前'
 
       form_description:
-        fallback_options: 'フォールバックオプション'
+        fallback_options: 'Fallback Options'
 
       exhibition:
         description: 'ブース詳細'
@@ -52,7 +52,7 @@ ja:
       'sponsorship[customization_request_attributes]': *customization_request
       'sponsorship[note_attributes]': *note
       sponsorship:
-        booth_requested: 'ブース出展する'
+        booth_requested: 'ブース出展を希望する'
 
   layouts:
     application:
@@ -122,9 +122,16 @@ ja:
       plan_closed: '受付期間終了'
       booth: 'スポンサーブース'
       booth_uneligible_plan_selected: '選択されたプランではブース出展はできません (%{plans} プランのみが対象となります)'
-      fallback_option: 'フォールバックオプション'
+      fallback_option: '代替の希望プランを設定する'
       fallback_option_blank: '-- 選択してください --'
-      fallback_option_help: '希望するオプションを選択してください。'
+      fallback_option_help: '選択したプランは抽選などにより希望に沿えない可能性がございます。その場合に備え、代替のプランを選択してください。'
+      fallback_priority:
+        header: '希望順'
+        help: 'このオプションは、第一希望を含め、以下の順番が希望順として設定されます。[ブースあり] と表記されている順位については、ブース希望ではなくブース割り当てがある場合を意味します。'
+      fallback_option_priority:
+        withdraw: 'ご辞退'
+        no_booth: 'ブースなし'
+        booth: 'ブースあり'
       information: 'サイト掲載情報'
       information_help: |
         ウェブサイトや会場に掲載するためのスポンサーの情報をご提供ください。こちらの情報は全て英語での提出をお願いしております。情報に含まれる社名・サービス名についても、英語表記をご利用ください。また、仮の内容を提出される場合はその旨を下記 [その他の連絡事項] 欄にご記入ください。修正され、連絡事項で仮ではなくなった事が分かるまで Web サイトへの掲載を保留いたします。

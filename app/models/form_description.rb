@@ -1,14 +1,28 @@
 class FormDescription < ApplicationRecord
-  FallbackOption = Data.define(:value, :name, :booth_request, :plans) do
-    def valid?
-      value.present? && name.present?
-    end
-
+  FallbackOptionCondition = Data.define(:plans, :booth_request) do
     def as_json = to_h.compact
 
+    def valid?
+      plans_valid = plans.nil? || plans.is_a?(Array)
+      booth_valid = booth_request.nil? || [true, false].include?(booth_request)
+      plans_valid && booth_valid
+    end
+  end
+
+  FallbackOption = Data.define(:value, :name, :conditions, :priority_human) do
+    def valid?
+      return false unless value.present? && name.present?
+      return false if priority_human.present? && !priority_human.is_a?(Array)
+      return true if conditions.nil?
+      conditions.is_a?(Array) && conditions.all?(&:valid?)
+    end
+
+    def as_json = to_h.merge(conditions: conditions&.map(&:as_json)).compact
+
     def to_dataset
-      dataset = to_h.except(:value, :name).compact
-      dataset[:plans] = dataset[:plans].join(',') if dataset[:plans].is_a?(Array)
+      dataset = {}
+      dataset[:conditions] = JSON.generate(conditions.map(&:as_json)) if conditions.present?
+      dataset[:priority_human] = JSON.generate(priority_human) if priority_human.present?
       dataset
     end
   end
@@ -61,17 +75,28 @@ class FormDescription < ApplicationRecord
 
   private def build_fallback_options(raw_array)
     if raw_array.is_a?(Hash)
-      return raw_array.map { |value, name|  FallbackOption.new(value:, name:, booth_request: nil, plans: nil) }
+      return raw_array.map { |value, name|  FallbackOption.new(value:, name:, conditions: nil, priority_human: nil) }
     end
 
     return [] if raw_array.blank?
 
     raw_array.map do |opt|
+      conditions = if opt['conditions'].present?
+        opt['conditions'].map do |cond|
+          FallbackOptionCondition.new(
+            plans: cond['plans'],
+            booth_request: cond['booth_request']
+          )
+        end
+      else
+        nil
+      end
+
       FallbackOption.new(
         value: opt['value'],
         name: opt['name'],
-        booth_request: opt['booth_request'],
-        plans: opt['plans']
+        conditions:,
+        priority_human: opt['priority_human']
       )
     end
   end

@@ -68,7 +68,7 @@
           = contact_form.check_box :_keep, class: 'form-check-input'
           = contact_form.label :_keep, t('.specify_alternate_billing_contact'), class: 'form-check-label'
 
-      %fieldset
+      %fieldset.d-none
         .form-group
           = contact_form.label :email
           = contact_form.email_field :email, class: 'form-control', required: true
@@ -144,14 +144,21 @@
       %small.d-none.sponsorships_form_booth_request_uneligible.form-text.text-small.text-info= t('.booth_uneligible_plan_selected', plans: conference.plans.select(&:booth_eligible?).map(&:name).join(', '))
 
   - if desc.fallback_options.present? && desc.fallback_options.any?
-    %section.py-2
+    %section.py-2.d-none.sponsorships_form_fallback_section{data: {locale_withdraw: t('.fallback_option_priority.withdraw'), locale_no_booth: t('.fallback_option_priority.no_booth'), locale_booth: t('.fallback_option_priority.booth')}}
       .form-group
         %h3= t('.fallback_option')
+        %p.form-text= t('.fallback_option_help')
 
       .form-group
         = form.label :fallback_option
-        = form.select :fallback_option, options_for_select(desc.fallback_options.map {|opt| [opt.name, opt.value, {data: opt.to_dataset}] }, sponsorship.fallback_option), {include_blank: t('.fallback_option_blank')}, class: 'form-control', required: true
-        %small.form-text= t('.fallback_option_help')
+        = form.select :fallback_option, options_for_select(desc.fallback_options.map {|opt| [opt.name, opt.value, {data: opt.to_dataset}] }, sponsorship.fallback_option), {include_blank: t('.fallback_option_blank')}, class: 'form-control'
+
+      .form-group
+        .card.d-none.sponsorships_form_fallback_priority
+          %h5.card-header= t('.fallback_priority.header')
+          .card-body
+            %p= t('.fallback_priority.help')
+            %ol
 
   %section.py-2.sponsorships_form_info
     .form-group

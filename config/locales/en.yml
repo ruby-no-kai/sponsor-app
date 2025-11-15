@@ -7,7 +7,7 @@ en:
         url: 'URL'
         profile: 'Introduction text'
         booth_requested: 'Booth Request'
-        fallback_option: 'Fallback Option'
+        fallback_option: 'Alternative Plan Preference'
         number_of_additional_attendees: 'Number of Additional Attendees'
         policy_agreement: 'I confirmed and agree with the policies'
 
@@ -121,9 +121,16 @@ en:
       plan_closed: 'Closed'
       booth: 'Sponsor Booth'
       booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
-      fallback_option: 'Fallback Option'
-      fallback_option_blank: '-- Please select --'
-      fallback_option_help: 'Please select your preferred option.'
+      fallback_option: 'Configure Alternative Plan Preferences'
+      fallback_option_blank: '-- Make a selection --'
+      fallback_option_help: 'Your selected plan may not be available due to capacity limits and random selection. Please select your preferred alternative option in case we could not accommodate your preferred request.'
+      fallback_priority:
+        header: 'Priority'
+        help: "This option sets the following priority order. Note that '(with booth)' in the following means a slot with booth allotment; It is not a booth request."
+      fallback_option_priority:
+        withdraw: 'Withdraw'
+        no_booth: 'without booth'
+        booth: 'with booth'
       information: 'Sponsor Information'
       information_help: |
         Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose. If you submit a preliminary information or prefer to submit later, let us know via [Others] field below. We'll hold the information from publication on our website.
