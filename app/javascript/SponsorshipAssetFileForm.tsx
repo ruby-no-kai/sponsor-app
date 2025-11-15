@@ -38,12 +38,8 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
     const uploadPromiseRef = useRef<Promise<string | null> | null>(null);
     const cachedResultRef = useRef<string | null | undefined>(undefined);
 
-    const needUploadFn = () => needUpload;
-
-    const uploadRequiredFn = () => props.needUpload;
-
     const startUpload = async (): Promise<string | null> => {
-      if (!needUploadFn() && !uploadRequiredFn())
+      if (!needUpload && !props.needUpload)
         return props.existingFileId || "";
       const form = formRef.current;
       if (!(form && form.reportValidity())) {
@@ -94,10 +90,10 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
       () => ({
         startUpload,
         ensureUpload,
-        needUpload: needUploadFn,
-        uploadRequired: uploadRequiredFn,
+        needUpload: () => needUpload,
+        uploadRequired: () => props.needUpload,
       }),
-      [file, needUpload, props.existingFileId],
+      [file, needUpload, props.existingFileId, props.needUpload],
     );
 
     const onReuploadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -120,14 +116,14 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
       setFilename(e.target.files[0].name);
     };
 
-    if (needUploadFn()) {
+    if (needUpload) {
       return (
         <div>
           <form action="#" ref={formRef}>
             <input
               type="file"
               onChange={onFileSelection}
-              required={uploadRequiredFn()}
+              required={props.needUpload}
               accept="image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"
             />
           </form>
