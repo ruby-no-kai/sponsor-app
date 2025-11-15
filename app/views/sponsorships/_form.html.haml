@@ -143,7 +143,7 @@
         = form.label :booth_requested, class: 'form-check-label'
       %small.d-none.sponsorships_form_booth_request_uneligible.form-text.text-small.text-info= t('.booth_uneligible_plan_selected', plans: conference.plans.select(&:booth_eligible?).map(&:name).join(', '))
 
-  %section.py-2
+  %section.py-2.sponsorships_form_info
     .form-group
       %h3= t('.information')
 
@@ -155,12 +155,25 @@
 
     .form-group
       = form.label :url
-      = form.text_field :url, class: 'form-control', required: true, placeholder: 'https://...'
+      = form.url_field :url, class: 'form-control', required: true, placeholder: 'https://...', pattern: '^https?://.+'
 
     .form-group
       = form.label :profile
       = form.text_area :profile, class: 'form-control', required: true
       %small.sponsorships_form_profile_help.form-text
+
+
+    %div.py-3.sponsorships_form_info__warning.d-none{data: {warning_kind: 'english'}}
+      .card
+        %h5.card-header= t('.warnings.english.header')
+        .card-body
+          %p.card-text= t('.warnings.english.body1')
+          %p.card-text= t('.warnings.english.body2')
+          .form-group.mb-0
+            .form-check
+              %input.form-check-input#sponsorships_form_english_ack{type: 'checkbox'}
+              %label.form-check-label{for: 'sponsorships_form_english_ack'}
+                = t('.warnings.english.acknowledge')
 
   %section.py-2
     .form-group

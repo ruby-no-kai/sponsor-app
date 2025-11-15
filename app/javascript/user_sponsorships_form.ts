@@ -126,5 +126,41 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
     });
+
+    const ENGLISH_REGEX =
+      /^(?:[\p{Script=Latin}\p{Script=Zyyy}\p{Sc}\p{Sk}\p{Sm}\p{So}])*$/u;
+    formElem.querySelectorAll(".sponsorships_form_info").forEach((elem) => {
+      elem
+        .querySelectorAll<HTMLInputElement>(
+          'input[name="sponsorship[name]"], textarea[name="sponsorship[profile]"]',
+        )
+        .forEach((inputElem) => {
+          const onChange = () => {
+            const warningsToShow = new Map<string, boolean>();
+
+            if (!ENGLISH_REGEX.test(inputElem.value)) {
+              warningsToShow.set("english", true);
+            }
+
+            const warningElems = formElem.querySelectorAll<HTMLElement>(
+              ".sponsorships_form_info__warning",
+            );
+
+            warningElems.forEach((w) => {
+              if (warningsToShow.has(w.dataset.warningKind || "")) {
+                w.classList.remove("d-none");
+                w.querySelectorAll("input").forEach((i) => (i.required = true));
+              } else {
+                w.classList.add("d-none");
+                w.querySelectorAll("input").forEach(
+                  (i) => (i.required = false),
+                );
+              }
+            });
+          };
+          inputElem.addEventListener("input", onChange);
+          inputElem.addEventListener("change", onChange);
+        });
+    });
   });
 });

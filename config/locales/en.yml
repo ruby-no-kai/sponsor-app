@@ -119,7 +119,7 @@ en:
       booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
       information: 'Sponsor Information'
       information_help: |
-        Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose.
+        Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose. If you submit a preliminary information or prefer to submit later, let us know via [Others] field below. We'll hold the information from publication on our website.
       logo: 'Logo'
       download_logo: '(Download previously uploaded file)'
       logo_help: |
@@ -132,6 +132,11 @@ en:
       policies: 'Policies'
       submit: 'Submit'
       warnings:
+        english:
+          header: 'The introduction may contain non-English text'
+          body1: 'We request all informations to be filled in English, and non-English text are not permitted. Please confirm the above fields contain only English text, or use the following checkbox to acknowledge in case we are misdetecting non-English text.'
+          body2: 'If we find non-English text upon human review, we may ask you to correct it, and your information may not be published on our website until the correction is made.'
+          acknowledge: 'Yes, I acknowledge that the above fields consist of English text.'
         zip_asset:
           header: 'Verify your .zip archive meets our requirements'
           item0: 'This .zip archive is not encrypted'
