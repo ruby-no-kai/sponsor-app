@@ -30,7 +30,9 @@ class SponsorshipAssetFile < ApplicationRecord
   end
 
   def make_session
-    Session.new(self).as_json
+    upload_url_and_fields.merge(
+      id: id.to_s,
+    )
   end
 
   def filename
@@ -38,7 +40,6 @@ class SponsorshipAssetFile < ApplicationRecord
   end
 
   def download_url
-    presigner = Aws::S3::Presigner.new(client: Aws::S3::Client.new(use_dualstack_endpoint: true, region: REGION))
     presigner.presigned_url(
       :get_object,
       bucket: BUCKET,
@@ -46,6 +47,30 @@ class SponsorshipAssetFile < ApplicationRecord
       expires_in: 3600,
       response_content_disposition: "attachment; filename=\"#{filename}\"",
     )
+  end
+
+  def upload_url_and_fields
+    # see also config/initializers/aws_s3_patches.rb to force dualstack endpoint
+    sign = Aws::S3::PresignedPost.new(
+      Session.new(self).credentials, # don't leak primary session token
+      REGION,
+      BUCKET,
+      {
+        key: object_key,
+        signature_expiration: Time.now+900,
+        content_length_range: 0..200.megabytes,
+        use_accelerate_endpoint: true,
+        allow_any: ['Content-Type'],
+      },
+    )
+    {
+      url: sign.url,
+      fields: sign.fields,
+    }
+  end
+
+  private def presigner
+    @presigner ||= Aws::S3::Presigner.new(client: Aws::S3::Client.new(use_dualstack_endpoint: true, region: REGION))
   end
 
   private def validate_ownership_not_changed
@@ -104,18 +129,12 @@ class SponsorshipAssetFile < ApplicationRecord
       )
     end
 
-    def as_json
-      {
-        id: file.id.to_s,
-        region: REGION,
-        bucket: BUCKET,
-        key: file.object_key,
-        credentials: {
-          access_key_id: role_session.credentials.access_key_id,
-          secret_access_key: role_session.credentials.secret_access_key,
-          session_token: role_session.credentials.session_token,
-        },
-      }
+    def credentials
+      Aws::Credentials.new(
+        role_session.credentials.access_key_id,
+        role_session.credentials.secret_access_key,
+        role_session.credentials.session_token,
+      )
     end
   end
 end
