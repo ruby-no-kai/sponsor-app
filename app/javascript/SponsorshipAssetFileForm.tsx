@@ -80,7 +80,9 @@ const SponsorshipAssetFileForm = forwardRef<
 
     try {
       const result = await promise;
-      cachedResultRef.current = result;
+      if (result !== null) {
+        cachedResultRef.current = result;
+      }
       return result;
     } finally {
       uploadPromiseRef.current = null;

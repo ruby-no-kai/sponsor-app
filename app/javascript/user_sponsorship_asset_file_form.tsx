@@ -8,7 +8,7 @@ import SponsorshipAssetFileForm, {
 declare global {
   interface Window {
     rksSponsorshipAssetFileForms: React.RefObject<SponsorshipAssetFileFormAPI>[];
-    rksTriggerAllUploads: () => Promise<(string | null)[]>;
+    rksTriggerAllUploads: () => Promise<(string | null | undefined)[]>;
   }
 }
 
