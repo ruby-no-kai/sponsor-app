@@ -114,7 +114,7 @@ Uses Shoryuken (AWS SQS) for background processing:
 ```bash
 # Install dependencies
 bundle install
-yarn install
+pnpm install
 
 # Setup database (requires Docker Compose for PostgreSQL)
 docker-compose up -d
@@ -122,7 +122,7 @@ rails db:setup
 
 # Start development servers
 rails s                # Rails server on :3000
-yarn run watch         # Webpack dev server with auto-reload
+pnpm run watch         # Vite dev server with auto-reload
 ```
 
 ### Database
@@ -145,8 +145,8 @@ rspec spec/models/sponsorship_spec.rb:42  # Run test at line 42
 ### Asset Management
 
 ```bash
-yarn run build          # Production build of frontend assets
-yarn run format         # Format TypeScript/SCSS with Prettier
+pnpm run build          # Production build of frontend assets
+pnpm run format         # Format TypeScript/SCSS with Prettier
 ```
 
 ### Background Jobs

@@ -30,6 +30,7 @@
 /node_modules
 yarn-debug.log*
 .yarn-integrity
+pnpm-debug.log*
 vendor
 
 .terraform/

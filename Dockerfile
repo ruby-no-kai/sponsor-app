@@ -1,15 +1,17 @@
 FROM public.ecr.aws/docker/library/node:24-trixie-slim as nodebuilder
 WORKDIR /app
 
-COPY package.json yarn.lock /app/
-RUN yarn install --immutable
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-COPY package.json yarn.lock tsconfig.json vite.config.mts /app
+COPY package.json pnpm-lock.yaml /app/
+RUN pnpm install --frozen-lockfile
+
+COPY package.json pnpm-lock.yaml tsconfig.json vite.config.mts /app
 COPY config/vite.json /app/config/
 COPY app/javascript /app/app/javascript
 COPY app/stylesheets /app/app/stylesheets
 
-RUN APP_ENV=production NODE_ENV=production VITE_BUILD=1 yarn run build
+RUN APP_ENV=production NODE_ENV=production VITE_BUILD=1 pnpm run build
 
 ###
 
