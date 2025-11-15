@@ -413,4 +413,83 @@ RSpec.describe Sponsorship, type: :model do
       expect(hash.key?('withdrawn_at')).to be false
     end
   end
+
+  describe 'auto-acceptance with organization flag' do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:asset_file) { FactoryBot.create(:sponsorship_asset_file, sponsorship: nil) }
+
+    def create_sponsorship_for_auto_acceptance_test(plan:, org_auto_acceptance_disabled:)
+      organization.update!(auto_acceptance_disabled: org_auto_acceptance_disabled)
+
+      sponsorship = Sponsorship.new(
+        name: 'Test Sponsorship',
+        url: 'https://example.com',
+        profile: 'Test profile',
+        locale: 'en',
+        plan:,
+        conference:,
+        asset_file:,
+      )
+
+      sponsorship.contact = FactoryBot.build(:contact,
+        email: "test@#{organization.domain}",
+      )
+
+      sponsorship.assume_organization
+
+      # Simulate controller logic from sponsorships_controller.rb:55
+      sponsorship.accept if sponsorship.plan&.auto_acceptance && !sponsorship.organization&.auto_acceptance_disabled
+
+      sponsorship.save!
+      sponsorship
+    end
+
+    context 'when plan has auto_acceptance enabled' do
+      let(:plan) { FactoryBot.create(:plan, conference:, auto_acceptance: true) }
+
+      it 'auto-accepts when organization has auto_acceptance_disabled false' do
+        sponsorship = create_sponsorship_for_auto_acceptance_test(
+          plan:,
+          org_auto_acceptance_disabled: false
+        )
+
+        expect(sponsorship.accepted?).to be true
+        expect(sponsorship.accepted_at).to be_present
+      end
+
+      it 'does NOT auto-accept when organization has auto_acceptance_disabled true' do
+        sponsorship = create_sponsorship_for_auto_acceptance_test(
+          plan:,
+          org_auto_acceptance_disabled: true
+        )
+
+        expect(sponsorship.accepted?).to be false
+        expect(sponsorship.accepted_at).to be_nil
+      end
+    end
+
+    context 'when plan has auto_acceptance disabled' do
+      let(:plan) { FactoryBot.create(:plan, conference:, auto_acceptance: false) }
+
+      it 'does NOT auto-accept when organization has auto_acceptance_disabled false' do
+        sponsorship = create_sponsorship_for_auto_acceptance_test(
+          plan:,
+          org_auto_acceptance_disabled: false
+        )
+
+        expect(sponsorship.accepted?).to be false
+        expect(sponsorship.accepted_at).to be_nil
+      end
+
+      it 'does NOT auto-accept when organization has auto_acceptance_disabled true' do
+        sponsorship = create_sponsorship_for_auto_acceptance_test(
+          plan:,
+          org_auto_acceptance_disabled: true
+        )
+
+        expect(sponsorship.accepted?).to be false
+        expect(sponsorship.accepted_at).to be_nil
+      end
+    end
+  end
 end
