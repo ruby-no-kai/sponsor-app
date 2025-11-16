@@ -17,13 +17,12 @@ gem 'omniauth-github'
 gem 'octokit'
 gem 'jwt'
 gem 'hashdiff'
-gem 'rqrcode'
 gem 'faraday'
 gem 'faraday_middleware'
 
-gem 'nokogiri'
-gem 'rexml' # letter-opener
-gem 'jsonnet'
+gem 'nokogiri', require: false
+gem 'rexml', require: false # letter-opener
+gem 'jsonnet', require: false
 
 gem 'shoryuken'
 
