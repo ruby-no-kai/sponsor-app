@@ -231,10 +231,11 @@ en:
           one: '%{count} ticket'
           other: '%{count} tickets'
       table:
+        retract: 'Retract'
         registration_reference: 'Registration Ref#'
         ticket_reference: 'Ticket Ref#'
         release: 'Type'
-        registration_email: 'Registration Email'
+        registration_email: 'Registrant Email'
         ticket_email: 'Assignee Email'
         ticket_state: 'Status'
       state:
@@ -253,3 +254,34 @@ en:
         email_management: 'Emails are sent from @tito.io email address. To manage all tickets in a registration, refer to the ''Your %{conference_name} Confirmation'' email. Ticket assignees are receiving ''Your %{conference_name} Ticket'' email instead to manage their own ticket.'
         reassignment: 'Tickets can be reassigned from the email mentioned above. For security reasons, if an email address was registered incorrectly, we recommend voiding the ticket and re-registering.'
         voiding: 'From this page, you can void tickets (and restore invitation URL usage count). Voiding is done per [Registration] unit, so all [Tickets] associated with the same [Registration] will be voided. Additionally, [Registrations] that can be voided from this page must not be paid, and all [Tickets] included in the [Registration] must be of the same type. If you want to void a registration that does not have a void button displayed, please contact %{contact_email}.'
+
+  pass_retraction:
+    new:
+      header: 'Cancel Registration'
+      description: 'Request cancellation for registration %{reference}'
+      affected_tickets: 'Tickets that will be cancelled'
+      reason_label: 'Reason for cancellation'
+      reason_placeholder: 'Please provide a reason for cancelling this registration'
+      not_retractable: 'This registration cannot be cancelled.'
+      notes_header: 'Please note:'
+      note_1: 'The invitation URL usage count will be restored by the number of cancelled tickets.'
+      note_2: 'Ticket reassignment is normally possible from emails sent from @tito.io. Registrants receive ''Your %{conference_name} Confirmation'' email to manage all tickets, and ticket assignees receive ''Your %{conference_name} Ticket'' email to manage their own ticket. We recommend making changes from there first.'
+      note_3: 'Important: No automatic notifications - We do not send notifications to ticket holders about this cancellation. It is your responsibility to inform them about the cancellation and how to obtain new tickets if applicable.'
+      confirmation_label: 'I understand and confirm the above information.'
+      submit: 'Request Cancellation'
+      cancel: 'Back to Pass Redemptions'
+    create:
+      notice: 'Cancellation request has been submitted.'
+      error: 'Unable to submit cancellation request.'
+    show:
+      header: 'Cancellation Request'
+      completed_header: 'Cancellation Completed'
+      completed_message: 'The registration has been successfully cancelled. You are all set!'
+      completed_note_1: 'The invitation URL usage count has been restored by the number of cancelled tickets.'
+      completed_note_2: 'All tickets associated with this registration have been voided.'
+      pending_header: 'Processing Cancellation'
+      pending_message: 'Your cancellation request is being processed. Please wait a moment.'
+      note_3: 'Important: No automatic notifications - We do not send notifications to ticket holders about this cancellation. It is your responsibility to inform them about the cancellation and how to obtain new tickets if applicable.'
+      reason: 'Reason'
+      registration_reference: 'Registration'
+      back: 'Back to Pass Redemptions'

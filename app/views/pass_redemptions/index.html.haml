@@ -35,6 +35,7 @@
       %table.table.table-hover
         %thead
           %tr
+            %th
             %th= t('.table.registration_reference')
             %th= t('.table.ticket_reference')
             %th= t('.table.release')
@@ -45,6 +46,9 @@
           - @pass_redemptions.registrations.each_with_index do |registration, reg_index|
             - registration.tickets.each_with_index do |ticket, ticket_index|
               %tr{class: reg_index.even? ? '' : 'pass-redemption-odd', style: (ticket_index == 0 && reg_index > 0) ? 'border-top: 3px solid #dee2e6;' : ''}
+                - if ticket_index == 0
+                  %td{rowspan: registration.tickets.size}
+                    = link_to t('.table.retract'), new_user_conference_sponsorship_retraction_path(@conference, registration.id), class: "btn btn-sm btn-outline-danger #{registration.retractable? ? '' : 'd-none'}"
                 %td= registration.reference
                 %td= ticket.reference
                 %td

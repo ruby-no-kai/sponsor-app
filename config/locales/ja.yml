@@ -232,6 +232,7 @@ ja:
           one: '%{count} 枚'
           other: '%{count} 枚'
       table:
+        retract: 'キャンセル'
         registration_reference: '登録番号'
         ticket_reference: 'チケット番号'
         release: 'リリース'
@@ -254,4 +255,35 @@ ja:
         email_management: 'Tito からのメールは @tito.io のメールアドレスから送信されます。登録に紐づく全てのチケットを管理するには ''Your %{conference_name} Confirmation'' という件名のメールをご確認ください。チケット割当先には ''Your %{conference_name} Ticket'' という件名のメールが送信され、個別のチケットを管理できるようになっています。'
         reassignment: 'チケットの再割り当ては上記のメールから行うことができます。セキュリティ上の理由から、メールアドレスを誤登録した場合はチケットを無効化して再登録することをおすすめします。'
         voiding: '本ページからはチケットの無効化 (および招待URL利用回数の復旧)を行うことができます。無効化には [登録] 単位で行われるため、同じ [登録] に紐付く全ての [チケット] が無効化されます。また、本ページで無効にできる [登録] は有償で購入されておらず、かつ [登録] に含まれる [チケット] の種別は全て同一である必要があります。無効化ボタンが表示されていない登録を無効化したい場合は、 %{contact_email} までご連絡ください。'
+
+  pass_retraction:
+    new:
+      header: '登録のキャンセル'
+      description: '登録 %{reference} のキャンセル申請'
+      affected_tickets: 'キャンセルされるチケット'
+      reason_label: 'キャンセル理由'
+      reason_placeholder: 'キャンセルの理由を入力してください'
+      not_retractable: 'この登録はキャンセルできません。'
+      notes_header: 'ご注意:'
+      note_1: 'キャンセルした分だけ再度招待URLが利用可能になります'
+      note_2: '@tito.io から送信されるメールで通常はチケットの再割り当てが可能です。登録者には ''Your %{conference_name} Confirmation'' という件名のメールが送信され全てのチケットを管理でき、チケット割当先には ''Your %{conference_name} Ticket'' という件名のメールが送信され個別のチケットを管理できます。基本的にはそちらからの変更をおすすめしています'
+      note_3: 'チケット割当先、登録者へのキャンセル通知は送信されません。キャンセルした旨や、(必要なら)新しいチケットの取得方法をご自身でご連絡ください'
+      confirmation_label: '上記の内容を理解し確認しました。'
+      submit: 'キャンセルを申請'
+      cancel: '利用状況へ戻る'
+    create:
+      notice: 'キャンセル申請を受け付けました。'
+      error: 'キャンセル申請を受け付けできませんでした。'
+    show:
+      header: 'キャンセル申請'
+      completed_header: 'キャンセル完了'
+      completed_message: '登録のキャンセルが完了しました。問題ありません！'
+      completed_note_1: '招待URLが再度利用可能になりました。'
+      completed_note_2: 'この登録に紐づく全てのチケットが無効化されました。'
+      pending_header: 'キャンセル処理中'
+      pending_message: 'キャンセル申請を処理しています。しばらくお待ちください。'
+      note_3: '重要: 自動通知は送信されません - チケット保有者へのキャンセル通知は自動送信されません。キャンセルの事実と、必要に応じて新しいチケットの取得方法をチケット保有者へご連絡いただくのはスポンサー様の責任となります。'
+      reason: '理由'
+      registration_reference: '登録'
+      back: '利用状況へ戻る'
 

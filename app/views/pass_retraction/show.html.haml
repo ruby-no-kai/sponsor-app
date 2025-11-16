@@ -1,0 +1,46 @@
+%h2= t('.header')
+
+- if @retraction.completed?
+  .card.mb-3
+    .card-body
+      .card-text
+        %h4.alert-heading= t('.completed_header')
+        %p= t('.completed_message')
+        %hr
+        %ul
+          %li= t('.completed_note_1')
+          %li= t('.completed_note_2')
+          %li= t('.note_3')
+
+      = render 'affected_tickets', retraction: @retraction
+
+      .card-text
+        %p= link_to t('.back'), user_conference_sponsorship_pass_redemptions_path(@conference), class: 'btn btn-secondary'
+
+- else
+  .alert.alert-info
+    %h4.alert-heading= t('.pending_header')
+    %p= t('.pending_message')
+    %hr
+    %ul.mb-0
+      %li= t('.note_3')
+
+  .card.mb-3
+    .card-body
+      = render 'affected_tickets', retraction: @retraction
+
+      .row.mb-3
+        .col-md-3
+          %strong= t('.registration_reference')
+        .col-md-9
+          = @retraction.order_reference
+
+      .row.mb-3
+        .col-md-3
+          %strong= t('.reason')
+        .col-md-9
+          = simple_format(@retraction.reason)
+
+      .row
+        .col-md-12
+          = link_to t('.back'), user_conference_sponsorship_pass_redemptions_path(@conference), class: 'btn btn-secondary'
