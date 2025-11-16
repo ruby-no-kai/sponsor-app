@@ -56,6 +56,7 @@ Rails.application.routes.draw do
     resources :conferences, param: :slug, only: %i(index) do
       resource :sponsorship, only: %i(new create show edit update) do
         resource :exhibition, only: %i(new create edit update)
+        resources :pass_redemptions, only: %i(index)
       end
       resources :sponsorship_asset_files, only: %i(create update show) do
         member do

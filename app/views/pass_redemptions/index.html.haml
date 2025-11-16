@@ -1,0 +1,91 @@
+%h2 #{t('.header')} - #{@conference.name}
+
+- if @conference.distributing_ticket? && @conference.tito_slug.present?
+  .card.mt-3
+    .card-header= t('.invitation.title')
+    .card-body
+      - if @sponsorship.tito_attendee_discount_code
+        %p.card-text
+          %strong #{t('.invitation.attendee_url')}
+          %span.text-muted  (#{t('.invitation.quantity', count: @sponsorship.tito_attendee_discount_code.quantity)})
+          %br
+          = link_to @sponsorship.tito_attendee_discount_code.url, @sponsorship.tito_attendee_discount_code.url, target: '_blank'
+      - if @sponsorship.tito_booth_staff_discount_code
+        %p.card-text
+          %strong #{t('.invitation.booth_staff_url')}
+          %span.text-muted  (#{t('.invitation.quantity', count: @sponsorship.tito_booth_staff_discount_code.quantity)})
+          %br
+          = link_to @sponsorship.tito_booth_staff_discount_code.url, @sponsorship.tito_booth_staff_discount_code.url, target: '_blank'
+      - if @sponsorship.tito_booth_paid_discount_code
+        %p.card-text
+          %strong #{t('.invitation.booth_paid_url')}
+          %br
+          = link_to @sponsorship.tito_booth_paid_discount_code.url, @sponsorship.tito_booth_paid_discount_code.url, target: '_blank'
+      %hr
+      %ul.card-text
+        %li= t('sponsorships.show.tickets.help.requirement')
+        %li= t('sponsorships.show.tickets.help.unique')
+
+.card.mt-3
+  .card-header= t('.card_title')
+  .card-body
+    - if @pass_redemptions.registrations.empty?
+      %p.text-muted= t('.no_registrations')
+    - else
+      %table.table.table-hover
+        %thead
+          %tr
+            %th= t('.table.registration_reference')
+            %th= t('.table.ticket_reference')
+            %th= t('.table.release')
+            %th= t('.table.registration_email')
+            %th= t('.table.ticket_email')
+            %th= t('.table.ticket_state')
+        %tbody
+          - @pass_redemptions.registrations.each_with_index do |registration, reg_index|
+            - registration.tickets.each_with_index do |ticket, ticket_index|
+              %tr{class: reg_index.even? ? '' : 'pass-redemption-odd', style: (ticket_index == 0 && reg_index > 0) ? 'border-top: 3px solid #dee2e6;' : ''}
+                %td= registration.reference
+                %td= ticket.reference
+                %td
+                  - if ticket.release&.tito_release_slug
+                    :ruby
+                      release_key = ticket.release.tito_release_slug
+                      color = case release_key
+                      when 'sponsor'
+                       'success'
+                      when 'exhibitor'
+                       'dark'
+                      when 'exhibitor-paid'
+                       'warning'
+                      else
+                       'light'
+                      end
+                    %span.badge{class: "badge-#{color}"}= t(".release_type.#{release_key}", default: ticket.release.tito_release_slug)
+                %td= registration.email
+                %td= ticket.email
+                %td
+                  - if ticket.void
+                    %span.badge.badge-danger= t('.state.void')
+                  - elsif ticket.state == 'complete'
+                    %span.badge.badge-success= t('.state.complete')
+                  - elsif ticket.state == 'incomplete'
+                    %span.badge.badge-warning= t('.state.incomplete')
+                  - elsif ticket.state == 'unassigned'
+                    %span.badge.badge-dark= t('.state.unassigned')
+                  - else
+                    %span.badge.badge-info= ticket.state
+
+      %ul.mt-3.card-text
+        %li
+          %p= t('.notes.overview')
+        %li
+          %p= t('.notes.registration_vs_ticket')
+        %li
+          %p= t('.notes.email_management', conference_name: @conference.name)
+        %li
+          %p= t('.notes.reassignment')
+        %li
+          %p= t('.notes.incomplete_status')
+        -#
+          %li= t('.notes.voiding', contact_email: @conference.contact_email_address).html_safe

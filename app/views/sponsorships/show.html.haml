@@ -62,19 +62,17 @@
       .card.mt-2.text-dark
         .card-header= t('.tickets.title')
         .card-body
-          %ul.card-text
-            %li
-              %strong #{t('.total_number_of_guests')}:
-              #{t('.guests_count', count: @sponsorship.total_number_of_attendees)}
           - if @conference.tito_slug.present?
             - if @sponsorship.tito_attendee_discount_code
               %p.card-text
-                %strong #{t('.tickets.attendee_url')}:
+                %strong #{t('.tickets.attendee_url')}
+                %span.text-muted (#{t('.tickets.quantity', count: @sponsorship.total_number_of_attendees)})
                 %br
                 %small= link_to @sponsorship.tito_attendee_discount_code.url, @sponsorship.tito_attendee_discount_code.url
             - if @sponsorship.tito_booth_staff_discount_code
               %p.card-text
-                %strong #{t('.tickets.booth_staff_url')}:
+                %strong #{t('.tickets.booth_staff_url')}
+                %span.text-muted (#{t('.tickets.quantity', count: @sponsorship.total_number_of_booth_staff)})
                 %br
                 %small= link_to @sponsorship.tito_booth_staff_discount_code.url, @sponsorship.tito_booth_staff_discount_code.url
             - if @sponsorship.tito_booth_paid_discount_code
@@ -87,6 +85,8 @@
               %small= t('.tickets.help.requirement')
             %li
               %small= t('.tickets.help.unique')
+          %p.card-text
+            = link_to t('.tickets.view_redemptions'), user_conference_sponsorship_pass_redemptions_path(@conference), class: 'btn btn-sm btn-secondary'
 
 - unless @announcements.empty?
   .row.py-2

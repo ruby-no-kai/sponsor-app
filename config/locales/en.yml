@@ -198,9 +198,13 @@ en:
         attendee_url: 'Conference invitations'
         booth_staff_url: 'Booth passes redemption'
         booth_paid_url: 'Purchase additional booth passes'
+        quantity:
+          one: '%{count} pass'
+          other: '%{count} passes'
         help:
-          requirement: 'All attendees who use a sponsor ticket must retrieve their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
-          unique: 'This URL is unique and bound to you, and there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
+          requirement: 'All people who visit the conference venue must exchange their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
+          unique: 'This URL is unique and bound to your sponsorship. Note that there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
+        view_redemptions: 'Review registrations'
     edit:
       amendment_availability: "You can amend your application until %{ts}."
   exhibitions:
@@ -212,3 +216,40 @@ en:
       header: 'Booth Details'
       help: 'Please submit your booth plans in advance. Organizers will review your plan to ensure it complies with the venue rules. We may contact you if we have something to advise.'
       submit: 'Submit'
+
+  pass_redemptions:
+    index:
+      header: 'Pass Redemptions'
+      card_title: 'Registrations and Tickets'
+      no_registrations: 'No registrations have been made yet using the invitation URLs.'
+      invitation:
+        title: 'Conference invitations and passes'
+        attendee_url: 'Conference invitations'
+        booth_staff_url: 'Booth passes - Complimentary'
+        booth_paid_url: 'Booth passes - Purchase'
+        quantity:
+          one: '%{count} ticket'
+          other: '%{count} tickets'
+      table:
+        registration_reference: 'Registration Ref#'
+        ticket_reference: 'Ticket Ref#'
+        release: 'Type'
+        registration_email: 'Registration Email'
+        ticket_email: 'Assignee Email'
+        ticket_state: 'Status'
+      state:
+        unassigned: 'Unassigned'
+        complete: 'Complete'
+        incomplete: 'Incomplete'
+        void: 'Void'
+      release_type:
+        sponsor: 'Conference'
+        exhibitor: 'Booth pass'
+        'exhibitor-paid': 'Booth pass (paid)'
+      notes:
+        overview: 'This page displays the status of tickets and booth passes registered using the invitation URLs.'
+        incomplete_status: 'Tickets marked as [Incomplete] have not finished answering required questions and do not have a check-in QR code displayed.'
+        registration_vs_ticket: 'The ticket management system Tito allows obtaining multiple tickets in a single registration (purchase), which the registrant can manage collectively. On this page, we refer to the registration (purchase) unit as [Registration] and the tickets associated with it as [Tickets].'
+        email_management: 'Emails are sent from @tito.io email address. To manage all tickets in a registration, refer to the ''Your %{conference_name} Confirmation'' email. Ticket assignees are receiving ''Your %{conference_name} Ticket'' email instead to manage their own ticket.'
+        reassignment: 'Tickets can be reassigned from the email mentioned above. For security reasons, if an email address was registered incorrectly, we recommend voiding the ticket and re-registering.'
+        voiding: 'From this page, you can void tickets (and restore invitation URL usage count). Voiding is done per [Registration] unit, so all [Tickets] associated with the same [Registration] will be voided. Additionally, [Registrations] that can be voided from this page must not be paid, and all [Tickets] included in the [Registration] must be of the same type. If you want to void a registration that does not have a void button displayed, please contact %{contact_email}.'

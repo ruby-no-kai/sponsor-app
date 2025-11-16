@@ -197,11 +197,15 @@ ja:
       tickets:
         title: 'スポンサーチケット'
         attendee_url: '本編チケット'
-        booth_staff_url: 'ブースパス(無償)'
-        booth_paid_url: 'ブースパス(有償)'
+        booth_staff_url: 'ブースパス - 無償'
+        booth_paid_url: 'ブースパス - 有償'
+        quantity:
+          one: '%{count} 枚'
+          other: '%{count} 枚'
         help:
           requirement: 'ブーススタッフを含む全参加者について上記 URL から各々チケットを取得する必要があります。御社内の参加者へ上記 URL を忘れずに共有してください。'
           unique: '本 URL についてはスポンサーごと固有のものとなり、スポンサーチケット利用にあたり認証や身元確認はありません。URL の取り扱いには気をつけていただくようお願い致します。'
+        view_redemptions: '利用状況を確認する'
     edit:
       amendment_availability: "%{ts} まで修正することができます。"
   exhibitions:
@@ -213,4 +217,41 @@ ja:
       header: 'ブース詳細'
       help: '会場の利用ルールなどに抵触しないか事前に確認するため、ブース出展内容の詳細をお知らせください。何かしら確認が必要な内容があった場合はこちらからご連絡を差し上げます。'
       submit: '送信'
+
+  pass_redemptions:
+    index:
+      header: '招待/ブースパス利用状況'
+      card_title: '利用状況'
+      no_registrations: '招待URLを利用した登録はまだありません。'
+      invitation:
+        title: '招待URL'
+        attendee_url: '本編チケット'
+        booth_staff_url: 'ブースパス(無償)'
+        booth_paid_url: 'ブースパス(有償)'
+        quantity:
+          one: '%{count} 枚'
+          other: '%{count} 枚'
+      table:
+        registration_reference: '登録番号'
+        ticket_reference: 'チケット番号'
+        release: 'リリース'
+        registration_email: '登録者'
+        ticket_email: '割当先'
+        ticket_state: 'ステータス'
+      state:
+        unassigned: '未割当'
+        complete: '完了'
+        incomplete: '未完了'
+        void: '無効'
+      release_type:
+        sponsor: '本編チケット'
+        exhibitor: 'ブースパス'
+        'exhibitor-paid': '有償ブースパス'
+      notes:
+        overview: 'このページでは招待URLを利用して登録されたチケットやブースパスの状況を確認することができます。'
+        incomplete_status: '[未完了]となっているチケットは必要な質問事項への回答が終わっておらず、受付用QRコードが表示されていないチケットです。'
+        registration_vs_ticket: 'チケット管理システム Tito は一度の登録(購入)で複数のチケットを得て、登録者が一括して管理することができるようになっています。本ページでは登録(購入)された単位を [登録]、それに紐つくチケットは [チケット] と表記しています。'
+        email_management: 'Tito からのメールは @tito.io のメールアドレスから送信されます。登録に紐づく全てのチケットを管理するには ''Your %{conference_name} Confirmation'' という件名のメールをご確認ください。チケット割当先には ''Your %{conference_name} Ticket'' という件名のメールが送信され、個別のチケットを管理できるようになっています。'
+        reassignment: 'チケットの再割り当ては上記のメールから行うことができます。セキュリティ上の理由から、メールアドレスを誤登録した場合はチケットを無効化して再登録することをおすすめします。'
+        voiding: '本ページからはチケットの無効化 (および招待URL利用回数の復旧)を行うことができます。無効化には [登録] 単位で行われるため、同じ [登録] に紐付く全ての [チケット] が無効化されます。また、本ページで無効にできる [登録] は有償で購入されておらず、かつ [登録] に含まれる [チケット] の種別は全て同一である必要があります。無効化ボタンが表示されていない登録を無効化したい場合は、 %{contact_email} までご連絡ください。'
 

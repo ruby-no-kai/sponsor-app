@@ -31,6 +31,10 @@ class TitoApi
     put("#{slug}/discount_codes/#{escape(id.to_s)}", discount_code: kwargs.merge(code: code, type: type, value: value)).body
   end
 
+  def list_registrations(slug, query = {})
+    get("#{slug}/registrations", query).body
+  end
+
   def get_ticket(account_event_slug, ticket_slug)
     get("#{account_event_slug}/tickets/#{escape(ticket_slug)}").body
   end
