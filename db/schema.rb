@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_15_233620) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_16_180758) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -331,6 +331,21 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_15_233620) do
     t.index ["conference_id"], name: "index_tito_sources_on_conference_id"
     t.index ["sponsorship_id"], name: "index_tito_sources_on_sponsorship_id", unique: true
     t.index ["tito_source_id"], name: "index_tito_sources_on_tito_source_id", unique: true
+  end
+
+  create_table "tito_ticket_retractions", force: :cascade do |t|
+    t.boolean "completed", default: false, null: false
+    t.bigint "conference_id", null: false
+    t.datetime "created_at", null: false
+    t.text "reason", null: false
+    t.bigint "sponsorship_id", null: false
+    t.json "tito_cancellation"
+    t.json "tito_registration", null: false
+    t.string "tito_registration_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conference_id"], name: "index_tito_ticket_retractions_on_conference_id"
+    t.index ["sponsorship_id"], name: "index_tito_ticket_retractions_on_sponsorship_id"
+    t.index ["tito_registration_id"], name: "index_tito_ticket_retractions_on_tito_registration_id", unique: true
   end
 
   add_foreign_key "announcements", "conferences"

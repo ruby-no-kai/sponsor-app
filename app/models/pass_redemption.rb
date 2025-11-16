@@ -10,8 +10,8 @@ class PassRedemption
     :free, :paid, :cancelled, :refunded, :partially_refunded,
     :tickets,
   ) do
-    def retractable?
-      free && !paid && !refunded && !partially_refunded && tickets.tally { |t| t.release_id }.size == 1 && tickets.tally { |t| t.discount_code }.size == 1
+    def retractable? # XXX: dupe with TitoTicketRetraction
+      free && !paid && !refunded && !partially_refunded && tickets.group_by { |t| t.release_id }.size == 1 && tickets.group_by { |t| t.discount_code }.size == 1
     end
 
     def as_json
