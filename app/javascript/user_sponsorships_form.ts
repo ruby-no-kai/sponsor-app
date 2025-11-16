@@ -128,10 +128,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     formElem
-      .querySelectorAll<HTMLSelectElement>(
-        'select[name="sponsorship[fallback_option]"]',
+      .querySelectorAll<HTMLElement>(
+        ".sponsorships_form_fallback_section",
       )
-      .forEach((fallbackOptionSelect) => {
+      .forEach((section) => {
+        const fallbackOptionSelect = section.querySelector<HTMLSelectElement>(
+          'select[name="sponsorship[fallback_option]"]',
+        );
+        if (!fallbackOptionSelect) return;
+
         const updateFallbackOptions = () => {
           const selectedPlanElem = formElem.querySelector<HTMLInputElement>(
             ".sponsorships_form_plans input[type=radio]:checked",
@@ -200,19 +205,16 @@ document.addEventListener("DOMContentLoaded", () => {
           });
 
           // Control section visibility and required attribute
-          const section = formElem.querySelector<HTMLElement>(
-            ".sponsorships_form_fallback_section",
-          );
           const blankOption = Array.from(fallbackOptionSelect.options).find(
             (opt) => opt.value === "",
           );
 
           if (visibleCount > 0) {
-            section?.classList.remove("d-none");
+            section.classList.remove("d-none");
             fallbackOptionSelect.required = true;
             if (blankOption) blankOption.hidden = true;
           } else {
-            section?.classList.add("d-none");
+            section.classList.add("d-none");
             fallbackOptionSelect.required = false;
             if (blankOption) blankOption.hidden = false;
           }
@@ -251,13 +253,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }`,
           );
 
-          const section = formElem.querySelector<HTMLElement>(
-            ".sponsorships_form_fallback_section",
-          );
           const locales = {
-            withdraw: section?.dataset.localeWithdraw || "!withdraw",
-            no_booth: section?.dataset.localeNoBooth || "!no_booth",
-            booth: section?.dataset.localeBooth || "!booth",
+            withdraw: section.dataset.localeWithdraw || "!withdraw",
+            no_booth: section.dataset.localeNoBooth || "!no_booth",
+            booth: section.dataset.localeBooth || "!booth",
           };
 
           priorityList.innerHTML = priorityHuman
