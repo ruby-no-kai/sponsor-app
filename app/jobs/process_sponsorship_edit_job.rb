@@ -15,5 +15,6 @@ class ProcessSponsorshipEditJob < ApplicationJob
 
     EnsureSponsorshipTitoDiscountCodeJob.perform_now(@sponsorship, 'attendee')
     EnsureSponsorshipTitoDiscountCodeJob.perform_now(@sponsorship, 'booth_staff')
+    EnsureSponsorshipTitoDiscountCodeJob.perform_now(@sponsorship, 'booth_paid')
   end
 end
