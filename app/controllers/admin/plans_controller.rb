@@ -1,6 +1,6 @@
 class Admin::PlansController < Admin::ApplicationController
   before_action :set_conference
-  before_action :set_plan, only: [:show, :edit, :update, :destroy]
+  before_action :set_plan, only: [:edit, :update]
 
   def new
     @plan = Plan.new(conference: @conference)
