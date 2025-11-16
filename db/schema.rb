@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_16_200713) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_16_202113) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -85,6 +85,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_16_200713) do
     t.string "invite_code"
     t.string "name", null: false
     t.boolean "no_plan_allowed", default: true, null: false
+    t.datetime "pass_retraction_disables_at"
     t.string "reception_key", null: false
     t.string "slug"
     t.datetime "ticket_distribution_starts_at"

@@ -4,6 +4,10 @@
   .card-header
     = t('.description', reference: @retraction.order_reference)
   .card-body
+    - if @pass_retraction_disabled
+      .alert.alert-warning
+        = t('.disabled_message', contact_email: @conference.contact_email_address).html_safe
+
     = render 'affected_tickets', retraction: @retraction
 
     - if @retraction.retractable?

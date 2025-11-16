@@ -26,6 +26,9 @@ ja:
         unit: '部署等'
         name: '名前'
 
+      conference:
+        pass_retraction_disables_at: 'チケット/パスキャンセル無効化日時'
+
       form_description:
         fallback_options: 'Fallback Options'
 
@@ -254,12 +257,15 @@ ja:
         registration_vs_ticket: 'チケット管理システム Tito は一度の登録(購入)で複数のチケットを得て、登録者が一括して管理することができるようになっています。本ページでは登録(購入)された単位を [登録]、それに紐つくチケットは [チケット] と表記しています。'
         email_management: 'Tito からのメールは @tito.io のメールアドレスから送信されます。登録に紐づく全てのチケットを管理するには ''Your %{conference_name} Confirmation'' という件名のメールをご確認ください。チケット割当先には ''Your %{conference_name} Ticket'' という件名のメールが送信され、個別のチケットを管理できるようになっています。'
         reassignment: 'チケットの再割り当ては上記のメールから行うことができます。セキュリティ上の理由から、メールアドレスを誤登録した場合はチケットを無効化して再登録することをおすすめします。'
+        retraction_enabled: '本ページからチケットの無効化 (登録のキャンセル) を行うことができます。[キャンセル] ボタンをクリックして登録をキャンセルし、招待URL利用回数を復旧できます。'
+        retraction_disabled: 'カンファレンスの開催が近いため、自動キャンセル機能を無効にしています。キャンセルや変更を行う場合は <a href="mailto:%{contact_email}">%{contact_email}</a> までご連絡いただき、手動での対応を依頼してください。'
         voiding: '本ページからはチケットの無効化 (および招待URL利用回数の復旧)を行うことができます。無効化には [登録] 単位で行われるため、同じ [登録] に紐付く全ての [チケット] が無効化されます。また、本ページで無効にできる [登録] は有償で購入されておらず、かつ [登録] に含まれる [チケット] の種別は全て同一である必要があります。無効化ボタンが表示されていない登録を無効化したい場合は、 %{contact_email} までご連絡ください。'
 
   pass_retraction:
     new:
       header: '登録のキャンセル'
       description: '登録 %{reference} のキャンセル申請'
+      disabled_message: 'カンファレンスの開催が近いため、自動キャンセル機能を無効にしています。キャンセルや変更を行う場合は <a href="mailto:%{contact_email}">%{contact_email}</a> までご連絡いただき、手動での対応を依頼してください。'
       affected_tickets: 'キャンセルされるチケット'
       reason_label: 'キャンセル理由'
       reason_placeholder: 'キャンセルの理由を入力してください'

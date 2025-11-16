@@ -48,7 +48,7 @@
               %tr{class: reg_index.even? ? '' : 'pass-redemption-odd', style: (ticket_index == 0 && reg_index > 0) ? 'border-top: 3px solid #dee2e6;' : ''}
                 - if ticket_index == 0
                   %td{rowspan: registration.tickets.size}
-                    = link_to t('.table.retract'), new_user_conference_sponsorship_retraction_path(@conference, registration.id), class: "btn btn-sm btn-outline-danger #{registration.retractable? ? '' : 'd-none'}"
+                    = link_to t('.table.retract'), new_user_conference_sponsorship_retraction_path(@conference, registration.id), class: "btn btn-sm btn-outline-danger #{registration.retractable? && @conference.pass_retraction_enabled? ? '' : 'd-none'}"
                 %td= registration.reference
                 %td= ticket.reference
                 %td
@@ -91,5 +91,10 @@
           %p= t('.notes.reassignment')
         %li
           %p= t('.notes.incomplete_status')
+        %li
+          - if @conference.pass_retraction_enabled?
+            %p= t('.notes.retraction_enabled')
+          - else
+            %p= t('.notes.retraction_disabled', contact_email: @conference.contact_email_address).html_safe
         -#
           %li= t('.notes.voiding', contact_email: @conference.contact_email_address).html_safe

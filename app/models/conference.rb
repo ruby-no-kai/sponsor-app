@@ -44,6 +44,11 @@ class Conference < ApplicationRecord
     ticket_distribution_starts_at && ticket_distribution_starts_at <= t
   end
 
+  def pass_retraction_enabled?
+    t = Time.now
+    pass_retraction_disables_at.nil? || t < pass_retraction_disables_at
+  end
+
   def form_description_for_locale
     form_descriptions.find_by(locale: I18n.locale) || form_descriptions.find_by!(locale: 'en')
   end

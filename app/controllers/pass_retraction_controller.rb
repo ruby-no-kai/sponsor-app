@@ -1,9 +1,11 @@
 class PassRetractionController < ApplicationController
   before_action :require_sponsorship_session
   before_action :set_conference_and_sponsorship
+  before_action :require_pass_retraction_enabled, only: [:create]
 
   def new
     @retraction = find_or_prepare_retraction
+    @pass_retraction_disabled = !@conference.pass_retraction_enabled?
     redirect_to user_conference_sponsorship_retraction_path(@conference, params[:id]) if @retraction.completed?
   rescue Faraday::ResourceNotFound
     raise ActiveRecord::RecordNotFound
@@ -47,5 +49,9 @@ class PassRetractionController < ApplicationController
 
   def retraction_params
     params.require(:tito_ticket_retraction).permit(:reason)
+  end
+
+  def require_pass_retraction_enabled
+    raise ActiveRecord::RecordNotFound unless @conference.pass_retraction_enabled?
   end
 end

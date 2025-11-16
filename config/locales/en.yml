@@ -26,6 +26,9 @@ en:
         unit: 'Unit'
         name: 'Name'
 
+      conference:
+        pass_retraction_disables_at: 'Pass Retraction Disables At'
+
       form_description:
         fallback_options: 'Fallback Options'
 
@@ -253,12 +256,15 @@ en:
         registration_vs_ticket: 'The ticket management system Tito allows obtaining multiple tickets in a single registration (purchase), which the registrant can manage collectively. On this page, we refer to the registration (purchase) unit as [Registration] and the tickets associated with it as [Tickets].'
         email_management: 'Emails are sent from @tito.io email address. To manage all tickets in a registration, refer to the ''Your %{conference_name} Confirmation'' email. Ticket assignees are receiving ''Your %{conference_name} Ticket'' email instead to manage their own ticket.'
         reassignment: 'Tickets can be reassigned from the email mentioned above. For security reasons, if an email address was registered incorrectly, we recommend voiding the ticket and re-registering.'
+        retraction_enabled: 'You can retract tickets (void registrations) from this page. Click the [Retract] button to cancel a registration and restore your invitation URL usage count.'
+        retraction_disabled: 'The automated retraction process has been disabled as the conference approaches. For any cancellations or changes, please contact <a href="mailto:%{contact_email}">%{contact_email}</a> for manual processing.'
         voiding: 'From this page, you can void tickets (and restore invitation URL usage count). Voiding is done per [Registration] unit, so all [Tickets] associated with the same [Registration] will be voided. Additionally, [Registrations] that can be voided from this page must not be paid, and all [Tickets] included in the [Registration] must be of the same type. If you want to void a registration that does not have a void button displayed, please contact %{contact_email}.'
 
   pass_retraction:
     new:
       header: 'Cancel Registration'
       description: 'Request cancellation for registration %{reference}'
+      disabled_message: 'The automated retraction process has been disabled as the conference approaches. For any cancellations or changes, please contact <a href="mailto:%{contact_email}">%{contact_email}</a> for manual processing.'
       affected_tickets: 'Tickets that will be cancelled'
       reason_label: 'Reason for cancellation'
       reason_placeholder: 'Please provide a reason for cancelling this registration'

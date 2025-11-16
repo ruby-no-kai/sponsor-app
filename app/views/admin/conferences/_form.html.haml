@@ -40,6 +40,9 @@
     = form.label :ticket_distribution_starts_at
     = form.datetime_local_field :ticket_distribution_starts_at, class: 'form-control'
   .form-group
+    = form.label :pass_retraction_disables_at
+    = form.datetime_local_field :pass_retraction_disables_at, class: 'form-control'
+  .form-group
     = form.label :booth_capacity
     = form.number_field :booth_capacity, class: 'form-control'
     %small.form-text
