@@ -23,6 +23,7 @@ gem 'faraday_middleware'
 
 gem 'nokogiri'
 gem 'rexml' # letter-opener
+gem 'jsonnet'
 
 gem 'shoryuken'
 

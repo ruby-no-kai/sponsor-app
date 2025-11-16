@@ -294,9 +294,7 @@ class Sponsorship < ApplicationRecord
 
     fallback_options = form_desc.fallback_options
     if fallback_options.present? && fallback_options.any?
-      if fallback_option.blank?
-        errors.add :fallback_option, :blank
-      elsif !fallback_options.any? { |opt| opt.value == fallback_option }
+      if fallback_option.present? && !fallback_options.any? { |opt| opt.value == fallback_option }
         errors.add :fallback_option, :invalid
       end
     end

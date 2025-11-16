@@ -5,6 +5,9 @@ require "securerandom"
 
 puts "Creating Conferences..."
 
+sponsorship_id_base = SecureRandom.random_number(1000..9999) * 1000
+sponsorship_id_next = -> { sponsorship_id_base += 1; sponsorship_id_base }
+
 ApplicationRecord.transaction do
   conferences = [
     {
@@ -42,39 +45,43 @@ ApplicationRecord.transaction do
     [
       {
         name: "Ruby",
+        rank: 0,
         price_text: "2,000,000 JPY",
         words_limit: 200,
         booth_size: 2,
         capacity: 6,
-        rank: 0,
+        number_of_guests: 8,
         auto_acceptance: false,
         closes_at: Time.now + 30.days
       },
       {
         name: "Platinum",
+        rank: 1,
         price_text: "1,000,000 JPY",
         words_limit: 100,
         booth_size: 1,
         capacity: 30,
-        rank: 1,
+        number_of_guests: 4,
         auto_acceptance: false,
         closes_at: Time.now + 30.days
       },
       {
         name: "Gold",
+        rank: 2,
         price_text: "500,000 JPY",
         words_limit: 50,
         booth_size: nil,
+        number_of_guests: 2,
         capacity: 1000,
-        rank: 2,
       },
       {
         name: "Silver",
+        rank: 3,
         price_text: "250,000 JPY",
         words_limit: 25,
         booth_size: nil,
+        number_of_guests: 1,
         capacity: 10000,
-        rank: 3,
       }
     ].each do |plan_params|
       conference.plans.find_or_create_by!(plan_params)
@@ -89,7 +96,8 @@ ApplicationRecord.transaction do
         plan_help: "See the sponsorship prospectus for package details.",
         booth_help: "Sponsor booth is only applicable for sponsors in Ruby and Platinum plan as a paid add-on.",
         policy_help: "Please read the following policies and all agree to avide by. Note that the policy is required for all participants including attendees and booth staff.",
-        ticket_help: "Select the tickets you'd like to include."
+        ticket_help: "Select the tickets you'd like to include.",
+        fallback_options: JSON.generate(Jsonnet.load(Rails.root.join("misc", "fallback_options_en.jsonnet"))),
       },
       {
         locale: "ja",
@@ -97,7 +105,8 @@ ApplicationRecord.transaction do
         plan_help: "各プランの詳細は 募集要項 をご参照ください。",
         booth_help: "Ruby, Platinum スポンサーはスポンサーブースを出展することができます。詳細は募集要項をご参照ください。",
         policy_help: "RubyKaigi ではスポンサー (ブーススタッフ) を含む全ての参加者に下記ポリシーへの同意を求めています。必要に応じてブース担当者や招待チケット利用者にもご共有ください。",
-        ticket_help: "含めたいチケットを選択してください。"
+        ticket_help: "含めたいチケットを選択してください。",
+        fallback_options: JSON.generate(Jsonnet.load(Rails.root.join("misc", "fallback_options_ja.jsonnet"))),
       }
     ].each do |form_desc_params|
       conference.form_descriptions.find_or_create_by!(form_desc_params)
@@ -107,9 +116,10 @@ ApplicationRecord.transaction do
     organizations = [
       { name: "ふつうのRubyの株式会社", domain: "ordinary-ruby.invalid", locale: "ja", plan: "Ruby", request: :customization },
       { name: "Great Ruby Inc.", domain: "great-ruby.invalid", locale: "en", plan: "Platinum", request: :billing, billing_contact: true },
+      conference.name == 'RubyKaigi 2048' ? { name: "Amazing Ruby Inc.", domain: "amazing-ruby.invalid", locale: "en", plan: "Platinum", request: :note } : nil,
       { name: "合同会社ゆかいなRubyists", domain: "cheerfull-rubyists.invalid", locale: "ja", plan: "Gold", billing_contact: true },
       { name: "Little Rubyists LLC", domain: "little-rubyists.invalid", locale: "en", plan: "Silver", request: :note },
-    ]
+    ].compact
 
     puts "Creating organizations and sponsorships for #{conference.name}..."
     organizations.each do |org_params|
@@ -120,6 +130,7 @@ ApplicationRecord.transaction do
       # Sponsorships
       plans = conference.plans
       sponsorship_params = {
+        id: sponsorship_id_next.call,
         name: organization.name,
         organization: organization,
         conference: conference,
@@ -129,7 +140,7 @@ ApplicationRecord.transaction do
         booth_requested: (org_params[:plan] == "Ruby"),
         booth_assigned: false,
         locale: org_params[:locale],
-        number_of_additional_attendees: 2,
+        number_of_additional_attendees: 0,
       }
       sponsorship = Sponsorship.new(sponsorship_params)
 
@@ -171,7 +182,8 @@ ApplicationRecord.transaction do
         sponsorship.requests << request
       end
 
-      sponsorship.accept if sponsorship.plan&.auto_acceptance
+      sponsorship.accept if sponsorship.plan&.auto_acceptance || conference.name == 'RubyKaigi 2048'
+      sponsorship.booth_assigned = sponsorship.booth_requested if conference.name == 'RubyKaigi 2048'
       sponsorship.save!
     end
   end
