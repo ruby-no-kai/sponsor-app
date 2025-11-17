@@ -1,4 +1,4 @@
-class PassRetractionController < ApplicationController
+class PassRetractionsController < ApplicationController
   before_action :require_sponsorship_session
   before_action :set_conference_and_sponsorship
   before_action :require_pass_retraction_enabled, only: [:create]

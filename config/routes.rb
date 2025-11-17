@@ -58,7 +58,7 @@ Rails.application.routes.draw do
         resource :exhibition, only: %i(new create edit update)
         resources :pass_redemptions, only: %i(index) do
           member do
-            resource :retraction, only: %i(new create show), controller: 'pass_retraction'
+            resource :retraction, only: %i(new create show), controller: 'pass_retractions'
           end
         end
       end

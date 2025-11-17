@@ -260,7 +260,7 @@ en:
         retraction_disabled: 'The automated retraction process has been disabled as the conference approaches. For any cancellations or changes, please contact <a href="mailto:%{contact_email}">%{contact_email}</a> for manual processing.'
         voiding: 'From this page, you can void tickets (and restore invitation URL usage count). Voiding is done per [Registration] unit, so all [Tickets] associated with the same [Registration] will be voided. Additionally, [Registrations] that can be voided from this page must not be paid, and all [Tickets] included in the [Registration] must be of the same type. If you want to void a registration that does not have a void button displayed, please contact %{contact_email}.'
 
-  pass_retraction:
+  pass_retractions:
     new:
       header: 'Cancel Registration'
       description: 'Request cancellation for registration %{reference}'
