@@ -1,6 +1,3 @@
-import "bootstrap/dist/css/bootstrap";
-import "font-awesome/css/font-awesome";
-
 // Provide jQuery globally for Bootstrap 4
 import jquery from "jquery";
 
