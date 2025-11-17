@@ -24,12 +24,12 @@ output "app_user_role_arn" {
 }
 
 output "cloudfront_distribution_id" {
-  value       = var.enable_cloudfront ? aws_cloudfront_distribution.prd[0].id : null
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.main[0].id : null
   description = "CloudFront distribution ID"
 }
 
 output "cloudfront_distribution_domain_name" {
-  value       = var.enable_cloudfront ? aws_cloudfront_distribution.prd[0].domain_name : null
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.main[0].domain_name : null
   description = "CloudFront distribution domain name"
 }
 
@@ -39,6 +39,6 @@ output "sqs_queue_url" {
 }
 
 output "apprunner_service_url" {
-  value       = var.enable_apprunner ? aws_apprunner_service.prd[0].service_url : null
+  value       = var.enable_apprunner ? aws_apprunner_service.main[0].service_url : null
   description = "App Runner service URL"
 }

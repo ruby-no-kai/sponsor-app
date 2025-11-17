@@ -2,7 +2,7 @@
 # Image identifier and environment variables should be managed outside Terraform
 # Using lifecycle ignore_changes to prevent Terraform from reverting manual updates
 
-resource "aws_apprunner_service" "prd" {
+resource "aws_apprunner_service" "main" {
   count = var.enable_apprunner ? 1 : 0
 
   service_name = var.service_name

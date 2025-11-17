@@ -1,7 +1,7 @@
-resource "aws_cloudfront_distribution" "prd" {
+resource "aws_cloudfront_distribution" "main" {
   count = var.enable_cloudfront ? 1 : 0
 
-  provider = aws.use1
+  provider = aws.cloudfront
 
   comment = var.cloudfront_comment != "" ? var.cloudfront_comment : "sponsor-app"
 
@@ -31,7 +31,7 @@ resource "aws_cloudfront_distribution" "prd" {
 
   origin {
     origin_id           = "apprunner"
-    domain_name         = replace(aws_apprunner_service.prd[0].service_url, "https://", "")
+    domain_name         = replace(aws_apprunner_service.main[0].service_url, "https://", "")
     origin_path         = null
     connection_attempts = 3
     connection_timeout  = 10

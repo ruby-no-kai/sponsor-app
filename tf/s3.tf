@@ -1,10 +1,10 @@
 resource "aws_s3_bucket" "files" {
-  provider = aws.apne1
+  provider = aws.files
   bucket   = var.s3_bucket_name
 }
 
 resource "aws_s3_bucket_public_access_block" "files" {
-  provider = aws.apne1
+  provider = aws.files
 
   bucket                  = aws_s3_bucket.files.bucket
   block_public_acls       = true
@@ -14,7 +14,7 @@ resource "aws_s3_bucket_public_access_block" "files" {
 }
 
 resource "aws_s3_bucket_versioning" "files" {
-  provider = aws.apne1
+  provider = aws.files
 
   bucket = aws_s3_bucket.files.bucket
 
@@ -24,7 +24,7 @@ resource "aws_s3_bucket_versioning" "files" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "files" {
-  provider = aws.apne1
+  provider = aws.files
 
   bucket = aws_s3_bucket.files.bucket
 
@@ -41,14 +41,14 @@ resource "aws_s3_bucket_lifecycle_configuration" "files" {
 }
 
 resource "aws_s3_bucket_accelerate_configuration" "files" {
-  provider = aws.apne1
+  provider = aws.files
 
   bucket = aws_s3_bucket.files.bucket
   status = "Enabled"
 }
 
 resource "aws_s3_bucket_cors_configuration" "files" {
-  provider = aws.apne1
+  provider = aws.files
   bucket   = aws_s3_bucket.files.bucket
 
   dynamic "cors_rule" {

@@ -90,7 +90,7 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
         "apprunner:ListTagsForResource",
       ]
       resources = [
-        aws_apprunner_service.prd[0].arn,
+        aws_apprunner_service.main[0].arn,
       ]
     }
   }
