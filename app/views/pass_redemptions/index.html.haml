@@ -32,69 +32,69 @@
     - if @pass_redemptions.registrations.empty?
       %p.text-muted= t('.no_registrations')
     - else
-      %table.table.table-hover
-        %thead
-          %tr
-            %th
-            %th= t('.table.registration_reference')
-            %th= t('.table.ticket_reference')
-            %th= t('.table.release')
-            %th= t('.table.registration_email')
-            %th= t('.table.ticket_email')
-            %th= t('.table.ticket_state')
-        %tbody
-          - @pass_redemptions.registrations.each_with_index do |registration, reg_index|
-            - registration.tickets.each_with_index do |ticket, ticket_index|
-              %tr{class: reg_index.even? ? '' : 'pass-redemption-odd', style: (ticket_index == 0 && reg_index > 0) ? 'border-top: 3px solid #dee2e6;' : ''}
-                - if ticket_index == 0
-                  %td{rowspan: registration.tickets.size}
-                    = link_to t('.table.retract'), new_user_conference_sponsorship_retraction_path(@conference, registration.id), class: "btn btn-sm btn-outline-danger #{registration.retractable? && @conference.pass_retraction_enabled? ? '' : 'd-none'}"
-                %td= registration.reference
-                %td= ticket.reference
-                %td
-                  - if ticket.release&.tito_release_slug
-                    :ruby
-                      release_key = ticket.release.tito_release_slug
-                      color = case release_key
-                      when 'sponsor'
-                       'success'
-                      when 'exhibitor'
-                       'dark'
-                      when 'exhibitor-paid'
-                       'warning'
-                      else
-                       'light'
-                      end
-                    %span.badge{class: "badge-#{color}"}= t(".release_type.#{release_key}", default: ticket.release.tito_release_slug)
-                %td= registration.email
-                %td= ticket.email
-                %td
-                  - if ticket.void
-                    %span.badge.badge-danger= t('.state.void')
-                  - elsif ticket.state == 'complete'
-                    %span.badge.badge-success= t('.state.complete')
-                  - elsif ticket.state == 'incomplete'
-                    %span.badge.badge-warning= t('.state.incomplete')
-                  - elsif ticket.state == 'unassigned'
-                    %span.badge.badge-dark= t('.state.unassigned')
-                  - else
-                    %span.badge.badge-info= ticket.state
+      .overflow-table-block
+        %table.table.overflow-table
+          %thead
+            %tr
+              %th
+              %th= t('.table.registration_reference')
+              %th= t('.table.ticket_reference')
+              %th= t('.table.release')
+              %th= t('.table.registration_email')
+              %th= t('.table.ticket_email')
+              %th= t('.table.ticket_state')
+          %tbody
+            - @pass_redemptions.registrations.each_with_index do |registration, reg_index|
+              - registration.tickets.each_with_index do |ticket, ticket_index|
+                %tr{class: reg_index.even? ? '' : 'pass-redemption-odd', style: (ticket_index == 0 && reg_index > 0) ? 'border-top: 3px solid #dee2e6;' : ''}
+                  - if ticket_index == 0
+                    %td.text-center{rowspan: registration.tickets.size, class: registration.tickets.size > 1 ? 'align-middle' : nil}
+                      = link_to t('.table.retract'), new_user_conference_sponsorship_retraction_path(@conference, registration.id), class: "btn btn-sm btn-outline-danger #{registration.retractable? && @conference.pass_retraction_enabled? ? '' : 'd-none'}"
+                  %td= registration.reference
+                  %td= ticket.reference
+                  %td
+                    - if ticket.release&.tito_release_slug
+                      :ruby
+                        release_key = ticket.release.tito_release_slug
+                        color = case release_key
+                        when 'sponsor'
+                         'success'
+                        when 'exhibitor'
+                         'dark'
+                        when 'exhibitor-paid'
+                         'warning'
+                        else
+                         'light'
+                        end
+                      %span.badge{class: "badge-#{color}"}= t(".release_type.#{release_key}", default: ticket.release.tito_release_slug)
+                  %td= registration.email
+                  %td= ticket.email
+                  %td
+                    - if ticket.void
+                      %span.badge.badge-danger= t('.state.void')
+                    - elsif ticket.state == 'complete'
+                      %span.badge.badge-success= t('.state.complete')
+                    - elsif ticket.state == 'incomplete'
+                      %span.badge.badge-warning= t('.state.incomplete')
+                    - elsif ticket.state == 'unassigned'
+                      %span.badge.badge-dark= t('.state.unassigned')
+                    - else
+                      %span.badge.badge-info= ticket.state
 
-      %ul.mt-3.card-text
-        %li
-          %p= t('.notes.overview')
-        %li
-          %p= t('.notes.registration_vs_ticket')
-        %li
-          %p= t('.notes.email_management', conference_name: @conference.name)
-        %li
-          %p= t('.notes.reassignment')
-        %li
-          %p= t('.notes.incomplete_status')
-        %li
-          - if @conference.pass_retraction_enabled?
-            %p= t('.notes.retraction_enabled')
-          - else
-            %p= t('.notes.retraction_disabled', contact_email: @conference.contact_email_address).html_safe
-        -#
-          %li= t('.notes.voiding', contact_email: @conference.contact_email_address).html_safe
+    %hr.m-1
+    %ul.mt-3.card-text
+      %li
+        %p= t('.notes.overview')
+      %li
+        %p= t('.notes.registration_vs_ticket')
+      %li
+        %p= t('.notes.email_management', conference_name: @conference.name)
+      %li
+        %p= t('.notes.reassignment')
+      %li
+        %p= t('.notes.incomplete_status')
+      %li
+        - if @conference.pass_retraction_enabled?
+          %p= t('.notes.retraction_enabled', contact_email: @conference.contact_email_address).html_safe
+        - else
+          %p= t('.notes.retraction_disabled', contact_email: @conference.contact_email_address).html_safe
