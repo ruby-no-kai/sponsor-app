@@ -1,23 +1,24 @@
-data "external" "apprunner-deploy" {
-  program = ["ruby", "${path.module}/apprunner_deploy.rb"]
-}
+# Note: apprunner_deploy.rb script handling is deferred
+# Image identifier and environment variables should be managed outside Terraform
+# Using lifecycle ignore_changes to prevent Terraform from reverting manual updates
 
 resource "aws_apprunner_service" "prd" {
-  service_name = "sponsor-app"
+  count = var.enable_apprunner ? 1 : 0
+
+  service_name = var.service_name
 
   source_configuration {
     image_repository {
       image_configuration {
         port = "3000"
-        runtime_environment_variables = merge(jsondecode(data.external.apprunner-deploy.result.runtime_environment_variables), {
-        })
-        runtime_environment_secrets = jsondecode(data.external.apprunner-deploy.result.runtime_environment_secrets)
+        runtime_environment_variables = {}
+        runtime_environment_secrets = {}
       }
-      image_identifier      = data.external.apprunner-deploy.result.image_identifier
+      image_identifier      = "${var.enable_shared_resources ? aws_ecr_repository.app[0].repository_url : "005216166247.dkr.ecr.us-west-2.amazonaws.com/sponsor-app"}:latest"
       image_repository_type = "ECR"
     }
     authentication_configuration {
-      access_role_arn = aws_iam_role.app-runner-access.arn
+      access_role_arn = aws_iam_role.app-runner-access[0].arn
     }
     auto_deployments_enabled = false
   }
@@ -38,18 +39,30 @@ resource "aws_apprunner_service" "prd" {
   }
 
   tags = {
-    Name        = "sponsor-app"
-    Environment = "production"
+    Name        = var.service_name
+    Environment = var.environment
+  }
+
+  lifecycle {
+    ignore_changes = [
+      source_configuration[0].image_repository[0].image_identifier,
+      source_configuration[0].image_repository[0].image_configuration[0].runtime_environment_variables,
+      source_configuration[0].image_repository[0].image_configuration[0].runtime_environment_secrets,
+    ]
   }
 }
 
 resource "aws_iam_role" "app-runner-access" {
-  name               = "AppraSponsorApp"
-  description        = "prd tf/iam.tf"
-  assume_role_policy = data.aws_iam_policy_document.app-runner-access-trust.json
+  count = var.enable_apprunner ? 1 : 0
+
+  name               = var.iam_apprunner_access_name
+  description        = "${var.environment} tf/iam.tf"
+  assume_role_policy = data.aws_iam_policy_document.app-runner-access-trust[0].json
 }
 
 data "aws_iam_policy_document" "app-runner-access-trust" {
+  count = var.enable_apprunner ? 1 : 0
+
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -63,11 +76,15 @@ data "aws_iam_policy_document" "app-runner-access-trust" {
 }
 
 resource "aws_iam_role_policy" "app-runner-access" {
-  role   = aws_iam_role.app-runner-access.name
-  policy = data.aws_iam_policy_document.app-runner-access.json
+  count = var.enable_apprunner ? 1 : 0
+
+  role   = aws_iam_role.app-runner-access[0].name
+  policy = data.aws_iam_policy_document.app-runner-access[0].json
 }
 
 data "aws_iam_policy_document" "app-runner-access" {
+  count = var.enable_apprunner ? 1 : 0
+
   statement {
     effect = "Allow"
     actions = [
@@ -85,8 +102,7 @@ data "aws_iam_policy_document" "app-runner-access" {
       "ecr:DescribeImages",
     ]
     resources = [
-      aws_ecr_repository.app.arn,
+      var.enable_shared_resources ? aws_ecr_repository.app[0].arn : "arn:aws:ecr:us-west-2:005216166247:repository/sponsor-app",
     ]
   }
 }
-

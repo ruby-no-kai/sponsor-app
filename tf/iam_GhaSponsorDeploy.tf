@@ -1,10 +1,14 @@
 resource "aws_iam_role" "GhaSponsorDeploy" {
+  count                = var.enable_shared_resources ? 1 : 0
   name                 = "GhaSponsorDeploy"
-  assume_role_policy   = data.aws_iam_policy_document.GhaSponsorDeploy-trust.json
+  description          = null
+  assume_role_policy   = data.aws_iam_policy_document.GhaSponsorDeploy-trust[0].json
   max_session_duration = 3600 * 4
 }
 
 data "aws_iam_policy_document" "GhaSponsorDeploy-trust" {
+  count = var.enable_shared_resources ? 1 : 0
+
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     effect  = "Allow"
@@ -15,20 +19,20 @@ data "aws_iam_policy_document" "GhaSponsorDeploy-trust" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values = [
-        "repo:ruby-no-kai/sponsor-app:environment:production",
-      ]
+      values   = [var.github_actions_sub]
     }
   }
 }
 
 resource "aws_iam_role_policy" "GhaSponsorDeploy" {
-  role   = aws_iam_role.GhaSponsorDeploy.id
+  count  = var.enable_shared_resources ? 1 : 0
+  role   = aws_iam_role.GhaSponsorDeploy[0].id
   name   = "GhaSponsorDeploy"
-  policy = data.aws_iam_policy_document.GhaSponsorDeploy.json
+  policy = data.aws_iam_policy_document.GhaSponsorDeploy[0].json
 }
 
 data "aws_iam_policy_document" "GhaSponsorDeploy" {
+  count = var.enable_shared_resources ? 1 : 0
   statement {
     effect = "Deny"
     actions = [
@@ -71,20 +75,24 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
     actions = [
       "ecs:UpdateService",
     ]
-    resources = ["arn:aws:ecs:us-west-2:${local.aws_account_id}:service/*/sponsor-*"]
+    resources = ["arn:aws:ecs:us-west-2:${data.aws_caller_identity.current.account_id}:service/*/sponsor-*"]
   }
 
-  statement {
-    effect = "Allow"
-    actions = [
-      "apprunner:DescribeService",
-      "apprunner:UpdateService",
-      "apprunner:ListOperations",
-      "apprunner:ListTagsForResource",
-    ]
-    resources = [
-      aws_apprunner_service.prd.arn,
-    ]
+  # AppRunner permissions (only when AppRunner is enabled)
+  dynamic "statement" {
+    for_each = var.enable_apprunner ? [1] : []
+    content {
+      effect = "Allow"
+      actions = [
+        "apprunner:DescribeService",
+        "apprunner:UpdateService",
+        "apprunner:ListOperations",
+        "apprunner:ListTagsForResource",
+      ]
+      resources = [
+        aws_apprunner_service.prd[0].arn,
+      ]
+    }
   }
 
   statement {
@@ -109,11 +117,13 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
     actions = [
       "iam:PassRole",
     ]
-    resources = [
-      aws_iam_role.SponsorApp.arn,
-      aws_iam_role.EcsExecSponsorApp.arn,
-      aws_iam_role.app-runner-access.arn,
-    ]
+    resources = concat(
+      [
+        aws_iam_role.SponsorApp.arn,
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/EcsExecSponsorApp",
+      ],
+      var.enable_apprunner ? [aws_iam_role.app-runner-access[0].arn] : []
+    )
   }
 
   statement {
@@ -136,7 +146,7 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
     resources = ["*"]
   }
 
-  # Terraform
+  # DynamoDB permissions for Terraform state locking (legacy, may not be needed with use_lockfile)
   statement {
     effect = "Allow"
     actions = [
@@ -147,6 +157,7 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
     ]
     resources = [data.aws_dynamodb_table.rk-terraform.arn]
   }
+
   statement {
     effect = "Allow"
     actions = [
@@ -154,11 +165,12 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
       "iam:ListRolePolicies",
       "iam:ListAttachedRolePolicies",
     ]
-    resources = [
-      aws_iam_role.SponsorApp.arn,
-      aws_iam_role.app-runner-access.arn,
-    ]
+    resources = concat(
+      [aws_iam_role.SponsorApp.arn],
+      var.enable_apprunner ? [aws_iam_role.app-runner-access[0].arn] : []
+    )
   }
+
   statement {
     effect = "Allow"
     actions = [

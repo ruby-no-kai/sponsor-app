@@ -1,11 +1,14 @@
 resource "aws_iam_role" "EcsExecSponsorApp" {
+  count                = var.enable_shared_resources ? 1 : 0
   name                 = "EcsExecSponsorApp"
   description          = "EcsExecSponsorApp"
-  assume_role_policy   = data.aws_iam_policy_document.EcsExecSponsorApp-trust.json
+  assume_role_policy   = data.aws_iam_policy_document.EcsExecSponsorApp-trust[0].json
   max_session_duration = 43200
 }
 
 data "aws_iam_policy_document" "EcsExecSponsorApp-trust" {
+  count = var.enable_shared_resources ? 1 : 0
+
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -19,11 +22,13 @@ data "aws_iam_policy_document" "EcsExecSponsorApp-trust" {
 }
 
 resource "aws_iam_role_policy" "EcsExecSponsorApp" {
-  role   = aws_iam_role.EcsExecSponsorApp.name
-  policy = data.aws_iam_policy_document.EcsExecSponsorApp.json
+  count  = var.enable_shared_resources ? 1 : 0
+  role   = aws_iam_role.EcsExecSponsorApp[0].name
+  policy = data.aws_iam_policy_document.EcsExecSponsorApp[0].json
 }
 
 data "aws_iam_policy_document" "EcsExecSponsorApp" {
+  count = var.enable_shared_resources ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
@@ -41,7 +46,7 @@ data "aws_iam_policy_document" "EcsExecSponsorApp" {
       "ecr:DescribeImages",
     ]
     resources = [
-      aws_ecr_repository.app.arn,
+      aws_ecr_repository.app[0].arn,
     ]
   }
   statement {
@@ -57,7 +62,7 @@ data "aws_iam_policy_document" "EcsExecSponsorApp" {
     actions = [
       "ssm:GetParameters",
     ]
-    resources = ["arn:aws:ssm:*:${local.aws_account_id}:parameter/sponsor-app/*"]
+    resources = ["arn:aws:ssm:*:${data.aws_caller_identity.current.account_id}:parameter/sponsor-app/*"]
   }
   statement {
     effect = "Allow"
@@ -67,5 +72,3 @@ data "aws_iam_policy_document" "EcsExecSponsorApp" {
     resources = [data.aws_kms_key.usw2_ssm.arn]
   }
 }
-
-

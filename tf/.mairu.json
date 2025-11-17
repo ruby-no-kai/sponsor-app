@@ -1,4 +1,0 @@
-{
-  "server": "https://amc.rubykaigi.net/api/remote/",
-  "role": "arn:aws:iam::005216166247:role/OrgzAdmin"
-}

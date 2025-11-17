@@ -1,9 +1,11 @@
 resource "aws_ecr_repository" "app" {
-  name = "sponsor-app"
+  count = var.enable_shared_resources ? 1 : 0
+  name  = "sponsor-app"
 }
 
 resource "aws_ecr_lifecycle_policy" "app" {
-  repository = aws_ecr_repository.app.name
+  count      = var.enable_shared_resources ? 1 : 0
+  repository = aws_ecr_repository.app[0].name
   policy = jsonencode({
     rules = [
       {

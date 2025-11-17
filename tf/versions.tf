@@ -3,12 +3,7 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
-    }
-    external = {
-      source  = "hashicorp/external"
-      version = "~> 2.2"
+      configuration_aliases = [aws.use1, aws.apne1]
     }
   }
 }
-
-provider "external" {}
