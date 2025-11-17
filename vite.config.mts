@@ -14,30 +14,30 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // Split vendor chunks for better caching
-          if (id.includes("node_modules")) {
-            // Group common vendor libraries together
-            if (
-              id.includes("react") ||
-              id.includes("react-dom") ||
-              id.includes("@sentry")
-            ) {
-              return "vendor";
-            }
-            if (
-              id.includes("bootstrap") ||
-              id.includes("jquery") ||
-              id.includes("popper")
-            ) {
-              return "vendor";
-            }
-          }
-        },
-      },
-    },
+    //    rollupOptions: {
+    //      output: {
+    //        manualChunks: (id) => {
+    //          // Split vendor chunks for better caching
+    //          if (id.includes("node_modules")) {
+    //            // Group common vendor libraries together
+    //            if (
+    //              id.includes("react") ||
+    //              id.includes("react-dom") ||
+    //              id.includes("@sentry")
+    //            ) {
+    //              return "vendor";
+    //            }
+    //            if (
+    //              id.includes("bootstrap") ||
+    //              id.includes("jquery") ||
+    //              id.includes("popper")
+    //            ) {
+    //              return "vendor";
+    //            }
+    //          }
+    //        },
+    //      },
+    //    },
   },
   define: {
     // Provide jQuery globally for Bootstrap 4 compatibility
