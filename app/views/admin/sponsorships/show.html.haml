@@ -74,7 +74,7 @@
             Organization
           .card-body
             %p.card-text
-              = @sponsorship.organization.name
+              = link_to @sponsorship.organization.name, organization_path(@sponsorship.organization)
 
       .col-md-6
         .card
@@ -97,19 +97,18 @@
                   - if @sponsorship.tito_attendee_discount_code
                     = link_to "Attendee", @sponsorship.tito_attendee_discount_code.url
                   - if @sponsorship.tito_booth_staff_discount_code
-                    = link_to "Booth Staff", @sponsorship.tito_booth_staff_discount_code.url
+                    = link_to "Exhibitor", @sponsorship.tito_booth_staff_discount_code.url
+                  - if @sponsorship.tito_booth_paid_discount_code
+                    = link_to "Exhibitor (Paid)", @sponsorship.tito_booth_paid_discount_code.url
               .row
                 .col-sm-12
                   %strong Tito Admin:
                   - if @sponsorship.tito_attendee_discount_code
                     = link_to "Attendee", @sponsorship.tito_attendee_discount_code.dashboard_orders_url
                   - if @sponsorship.tito_booth_staff_discount_code
-                    = link_to "Booth Staff", @sponsorship.tito_booth_staff_discount_code.dashboard_orders_url
-            - else
-              .row
-                .col-sm-12
-                  %strong Registration:
-                  = link_to "Ticket (sponsor-app)", new_user_conference_ticket_path(@conference, key: @sponsorship.ticket_key)
+                    = link_to "Exhibitor", @sponsorship.tito_booth_staff_discount_code.dashboard_orders_url
+                  - if @sponsorship.tito_booth_paid_discount_code
+                    = link_to "Exhibitor (Paid)", @sponsorship.tito_booth_paid_discount_code.dashboard_orders_url
         .card
           %h5.card-header
             Requests

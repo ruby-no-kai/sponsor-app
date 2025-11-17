@@ -89,30 +89,30 @@ document.addEventListener("DOMContentLoaded", () => {
       ) as Element;
 
       const handleChange = (e: HTMLInputElement | null) => {
-        if (!e) return;
-        if (e.dataset.booth == "1") {
+        if (e?.dataset.booth == "1") {
           uneligibleHelpTextElem.classList.add("d-none");
           boothCheckbox.disabled = false;
         } else {
           uneligibleHelpTextElem.classList.remove("d-none");
+          boothCheckbox.checked = false;
           boothCheckbox.disabled = true;
         }
 
-        const wordsLimitHelp = e.dataset.wordsLimitHelp;
+        const wordsLimitHelp = e?.dataset.wordsLimitHelp;
         if (wordsLimitHelp) {
           profileFieldHelpElem.innerHTML = wordsLimitHelp;
         } else {
           profileFieldHelpElem.innerHTML = "";
         }
 
-        const acceptanceHelp = e.dataset.acceptanceHelp;
+        const acceptanceHelp = e?.dataset.acceptanceHelp;
         if (acceptanceHelp) {
           acceptanceHelpElem.innerHTML = acceptanceHelp;
         } else {
           acceptanceHelpElem.innerHTML = "";
         }
 
-        customizationRequestField.required = e.dataset["other"] == "1";
+        customizationRequestField.required = e?.dataset["other"] == "1";
       };
       handleChange(
         elem.querySelector("input[type=radio]:checked") as HTMLInputElement,
@@ -125,6 +125,229 @@ document.addEventListener("DOMContentLoaded", () => {
           handleChange(e.target as HTMLInputElement);
         });
       });
+    });
+
+    formElem
+      .querySelectorAll<HTMLElement>(
+        ".sponsorships_form_fallback_section",
+      )
+      .forEach((section) => {
+        const fallbackOptionSelect = section.querySelector<HTMLSelectElement>(
+          'select[name="sponsorship[fallback_option]"]',
+        );
+        if (!fallbackOptionSelect) return;
+
+        const updateFallbackOptions = () => {
+          const selectedPlanElem = formElem.querySelector<HTMLInputElement>(
+            ".sponsorships_form_plans input[type=radio]:checked",
+          );
+          const boothCheckbox = formElem.querySelector<HTMLInputElement>(
+            ".sponsorships_form_booth_request input[type=checkbox]",
+          );
+
+          const boothRequested = boothCheckbox?.checked || false;
+          const selectedPlanName = selectedPlanElem?.dataset.planName;
+
+          let visibleCount = 0;
+
+          Array.from(fallbackOptionSelect.options).forEach((option) => {
+            if (option.value === "") {
+              // Handle blank option separately at the end
+              return;
+            }
+
+            const conditionsStr = option.dataset.conditions;
+            let shouldShow = false;
+
+            if (conditionsStr) {
+              try {
+                const conditions = JSON.parse(conditionsStr);
+                // OR logic: if ANY condition matches, show the option
+                shouldShow = conditions.some(
+                  (condition: {
+                    plans?: string[];
+                    booth_request?: boolean;
+                  }) => {
+                    // AND logic: ALL attributes in a condition must match
+                    let matches = true;
+
+                    if (condition.booth_request !== undefined) {
+                      matches =
+                        matches && boothRequested === condition.booth_request;
+                    }
+
+                    if (condition.plans && condition.plans.length > 0) {
+                      matches =
+                        matches &&
+                        selectedPlanName !== undefined &&
+                        condition.plans.includes(selectedPlanName);
+                    }
+
+                    return matches;
+                  },
+                );
+              } catch (e) {
+                console.error("Failed to parse conditions data", e);
+              }
+            } else {
+              // No conditions means always show
+              shouldShow = true;
+            }
+
+            option.hidden = !shouldShow;
+            if (shouldShow) {
+              visibleCount++;
+            }
+            if (!shouldShow && option.selected) {
+              // If current selection is hidden, reset to blank
+              fallbackOptionSelect.value = "";
+            }
+          });
+
+          // Control section visibility and required attribute
+          const blankOption = Array.from(fallbackOptionSelect.options).find(
+            (opt) => opt.value === "",
+          );
+
+          if (visibleCount > 0) {
+            section.classList.remove("d-none");
+            fallbackOptionSelect.required = true;
+            if (blankOption) blankOption.hidden = true;
+          } else {
+            section.classList.add("d-none");
+            fallbackOptionSelect.required = false;
+            if (blankOption) blankOption.hidden = false;
+          }
+        };
+
+        const updatePriorityHuman = () => {
+          const priorityListSection = formElem.querySelector<HTMLElement>(
+            ".sponsorships_form_fallback_priority",
+          );
+          if (!priorityListSection) return;
+          const priorityList = priorityListSection.querySelector("ol");
+          if (!priorityList) return;
+
+          const selectedOption = fallbackOptionSelect.selectedOptions[0];
+          if (!selectedOption || selectedOption.value === "") {
+            priorityList.innerHTML = "";
+            return;
+          }
+
+          const priorityHumanStr = selectedOption.dataset.priorityHuman || "[]";
+          const priorityHuman = JSON.parse(priorityHumanStr) as string[];
+
+          const selectedPlanElem = formElem.querySelector<HTMLInputElement>(
+            ".sponsorships_form_plans input[type=radio]:checked",
+          );
+          const selectedPlanName = selectedPlanElem?.dataset.planName || "";
+
+          const boothCheckbox = formElem.querySelector<HTMLInputElement>(
+            ".sponsorships_form_booth_request input[type=checkbox]",
+          );
+          priorityHuman.unshift(
+            `{plan}${
+              boothCheckbox?.disabled
+                ? ""
+                : `!${boothCheckbox?.checked ? "booth" : "no_booth"}`
+            }`,
+          );
+
+          const locales = {
+            withdraw: section.dataset.localeWithdraw || "!withdraw",
+            no_booth: section.dataset.localeNoBooth || "!no_booth",
+            booth: section.dataset.localeBooth || "!booth",
+          };
+
+          priorityList.innerHTML = priorityHuman
+            .map((item) => {
+              let displayItem = item.replace("{plan}", selectedPlanName);
+
+              displayItem = displayItem
+                .replace(/!no_booth/g, ` (${locales.no_booth})`)
+                .replace(/!booth/g, ` (${locales.booth})`)
+                .replace(/!withdraw/g, `${locales.withdraw}`);
+
+              return `<li>${displayItem}</li>`;
+            })
+            .join("");
+
+          priorityListSection.classList.remove("d-none");
+        };
+
+        updateFallbackOptions();
+        updatePriorityHuman();
+
+        fallbackOptionSelect.addEventListener("change", updatePriorityHuman);
+
+        formElem
+          .querySelectorAll<HTMLInputElement>(
+            ".sponsorships_form_plans input[type=radio]",
+          )
+          .forEach((planRadio) => {
+            planRadio.addEventListener("change", () => {
+              // Reset fallback option to remind user to select again
+              fallbackOptionSelect.value = "";
+              const prioritySection = formElem.querySelector<HTMLElement>(
+                ".sponsorships_form_fallback_priority",
+              );
+              prioritySection?.classList.add("d-none");
+              updateFallbackOptions();
+              updatePriorityHuman();
+            });
+          });
+
+        formElem
+          .querySelectorAll<HTMLInputElement>(
+            ".sponsorships_form_booth_request input[type=checkbox]",
+          )
+          .forEach((boothCheckbox) => {
+            boothCheckbox.addEventListener("change", () => {
+              // Reset fallback option to remind user to select again
+              fallbackOptionSelect.value = "";
+              const prioritySection = formElem.querySelector<HTMLElement>(
+                ".sponsorships_form_fallback_priority",
+              );
+              prioritySection?.classList.add("d-none");
+              updateFallbackOptions();
+            });
+          });
+      });
+
+    const ENGLISH_REGEX =
+      /^(?:[\p{Script=Latin}\p{Script=Zyyy}\p{Sc}\p{Sk}\p{Sm}\p{So}])*$/u;
+    formElem.querySelectorAll(".sponsorships_form_info").forEach((elem) => {
+      elem
+        .querySelectorAll<HTMLInputElement>(
+          'input[name="sponsorship[name]"], textarea[name="sponsorship[profile]"]',
+        )
+        .forEach((inputElem) => {
+          const onChange = () => {
+            const warningsToShow = new Map<string, boolean>();
+
+            if (!ENGLISH_REGEX.test(inputElem.value)) {
+              warningsToShow.set("english", true);
+            }
+
+            const warningElems = formElem.querySelectorAll<HTMLElement>(
+              ".sponsorships_form_info__warning",
+            );
+
+            warningElems.forEach((w) => {
+              if (warningsToShow.has(w.dataset.warningKind || "")) {
+                w.classList.remove("d-none");
+                w.querySelectorAll("input").forEach((i) => (i.required = true));
+              } else {
+                w.classList.add("d-none");
+                w.querySelectorAll("input").forEach(
+                  (i) => (i.required = false),
+                );
+              }
+            });
+          };
+          inputElem.addEventListener("input", onChange);
+          inputElem.addEventListener("change", onChange);
+        });
     });
   });
 });

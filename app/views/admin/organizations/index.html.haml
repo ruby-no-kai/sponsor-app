@@ -1,0 +1,25 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to 'Admin', dashboard_path
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Organizations
+
+%h1 Organizations
+
+- if @organizations.empty?
+  %p.text-muted No organizations yet
+- else
+  .row.py-2
+    - @organizations.each do |organization|
+      .col-md-6.mb-3
+        .card
+          .card-body
+            %h5.card-title
+              = link_to organization.name, organization_path(organization)
+            %p.card-text
+              %small.text-muted
+                %code= organization.domain
+                - if organization.auto_acceptance_disabled
+                  %span.badge.badge-warning.ml-2 Auto-acceptance disabled
+            %p.card-text
+              %small.text-muted
+                = pluralize(organization.sponsorships.count, 'sponsorship')

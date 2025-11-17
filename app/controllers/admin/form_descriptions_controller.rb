@@ -45,6 +45,7 @@ class Admin::FormDescriptionsController < Admin::ApplicationController
       :booth_help,
       :policy_help,
       :ticket_help,
+      :fallback_options,
     )
   end
 

@@ -7,6 +7,7 @@ en:
         url: 'URL'
         profile: 'Introduction text'
         booth_requested: 'Booth Request'
+        fallback_option: 'Alternative Plan Preference'
         number_of_additional_attendees: 'Number of Additional Attendees'
         policy_agreement: 'I confirmed and agree with the policies'
 
@@ -25,13 +26,14 @@ en:
         unit: 'Unit'
         name: 'Name'
 
+      conference:
+        pass_retraction_disables_at: 'Pass Retraction Disables At'
+
+      form_description:
+        fallback_options: 'Fallback Options'
+
       exhibition:
         description: 'Booth Plan'
-
-      ticket:
-        name: 'Your Name'
-        kind: 'Ticket Type'
-        email: 'Email Address'
     errors:
       models:
         sponsorship:
@@ -54,9 +56,6 @@ en:
       'sponsorship[note_attributes]': *note
       sponsorship:
         booth_requested: 'Request a Booth'
-    submit:
-      ticket:
-        create: 'Submit'
 
   layouts:
     application:
@@ -88,12 +87,6 @@ en:
       subject: "Thank you for sponsoring us"
     admin_email:
       subject: "New sponsorship application from: %{name}"
-  ticket_retrieval_mailer:
-    notify:
-      subject: 'Reminder of Your sponsor ticket'
-  unauthorized_ticket_warning_mailer:
-    notify:
-      subject: 'There was an unverified attendee from your organization'
 
   sponsorships:
     form:
@@ -103,8 +96,10 @@ en:
         header: 'Filling the same information with your sponsorship application in past?'
         explanation: 'Select an existing application from below, then the existing data will be filled in.'
       contact: 'Point of Contact'
+      email_help: "We recommend using a mailing list (group address) as a primary, and specify an individual email address to CC. It will help referencing past informations in future conferences."
       email_cc_help: "Enter alternate email addresses (comma separated). Announcements will be CC'd to these addresses. Note that these CC addresses cannot be used for logging into sponsor portal."
       billing: 'Billing Information'
+      billing_help: 'Please provide billing information for invoicing. If you have any special requests, use the additional note field below. Note that we will issue invoices in PDF format via email; No hardcopy will be sent.'
       specify_alternate_billing_contact: 'Specify an alternate contact for billing'
       billing_request_help: 'Use this field especially if you have: requirement of contract or submitting form, explicit due date for a bill...'
       plan: 'Sponsorship Package'
@@ -129,22 +124,43 @@ en:
       plan_closed: 'Closed'
       booth: 'Sponsor Booth'
       booth_uneligible_plan_selected: 'Your selected plan is uneligible for booths; only available in %{plans} plan'
+      fallback_option: 'Configure Alternative Plan Preferences'
+      fallback_option_blank: '-- Make a selection --'
+      fallback_option_help: 'Your selected plan may not be available due to capacity limits and random selection. Please select your preferred alternative option in case we could not accommodate your preferred request.'
+      fallback_priority:
+        header: 'Priority'
+        help: "This option sets the following priority order. Note that '(with booth)' in the following means a slot with booth allotment; It is not a booth request."
+      fallback_option_priority:
+        withdraw: 'Withdraw'
+        no_booth: 'without booth'
+        booth: 'with booth'
       information: 'Sponsor Information'
       information_help: |
-        Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose.
+        Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose. If you submit a preliminary information or prefer to submit later, let us know via [Others] field below. We'll hold the information from publication on our website.
       logo: 'Logo'
       download_logo: '(Download previously uploaded file)'
       logo_help: |
-        Upload your company logo file for the sponsors page in our website, and the venue onsite. Please make sure your file is in vector format (like .ai, .eps, .svg). If you have multiple files, archive them into a .zip file.
+        Upload your company logo file for the sponsors page in our website, and the venue onsite. Please make sure your file is in vector format (like .ai, .eps, .svg).
+      logo_zip_help: |
+         If you have multiple files, archive all files in .zip file; This is useful in case you want us to follow a guideline, or use a separate file such as different color mode (RGB/CMYK) for website and printing purpose. If you submit a single file, please choose a one in RGB color mode.
       others_help: |
         Use the following field for anything you want let us know in advance.
-      tickets: 'Attendee Tickets'
-      tickets_included_in_plan: 'Tickets included in the selected plan'
-      tickets_additionally_request: 'Additional Tickets'
-      tickets_total: 'Total number of Attendees'
       note: 'Others'
       policies: 'Policies'
       submit: 'Submit'
+      warnings:
+        english:
+          header: 'The introduction may contain non-English text'
+          body1: 'We request all informations to be filled in English, and non-English text are not permitted. Please confirm the above fields contain only English text, or use the following checkbox to acknowledge in case we are misdetecting non-English text.'
+          body2: 'If we find non-English text upon human review, we may ask you to correct it, and your information may not be published on our website until the correction is made.'
+          acknowledge: 'Yes, I acknowledge that the above fields consist of English text.'
+        zip_asset:
+          header: 'Verify your .zip archive meets our requirements'
+          item0: 'This .zip archive is not encrypted'
+          item1: 'This .zip archive contains vector files (like .ai, .svg, .pdf) for logos'
+          item2: 'This .zip archive contains a guideline if applicable'
+          item3: 'If multiple logos are included: Specify the file names in [Others] field below'
+          acknowledge: 'Yes, I have confirmed these requirements.'
     closed:
       header: 'Application form is not open'
       closed: "Thank you for your interest. But we're sorry, we have closed the sponsorship application for this conference at %{ts}."
@@ -161,8 +177,6 @@ en:
       your_sponsorship_plan: "Your selected sponsorship plan"
       customized_plan: "Customized"
       sponsor_talk_eligible: "Includes a sponsor session"
-      included_guests: "Attendee tickets included in the plan"
-      additional_guests: "Additional tickets purchased"
       total_number_of_guests: "Total"
       guests_count:
         zero: 'no guests'
@@ -183,14 +197,17 @@ en:
         new: 'Edit'
         not_submitted: 'Not Submitted Yet'
       tickets:
-        title: 'Invitations'
-        your_url: 'Invitation URL'
-        attendee_url: 'Attendee invitation URL'
-        booth_staff_url: 'Booth staff invitation URL'
+        title: 'Invitation and Passes'
+        attendee_url: 'Conference invitations'
+        booth_staff_url: 'Booth passes redemption'
+        booth_paid_url: 'Purchase additional booth passes'
+        quantity:
+          one: '%{count} pass'
+          other: '%{count} passes'
         help:
-          direction: 'To register, follow the instructions shown in the ticket page.'
-          requirement: 'All attendees who use a sponsor ticket must retrieve their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
-          unique: 'This URL is unique and bound to you, and there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
+          requirement: 'All people who visit the conference venue must exchange their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
+          unique: 'This URL is unique and bound to your sponsorship. Note that there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
+        view_redemptions: 'Review registrations'
     edit:
       amendment_availability: "You can amend your application until %{ts}."
   exhibitions:
@@ -202,27 +219,74 @@ en:
       header: 'Booth Details'
       help: 'Please submit your booth plans in advance. Organizers will review your plan to ensure it complies with the venue rules. We may contact you if we have something to advise.'
       submit: 'Submit'
-  tickets:
+
+  pass_redemptions:
+    index:
+      header: 'Pass Redemptions'
+      card_title: 'Registrations and Tickets'
+      no_registrations: 'No registrations have been made yet using the invitation URLs.'
+      invitation:
+        title: 'Conference invitations and passes'
+        attendee_url: 'Conference invitations'
+        booth_staff_url: 'Booth passes - Complimentary'
+        booth_paid_url: 'Booth passes - Purchase'
+        quantity:
+          one: '%{count} ticket'
+          other: '%{count} tickets'
+      table:
+        retract: 'Void'
+        registration_reference: 'Registration Ref#'
+        ticket_reference: 'Ticket Ref#'
+        release: 'Type'
+        registration_email: 'Registrant Email'
+        ticket_email: 'Assignee Email'
+        ticket_state: 'Status'
+      state:
+        unassigned: 'Unassigned'
+        complete: 'Complete'
+        incomplete: 'Incomplete'
+        void: 'Void'
+      release_type:
+        sponsor: 'Conference'
+        exhibitor: 'Booth pass'
+        'exhibitor-paid': 'Booth pass (paid)'
+      notes:
+        overview: 'This page displays the status of tickets and booth passes registered using the invitation URLs.'
+        incomplete_status: 'Tickets marked as [Incomplete] have not finished answering required questions and do not have a check-in QR code displayed. Please ensure ticket assignees complete them before arriving at the venue.'
+        registration_vs_ticket: 'The ticket management system Tito allows obtaining multiple tickets in a single registration (purchase), which the registrant can manage collectively. On this page, we refer to a registration (purchase) unit as [Registration] and the tickets associated with it as [Tickets]. When using invitation URLs, you can either distribute the URL directly to individuals for separate registrations, or have one person register all tickets at once and assign them to attendees through Tito.'
+        email_management: 'Emails are sent from @tito.io email address. To manage all tickets in a registration, refer to the ''Your %{conference_name} Confirmation'' email. Ticket assignees receive the ''Your %{conference_name} Ticket'' email instead, which allows them to manage only their assigned ticket.'
+        reassignment: 'Tickets can be reassigned from the email mentioned above. For security reasons, if an email address was registered incorrectly, we recommend voiding the ticket and re-registering.'
+        retraction_enabled: 'Also, you can cancel registrations from this page to restore your ticket quota. Click the [Void] button to start the cancellation process. Some registrations may not show a [Void] button; in such cases, please contact <a href="mailto:%{contact_email}">%{contact_email}</a> with the tickets you wish to cancel and the reason. Note that paid booth passes cannot be cancelled nor refunded.'
+        retraction_disabled: 'For any cancellations or changes, please contact <a href="mailto:%{contact_email}">%{contact_email}</a> with the reason and ticket information; lhe automated cancellation feature has been disabled as the conference approaches. Note that paid booth passes cannot be cancelled.'
+
+  pass_retractions:
     new:
-      header: '%{name} Sponsorship Ticket Registration'
-      desc1: "Welcome! At this page, you can register yourself for %{conference} as an attendee using your sponsor ticket. By submitting the following form you'll get a QR code for the reception. You can:"
-      onsite:
-        head: 'Register using mobile device:'
-        desc: "You can visit this page using your mobile device and submit the form in advance, or while you are waiting in the registration queue."
-      print_in_advance:
-        head: 'Print in advance:'
-        desc: "Otherwise, you can submit the form now, then print the QR code out and bring it to the reception."
-      desc2: "Retrieving the ticket using mobile device is strongly recommended. See you soon at the venue!"
-      code_desc: "Use this code to open this page on your mobile device"
-      form:
-        from: 'from %{sponsorship}'
-        email_help: 'Optional (recommended). We will send a email to retrieve your code again.'
-        attendee_help: "Attend to the event as an attendee. Choose this if you're in doubt."
-        booth_staff_help: "Booth passes are not allowed to attend the sessions."
-        policy_help: "By submitting this form you agree to the following policy."
-        submit_help: "Note: submitting your information doesn't consume your organization's sponsor tickets immediately. Sponsor ticket will become used upon the registration in the venue."
+      header: 'Cancel Registration'
+      description: 'Request cancellation for registration %{reference}'
+      disabled_message: 'The automated retraction process has been disabled as the conference approaches. For any cancellations or changes, please contact <a href="mailto:%{contact_email}">%{contact_email}</a> for manual processing.'
+      affected_tickets: 'Tickets to be voided'
+      reason_label: 'Reason for cancellation'
+      reason_placeholder: 'Brief reason for cancellation: e.g. mistyped email address'
+      not_retractable: 'This registration cannot be cancelled automatically. Note that paid booth passes cannot be cancelled.'
+      notes_header: 'Important notes'
+      note_1: 'All tickets listed above will be voided. Partial cancellation is not possible (cancellation is done per registration unit).'
+      note_2: 'If you want to reassign tickets, we recommend using the management links in emails sent from the Tito ticketing system (...@tito.io). Registrants should have received a ''Your %{conference_name} Confirmation'' email, and ticket assignees should have received a ''Your %{conference_name} Ticket'' email. If the email address was registered incorrectly, we recommend cancellation.'
+      note_3: 'Your ticket quota will be restored by the number of voided tickets. No automatic notifications will be sent to ticket assignees or registrants. It is your responsibility to inform them about the cancellation and how to obtain new tickets (if needed).'
+      confirmation_label: 'I understand and confirm the above information.'
+      submit: 'Submit'
+      cancel: 'Back to Pass Redemptions'
+    create:
+      notice: 'Cancellation request has been submitted.'
+      error: 'Unable to submit cancellation request.'
     show:
-      guide1: "Present this page to the sponsor registration desk. You can use mobile device, or you may print this page out in advance and bring to the desk."
-      guide2: "The link to this page is sent to your email address."
-      reissue_guide: "You need an another ticket or made a mistake in your information?"
-      reissue_link: "Click here to register again"
+      header: 'Cancellation Request'
+      completed_header: 'Cancellation Completed'
+      completed_message: ''
+      completed_note_1: 'Your invitation URL has been made available again for the number of voided tickets'
+      completed_note_2: 'All tickets associated with this registration have been voided'
+      pending_header: 'Processing Cancellation'
+      pending_message: 'Your cancellation request is being processed. Please wait a moment.'
+      note_3: 'No automatic notifications will be sent to ticket assignees or registrants. It is your responsibility to inform them about the cancellation and how to obtain new tickets (if needed).'
+      reason: 'Reason'
+      registration_reference: 'Registration'
+      back: 'Back to Pass Redemptions'

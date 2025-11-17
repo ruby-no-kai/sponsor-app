@@ -3,6 +3,8 @@ class SponsorshipAssetFile < ApplicationRecord
   BUCKET = ENV['S3_FILES_BUCKET']
   PREFIX = ENV['S3_FILES_PREFIX']
 
+  MAX_FILE_SIZE = 200.megabytes
+
   ROLE = ENV['S3_FILES_ROLE']
 
   belongs_to :sponsorship, optional: true
@@ -16,11 +18,12 @@ class SponsorshipAssetFile < ApplicationRecord
 
   def copy_to!(conference)
     dst = self.class.create!(prefix: "c-#{conference.id}/", extension: self.extension)
-    Aws::S3::Client.new(logger: Rails.logger, region: REGION).copy_object(
+    s3_client.copy_object(
       bucket: BUCKET,
       copy_source: "#{BUCKET}/#{object_key}",
       key: dst.object_key,
     )
+    dst.update_object_header
     dst
   end
 
@@ -30,7 +33,9 @@ class SponsorshipAssetFile < ApplicationRecord
   end
 
   def make_session
-    Session.new(self).as_json
+    upload_url_and_fields.merge(
+      id: id.to_s,
+    )
   end
 
   def filename
@@ -38,7 +43,6 @@ class SponsorshipAssetFile < ApplicationRecord
   end
 
   def download_url
-    presigner = Aws::S3::Presigner.new(client: Aws::S3::Client.new(use_dualstack_endpoint: true, region: REGION))
     presigner.presigned_url(
       :get_object,
       bucket: BUCKET,
@@ -46,6 +50,43 @@ class SponsorshipAssetFile < ApplicationRecord
       expires_in: 3600,
       response_content_disposition: "attachment; filename=\"#{filename}\"",
     )
+  end
+
+  def upload_url_and_fields
+    # see also config/initializers/aws_s3_patches.rb to force dualstack endpoint
+    sign = Aws::S3::PresignedPost.new(
+      Session.new(self).credentials, # don't leak primary session token
+      REGION,
+      BUCKET,
+      {
+        key: object_key,
+        signature_expiration: Time.now+900,
+        content_length_range: 0..MAX_FILE_SIZE,
+        use_accelerate_endpoint: true,
+        allow_any: ['Content-Type', 'x-amz-checksum-algorithm', 'x-amz-checksum-sha256'],
+      },
+    )
+    {
+      url: sign.url,
+      fields: sign.fields,
+      max_size: MAX_FILE_SIZE,
+    }
+  end
+
+  def update_object_header
+    head = s3_client.head_object(bucket: BUCKET, key: object_key, checksum_mode: :enabled)
+    self.version_id = head.version_id if head.version_id != version_id
+    self.last_modified_at = head.last_modified
+    self.checksum_sha256 = head.checksum_sha256
+    self
+  end
+
+  private def presigner
+    @presigner ||= Aws::S3::Presigner.new(client: s3_client)
+  end
+
+  private def s3_client
+    @s3_client ||= Aws::S3::Client.new(use_dualstack_endpoint: true, region: REGION, logger: Rails.logger)
   end
 
   private def validate_ownership_not_changed
@@ -104,18 +145,12 @@ class SponsorshipAssetFile < ApplicationRecord
       )
     end
 
-    def as_json
-      {
-        id: file.id.to_s,
-        region: REGION,
-        bucket: BUCKET,
-        key: file.object_key,
-        credentials: {
-          access_key_id: role_session.credentials.access_key_id,
-          secret_access_key: role_session.credentials.secret_access_key,
-          session_token: role_session.credentials.session_token,
-        },
-      }
+    def credentials
+      Aws::Credentials.new(
+        role_session.credentials.access_key_id,
+        role_session.credentials.secret_access_key,
+        role_session.credentials.session_token,
+      )
     end
   end
 end

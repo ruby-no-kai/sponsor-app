@@ -1,3 +1,7 @@
 export const SENTRY_DSN = document.querySelector<HTMLMetaElement>(
-  'meta[name="rkto:sentry-dsn"]',
+  'meta[name="rk:sentry-dsn"]',
+)?.content;
+
+export const RELEASE = document.querySelector<HTMLMetaElement>(
+  'meta[name="rk:release"]',
 )?.content;

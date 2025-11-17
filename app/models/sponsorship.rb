@@ -18,6 +18,8 @@ class Sponsorship < ApplicationRecord
 
   has_one :asset_file, class_name: 'SponsorshipAssetFile', dependent: :destroy
 
+  has_one :tito_source
+
   def asset_file_id; self.asset_file&.id; end
   def asset_file_id=(other)
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
@@ -35,7 +37,6 @@ class Sponsorship < ApplicationRecord
   has_one :exhibition
 
   has_many :broadcast_deliveries, dependent: :nullify
-  has_many :tickets, dependent: :destroy
 
   has_many :tito_discount_codes, dependent: :destroy
 
@@ -45,6 +46,10 @@ class Sponsorship < ApplicationRecord
 
   def tito_booth_staff_discount_code
     @tito_booth_staff_discount_code ||= tito_discount_codes.where(kind: 'booth_staff').first
+  end
+
+  def tito_booth_paid_discount_code
+    @tito_booth_paid_discount_code ||= tito_discount_codes.where(kind: 'booth_paid').first
   end
 
   scope :active, -> { accepted.not_withdrawn }
@@ -73,8 +78,6 @@ class Sponsorship < ApplicationRecord
 
   validates :asset_file, presence: true
 
-  validates :ticket_key, presence: true
-
   validates_numericality_of :number_of_additional_attendees, allow_nil: true, greater_than_or_equal_to: 0, only_integer: true
 
   validate :validate_correct_plan
@@ -83,6 +86,7 @@ class Sponsorship < ApplicationRecord
   validate :validate_booth_eligibility, on: :update_by_user
   validate :validate_word_count, on: :update_by_user
   validate :validate_no_plan_allowance, on: :update_by_user
+  validate :validate_fallback_option, on: :update_by_user
   validate :policy_agreement
 
 
@@ -168,7 +172,7 @@ class Sponsorship < ApplicationRecord
   end
 
   def assume_organization
-    self.organization = Organization.create_with(name: self.name).find_or_initialize_by(domain: self.contact&.email&.split(?@, 2).last)
+    self.organization = Organization.create_with(name: self.name).find_or_initialize_by(domain: self.contact&.email&.split(?@, 2)&.last&.downcase)
   end
 
   def to_h_for_history
@@ -194,7 +198,12 @@ class Sponsorship < ApplicationRecord
       "organization_name" => organization&.name,
       "locale" => locale,
       "asset_file_id" => asset_file&.id,
+      "asset_file.extension" => asset_file&.extension,
+      "asset_file.version_id" => asset_file&.version_id,
+      "asset_file.checksum_sha256" => asset_file&.checksum_sha256,
+      "asset_file.last_modified_at" => asset_file&.last_modified_at,
       "note" => note&.body,
+      "fallback_option" => fallback_option,
       "number_of_additional_attendees" => number_of_additional_attendees,
       "accepted_at" => accepted_at,
     }.tap do |h|
@@ -212,11 +221,7 @@ class Sponsorship < ApplicationRecord
   
   def total_number_of_booth_staff
     #(active? && booth_assigned?) ? [3, booth_size ? booth_size*2 : 0].max : 0 # FIXME:
-    (active? && booth_assigned?) ? 3 : 0 # FIXME:
-  end
-
-  def number_of_registered_attendees
-    tickets.where.not(kind: :attendee, checked_in_at: nil).count
+    (active? && booth_assigned?) ? 2 : 0 # FIXME:
   end
 
   def booth_size
@@ -280,6 +285,18 @@ class Sponsorship < ApplicationRecord
   def validate_no_plan_allowance
     if !plan_id && conference && !conference.no_plan_allowed
       errors.add :plan, :no_plan_not_allowed
+    end
+  end
+
+  def validate_fallback_option
+    form_desc = conference&.form_description_for_locale
+    return unless form_desc
+
+    fallback_options = form_desc.fallback_options
+    if fallback_options.present? && fallback_options.any?
+      if fallback_option.present? && !fallback_options.any? { |opt| opt.value == fallback_option }
+        errors.add :fallback_option, :invalid
+      end
     end
   end
 

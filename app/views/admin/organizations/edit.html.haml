@@ -1,0 +1,37 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to 'Admin', dashboard_path
+    %li.breadcrumb-item= link_to 'Organizations', organizations_path
+    %li.breadcrumb-item= link_to @organization.name, organization_path(@organization)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Edit
+
+%h1 Editing Organization
+
+= form_with(model: @organization, url: organization_path(@organization), local: true) do |form|
+  - if @organization.errors.any?
+    .alert.alert-danger
+      %p #{pluralize(@organization.errors.count, "error")} prohibited this from being saved:
+      %ul
+        - @organization.errors.full_messages.each do |message|
+          %li= message
+
+  .form-group
+    = form.label :name
+    = form.text_field :name, class: 'form-control', required: true
+
+  .form-group
+    = form.label :domain
+    = form.text_field :domain, class: 'form-control', required: true
+    %small.form-text.text-muted
+      Email domain identifier (e.g., example.com)
+
+  .form-group
+    .form-check
+      = form.check_box :auto_acceptance_disabled, class: 'form-check-input'
+      = form.label :auto_acceptance_disabled, class: 'form-check-label'
+      %small.form-text.text-muted
+        When checked, sponsorships from this organization will not be auto-accepted even if the plan allows it
+
+  .form-group
+    = form.submit 'Save', class: 'btn btn-primary'
+    = link_to 'Cancel', organization_path(@organization), class: 'btn btn-secondary'

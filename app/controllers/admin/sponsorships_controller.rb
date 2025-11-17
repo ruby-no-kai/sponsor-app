@@ -55,6 +55,7 @@ class Admin::SponsorshipsController < Admin::ApplicationController
       :profile,
       :logo_key,
       :booth_requested,
+      :fallback_option,
 
       :customization,
       :customization_name,

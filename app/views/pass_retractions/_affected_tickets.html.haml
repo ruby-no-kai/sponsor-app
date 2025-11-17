@@ -1,0 +1,31 @@
+- if retraction.tito_registration
+  .mb-3
+    %strong= t('pass_redemptions.index.table.registration_email')
+    = retraction.tito_registration['email']
+
+  %h5.mb-2= t('pass_retraction.new.affected_tickets')
+  %table.table.table-sm.mb-3
+    %thead
+      %tr
+        %th= t('pass_redemptions.index.table.ticket_reference')
+        %th= t('pass_redemptions.index.table.release')
+        %th= t('pass_redemptions.index.table.ticket_email')
+    %tbody
+      - retraction.tito_registration.fetch('tickets', []).each do |ticket|
+        %tr
+          %td= ticket['reference']
+          %td
+            - if (release_slug = retraction.ticket_release_slugs&.first)
+              :ruby
+                color = case release_slug
+                when 'sponsor'
+                  'success'
+                when 'exhibitor'
+                  'dark'
+                when 'exhibitor-paid'
+                  'warning'
+                else
+                  'light'
+                end
+              %span.badge{class: "badge-#{color}"}= t("pass_redemptions.index.release_type.#{release_slug}", default: release_slug)
+          %td= ticket['email']

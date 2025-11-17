@@ -31,12 +31,32 @@ class TitoApi
     put("#{slug}/discount_codes/#{escape(id.to_s)}", discount_code: kwargs.merge(code: code, type: type, value: value)).body
   end
 
+  def list_registrations(slug, query = {})
+    get("#{slug}/registrations", query).body
+  end
+
+  def get_registration(event_slug, registration_slug, query = {})
+    get("#{event_slug}/registrations/#{escape(registration_slug.to_s)}", query).body
+  end
+
+  def cancel_registration(event_slug, registration_slug)
+    post("#{event_slug}/registrations/#{escape(registration_slug.to_s)}/cancellation").body
+  end
+
+  def create_registration_note(event_slug, registration_slug, content:)
+    post("#{event_slug}/registrations/#{escape(registration_slug.to_s)}/notes", note: { content: }).body
+  end
+
   def get_ticket(account_event_slug, ticket_slug)
     get("#{account_event_slug}/tickets/#{escape(ticket_slug)}").body
   end
 
   def patch_ticket(account_event_slug, ticket_slug, **kwargs)
     patch("#{account_event_slug}/tickets/#{escape(ticket_slug)}", ticket: kwargs).body
+  end
+
+  def create_source(slug, name:, code:, description: '', **kwargs)
+    post("#{slug}/sources", source: kwargs.merge(name:, code:, description:)).body
   end
 
   def default_headers

@@ -30,22 +30,32 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
   end
 
   def discount_code_attributes
-    {
+    retval = {
       code: code,
       type: 'PercentOffDiscountCode',
       value: '100.0',
       only_show_attached: true,
       reveal_secret: true,
+      block_registrations_if_not_applicable: @kind != 'attendee',
       quantity: quantity,
       release_ids: quantity > 0 ? release_ids : nil,
+      source_id: tito_source.tito_source_id,
       description_for_organizer: "sponsorship=#{@sponsorship.id}, domain=#{@sponsorship.organization&.domain}, plan=#{@sponsorship.plan&.name}",
     }
+    if @kind == 'booth_paid'
+      retval.merge!(
+        type: 'MoneyOffDiscountCode',
+        value: @sponsorship.conference.tito_booth_paid_flat_discount_amount.to_s,
+      )
+    end
+    retval
   end
 
   def quantity
     {
       'attendee' => @sponsorship.total_number_of_attendees,
       'booth_staff' => @sponsorship.total_number_of_booth_staff,
+      'booth_paid' => @sponsorship.total_number_of_booth_staff > 0 ? 6 : 0,
     }.fetch(@kind)
   end
 
@@ -53,19 +63,46 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     {
       'attendee' => 'sa',
       'booth_staff' => 'sb',
+      'booth_paid' => 'se',
     }.fetch(@kind)
   end
 
   def release_slugs
     {
       'attendee' => %w(sponsor),
-      'booth_staff' => %w(booth-staff),
+      'booth_staff' => %w(exhibitor),
+      'booth_paid' => %w(exhibitor-paid),
     }.fetch(@kind)
   end
 
+  def tito_source
+    @tito_source ||= @sponsorship.tito_source || begin
+      source = tito.create_source(
+        @conference.tito_slug,
+        code: "ss_#{@sponsorship.id}",
+        name: "Sponsor: #{@sponsorship.name} (#{@sponsorship.id})",
+        description: "Sponsor: #{@sponsorship.organization.name}, Conference: #{@conference.name} (#{@conference.id})",
+      ).fetch(:source).fetch(:id)
+      TitoSource.create!(
+        conference: @conference,
+        sponsorship: @sponsorship,
+        tito_source_id: source.to_s,
+      )
+    end
+  end
+
   def release_ids
-    @release_ids ||= release_slugs.map do |slug|
-      tito.get_release(@conference.tito_slug, slug).fetch(:release).fetch(:id)
+    @release_ids ||= TitoCachedRelease.transaction do
+      release_slugs.map do |slug|
+        TitoCachedRelease.where(conference: @conference, tito_release_slug: slug).first&.tito_release_id or begin
+          id = tito.get_release(@conference.tito_slug, slug).fetch(:release).fetch(:id)
+          TitoCachedRelease.create!(
+            conference: @conference,
+            tito_release_slug: slug,
+            tito_release_id: id.to_s,
+          ).tito_release_id
+          end
+      end
     end
   end
 

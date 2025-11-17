@@ -1,28 +1,26 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
-  unless ENV['STACK'] # not during heroku build
-    config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST')
+  config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST')
 
-    config.x.org_name = ENV.fetch('ORG_NAME')
+  config.x.org_name = ENV.fetch('ORG_NAME')
 
-    config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
-    config.x.default_email_reply_to = ENV.fetch('DEFAULT_EMAIL_REPLY_TO', config.x.default_email_address)
-    config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST')
+  config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
+  config.x.default_email_reply_to = ENV.fetch('DEFAULT_EMAIL_REPLY_TO', config.x.default_email_address)
+  config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST')
 
-    config.x.github.repo = ENV.fetch('GITHUB_REPO')
-    config.x.github.client_id = ENV.fetch('GITHUB_CLIENT_ID')
-    config.x.github.client_secret = ENV.fetch('GITHUB_CLIENT_SECRET')
-    config.x.github.app_id = ENV.fetch('GITHUB_APP_ID')
-    config.x.github.private_key = OpenSSL::PKey::RSA.new(ENV.fetch('GITHUB_CLIENT_PRIVATE_KEY').unpack1('m*'), '')
+  config.x.github.repo = ENV.fetch('GITHUB_REPO')
+  config.x.github.client_id = ENV.fetch('GITHUB_CLIENT_ID')
+  config.x.github.client_secret = ENV.fetch('GITHUB_CLIENT_SECRET')
+  config.x.github.app_id = ENV.fetch('GITHUB_APP_ID')
+  config.x.github.private_key = OpenSSL::PKey::RSA.new(ENV.fetch('GITHUB_CLIENT_PRIVATE_KEY').unpack1('m*'), '')
 
-    config.x.tito.token = ENV.fetch('TITO_API_TOKEN')
+  config.x.tito.token = ENV.fetch('TITO_API_TOKEN')
 
-    config.x.slack.webhook_urls = {
-      default: ENV.fetch('SLACK_WEBHOOK_URL'),
-      feed: ENV.fetch('SLACK_WEBHOOK_URL_FOR_FEED', ENV.fetch('SLACK_WEBHOOK_URL')),
-    }
-  end
+  config.x.slack.webhook_urls = {
+    default: ENV.fetch('SLACK_WEBHOOK_URL'),
+    feed: ENV.fetch('SLACK_WEBHOOK_URL_FOR_FEED', ENV.fetch('SLACK_WEBHOOK_URL')),
+  }
 
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -38,25 +36,12 @@ Rails.application.configure do
   # Turn on fragment caching in view templates.
   config.action_controller.perform_caching = true
 
-  # Ensures that a master key has been made available in ENV["RAILS_MASTER_KEY"], config/master.key, or an environment
-  # key such as config/credentials/production.key. This key is used to decrypt credentials (and other encrypted files).
-  # config.require_master_key = true
-
-  # Disable serving static files from `public/`, relying on NGINX/Apache to do so instead.
+  # Cache assets for far-future expiry since they are all digest stamped.
   config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
-  config.public_file_server.headers = {'Cache-Control' => "public, max-age=172800, s-maxage=2592000"}
+  config.public_file_server.headers = {'Cache-Control' => "public, max-age=#{1.year.to_i}"}
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
-
-  # Specifies the header that your server uses for sending files.
-  # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for Apache
-  # config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for NGINX
-
-  # Mount Action Cable outside main process or domain.
-  # config.action_cable.mount_path = nil
-  # config.action_cable.url = "wss://example.com/cable"
-  # config.action_cable.allowed_request_origins = [ "http://example.com", /http:\/\/example.*/ ]
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true
@@ -71,7 +56,7 @@ Rails.application.configure do
   config.log_tags = [ :request_id ]
   config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
 
-  # Change to "debug" to log everything (including potentially personally-identifiable information!)
+  # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
   # Prevent health checks from clogging up the logs.
@@ -82,7 +67,6 @@ Rails.application.configure do
 
   # Replace the default in-process memory cache store with a durable alternative.
   # config.cache_store = :mem_cache_store
-  # config.cache_store = :redis_cache_store, { url: [ENV['REDIS_URL']], pool_size: 5, pool_timeout: 5 }
 
   config.session_store(:cookie_store,
     expire_after: 14.days,
@@ -103,6 +87,7 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
+  # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = {host: config.x.public_url_host, protocol: 'https'}
 
   if ENV['MAILGUN_SMTP_PASSWORD']

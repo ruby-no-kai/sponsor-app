@@ -36,22 +36,11 @@ Rails.application.routes.draw do
         end
       end
     end
+
+    resources :organizations, param: :slug, only: %i(index show edit update), constraints: {slug: /[^\/]+/}
+
     resource :session, only: %i(new destroy) do
       get :rise, as: :rise
-    end
-  end
-
-  get '/t/:handle' => 'reception/registrations#short_show', as: :reception_ticket
-
-  scope as: :reception, path: 'reception', module: 'reception' do
-    get 'session/assume/:handle' => 'sessions#assume', as: :assume_session
-
-    resources :conferences, param: :slug, only: %i(show) do
-      member do
-        get :code
-      end
-
-      resources :registrations, param: :code, only: %i(new show update create)
     end
   end
 
@@ -67,13 +56,16 @@ Rails.application.routes.draw do
     resources :conferences, param: :slug, only: %i(index) do
       resource :sponsorship, only: %i(new create show edit update) do
         resource :exhibition, only: %i(new create edit update)
+        resources :pass_redemptions, only: %i(index) do
+          member do
+            resource :retraction, only: %i(new create show), controller: 'pass_retractions'
+          end
+        end
       end
-      resource :sponsorship_asset_file, only: %i(create update show)
-
-      resource :ticket, only: %i(new create show) do
-        get 'code' => 'tickets#code', as: :code
-        get 'new_code' => 'tickets#new_code', as: :new_code
-        get 'retrieve/:handle' => 'tickets#retrieve', as: :retrieve
+      resources :sponsorship_asset_files, only: %i(create update show) do
+        member do
+          post :initiate_update
+        end
       end
     end
 

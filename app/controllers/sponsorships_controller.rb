@@ -52,7 +52,7 @@ class SponsorshipsController < ApplicationController
     @sponsorship.locale = I18n.locale
     @sponsorship.conference = @conference
     @sponsorship.assume_organization
-    @sponsorship.accept if @sponsorship.plan&.auto_acceptance
+    @sponsorship.accept if @sponsorship.plan&.auto_acceptance && !@sponsorship.organization&.auto_acceptance_disabled
 
     respond_to do |format|
       if @sponsorship.save(context: :update_by_user)
@@ -98,6 +98,7 @@ class SponsorshipsController < ApplicationController
       :asset_file_id,
       :asset_file_id_to_copy,
       :booth_requested,
+      :fallback_option,
       :number_of_additional_attendees,
       contact_attributes: %i(id email email_cc address organization unit name),
       alternate_billing_contact_attributes: %i(_keep id email address organization unit name),

@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::Base
-  before_action :migrate_legacy_sponsorship_session
   before_action :set_locale
 
   private
@@ -37,6 +36,12 @@ class ApplicationController < ActionController::Base
       .first
   end
 
+  helper_method def current_conference
+    return @current_conference if defined? @current_conference
+    return nil unless params[:conference_slug]
+    @current_conference = current_sponsorship&.conference || Conference.find_by(slug: params[:conference_slug])
+  end
+
   helper_method def current_available_sponsorships
     return @current_available_sponsorships if defined? @current_available_sponsorships
     return nil unless session[:sponsorship_ids]
@@ -52,14 +57,6 @@ class ApplicationController < ActionController::Base
   def require_sponsorship_session
     unless current_sponsorship
       redirect_to new_user_session_path(back_to: url_for(params.to_unsafe_h.merge(only_path: true)))
-    end
-  end
-
-  def migrate_legacy_sponsorship_session
-    sponsorship_id = session.delete(:sponsorship_id)
-    if sponsorship_id
-      session_token = SessionToken.find_by(id: session[:session_token_id])
-      session[:sponsorship_ids] = session_token&.sponsorship_ids
     end
   end
 end

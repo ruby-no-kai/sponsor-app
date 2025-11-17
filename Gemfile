@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 8.0.0'
+gem 'rails', '~> 8.1.0'
 gem 'rails-i18n', '~> 8.0'
 gem 'rack-contrib'
 
@@ -17,24 +17,25 @@ gem 'omniauth-github'
 gem 'octokit'
 gem 'jwt'
 gem 'hashdiff'
-gem 'rqrcode'
 gem 'faraday'
 gem 'faraday_middleware'
 
-gem 'nokogiri'
-gem 'rexml' # letter-opener
+gem 'nokogiri', require: false
+gem 'rexml', require: false # letter-opener
+gem 'jsonnet', require: false
 
 gem 'shoryuken'
 
 gem 'jbuilder', '~> 2.9'
 gem 'haml'
-gem 'simpacker'
+gem 'vite_rails'
 
 gem 'premailer-rails'
 
 gem 'revision_plate'
 gem "sentry-ruby"
 gem "sentry-rails"
+gem 'rails_semantic_logger'
 
 gem 'puma'
 
@@ -47,11 +48,12 @@ group :development, :test do
   gem 'faker'
   gem 'listen'
 
-  gem 'letter_opener_web', git: 'https://github.com/fgrehm/letter_opener_web', ref: 'ab50ad09a2af5350bdca9c079bba73523e64f4cd' # https://github.com/fgrehm/letter_opener_web/pull/83
+  gem 'letter_opener_web'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
 end
 
 group :development do
+  gem 'openssl'
   # gem 'web-console', '>= 3.3.0'
 end

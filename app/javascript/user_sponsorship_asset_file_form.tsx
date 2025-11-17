@@ -1,7 +1,26 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
-import SponsorshipAssetFileForm from "./SponsorshipAssetFileForm";
+import SponsorshipAssetFileForm, {
+  SponsorshipAssetFileFormAPI,
+} from "./SponsorshipAssetFileForm";
+
+declare global {
+  interface Window {
+    rksSponsorshipAssetFileForms: React.RefObject<SponsorshipAssetFileFormAPI | null>[];
+    rksTriggerAllUploads: () => Promise<(string | null)[]>;
+  }
+}
+
+window.rksSponsorshipAssetFileForms = [];
+
+window.rksTriggerAllUploads = async () => {
+  return Promise.all(
+    window.rksSponsorshipAssetFileForms.map(
+      (ref) => ref.current?.ensureUpload() ?? Promise.resolve(null),
+    ),
+  );
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".sponsorships_form").forEach((formElem) => {
@@ -26,23 +45,66 @@ document.addEventListener("DOMContentLoaded", () => {
       const sessionEndpointMethod = elem.dataset.sessionEndpointMethod;
       if (!sessionEndpoint || !sessionEndpointMethod) return;
 
-      const component = ReactDOM.render(
+      const onFileChange = (file: File | null) => {
+        console.log("File changed:", file?.type);
+        const warningsToShow = new Map<string, boolean>();
+
+        if (
+          file?.type === "application/zip" ||
+          file?.type === "application/x-zip-compressed" ||
+          file?.name.endsWith(".zip")
+        ) {
+          warningsToShow.set("zip_asset", true);
+        }
+
+        const warningElems = form.querySelectorAll<HTMLElement>(
+          ".sponsorships_form_asset_file_form__warning",
+        );
+
+        warningElems.forEach((w) => {
+          if (warningsToShow.has(w.dataset.warningKind || "")) {
+            w.classList.remove("d-none");
+            w.querySelectorAll("input").forEach((i) => (i.required = true));
+          } else {
+            w.classList.add("d-none");
+            w.querySelectorAll("input").forEach((i) => (i.required = false));
+          }
+        });
+      };
+
+      const componentRef = React.createRef<SponsorshipAssetFileFormAPI>();
+
+      if (!dest) {
+        console.error("Destination element not found for SponsorshipAssetFileForm");
+        return;
+      }
+
+      const root = createRoot(dest);
+      root.render(
         <SponsorshipAssetFileForm
+          ref={componentRef}
           needUpload={doCopy ? false : !existingFileId}
           existingFileId={existingFileId}
           sessionEndpoint={sessionEndpoint}
           sessionEndpointMethod={sessionEndpointMethod}
-        />,
-        dest,
-      ) as unknown as SponsorshipAssetFileForm;
+          onFileChange={onFileChange}
+        />
+      );
+
+      // Add ref to global array - it will be populated when component mounts
+      window.rksSponsorshipAssetFileForms.push(componentRef);
+      console.log("Registered SponsorshipAssetFileForm (ref will be available after mount)");
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
         form
-          .querySelectorAll("input[type=submit]:disabled")
+          .querySelectorAll("input[type=submit]")
           .forEach((el) => ((el as HTMLInputElement).disabled = true));
         try {
           errorElem.classList.add("d-none");
-          const fileId = await component.startUpload();
+          if (!componentRef.current) {
+            throw new Error("SponsorshipAssetFileForm ref is not available");
+          }
+          const fileId = await componentRef.current.ensureUpload();
           if (fileId !== null) {
             fileIdElem.value = fileId;
             form.submit();

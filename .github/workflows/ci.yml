@@ -3,9 +3,12 @@ on:
   push:
     branches:
       - master
+      - main
       - test
 
 jobs:
+  test:
+    uses: ./.github/workflows/_test.yml
   build:
     name: build
     permissions:
@@ -15,23 +18,23 @@ jobs:
     outputs:
       image-tag: "${{ steps.login-ecr.outputs.registry }}/sponsor-app:${{ github.sha }}"
     steps:
-      - uses: docker/setup-buildx-action@v2
-      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55 # v2.10.0
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       #- uses: ruby/setup-ruby@v1
       #  with:
       #    ruby-version: '3.1'
       #    bundler-cache: true
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
           aws-region: "us-west-2"
           role-skip-session-tagging: true
           role-to-assume: "arn:aws:iam::005216166247:role/GhaDockerPush"
           mask-aws-account-id: false
       - id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
       - run: "echo '${{ github.sha }}' > REVISION"
       - name: 'Build Docker image'
-        uses: 'docker/build-push-action@v3'
+        uses: 'docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6' # v3.3.1
         with:
           context: '.'
           load: true
@@ -39,14 +42,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: 'Push Docker image'
-        uses: 'docker/build-push-action@v3'
+        uses: 'docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6' # v3.3.1
         with:
           context: '.'
           push: true
           tags: "${{ steps.login-ecr.outputs.registry }}/sponsor-app:${{ github.sha }},${{ steps.login-ecr.outputs.registry }}/sponsor-app:latest"
 
   deploy-prod:
-    if: "${{ success() && github.event_name == 'push' }}"
+    if: "${{ success() && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}"
     name: deploy-prod
     needs: ["build"]
     permissions:
@@ -62,13 +65,13 @@ jobs:
     env:
       BUNDLE_GEMFILE: "${{ github.workspace }}/deploy/Gemfile"
     steps:
-      - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: ruby/setup-ruby@d5126b9b3579e429dd52e51e68624dda2e05be25 # v1.267.0
         with:
           ruby-version: '3.2'
           bundler-cache: true
-      - uses: hashicorp/setup-terraform@v3
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+      - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
           aws-region: "us-west-2"
           role-skip-session-tagging: true

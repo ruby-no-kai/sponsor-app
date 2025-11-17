@@ -6,12 +6,13 @@
     %title= yield(:title) || 'sponsor-app admin'
     = csrf_meta_tags
     = csp_meta_tag
+    = vite_stylesheet_tag 'application.css'
 
-    = stylesheet_pack_tag 'vendor', media: 'all'
-    = begin; stylesheet_pack_tag 'admin', media: 'all'; rescue Simpacker::Manifest::MissingEntryError; end
+    %meta{name: 'rk:sentry-dsn', content: Rails.configuration.x.sentry.dsn}
+    %meta{name: 'rk:release', content: Rails.configuration.x.release.release}
 
-    - if Rails.application.config.x.sentry.dsn.present?
-      %script= "window.SENTRY_DSN = '#{Rails.application.config.x.sentry.dsn}'".html_safe
+    = vite_client_tag
+    = vite_typescript_tag 'admin'
   %body
     %nav.navbar.navbar-expand-lg.navbar-light.bg-light
       %a.navbar-brand{href: '/'} Sponsorships Admin
@@ -21,6 +22,7 @@
         .navbar-nav
           - if current_staff
             %a.nav-item.nav-link{href: conferences_path} Conferences
+            %a.nav-item.nav-link{href: organizations_path} Organizations
       .collapse.navbar-collapse
         %ul.navbar-nav.ml-auto
           %li.nav-item
@@ -31,5 +33,3 @@
         - if notice
           .alert.alert-success= notice
         = yield
-    = javascript_pack_tag 'vendor'
-    = javascript_pack_tag 'admin'

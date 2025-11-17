@@ -7,8 +7,8 @@ FactoryBot.define do
 
     trait :full do
       after(:create) do |conference, context|
-        create(:form_description, conference:)
-        create(:plan, conference:)
+        FactoryBot.create(:form_description, conference:)
+        FactoryBot.create(:plan, conference:)
       end
     end
   end

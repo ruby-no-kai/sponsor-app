@@ -1,0 +1,38 @@
+%h2= t('.header')
+
+.card.mb-3
+  .card-header
+    = t('.description', reference: @retraction.order_reference)
+  .card-body
+    - if @pass_retraction_disabled
+      .alert.alert-warning
+        = t('.disabled_message', contact_email: @conference.contact_email_address).html_safe
+
+    = render 'affected_tickets', retraction: @retraction
+
+    - if @retraction.retractable?
+      = form_with model: @retraction, url: user_conference_sponsorship_retraction_path(@conference, @retraction.tito_registration_id), local: true do |f|
+        .form-group
+          = f.label :reason, t('.reason_label')
+          = f.text_area :reason, class: 'form-control', rows: 5, placeholder: t('.reason_placeholder'), required: true
+
+        .alert.alert-info
+          %strong= t('.notes_header')
+          %ul.mb-0
+            %li= t('.note_1')
+            %li= t('.note_2', conference_name: @conference.name)
+            %li= t('.note_3')
+
+        .form-group
+          .custom-control.custom-checkbox
+            = check_box_tag :confirmation, '1', false, required: true, class: 'custom-control-input', id: 'retraction_confirmation'
+            = label_tag :confirmation, t('.confirmation_label'), class: 'custom-control-label', for: 'retraction_confirmation'
+
+        .form-group
+          = f.submit t('.submit'), class: 'btn btn-danger'
+          = link_to t('.cancel'), user_conference_sponsorship_pass_redemptions_path(@conference), class: 'btn btn-secondary'
+    - else
+      .alert.alert-danger
+        = t('.not_retractable')
+
+      = link_to t('.cancel'), user_conference_sponsorship_pass_redemptions_path(@conference), class: 'btn btn-secondary'
