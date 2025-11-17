@@ -8,6 +8,7 @@ RUN pnpm install --frozen-lockfile
 
 COPY package.json pnpm-lock.yaml tsconfig.json vite.config.mts /app
 COPY config/vite.json /app/config/
+COPY types /app/types
 COPY app/javascript /app/app/javascript
 COPY app/stylesheets /app/app/stylesheets
 
