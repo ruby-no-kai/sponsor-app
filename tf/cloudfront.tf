@@ -1,36 +1,43 @@
-resource "aws_cloudfront_distribution" "prd" {
-  comment = "sponsor-app"
+resource "aws_cloudfront_distribution" "main" {
+  count = var.enable_cloudfront ? 1 : 0
+
+  provider = aws.cloudfront
+
+  comment = var.cloudfront_comment != "" ? var.cloudfront_comment : "sponsor-app"
 
   enabled         = true
   is_ipv6_enabled = true
   http_version    = "http2and3"
   price_class     = "PriceClass_All"
 
-  aliases = ["sponsorships.rubykaigi.org"]
+  aliases = [var.app_domain]
 
   viewer_certificate {
-    acm_certificate_arn            = data.aws_acm_certificate.use1-sponsorships-rk-o.arn
+    acm_certificate_arn            = var.certificate_arn
     cloudfront_default_certificate = false
     iam_certificate_id             = null
     minimum_protocol_version       = "TLSv1.2_2021"
     ssl_support_method             = "sni-only"
   }
 
-  logging_config {
-    bucket          = "rk-aws-logs.s3.amazonaws.com"
-    include_cookies = false
-    prefix          = "cf/sponsorships.rubykaigi.org/"
+  dynamic "logging_config" {
+    for_each = var.cloudfront_log_bucket != "" ? [1] : []
+    content {
+      bucket          = var.cloudfront_log_bucket
+      include_cookies = false
+      prefix          = var.cloudfront_log_prefix
+    }
   }
 
   origin {
     origin_id           = "apprunner"
-    domain_name         = replace(aws_apprunner_service.prd.service_url, "https://", "")
+    domain_name         = replace(aws_apprunner_service.main[0].service_url, "https://", "")
     origin_path         = null
     connection_attempts = 3
     connection_timeout  = 10
     custom_header {
       name  = "x-forwarded-host"
-      value = "sponsorships.rubykaigi.org"
+      value = var.app_domain
     }
     custom_origin_config {
       http_port                = 80
@@ -96,8 +103,4 @@ resource "aws_cloudfront_distribution" "prd" {
       restriction_type = "none"
     }
   }
-}
-import {
-  to = aws_cloudfront_distribution.prd
-  id = "E2ZBMTEBD45786"
 }
