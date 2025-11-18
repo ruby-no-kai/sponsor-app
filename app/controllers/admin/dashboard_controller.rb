@@ -1,4 +1,6 @@
 class Admin::DashboardController < Admin::ApplicationController
+  class Boom < StandardError; end
+
   def index
     redirect_to conferences_path
   end
@@ -15,4 +17,7 @@ class Admin::DashboardController < Admin::ApplicationController
     render plain: "Mail Mail Mail"
   end
 
+  def errortown
+    raise Boom, "boom!"
+  end
 end

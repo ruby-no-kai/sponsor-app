@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     get '/' => 'dashboard#index', as: :dashboard
     get '/slacktown' => 'dashboard#slacktown', as: :slacktown
     get '/mailtown' => 'dashboard#mailtown', as: :mailtown
+    get '/errortown' => 'dashboard#errortown', as: :errortown
 
     resources :conferences, param: :slug do
       member do
