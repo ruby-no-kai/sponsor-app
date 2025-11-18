@@ -91,15 +91,15 @@ data "aws_iam_policy_document" "SponsorApp" {
     }
   }
 
-  # SSM and KMS permissions for App Runner (only when enabled)
+  # SSM permissions for secrets defined in var.secrets
   dynamic "statement" {
-    for_each = var.enable_apprunner ? [1] : []
+    for_each = length(var.secrets) > 0 ? [1] : []
     content {
       effect = "Allow"
       actions = [
         "ssm:GetParameters",
       ]
-      resources = ["arn:aws:ssm:*:${data.aws_caller_identity.current.account_id}:parameter/sponsor-app/*"]
+      resources = values(var.secrets)
     }
   }
 
