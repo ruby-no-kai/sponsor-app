@@ -10,9 +10,9 @@ resource "aws_apprunner_service" "main" {
   source_configuration {
     image_repository {
       image_configuration {
-        port = "3000"
-        runtime_environment_variables = {}
-        runtime_environment_secrets = {}
+        port                          = "3000"
+        runtime_environment_variables = local.environments
+        runtime_environment_secrets   = local.secrets
       }
       image_identifier      = "${var.enable_shared_resources ? aws_ecr_repository.app[0].repository_url : "005216166247.dkr.ecr.us-west-2.amazonaws.com/sponsor-app"}:latest"
       image_repository_type = "ECR"

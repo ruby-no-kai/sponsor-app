@@ -97,3 +97,15 @@ variable "github_actions_sub" {
   type        = string
   description = "GitHub Actions OIDC subject for deployment role"
 }
+
+variable "environments" {
+  type        = map(string)
+  default     = {}
+  description = "Additional/override runtime environment variables for AppRunner"
+}
+
+variable "secrets" {
+  type        = map(string)
+  default     = {}
+  description = "Runtime environment secrets (SSM parameter ARNs) for AppRunner"
+}
