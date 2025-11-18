@@ -75,9 +75,8 @@ Rails.application.configure do
     secure: true,
   )
 
-  # Use a real queuing backend for Active Job (and separate queues per environment)
-  config.active_job.queue_adapter = ENV.fetch('ENABLE_SHORYUKEN', '1') == '1' ? :shoryuken : :inline
-  # config.active_job.queue_name_prefix = "sponsor_app2_production"
+  # see also config/initializers/active_job.rb
+  config.active_job.queue_adapter = :inline
 
   # Disable caching for Action Mailer templates even if Action Controller
   # caching is enabled.

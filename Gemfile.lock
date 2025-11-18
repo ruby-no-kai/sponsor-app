@@ -77,6 +77,10 @@ GEM
       uri (>= 0.13.1)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    apigatewayv2_rack (0.4.0)
+      base64
+      rack
+      stringio
     aws-eventstream (1.4.0)
     aws-partitions (1.1182.0)
     aws-sdk-core (3.237.0)
@@ -97,11 +101,12 @@ GEM
     aws-sdk-sqs (1.106.0)
       aws-sdk-core (~> 3, >= 3.234.0)
       aws-sigv4 (~> 1.5)
+    aws-sdk-ssm (1.206.0)
+      aws-sdk-core (~> 3, >= 3.234.0)
+      aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
       aws-eventstream (~> 1, >= 1.0.2)
-    barnes (0.0.9)
-      multi_json (~> 1)
-      statsd-ruby (~> 1.1)
+    aws_lambda_ric (3.1.3)
     base64 (0.3.0)
     bigdecimal (3.3.1)
     builder (3.3.0)
@@ -178,6 +183,11 @@ GEM
       mini_portile2 (>= 2.2.0)
     jwt (3.1.2)
       base64
+    lambdakiq (2.3.0)
+      activejob
+      aws-sdk-sqs
+      concurrent-ruby
+      railties
     launchy (3.1.1)
       addressable (~> 2.8)
       childprocess (~> 5.0)
@@ -206,7 +216,6 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (5.26.1)
-    multi_json (1.17.0)
     multi_xml (0.7.2)
       bigdecimal (~> 3.1)
     multipart-post (2.4.1)
@@ -246,6 +255,7 @@ GEM
     omniauth-oauth2 (1.8.0)
       oauth2 (>= 1.4, < 3)
       omniauth (~> 2.0)
+    open3 (0.2.1)
     openssl (3.3.2)
     pg (1.6.2)
     pp (0.6.3)
@@ -372,7 +382,6 @@ GEM
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
-    statsd-ruby (1.5.0)
     stringio (3.1.8)
     temple (0.10.4)
     thor (1.4.0)
@@ -404,10 +413,12 @@ PLATFORMS
 
 DEPENDENCIES
   addressable
+  apigatewayv2_rack
   aws-sdk-core
   aws-sdk-s3
   aws-sdk-sqs
-  barnes
+  aws-sdk-ssm
+  aws_lambda_ric
   commonmarker
   connection_pool
   factory_bot_rails
@@ -419,12 +430,14 @@ DEPENDENCIES
   jbuilder (~> 2.9)
   jsonnet
   jwt
+  lambdakiq
   letter_opener_web
   listen
   nokogiri
   octokit
   omniauth
   omniauth-github
+  open3
   openssl
   pg (>= 0.18, < 2.0)
   premailer-rails

@@ -28,7 +28,13 @@ locals {
   # Empty for now, will be populated when SSM parameters are migrated to Terraform
   default_secrets = {}
 
+  # Transform secrets to SSM_SECRET__ environment variables for dynamic loading
+  secret_loader_environments = {
+    for key, arn in var.secrets :
+    "SSM_SECRET__${key}" => arn
+  }
+
   # Final merged values
-  environments = merge(local.default_environments, var.environments)
+  environments = merge(local.default_environments, local.secret_loader_environments, var.environments)
   secrets      = merge(local.default_secrets, var.secrets)
 }
