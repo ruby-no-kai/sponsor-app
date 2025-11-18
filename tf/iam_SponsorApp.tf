@@ -6,37 +6,35 @@ resource "aws_iam_role" "SponsorApp" {
 }
 
 data "aws_iam_policy_document" "SponsorApp-trust" {
-  # Service principal trust for AppRunner and ECS (prd)
-  dynamic "statement" {
-    for_each = var.enable_amc_oidc ? [] : [1]
-    content {
-      effect  = "Allow"
-      actions = ["sts:AssumeRole"]
-      principals {
-        type = "Service"
-        identifiers = [
-          "ecs-tasks.amazonaws.com",
-          "tasks.apprunner.amazonaws.com",
-        ]
-      }
+  # Service principal trust for AppRunner, ECS, and Lambda (always enabled)
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type = "Service"
+      identifiers = [
+        "ecs-tasks.amazonaws.com",
+        "tasks.apprunner.amazonaws.com",
+        "lambda.amazonaws.com",
+      ]
     }
   }
 
-  # OIDC trust for AMC (dev)
+  # OIDC trust for AMC (when domain is specified)
   dynamic "statement" {
-    for_each = var.enable_amc_oidc ? [1] : []
+    for_each = var.amc_oidc_domain != null ? [1] : []
     content {
       effect  = "Allow"
       actions = ["sts:AssumeRoleWithWebIdentity", "sts:TagSession"]
       principals {
         type = "Federated"
         identifiers = [
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/amc.rubykaigi.net",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.amc_oidc_domain}",
         ]
       }
       condition {
         test     = "StringLike"
-        variable = "amc.rubykaigi.net:sub"
+        variable = "${var.amc_oidc_domain}:sub"
         values   = ["${data.aws_caller_identity.current.account_id}:${var.iam_role_prefix}:*"]
       }
     }
@@ -104,7 +102,7 @@ data "aws_iam_policy_document" "SponsorApp" {
   }
 
   dynamic "statement" {
-    for_each = var.enable_apprunner ? [1] : []
+    for_each = var.enable_app ? [1] : []
     content {
       effect = "Allow"
       actions = [

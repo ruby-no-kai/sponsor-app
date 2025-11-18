@@ -39,6 +39,6 @@ output "sqs_queue_url" {
 }
 
 output "apprunner_service_url" {
-  value       = var.enable_apprunner ? aws_apprunner_service.main[0].service_url : null
+  value       = var.enable_app ? aws_apprunner_service.main[0].service_url : null
   description = "App Runner service URL"
 }

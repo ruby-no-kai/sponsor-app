@@ -51,16 +51,16 @@ variable "enable_sqs" {
   description = "Enable SQS queues for ActiveJob"
 }
 
-variable "enable_apprunner" {
+variable "enable_app" {
   type        = bool
   default     = false
-  description = "Enable App Runner service"
+  description = "Enable app service (AppRunner, ECS, etc.)"
 }
 
-variable "enable_amc_oidc" {
-  type        = bool
-  default     = false
-  description = "Enable AMC OIDC trust for app role (dev only)"
+variable "amc_oidc_domain" {
+  type        = string
+  default     = null
+  description = "OIDC provider domain for AMC authentication (e.g., 'amc.rubykaigi.net'). When set, adds OIDC trust to app role"
 }
 
 variable "app_domain" {

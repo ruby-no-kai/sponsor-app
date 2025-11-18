@@ -80,7 +80,7 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
 
   # AppRunner permissions (only when AppRunner is enabled)
   dynamic "statement" {
-    for_each = var.enable_apprunner ? [1] : []
+    for_each = var.enable_app ? [1] : []
     content {
       effect = "Allow"
       actions = [
@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
         aws_iam_role.SponsorApp.arn,
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/EcsExecSponsorApp",
       ],
-      var.enable_apprunner ? [aws_iam_role.app-runner-access[0].arn] : []
+      var.enable_app ? [aws_iam_role.app-runner-access[0].arn] : []
     )
   }
 
@@ -167,7 +167,7 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
     ]
     resources = concat(
       [aws_iam_role.SponsorApp.arn],
-      var.enable_apprunner ? [aws_iam_role.app-runner-access[0].arn] : []
+      var.enable_app ? [aws_iam_role.app-runner-access[0].arn] : []
     )
   }
 
