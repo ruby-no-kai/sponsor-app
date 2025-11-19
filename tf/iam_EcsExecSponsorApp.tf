@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "EcsExecSponsorApp" {
     actions = [
       "ssm:GetParameters",
     ]
-    resources = ["arn:aws:ssm:*:${data.aws_caller_identity.current.account_id}:parameter/sponsor-app/*"]
+    resources = ["arn:aws:ssm:*:${data.aws_caller_identity.current.account_id}:parameter${var.ssm_parameter_prefix}*"]
   }
   statement {
     effect = "Allow"

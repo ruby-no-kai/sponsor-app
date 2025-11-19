@@ -3,7 +3,7 @@
 # Using lifecycle ignore_changes to prevent Terraform from reverting manual updates
 
 resource "aws_apprunner_service" "main" {
-  count = var.enable_apprunner ? 1 : 0
+  count = var.enable_app ? 1 : 0
 
   service_name = var.service_name
 
@@ -53,7 +53,7 @@ resource "aws_apprunner_service" "main" {
 }
 
 resource "aws_iam_role" "app-runner-access" {
-  count = var.enable_apprunner ? 1 : 0
+  count = var.enable_app ? 1 : 0
 
   name               = var.iam_apprunner_access_name
   description        = "${var.environment} tf/iam.tf"
@@ -61,7 +61,7 @@ resource "aws_iam_role" "app-runner-access" {
 }
 
 data "aws_iam_policy_document" "app-runner-access-trust" {
-  count = var.enable_apprunner ? 1 : 0
+  count = var.enable_app ? 1 : 0
 
   statement {
     effect  = "Allow"
@@ -76,14 +76,14 @@ data "aws_iam_policy_document" "app-runner-access-trust" {
 }
 
 resource "aws_iam_role_policy" "app-runner-access" {
-  count = var.enable_apprunner ? 1 : 0
+  count = var.enable_app ? 1 : 0
 
   role   = aws_iam_role.app-runner-access[0].name
   policy = data.aws_iam_policy_document.app-runner-access[0].json
 }
 
 data "aws_iam_policy_document" "app-runner-access" {
-  count = var.enable_apprunner ? 1 : 0
+  count = var.enable_app ? 1 : 0
 
   statement {
     effect = "Allow"

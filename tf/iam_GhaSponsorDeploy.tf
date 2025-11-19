@@ -80,7 +80,7 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
 
   # AppRunner permissions (only when AppRunner is enabled)
   dynamic "statement" {
-    for_each = var.enable_apprunner ? [1] : []
+    for_each = var.enable_app ? [1] : []
     content {
       effect = "Allow"
       actions = [
@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
         aws_iam_role.SponsorApp.arn,
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/EcsExecSponsorApp",
       ],
-      var.enable_apprunner ? [aws_iam_role.app-runner-access[0].arn] : []
+      var.enable_app ? [aws_iam_role.app-runner-access[0].arn] : []
     )
   }
 
@@ -167,7 +167,7 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
     ]
     resources = concat(
       [aws_iam_role.SponsorApp.arn],
-      var.enable_apprunner ? [aws_iam_role.app-runner-access[0].arn] : []
+      var.enable_app ? [aws_iam_role.app-runner-access[0].arn] : []
     )
   }
 
@@ -186,5 +186,53 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
       "s3:DeleteObject",
     ]
     resources = ["arn:aws:s3:::rk-infra/terraform/sponsor-app.tfstate"]
+  }
+
+  dynamic "statement" {
+    for_each = var.enable_shared_resources ? [0] : []
+    content {
+      effect = "Allow"
+      actions = [
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories",
+        "ecr:ListImages",
+        "ecr:BatchGetImage",
+
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:CompleteLayerUpload",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:UploadLayerPart",
+      ]
+      resources = [
+        aws_ecr_repository.app[statement.key].arn,
+      ]
+    }
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecr:GetAuthorizationToken",
+      "sts:GetServiceBearerToken",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "lambda:UpdateFunctionCode",
+      "lambda:GetFunctionConfiguration",
+    ]
+    resources = [for v in aws_lambda_function.app : v.arn]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+    resources = [aws_lambda_function.app["runner"].arn]
   }
 }

@@ -30,11 +30,8 @@ Rails.application.configure do
   # Change to :null_store to avoid any caching.
   config.cache_store = :memory_store
 
-  config.active_job.queue_adapter = :inline
-  if ENV['ENABLE_SIDEKIQ']
-    config.active_job.queue_name_prefix = "sponsor_app"
-    config.active_job.queue_adapter = :sidekiq
-  end
+  # see also config/initializers/active_job.rb
+  # config.active_job.queue_adapter = :inline
 
   if ENV['MAILGUN_SMTP_PASSWORD']
     config.action_mailer.smtp_settings = {

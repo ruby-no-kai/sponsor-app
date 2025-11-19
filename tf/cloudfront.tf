@@ -1,3 +1,14 @@
+data "aws_cloudfront_origin_request_policy" "Managed-AllViewerExceptHostHeader" {
+  name = "Managed-AllViewerExceptHostHeader"
+}
+data "aws_cloudfront_cache_policy" "Managed-CachingDisabled" {
+  name = "Managed-CachingDisabled"
+}
+data "aws_cloudfront_cache_policy" "Managed-CachingOptimized" {
+  name = "Managed-CachingOptimized"
+}
+
+
 resource "aws_cloudfront_distribution" "main" {
   count = var.enable_cloudfront ? 1 : 0
 
@@ -30,6 +41,30 @@ resource "aws_cloudfront_distribution" "main" {
   }
 
   origin {
+    origin_id           = "functionurl"
+    domain_name         = replace(replace(aws_lambda_function_url.app[0].function_url, "https://", ""), "/", "")
+    origin_path         = null
+    connection_attempts = 3
+    connection_timeout  = 10
+    custom_header {
+      name  = "x-forwarded-host"
+      value = var.app_domain
+    }
+    custom_header {
+      name  = "x-origin-verify"
+      value = random_bytes.cloudfront_verify.base64
+    }
+    custom_origin_config {
+      http_port                = 80
+      https_port               = 443
+      origin_read_timeout      = 30
+      origin_keepalive_timeout = 5
+      origin_protocol_policy   = "https-only"
+      origin_ssl_protocols     = ["TLSv1.2"]
+    }
+  }
+
+  origin {
     origin_id           = "apprunner"
     domain_name         = replace(aws_apprunner_service.main[0].service_url, "https://", "")
     origin_path         = null
@@ -50,32 +85,20 @@ resource "aws_cloudfront_distribution" "main" {
   }
 
   ordered_cache_behavior {
-    target_origin_id = "apprunner"
-    path_pattern     = "/packs/*"
+    target_origin_id = "functionurl"
+    path_pattern     = "/vite/*"
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
 
-    compress = true
+    #origin_request_policy_id = data.aws_cloudfront_origin_request_policy.Managed-AllViewerExceptHostHeader.id
 
-    min_ttl     = 0
-    default_ttl = 86400
-    max_ttl     = 31536000
-
+    compress               = true
+    cache_policy_id        = data.aws_cloudfront_cache_policy.Managed-CachingOptimized.id
     viewer_protocol_policy = "redirect-to-https"
-
-    forwarded_values {
-      headers                 = []
-      query_string            = false
-      query_string_cache_keys = []
-      cookies {
-        forward           = "none"
-        whitelisted_names = []
-      }
-    }
   }
 
   default_cache_behavior {
-    target_origin_id = "apprunner"
+    target_origin_id = "functionurl"
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
 
@@ -103,4 +126,13 @@ resource "aws_cloudfront_distribution" "main" {
       restriction_type = "none"
     }
   }
+}
+
+resource "random_bytes" "cloudfront_verify" {
+  length = 32
+}
+resource "aws_ssm_parameter" "cloudfront_verify" {
+  name  = "${var.ssm_parameter_prefix}X_CLOUDFRONT_VERIFY"
+  type  = "SecureString"
+  value = random_bytes.cloudfront_verify.base64
 }

@@ -12,6 +12,7 @@ gem 'commonmarker'
 gem 'aws-sdk-core' # STS
 gem 'aws-sdk-s3'
 gem 'aws-sdk-sqs'
+gem 'aws-sdk-ssm'
 gem 'omniauth'
 gem 'omniauth-github'
 gem 'octokit'
@@ -25,6 +26,7 @@ gem 'rexml', require: false # letter-opener
 gem 'jsonnet', require: false
 
 gem 'shoryuken'
+gem 'lambdakiq'
 
 gem 'jbuilder', '~> 2.9'
 gem 'haml'
@@ -37,10 +39,13 @@ gem "sentry-ruby"
 gem "sentry-rails"
 gem 'rails_semantic_logger'
 
-gem 'puma'
+gem 'puma', require: false
+gem 'aws_lambda_ric', require: false
+gem 'apigatewayv2_rack'
+
+gem 'open3', require: false
 
 group :production do
-  gem 'barnes'
 end
 
 group :development, :test do
