@@ -50,6 +50,7 @@ COPY --from=builder /app/.bundle /app/.bundle
 COPY --from=builder /usr/local/bin/bundle /usr/local/bin/aws_lambda_ric /usr/local/bin
 COPY --from=nodebuilder /app/public/vite /app/public/vite
 COPY . /app/
+COPY config/lambda_entrypoint.sh /lambda_entrypoint.sh
 
 ENV PORT 3000
 ENV LANG C.UTF-8
