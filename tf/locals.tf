@@ -22,12 +22,12 @@ locals {
     # Conditional: SQS (only when enabled)
     JOB_ADAPTER     = var.enable_sqs ? "lambdakiq" : "inline"
     LAMBDAKIQ_QUEUE = var.enable_sqs ? aws_sqs_queue.lambdakiq[0].name : ""
-
-    CLOUDFRONT_VERIFY = random_bytes.cloudfront_verify.base64
   }
 
   # Empty for now, will be populated when SSM parameters are migrated to Terraform
-  default_secrets = {}
+  default_secrets = {
+    CLOUDFRONT_VERIFY = aws_ssm_parameter.cloudfront_verify.arn
+  }
 
   # Transform secrets to SSM_SECRET__ environment variables for dynamic loading
   secret_loader_environments = {
