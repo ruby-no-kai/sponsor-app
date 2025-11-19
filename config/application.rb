@@ -42,5 +42,23 @@ module SponsorApp2
     config.i18n.default_locale = :en
     config.i18n.available_locales = [:en, :ja]
     config.i18n.fallbacks = [:en]
+
+    begin
+      config.semantic_logger.application = "sponsor-app"
+      config.semantic_logger.environment = Rails.env
+      config.rails_semantic_logger.started = :info
+
+      config.log_tags = {
+        request_id: :request_id,
+        method: :request_method,
+        path: :path_info,
+        ip: :ip,
+      }
+
+      if ENV["RAILS_LOG_TO_STDOUT"].present?
+        config.rails_semantic_logger.add_file_appender = false
+        config.semantic_logger.add_appender(io: $stdout, formatter: :json)
+      end
+    end
   end
 end
