@@ -48,11 +48,11 @@ jobs:
   deploy-prod:
     if: "${{ success() && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}"
     name: deploy-prod
-    needs: ["build"]
+    needs: ["build", "test"]
     permissions:
       contents: read
       id-token: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     concurrency:
       group: production
       cancel-in-progress: true
@@ -61,24 +61,20 @@ jobs:
       url: https://sponsorships.rubykaigi.org
     env:
       BUNDLE_GEMFILE: "${{ github.workspace }}/deploy/Gemfile"
+      IMAGE_URI: "${{ needs.build.outputs.image-tag }}"
     steps:
-      - run: 'false' # disable temporarily
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - uses: ruby/setup-ruby@d5126b9b3579e429dd52e51e68624dda2e05be25 # v1.267.0
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.4'
           bundler-cache: true
-      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
       - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
           aws-region: "us-west-2"
           role-skip-session-tagging: true
           role-to-assume: "arn:aws:iam::005216166247:role/GhaSponsorDeploy"
           mask-aws-account-id: false
-      - name: 'Run pre-deploy task'
-        run: "bundle exec hako oneshot --tag '${{ github.sha }}' ./deploy/hako/sponsor-app-batch.jsonnet bundle exec rake db:migrate"
-      - name: "Deploy sponsor-app-worker (ECS)"
-        run: "bundle exec hako deploy --tag '${{ github.sha }}' ./deploy/hako/sponsor-app-worker.jsonnet"
-      - name: "Deploy sponsor-app (App Runner)"
-        working-directory: '${{ github.workspace }}/tf/'
-        run: "terraform init && terraform apply -target=aws_apprunner_service.prd -auto-approve"
+      - run: 'aws lambda update-function-code --function-name sponsor-app-runner-prd --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-runner-prd'
+      - run: 'bundle exec ./deploy/lambrunner.rb sponsor-app-runner-prd bundle exec rake db:migrate'
+      - run: 'aws lambda update-function-code --function-name sponsor-app-lambdakiq-prd --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-lambdakiq-prd'
+      - run: 'aws lambda update-function-code --function-name sponsor-app-web-prd --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-web-prd'
