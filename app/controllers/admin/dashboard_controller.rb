@@ -18,6 +18,8 @@ class Admin::DashboardController < Admin::ApplicationController
   end
 
   def errortown
-    raise Boom, "boom!"
+    request_id = request.request_id
+    ErrorTownJob.perform_later(request_id)
+    raise Boom, "boom! #{request_id}"
   end
 end
