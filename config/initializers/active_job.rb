@@ -9,3 +9,6 @@ Rails.application.configure do
     ActiveJob::Base.queue_adapter = config.active_job.queue_adapter = :inline
   end
 end
+
+ActiveJob::Base.queue_as ENV['LAMBDAKIQ_QUEUE'] if ENV['LAMBDAKIQ_QUEUE']
+ActiveJob::Base.queue_as ENV['SPONSOR_APP_SHORYUKEN_QUEUE'] if ENV['SPONSOR_APP_SHORYUKEN_QUEUE']
