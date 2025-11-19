@@ -3,6 +3,11 @@ variable "environment" {
   description = "Environment identifier (production, dev)"
 }
 
+variable "name" {
+  type        = string
+  description = "Short environment name (prd, dev)"
+}
+
 variable "service_name" {
   type        = string
   description = "Name for AppRunner service and tags"

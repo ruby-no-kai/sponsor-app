@@ -46,6 +46,11 @@ resource "aws_iam_role_policy" "SponsorApp" {
   policy = data.aws_iam_policy_document.SponsorApp.json
 }
 
+resource "aws_iam_role_policy_attachment" "SponsorApp-lambda-basic" {
+  role       = aws_iam_role.SponsorApp.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 data "aws_iam_policy_document" "SponsorApp" {
   statement {
     effect = "Allow"
@@ -84,7 +89,8 @@ data "aws_iam_policy_document" "SponsorApp" {
         "sqs:GetQueueUrl",
       ]
       resources = [
-        aws_sqs_queue.activejob[0].arn
+        aws_sqs_queue.activejob[0].arn,
+        aws_sqs_queue.lambdakiq[0].arn,
       ]
     }
   }
