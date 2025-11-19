@@ -45,13 +45,16 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,t
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+RUN ln -s /tmp/apptmp /app/tmp
 COPY --from=builder /gems /gems
 COPY --from=builder /app/.bundle /app/.bundle
 COPY --from=builder /usr/local/bin/bundle /usr/local/bin/aws_lambda_ric /usr/local/bin
 COPY --from=nodebuilder /app/public/vite /app/public/vite
 COPY . /app/
 COPY config/lambda_entrypoint.sh /lambda_entrypoint.sh
+COPY config/docker_entrypoint.sh /docker_entrypoint.sh
 
 ENV PORT 3000
 ENV LANG C.UTF-8
+ENTRYPOINT ["/docker_entrypoint.sh"]
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
