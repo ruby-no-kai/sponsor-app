@@ -131,3 +131,8 @@ resource "aws_cloudfront_distribution" "main" {
 resource "random_bytes" "cloudfront_verify" {
   length = 32
 }
+resource "aws_ssm_parameter" "cloudfront_verify" {
+  name  = "${var.ssm_parameter_prefix}X_CLOUDFRONT_VERIFY"
+  type  = "SecureString"
+  value = random_bytes.cloudfront_verify.base64
+}

@@ -103,6 +103,11 @@ variable "github_actions_sub" {
   description = "GitHub Actions OIDC subject for deployment role"
 }
 
+variable "ssm_parameter_prefix" {
+  type        = string
+  description = "Prefix for SSM parameter paths (include leading/trailing slashes)"
+}
+
 variable "environments" {
   type        = map(string)
   default     = {}
