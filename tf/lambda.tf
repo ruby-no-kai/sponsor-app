@@ -44,11 +44,11 @@ resource "aws_lambda_function" "app" {
     Environment = var.environment
   }
 
-  #lifecycle {
-  #  ignore_changes = [
-  #    image_uri,
-  #  ]
-  #}
+  lifecycle {
+    ignore_changes = [
+      image_uri,
+    ]
+  }
 }
 
 resource "aws_lambda_event_source_mapping" "lambdakiq" {
@@ -59,4 +59,9 @@ resource "aws_lambda_event_source_mapping" "lambdakiq" {
   batch_size       = 1
 
   function_response_types = ["ReportBatchItemFailures"]
+}
+
+output "lambda_env" {
+  value = merge(local.environments, {
+  })
 }

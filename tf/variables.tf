@@ -8,11 +8,6 @@ variable "name" {
   description = "Short environment name (prd, dev)"
 }
 
-variable "service_name" {
-  type        = string
-  description = "Name for AppRunner service and tags"
-}
-
 variable "sqs_name_suffix" {
   type        = string
   description = "Suffix for SQS queue names (prd, dev)"
@@ -21,11 +16,6 @@ variable "sqs_name_suffix" {
 variable "iam_role_prefix" {
   type        = string
   description = "PascalCase prefix for IAM role names (e.g., SponsorAppDev, SponsorApp)"
-}
-
-variable "iam_apprunner_access_name" {
-  type        = string
-  description = "Name for AppRunner ECR access IAM role"
 }
 
 variable "enable_shared_resources" {

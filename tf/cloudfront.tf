@@ -64,26 +64,6 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  origin {
-    origin_id           = "apprunner"
-    domain_name         = replace(aws_apprunner_service.main[0].service_url, "https://", "")
-    origin_path         = null
-    connection_attempts = 3
-    connection_timeout  = 10
-    custom_header {
-      name  = "x-forwarded-host"
-      value = var.app_domain
-    }
-    custom_origin_config {
-      http_port                = 80
-      https_port               = 443
-      origin_read_timeout      = 30
-      origin_keepalive_timeout = 5
-      origin_protocol_policy   = "https-only"
-      origin_ssl_protocols     = ["TLSv1.2"]
-    }
-  }
-
   ordered_cache_behavior {
     target_origin_id = "functionurl"
     path_pattern     = "/vite/*"

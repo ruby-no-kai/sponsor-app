@@ -6,7 +6,7 @@ resource "aws_iam_role" "SponsorApp" {
 }
 
 data "aws_iam_policy_document" "SponsorApp-trust" {
-  # Service principal trust for AppRunner, ECS, and Lambda (always enabled)
+  # Service principal trust for ECS and Lambda (always enabled)
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -14,7 +14,6 @@ data "aws_iam_policy_document" "SponsorApp-trust" {
       type = "Service"
       identifiers = [
         "ecs-tasks.amazonaws.com",
-        "tasks.apprunner.amazonaws.com",
         "lambda.amazonaws.com",
       ]
     }

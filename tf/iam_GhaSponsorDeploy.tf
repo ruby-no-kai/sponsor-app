@@ -78,31 +78,6 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
     resources = ["arn:aws:ecs:us-west-2:${data.aws_caller_identity.current.account_id}:service/*/sponsor-*"]
   }
 
-  # AppRunner permissions (only when AppRunner is enabled)
-  dynamic "statement" {
-    for_each = var.enable_app ? [1] : []
-    content {
-      effect = "Allow"
-      actions = [
-        "apprunner:DescribeService",
-        "apprunner:UpdateService",
-        "apprunner:ListOperations",
-        "apprunner:ListTagsForResource",
-      ]
-      resources = [
-        aws_apprunner_service.main[0].arn,
-      ]
-    }
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "apprunner:ListServices",
-    ]
-    resources = ["*"]
-  }
-
   statement {
     effect = "Allow"
     actions = [
@@ -117,13 +92,10 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
     actions = [
       "iam:PassRole",
     ]
-    resources = concat(
-      [
-        aws_iam_role.SponsorApp.arn,
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/EcsExecSponsorApp",
-      ],
-      var.enable_app ? [aws_iam_role.app-runner-access[0].arn] : []
-    )
+    resources = [
+      aws_iam_role.SponsorApp.arn,
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/EcsExecSponsorApp",
+    ]
   }
 
   statement {
@@ -165,10 +137,7 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
       "iam:ListRolePolicies",
       "iam:ListAttachedRolePolicies",
     ]
-    resources = concat(
-      [aws_iam_role.SponsorApp.arn],
-      var.enable_app ? [aws_iam_role.app-runner-access[0].arn] : []
-    )
+    resources = [aws_iam_role.SponsorApp.arn]
   }
 
   statement {
