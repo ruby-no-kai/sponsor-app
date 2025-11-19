@@ -31,7 +31,7 @@ Rails.application.configure do
   config.cache_store = :memory_store
 
   # see also config/initializers/active_job.rb
-  config.active_job.queue_adapter = :inline
+  # config.active_job.queue_adapter = :inline
 
   if ENV['MAILGUN_SMTP_PASSWORD']
     config.action_mailer.smtp_settings = {

@@ -76,7 +76,7 @@ Rails.application.configure do
   )
 
   # see also config/initializers/active_job.rb
-  config.active_job.queue_adapter = :inline
+  # config.active_job.queue_adapter = :inline
 
   # Disable caching for Action Mailer templates even if Action Controller
   # caching is enabled.
