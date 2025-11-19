@@ -187,4 +187,52 @@ data "aws_iam_policy_document" "GhaSponsorDeploy" {
     ]
     resources = ["arn:aws:s3:::rk-infra/terraform/sponsor-app.tfstate"]
   }
+
+  dynamic "statement" {
+    for_each = var.enable_shared_resources ? [0] : []
+    content {
+      effect = "Allow"
+      actions = [
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories",
+        "ecr:ListImages",
+        "ecr:BatchGetImage",
+
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:CompleteLayerUpload",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:UploadLayerPart",
+      ]
+      resources = [
+        aws_ecr_repository.app[statement.key].arn,
+      ]
+    }
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecr:GetAuthorizationToken",
+      "sts:GetServiceBearerToken",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "lambda:UpdateFunctionCode",
+      "lambda:GetFunctionConfiguration",
+    ]
+    resources = [for v in aws_lambda_function.app : v.arn]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+    resources = [aws_lambda_function.app["runner"].arn]
+  }
 }
