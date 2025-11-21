@@ -41,12 +41,24 @@ class SponsorshipsController < ApplicationController
     return render(plain: '404', status: 404) unless @conference.verify_invite_code(params[:invite_code])
     return render(:closed, status: 403) if !@conference&.application_open? && !current_staff
 
-    @sponsorship = Sponsorship.new(sponsorship_params)
-    return render(status: 403, plain: '403') if sponsorship_params[:asset_file_id].present? && (!session[:asset_file_ids] || !session[:asset_file_ids].include?(@sponsorship.asset_file&.id))
+    @sponsorship = Sponsorship.new(sponsorship_params.except(:asset_file_id))
 
-    if sponsorship_params[:asset_file_id_to_copy].present? && !@sponsorship.asset_file
-      src_asset = SponsorshipAssetFile.where(sponsorship_id: current_available_sponsorships.map(&:id), id: sponsorship_params[:asset_file_id_to_copy]).first
-      @sponsorship.asset_file = src_asset.copy_to!(@conference)
+    if sponsorship_params[:asset_file_id].present? 
+      asset_src = SponsorshipAssetFile
+        .available_for_user(
+          sponsorship_params[:asset_file_id],
+          session_asset_file_ids: session[:asset_file_ids],
+          available_sponsorship_ids: current_available_sponsorships&.pluck(:id) || [],
+        )
+        .first
+      return render(plain: '404 asset not found', status: 404) unless asset_src
+      if asset_src.sponsorship_id.present?
+        new_asset = asset_src.copy_to!(@conference)
+        (session[:asset_file_ids] ||= []) << new_asset.id
+        @sponsorship.asset_file = new_asset
+      else
+        @sponsorship.asset_file = asset_src
+      end
     end
 
     @sponsorship.locale = I18n.locale
@@ -126,14 +138,6 @@ class SponsorshipsController < ApplicationController
     return {} unless session[:sponsorship_ids].include?(params[:sponsorship_id_to_copy].to_i)
     src = Sponsorship.find_by(id: params[:sponsorship_id_to_copy])
     return {} unless src
-    {
-      name: src.name,
-      url: src.url,
-      profile: src.profile,
-      asset_file_id_to_copy: src.asset_file_id,
-      contact_attributes: src.contact.attributes.except('id', 'kind'),
-      alternate_billing_contact_attributes: src.alternate_billing_contact&.attributes&.except('id', 'kind')&.merge(_keep: '1'),
-      billing_request_attributes: src.billing_request&.attributes&.except('id', 'kind'),
-    }.compact
+    src.attributes_for_copy
   end
 end

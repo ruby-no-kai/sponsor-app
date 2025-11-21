@@ -38,11 +38,10 @@ class SponsorshipAssetFilesController < ApplicationController
 
   private def set_asset_file
     @asset_file = SponsorshipAssetFile
-      .where(id: params[:id])
-      .merge(
-        SponsorshipAssetFile
-          .where(sponsorship_id: nil, id: session[:asset_file_ids] || [])
-          .or(SponsorshipAssetFile.where(sponsorship_id: [current_sponsorship&.id].compact))
+      .available_for_user(
+        params[:id],
+        session_asset_file_ids: session[:asset_file_ids],
+        available_sponsorship_ids: [current_sponsorship&.id].compact,
       )
       .first!
   end

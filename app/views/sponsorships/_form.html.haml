@@ -201,11 +201,16 @@
 
     .form-group.sponsorships_form_asset_file{data: {session_endpoint: sponsorship.asset_file&.persisted? ? initiate_update_user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file) : user_conference_sponsorship_asset_files_path, session_endpoint_method: 'POST'}}
       = form.hidden_field :asset_file_id
-      = form.hidden_field :asset_file_id_to_copy unless sponsorship.persisted?
       .sponsorships_form_asset_file_form (Loading)
 
-    - if sponsorship.persisted? && sponsorship.asset_file
-      %small.form-text= link_to t('.download_logo'), user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file)
+    - if sponsorship.asset_file
+      :ruby
+        asset_file_url = user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file)
+        unless sponsorship.persisted? # possibly copying from another sponsorship
+          asset_file = SponsorshipAssetFile.includes(:sponsorship).find(sponsorship.asset_file_id)
+          asset_file_url = user_conference_sponsorship_asset_file_path(asset_file.sponsorship.conference, asset_file)
+        end
+      %small.form-text= link_to t('.download_logo'), asset_file_url
 
     %div.py-3.sponsorships_form_asset_file_form__warning.d-none{data: {warning_kind: 'zip_asset'}}
       .card

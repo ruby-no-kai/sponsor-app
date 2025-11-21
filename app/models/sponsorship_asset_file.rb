@@ -8,6 +8,15 @@ class SponsorshipAssetFile < ApplicationRecord
   ROLE = ENV['S3_FILES_ROLE']
 
   belongs_to :sponsorship, optional: true
+
+  scope :available_for_user, ->(id, session_asset_file_ids: [], available_sponsorship_ids: []) do
+    where(id:)
+      .merge(
+        SponsorshipAssetFile.where(sponsorship_id: available_sponsorship_ids)
+          .or(SponsorshipAssetFile.where(sponsorship_id: nil, id: session_asset_file_ids || []))
+      )
+  end
+
   validates :handle, presence: true
 
   validate :validate_ownership_not_changed

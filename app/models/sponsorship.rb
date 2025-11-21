@@ -25,13 +25,6 @@ class Sponsorship < ApplicationRecord
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
   end
 
-  # XXX: this can only hold a value, because authorization is mandatory in a controller
-  def asset_file_id_to_copy; @asset_file_id_to_copy; end
-  def asset_file_id_to_copy=(id)
-    raise "asset_file_id_to_copy= cannot be used for a persisted record" if id && self.persisted?
-    @asset_file_id_to_copy = id
-  end
-
   has_many :staff_notes, class_name: 'SponsorshipStaffNote', dependent: :destroy
 
   has_one :exhibition
@@ -209,6 +202,18 @@ class Sponsorship < ApplicationRecord
     }.tap do |h|
       h["withdrawn_at"] = withdrawn_at if withdrawn_at
     end
+  end
+
+  def attributes_for_copy
+    {
+      name: self.name,
+      url: self.url,
+      profile: self.profile,
+      asset_file_id: self.asset_file_id,
+      contact_attributes: self.contact.attributes.except('id', 'kind'),
+      alternate_billing_contact_attributes: self.alternate_billing_contact&.attributes&.except('id', 'kind')&.merge(_keep: '1'),
+      billing_request_attributes: self.billing_request&.attributes&.except('id', 'kind'),
+    }.compact
   end
 
   def total_number_of_attendees
