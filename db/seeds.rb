@@ -9,6 +9,11 @@ puts "Creating Conferences..."
 sponsorship_id_base = SecureRandom.random_number(1000..9999) * 1000
 sponsorship_id_next = -> { sponsorship_id_base += 1; sponsorship_id_base }
 
+contact_emails = {}
+generate_contact_email = ->(domain) {
+  contact_emails[domain] ||= Faker::Internet.email(domain:)
+}
+
 ApplicationRecord.transaction do
   conferences = [
     {
@@ -155,7 +160,7 @@ ApplicationRecord.transaction do
       sponsorship.build_contact(
         organization: sponsorship.name,
         name: Faker::Name.name,
-        email: Faker::Internet.email(domain: organization.domain),
+        email: generate_contact_email.call(organization.domain),
         kind: :primary,
         address: Faker::Address.full_address,
         email_cc: "#{Faker::Internet.email(domain: organization.domain)}, #{Faker::Internet.email(domain: organization.domain)}"
