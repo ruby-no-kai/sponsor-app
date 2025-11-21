@@ -3,9 +3,9 @@ services:
     image: public.ecr.aws/docker/library/postgres:17-trixie
     restart: always
     environment:
-      POSTGRES_USER: takeoutapp
-      POSTGRES_PASSWORD: takeoutapp
-      POSTGRES_DB: takeout_app_development
+      POSTGRES_USER: sponsorapp
+      POSTGRES_PASSWORD: sponsorapp
+      POSTGRES_DB: sponsor_app2_development
     volumes:
       - 'postgres17:/var/lib/postgresql/data'
     ports:

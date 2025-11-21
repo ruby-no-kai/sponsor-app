@@ -28,8 +28,8 @@ development: &development
 <% unless docker_port.empty? %>
   host: 127.0.0.1
   port: <%= docker_port %>
-  username: takeoutapp
-  password: takeoutapp
+  username: sponsorapp
+  password: sponsorapp
 <% end %>
 
 
