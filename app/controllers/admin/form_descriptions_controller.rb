@@ -55,6 +55,6 @@ class Admin::FormDescriptionsController < Admin::ApplicationController
   end
 
   def set_form_description
-    @form_description = FormDescription.where(conference: @conference).find(params[:id])
+    @form_description = FormDescription.where(conference: @conference).find_by!(locale: params[:locale])
   end
 end

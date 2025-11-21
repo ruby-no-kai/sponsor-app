@@ -18,7 +18,7 @@ Rails.application.routes.draw do
 
       resource :booth_assignment, only: %i(show update)
 
-      resources :form_descriptions, except: %i(index)
+      resources :form_descriptions, param: :locale, except: %i(index)
       resources :plans, except: %i(index show)
 
       resources :sponsorships, except: %i(index new create) do
