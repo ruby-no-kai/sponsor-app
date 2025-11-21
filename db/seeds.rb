@@ -197,4 +197,7 @@ ApplicationRecord.transaction do
   end
 end
 
+
+ApplicationRecord.connection.execute("alter sequence sponsorships_id_seq restart with #{sponsorship_id_next.call}")
+
 puts "Seeding complete!"
