@@ -65,13 +65,19 @@ ja:
       login: 'ログイン'
       logout: 'ログアウト'
 
+  conferences:
+    index:
+      title: イベント一覧
+
   sessions:
     new:
+      title: ログイン
       header: Log in
       description: "スポンサーシップ申し込みで利用したメールアドレスを入力してください。"
       email_address: "Eメールアドレス"
       submit: "進む"
     claim:
+      title: ログイン
       expired: "リンクの有効期限が切れています。ログインページにてリンクを再取得してください。"
     create:
       no_email_found: "入力されたEメールアドレスが確認できませんでした。再度入力していただくか、お問い合わせください。"
@@ -89,6 +95,10 @@ ja:
       subject: "New sponsorship application from: %{name}"
 
   sponsorships:
+    new:
+      title: スポンサー申込
+    edit:
+      title: 申込内容の編集
     form:
       optional: '(任意)'
       header: '%{name} スポンサーシップ申込フォーム'
@@ -164,12 +174,14 @@ ja:
           acknowledge: '上記の要件を確認しました。'
 
     closed:
+      title: 受付終了
       header: '申し込み期間ではありません'
       closed: "スポンサーシップのお申し込みをご検討いただきありがとうございます。申し訳ありませんが、本イベントへのスポンサー申し込みは %{ts} に締め切られました。"
       not_yet_open: "スポンサーシップのお申し込みをご検討いただきありがとうございます。申し訳ありませんが、本イベントへの申し込みはまだ開始しておりません。"
     create:
       notice: "スポンサーシップへお申込みいただきありがとうございます。入力いただいたメールアドレスへ確認メールを送信しました。"
     show:
+      title: スポンサーポータル
       header: "%{name} スポンサーポータル"
       your_application: "申込情報"
       edit: "修正"
@@ -212,6 +224,10 @@ ja:
     edit:
       amendment_availability: "%{ts} まで修正することができます。"
   exhibitions:
+    new:
+      title: ブース詳細
+    edit:
+      title: ブース詳細の編集
     create:
       notice: 'ブース詳細の提出を受け付けました。'
     update:
@@ -223,6 +239,7 @@ ja:
 
   pass_redemptions:
     index:
+      title: 招待/パス利用状況
       header: '招待/ブースパス利用状況'
       card_title: '利用状況'
       no_registrations: '招待URLを利用した登録はまだありません。'
@@ -262,6 +279,7 @@ ja:
 
   pass_retractions:
     new:
+      title: 取消申請
       header: '取消申請'
       description: '登録 %{reference} のキャンセル申請'
       disabled_message: 'カンファレンスの開催が近いため、自動キャンセル機能を無効にしています。キャンセルや変更を行う場合は <a href="mailto:%{contact_email}">%{contact_email}</a> までご連絡いただき、手動での対応を依頼してください。'
@@ -280,6 +298,7 @@ ja:
       notice: 'キャンセル申請を受け付けました。'
       error: 'キャンセル申請を受け付けできませんでした。'
     show:
+      title: 取消申請
       header: '取消申請'
       completed_header: 'キャンセル完了'
       completed_message: ''

@@ -3,7 +3,12 @@
   %head
     %meta{charset: 'utf-8'}
     %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, shrink-to-fit=no'}
-    %title= yield(:title) || 'sponsor-app admin'
+    - page_title = yield(:title)
+    - site_name = "#{Rails.application.config.x.org_name} Sponsorships Portal"
+    - if page_title.present?
+      %title= "#{page_title} - Admin | #{site_name}"
+    - else
+      %title= "Admin | #{site_name}"
     = csrf_meta_tags
     = csp_meta_tag
     = vite_stylesheet_tag 'application.css'

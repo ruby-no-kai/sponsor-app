@@ -65,13 +65,19 @@ en:
       login: 'Log in'
       logout: 'Log out'
 
+  conferences:
+    index:
+      title: Conferences
+
   sessions:
     new:
+      title: Log in
       header: Log in
       description: "Enter your email address used for your sponsorship application to proceed."
       email_address: Email Address
       submit: Proceed
     claim:
+      title: Log in
       expired: "The link has been expired. Please obtain a new link in this login form."
     create:
       no_email_found: "We're sorry but no applications found for the email address you entered. Please try again or contact us."
@@ -89,6 +95,10 @@ en:
       subject: "New sponsorship application from: %{name}"
 
   sponsorships:
+    new:
+      title: Apply
+    edit:
+      title: Edit Application
     form:
       optional: '(Optional)'
       header: '%{name} Sponsorship Application Form'
@@ -162,12 +172,14 @@ en:
           item3: 'If multiple logos are included: Specify the file names in [Others] field below'
           acknowledge: 'Yes, I have confirmed these requirements.'
     closed:
+      title: Application Closed
       header: 'Application form is not open'
       closed: "Thank you for your interest. But we're sorry, we have closed the sponsorship application for this conference at %{ts}."
       not_yet_open: "Thank you for your interest. But we're sorry, our application form is not yet open. Stay tuned!"
     create:
       notice: "Thank you for the application. We'll send you a confirmation email."
     show:
+      title: Sponsorship Portal
       header: "%{name} Sponsorship Portal"
       your_application: "Your application"
       edit: "Edit"
@@ -211,6 +223,10 @@ en:
     edit:
       amendment_availability: "You can amend your application until %{ts}."
   exhibitions:
+    new:
+      title: Booth Details
+    edit:
+      title: Edit Booth Details
     create:
       notice: 'The booth plan has been submitted.'
     update:
@@ -222,6 +238,7 @@ en:
 
   pass_redemptions:
     index:
+      title: Pass Redemptions
       header: 'Pass Redemptions'
       card_title: 'Registrations and Tickets'
       no_registrations: 'No registrations have been made yet using the invitation URLs.'
@@ -261,6 +278,7 @@ en:
 
   pass_retractions:
     new:
+      title: Cancel Registration
       header: 'Cancel Registration'
       description: 'Request cancellation for registration %{reference}'
       disabled_message: 'The automated retraction process has been disabled as the conference approaches. For any cancellations or changes, please contact <a href="mailto:%{contact_email}">%{contact_email}</a> for manual processing.'
@@ -279,6 +297,7 @@ en:
       notice: 'Cancellation request has been submitted.'
       error: 'Unable to submit cancellation request.'
     show:
+      title: Cancellation Request
       header: 'Cancellation Request'
       completed_header: 'Cancellation Completed'
       completed_message: ''
@@ -290,3 +309,74 @@ en:
       reason: 'Reason'
       registration_reference: 'Registration'
       back: 'Back to Pass Redemptions'
+
+  admin:
+    sessions:
+      new:
+        title: Admin Login
+    conferences:
+      index:
+        title: Conferences
+      show:
+        title: "%{conference}"
+      new:
+        title: New Conference
+      edit:
+        title: Edit Conference
+      table_view:
+        title: Table View
+      attendees_keeper:
+        title: Check Attendees
+    sponsorships:
+      show:
+        title: "%{sponsorship}"
+      edit:
+        title: Edit Sponsorship
+    sponsorship_editing_histories:
+      index:
+        title: History
+    sponsorship_staff_notes:
+      index:
+        title: Notes
+      edit:
+        title: Edit Note
+    organizations:
+      index:
+        title: Organizations
+      show:
+        title: "%{organization}"
+      edit:
+        title: Edit Organization
+    plans:
+      new:
+        title: New Plan
+      edit:
+        title: Edit Plan
+    form_descriptions:
+      show:
+        title: Form Description
+      new:
+        title: New Form Description
+      edit:
+        title: Edit Form Description
+    broadcasts:
+      index:
+        title: Broadcasts
+      show:
+        title: "%{broadcast}"
+      new:
+        title: New Broadcast
+      edit:
+        title: Edit Broadcast
+    announcements:
+      index:
+        title: Announcements
+      show:
+        title: "%{announcement}"
+      new:
+        title: New Announcement
+      edit:
+        title: Edit Announcement
+    booth_assignments:
+      show:
+        title: Booth Assignments

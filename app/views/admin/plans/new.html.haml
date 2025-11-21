@@ -1,3 +1,5 @@
+- content_for(:title) { t('.title') }
+
 %h1 New Plan (#{@conference.name})
 
 = render 'form', plan: @plan

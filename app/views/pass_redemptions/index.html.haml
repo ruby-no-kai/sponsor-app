@@ -1,3 +1,5 @@
+- content_for(:title) { t('.title') }
+
 %h2 #{t('.header')} - #{@conference.name}
 
 - if @conference.distributing_ticket? && @conference.tito_slug.present?

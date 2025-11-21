@@ -7,7 +7,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 
-    %title= yield(:title) || 'sponsor-app'
+    - page_title = yield(:title)
+    - site_name = "#{Rails.application.config.x.org_name} Sponsorships Portal"
+    - if page_title.present?
+      - conf = @conference || current_conference
+      - if conf
+        %title= "#{page_title} | #{conf.name} | #{site_name}"
+      - else
+        %title= "#{page_title} | #{site_name}"
+    - else
+      %title= site_name
     = csrf_meta_tags
     = csp_meta_tag
     = vite_stylesheet_tag 'application.css'

@@ -1,3 +1,5 @@
+- content_for(:title) { t('.title') }
+
 - if @conference.amendment_closes_at
   %p= t('.amendment_availability', ts: l(@conference.amendment_closes_at))
 

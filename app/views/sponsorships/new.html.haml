@@ -1,3 +1,5 @@
+- content_for(:title) { t('.title') }
+
 - if current_staff && !@conference.application_open?
   .alert.alert-warning
     Application
