@@ -49,6 +49,7 @@
             %li
               = link_to plan.name, edit_conference_plan_path(@conference, plan)
               %span (#{count}/#{capacity})
+        = link_to 'View all plans', conference_plans_path(@conference), class: 'card-link'
         = link_to 'Add plan', new_conference_plan_path(@conference), class: 'card-link'
 
   .col-md-4
