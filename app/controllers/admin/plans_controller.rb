@@ -2,6 +2,10 @@ class Admin::PlansController < Admin::ApplicationController
   before_action :set_conference
   before_action :set_plan, only: [:edit, :update]
 
+  def index
+    @plans = @conference.plans.order(:rank)
+  end
+
   def new
     @plan = Plan.new(conference: @conference)
   end
@@ -15,7 +19,7 @@ class Admin::PlansController < Admin::ApplicationController
 
     respond_to do |format|
       if @plan.save
-        format.html { redirect_to edit_conference_plan_path(@conference, @plan), notice: 'Plan was successfully created.' }
+        format.html { redirect_to conference_plans_path(@conference), notice: 'Plan was successfully created.' }
       else
         format.html { render :new }
       end
@@ -25,9 +29,9 @@ class Admin::PlansController < Admin::ApplicationController
   def update
     respond_to do |format|
       if @plan.update(plan_params)
-        format.html { redirect_to edit_conference_plan_path(@conference, @plan), notice: 'Plan was successfully updated.' }
+        format.html { redirect_to conference_plans_path(@conference), notice: 'Plan was successfully updated.' }
       else
-        format.html { render :new }
+        format.html { render :edit }
       end
     end
   end
