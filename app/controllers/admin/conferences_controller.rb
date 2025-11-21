@@ -13,7 +13,7 @@ class Admin::ConferencesController < Admin::ApplicationController
       .group(:id)
       .select('plans.*, COUNT(sponsorships.plan_id) as cnt')
       .map {|_| [_, _.cnt, _.capacity] }
-      .sort_by { |plan, _cnt, _capa| -plan.rank }
+      .sort_by { |plan, _cnt, _capa| plan.rank }
   end
 
   def attendees_keeper

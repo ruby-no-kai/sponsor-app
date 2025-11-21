@@ -1,0 +1,51 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Plans
+
+.d-md-flex.justify-content-between
+  %h3 Plans
+  %div
+    = link_to "New Plan", new_conference_plan_path(@conference), class: 'btn btn-primary'
+
+- if @plans.any?
+  .table-responsive
+    %table.table.table-bordered.table-striped
+      %thead
+        %tr
+          %th Rank
+          %th Name
+          %th Summary
+          %th Price
+          %th Capacity
+          %th Guests
+          %th Booth Size
+          %th Words Limit
+          %th Closes At
+          %th Auto Accept
+          %th Actions
+      %tbody
+        - @plans.each do |plan|
+          %tr
+            %td= plan.rank
+            %td= plan.name
+            %td= plan.summary
+            %td= plan.price_text
+            %td= plan.capacity
+            %td= plan.number_of_guests
+            %td= plan.booth_size
+            %td= plan.words_limit
+            %td
+              - if plan.closes_at
+                = plan.closes_at.strftime('%Y-%m-%d %H:%M')
+            %td
+              - if plan.auto_acceptance
+                %span.badge.badge-success Yes
+              - else
+                %span.badge.badge-secondary No
+            %td
+              = link_to 'Edit', edit_conference_plan_path(@conference, plan), class: 'btn btn-sm btn-secondary'
+- else
+  .alert.alert-info
+    No plans have been created yet.
+    = link_to "Create the first plan", new_conference_plan_path(@conference)
