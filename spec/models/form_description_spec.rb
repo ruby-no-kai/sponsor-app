@@ -3,6 +3,21 @@ require 'rails_helper'
 RSpec.describe FormDescription, type: :model do
   let(:conference) { FactoryBot.create(:conference) }
 
+  describe '#to_param' do
+    it 'returns locale instead of id' do
+      form = FactoryBot.create(:form_description, conference:, locale: 'en')
+      expect(form.to_param).to eq('en')
+    end
+
+    it 'returns different locales correctly' do
+      form_en = FactoryBot.create(:form_description, conference:, locale: 'en')
+      form_ja = FactoryBot.create(:form_description, conference:, locale: 'ja')
+      
+      expect(form_en.to_param).to eq('en')
+      expect(form_ja.to_param).to eq('ja')
+    end
+  end
+
   describe '#render_markdown callback' do
     it 'renders markdown fields to HTML on save' do
       form = FactoryBot.create(:form_description,

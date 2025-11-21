@@ -31,6 +31,10 @@ class FormDescription < ApplicationRecord
 
   validate :validate_fallback_options_json
 
+  def to_param
+    locale
+  end
+
   before_save :render_markdown
 
   def fallback_options
