@@ -1,3 +1,5 @@
+- content_for(:title) { t('.title', conference: @conference.name) }
+
 %p
   - application_form_url = new_user_conference_sponsorship_url(@conference, {invite_code: @conference.invite_code}.compact)
 
