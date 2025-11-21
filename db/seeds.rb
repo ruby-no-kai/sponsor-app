@@ -17,6 +17,7 @@ generate_contact_email = ->(domain) {
 ApplicationRecord.transaction do
   conferences = [
     {
+      id: sponsorship_id_base + 1,
       name: "RubyKaigi 2048",
       contact_email_address: "2048@rubykaigi.invalid",
       tito_slug: nil,
@@ -29,6 +30,7 @@ ApplicationRecord.transaction do
       hidden: false,
     },
     {
+      id: sponsorship_id_base + 2,
       name: "RubyKaigi 4096",
       contact_email_address: "4096@rubykaigi.invalid",
       tito_slug: nil,
