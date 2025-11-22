@@ -61,6 +61,14 @@ class SponsorshipAssetFile < ApplicationRecord
     )
   end
 
+  def get_object
+    s3_client.get_object(bucket: BUCKET, key: object_key)
+  end
+
+  def put_object(**args)
+    s3_client.put_object(bucket: BUCKET, key: object_key, **args)
+  end
+
   def upload_url_and_fields
     # see also config/initializers/aws_s3_patches.rb to force dualstack endpoint
     sign = Aws::S3::PresignedPost.new(
@@ -94,7 +102,7 @@ class SponsorshipAssetFile < ApplicationRecord
     @presigner ||= Aws::S3::Presigner.new(client: s3_client)
   end
 
-  private def s3_client
+  def s3_client
     @s3_client ||= Aws::S3::Client.new(use_dualstack_endpoint: true, region: REGION, logger: Rails.logger)
   end
 

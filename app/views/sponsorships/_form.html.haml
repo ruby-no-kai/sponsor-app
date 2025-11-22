@@ -208,7 +208,7 @@
         asset_file_url = user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file)
         unless sponsorship.persisted? # possibly copying from another sponsorship
           asset_file = SponsorshipAssetFile.includes(:sponsorship).find(sponsorship.asset_file_id)
-          asset_file_url = user_conference_sponsorship_asset_file_path(asset_file.sponsorship.conference, asset_file)
+          asset_file_url = user_conference_sponsorship_asset_file_path(asset_file.sponsorship&.conference || conference, asset_file)
         end
       %small.form-text= link_to t('.download_logo'), asset_file_url
 

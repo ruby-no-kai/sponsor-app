@@ -17,5 +17,7 @@ class SponsorshipWelcomeJob < ApplicationJob
 
     EnsureSponsorshipTitoDiscountCodeJob.perform_later(sponsorship, 'attendee')
     GenerateSponsorsYamlFileJob.perform_later(sponsorship.conference)
+
+    BackfillSponsorshipAssetFileChecksumJob.perform_later(sponsorship.asset_file) if sponsorship.asset_file.checksum_sha256 == '-'
   end
 end
