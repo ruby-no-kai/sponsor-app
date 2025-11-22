@@ -86,7 +86,7 @@ class SponsorshipAssetFile < ApplicationRecord
     head = s3_client.head_object(bucket: BUCKET, key: object_key, checksum_mode: :enabled)
     self.version_id = head.version_id if head.version_id != version_id
     self.last_modified_at = head.last_modified
-    self.checksum_sha256 = head.checksum_sha256
+    self.checksum_sha256 = head.checksum_sha256 || "-"
     self
   end
 
