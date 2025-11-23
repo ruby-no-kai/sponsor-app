@@ -58,7 +58,10 @@
                     = link_to sponsorship.conference.name, conference_sponsorship_path(sponsorship.conference, sponsorship)
                   %td= sponsorship.name
                   %td
-                    = sponsorship.plan.name
+                    - if sponsorship.plan
+                      = sponsorship.plan.name
+                    - else
+                      %i.text-muted Other
                   %td
                     = sponsorship.customization_name
                   %td
