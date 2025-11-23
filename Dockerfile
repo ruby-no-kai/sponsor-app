@@ -51,10 +51,14 @@ COPY --from=builder /app/.bundle /app/.bundle
 COPY --from=builder /usr/local/bin/bundle /usr/local/bin/aws_lambda_ric /usr/local/bin
 COPY --from=nodebuilder /app/public/vite /app/public/vite
 COPY . /app/
+ENV BOOTSNAP_CACHE_DIR=/bootsnap
+RUN mkdir -p /bootsnap && bundle exec bootsnap precompile --gemfile app/ lib/ config/
+
 COPY config/lambda_entrypoint.sh /lambda_entrypoint.sh
 COPY config/docker_entrypoint.sh /docker_entrypoint.sh
 
 ENV PORT 3000
 ENV LANG C.UTF-8
+ENV BOOTSNAP_READONLY=1
 ENTRYPOINT ["/docker_entrypoint.sh"]
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]

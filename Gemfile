@@ -45,6 +45,8 @@ gem 'apigatewayv2_rack'
 
 gem 'open3', require: false
 
+gem 'bootsnap', require: false
+
 group :production do
 end
 
