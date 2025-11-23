@@ -199,18 +199,42 @@
       %p= t('.logo_help')
       %p= t('.logo_zip_help')
 
-    .form-group.sponsorships_form_asset_file{data: {session_endpoint: sponsorship.asset_file&.persisted? ? initiate_update_user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file) : user_conference_sponsorship_asset_files_path, session_endpoint_method: 'POST'}}
-      = form.hidden_field :asset_file_id
-      .sponsorships_form_asset_file_form (Loading)
-
-    - if sponsorship.asset_file
       :ruby
-        asset_file_url = user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file)
-        unless sponsorship.persisted? # possibly copying from another sponsorship
-          asset_file = SponsorshipAssetFile.includes(:sponsorship).find(sponsorship.asset_file_id)
-          asset_file_url = user_conference_sponsorship_asset_file_path(asset_file.sponsorship&.conference || conference, asset_file)
+        asset_file_state = :new
+        if sponsorship.asset_file&.persisted?
+          asset_file_state = :existing
+          asset_file_url = user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file)
+          # Copying from another sponsorship (:copy) or failed validation (:unclaimed)
+          if sponsorship.new_record?
+            # We need to query it again as foo.assoc=other rewrites other.foo
+            asset_sponsorship = Sponsorship.includes(:asset_file, :conference).select(:id, :conference_id).where(asset_file: {id: sponsorship.asset_file_id}).first
+            claimed_asset_file = asset_sponsorship&.asset_file
+            if claimed_asset_file
+              asset_file_state = :copy
+              asset_file_url = user_conference_sponsorship_asset_file_path(asset_sponsorship.conference, claimed_asset_file)
+              raise "asset_file_state=:copy, assertion failed, conference_id must differ when copy; asset_file_id=#{sponsorship.asset_file.id}" unless asset_sponsorship.conference_id != conference.id
+            else
+              asset_file_state = :unclaimed
+              asset_file_url = user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file)
+            end
+          end
         end
-      %small.form-text= link_to t('.download_logo'), asset_file_url
+
+        form_params = case asset_file_state
+        when :new, :copy
+          {session_endpoint: user_conference_sponsorship_asset_files_path, session_endpoint_method: 'POST', asset_file_state: asset_file_state.to_s}
+        when :existing, :unclaimed
+          {session_endpoint: initiate_update_user_conference_sponsorship_asset_file_path(conference, sponsorship.asset_file), session_endpoint_method: 'POST', asset_file_state: asset_file_state.to_s}
+        else
+          raise "Unknown asset_file_state: #{asset_file_state}, sponsorship_asset_file_id: #{sponsorship.asset_file.id}"
+        end
+
+      .form-group.sponsorships_form_asset_file{data: form_params}
+        = form.hidden_field :asset_file_id
+        .sponsorships_form_asset_file_form (Loading)
+
+        - if sponsorship.asset_file
+          %small.form-text= link_to t('.download_logo'), asset_file_url
 
     %div.py-3.sponsorships_form_asset_file_form__warning.d-none{data: {warning_kind: 'zip_asset'}}
       .card
