@@ -25,6 +25,10 @@
           %p.card-text= t('.copy.explanation')
           .form-group
             = select_tag "sponsorship_id_to_copy", options_for_select(current_available_sponsorships.map {|_| [_.conference.name, _.id] }, params[:sponsorship_id_to_copy]), class: 'form-control form-control-sm sponsorship_id_to_copy_selector', include_blank: true
+  - elsif !sponsorship.persisted? && params[:sponsorship_id_to_copy].present?
+    %section.py-3
+      .alert.alert-info
+        = t('.copy.login_required')
 
   %section.py-2
     .form-group

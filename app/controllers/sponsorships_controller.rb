@@ -135,7 +135,7 @@ class SponsorshipsController < ApplicationController
 
   def copied_sponsorship_attributes
     return {} unless params[:sponsorship_id_to_copy].present?
-    return {} unless session[:sponsorship_ids].include?(params[:sponsorship_id_to_copy].to_i)
+    return {} unless session[:sponsorship_ids]&.include?(params[:sponsorship_id_to_copy].to_i)
     src = Sponsorship.find_by(id: params[:sponsorship_id_to_copy])
     return {} unless src
     src.attributes_for_copy
