@@ -92,7 +92,7 @@ en:
     user_email:
       subject: "Thank you for sponsoring us"
     admin_email:
-      subject: "New sponsorship application from: %{name}"
+      subject: "New: %{name}"
 
   sponsorships:
     new:

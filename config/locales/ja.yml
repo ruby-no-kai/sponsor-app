@@ -92,7 +92,7 @@ ja:
     user_email:
       subject: "スポンサーシップ申込確認"
     admin_email:
-      subject: "New sponsorship application from: %{name}"
+      subject: "New: %{name}"
 
   sponsorships:
     new:
