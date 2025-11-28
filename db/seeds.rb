@@ -15,6 +15,13 @@ generate_contact_email = ->(domain) {
 }
 
 ApplicationRecord.transaction do
+  # Create admin staff for broadcasts
+  puts "Creating staff..."
+  staff = Staff.find_or_create_by!(login: "admin") do |s|
+    s.name = "Admin User"
+    s.uid = "12345"
+  end
+
   conferences = [
     {
       id: sponsorship_id_base + 1,
@@ -46,7 +53,7 @@ ApplicationRecord.transaction do
 
   conferences.each do |conf_params|
     conference = Conference.find_or_initialize_by(name: conf_params[:name])
-    conference.update!(conf_params)
+    conference.update!(conf_params.except(:id))
 
     # Plans
     puts "Creating plans for #{conference.name}..."
@@ -92,7 +99,7 @@ ApplicationRecord.transaction do
         capacity: 10000,
       }
     ].each do |plan_params|
-      conference.plans.find_or_create_by!(plan_params)
+      conference.plans.find_or_create_by!(name: plan_params.fetch(:name)).update!(plan_params)
     end
 
     # FormDescriptions
@@ -117,7 +124,7 @@ ApplicationRecord.transaction do
         fallback_options: JSON.generate(Jsonnet.load(Rails.root.join("misc", "fallback_options_ja.jsonnet"))),
       }
     ].each do |form_desc_params|
-      conference.form_descriptions.find_or_create_by!(form_desc_params)
+      conference.form_descriptions.find_or_create_by!(locale: form_desc_params.fetch(:locale)).update!(form_desc_params)
     end
 
     # Organizations
@@ -137,26 +144,41 @@ ApplicationRecord.transaction do
 
       # Sponsorships
       plans = conference.plans
-      sponsorship_params = {
-        id: sponsorship_id_next.call,
-        name: organization.name,
-        organization: organization,
+      sponsorship = Sponsorship.find_or_initialize_by(
         conference: conference,
-        url: "https://#{organization.domain}",
-        profile: "#{organization.name} is a leader in innovation and technology.",
-        plan: plans.find_by(name: org_params[:plan]),
-        booth_requested: (org_params[:plan] == "Ruby"),
-        booth_assigned: false,
-        locale: org_params[:locale],
-        number_of_additional_attendees: 0,
-      }
-      sponsorship = Sponsorship.new(sponsorship_params)
-
-      # Asset Files
-      sponsorship.build_asset_file(
-        prefix: "c-#{conference.id}/",
-        extension: "zip",
+        name: organization.name
       )
+
+      # Assign ID only for new records
+      sponsorship.id ||= sponsorship_id_next.call
+
+      # Update attributes
+      sponsorship.organization = organization
+      sponsorship.url = "https://#{organization.domain}"
+      sponsorship.profile = "#{organization.name} is a leader in innovation and technology."
+      sponsorship.plan = plans.find_by(name: org_params[:plan])
+      sponsorship.booth_requested = (org_params[:plan] == "Ruby")
+      sponsorship.locale = org_params[:locale]
+      sponsorship.number_of_additional_attendees = 0
+
+      sponsorship.booth_assigned = sponsorship.booth_requested && conference.name == 'RubyKaigi 2048'
+      sponsorship.accept if conference.name == 'RubyKaigi 2048'
+
+      # Asset Files (update or build)
+      if sponsorship.asset_file
+        sponsorship.asset_file.assign_attributes(
+          prefix: "c-#{conference.id}/",
+          extension: "zip"
+        )
+      else
+        sponsorship.build_asset_file(
+          prefix: "c-#{conference.id}/",
+          extension: "zip"
+        )
+      end
+
+      # Clear and rebuild contacts to ensure clean state
+      sponsorship.contacts.destroy_all
 
       # Contacts (:primary)
       sponsorship.build_contact(
@@ -170,7 +192,7 @@ ApplicationRecord.transaction do
 
       # Contacts (:billing)
       if org_params[:billing_contact]
-        sponsorship.contacts.build(
+        sponsorship.build_alternate_billing_contact(
           organization: sponsorship.name,
           name: Faker::Name.name,
           email: Faker::Internet.email(domain: organization.domain),
@@ -178,6 +200,9 @@ ApplicationRecord.transaction do
           address: Faker::Address.full_address
         )
       end
+
+      # Clear and rebuild requests to ensure clean state
+      sponsorship.requests.destroy_all
 
       # Sponsorship Requests
       if org_params[:request]
@@ -194,10 +219,189 @@ ApplicationRecord.transaction do
       sponsorship.booth_assigned = sponsorship.booth_requested if conference.name == 'RubyKaigi 2048'
       sponsorship.save!
     end
+
+    # Broadcasts and Deliveries
+    puts "Creating broadcasts and deliveries for #{conference.name}..."
+
+    # Broadcast 1: Welcome Email (sent)
+    broadcast1 = Broadcast.find_or_create_by!(
+      conference: conference,
+      campaign: "welcome-#{conference.id}"
+    ) do |b|
+      b.staff = staff
+      b.status = :sent
+      b.title = "Welcome to #{conference.name}!"
+      b.description = "Welcome email sent to all sponsors"
+      b.body = <<~MARKDOWN
+        # Welcome to #{conference.name}!
+
+        Thank you for sponsoring #{conference.name}. We're excited to have you on board!
+
+        ## Next Steps
+
+        Please visit your sponsor portal to complete your profile and submit your logo:
+
+        @LOGIN@
+
+        If you have any questions, please don't hesitate to reach out.
+
+        Best regards,
+        The #{conference.name} Team
+      MARKDOWN
+      b.dispatched_at = Time.zone.now - 2.weeks
+      b.hidden = false
+    end
+
+    # Create deliveries for all sponsorships (delivered status)
+    conference.sponsorships.includes(:contact).each do |sponsorship|
+      BroadcastDelivery.find_or_create_by!(
+        broadcast: broadcast1,
+        sponsorship: sponsorship
+      ) do |d|
+        d.recipient = sponsorship.contact.email
+        d.recipient_cc = sponsorship.contact.email_cc
+        d.status = :delivered
+        d.dispatched_at = broadcast1.dispatched_at
+      end
+    end
+
+    # Broadcast 2: Booth Information (sent, only to booth sponsors)
+    broadcast2 = Broadcast.find_or_create_by!(
+      conference: conference,
+      campaign: "booth-info-#{conference.id}"
+    ) do |b|
+      b.staff = staff
+      b.status = :sent
+      b.title = "Booth Setup Information"
+      b.description = "Booth setup instructions for exhibitors"
+      b.body = <<~MARKDOWN
+        # Booth Setup Information
+
+        Thank you for participating as an exhibitor at #{conference.name}!
+
+        ## Important Information
+
+        - Setup time: Day before the conference, 3:00 PM - 6:00 PM
+        - Booth dimensions: 2m x 2m
+        - Power outlet: 1 available per booth
+
+        ## Submit Your Booth Plan
+
+        Please submit your booth plan and requirements through the sponsor portal:
+
+        @FORM@
+
+        We look forward to seeing your booth!
+
+        Best regards,
+        The #{conference.name} Team
+      MARKDOWN
+      b.dispatched_at = Time.zone.now - 1.week
+      b.hidden = false
+    end
+
+    # Create deliveries only for sponsorships with booths (sent/opened status)
+    booth_sponsorships = conference.sponsorships.includes(:contact).where(booth_assigned: true)
+    booth_sponsorships.each_with_index do |sponsorship, idx|
+      BroadcastDelivery.find_or_create_by!(
+        broadcast: broadcast2,
+        sponsorship: sponsorship
+      ) do |d|
+        d.recipient = sponsorship.contact.email
+        d.recipient_cc = sponsorship.contact.email_cc
+        d.status = idx.even? ? :sent : :opened
+        d.dispatched_at = broadcast2.dispatched_at
+        d.opened_at = idx.odd? ? (broadcast2.dispatched_at + 1.day) : nil
+      end
+    end
+
+    # Broadcast 3: Important Update (ready, not sent yet)
+    broadcast3 = Broadcast.find_or_create_by!(
+      conference: conference,
+      campaign: "update-#{conference.id}"
+    ) do |b|
+      b.staff = staff
+      b.status = :ready
+      b.title = "Important Update - Please Review"
+      b.description = "Important update for all sponsors (not sent yet)"
+      b.body = <<~MARKDOWN
+        # Important Update
+
+        Dear Sponsors,
+
+        We have an important update regarding #{conference.name}.
+
+        ## Schedule Changes
+
+        Please note the following schedule adjustments:
+        - Registration opens 30 minutes earlier
+        - Keynote time has been adjusted
+
+        ## Action Required
+
+        Please review the updated schedule in your portal and confirm your attendance.
+
+        Thank you for your cooperation!
+
+        Best regards,
+        The #{conference.name} Team
+      MARKDOWN
+      b.dispatched_at = nil
+      b.hidden = false
+    end
+
+    # Create deliveries for all sponsorships (ready status, not sent)
+    conference.sponsorships.includes(:contact).each do |sponsorship|
+      BroadcastDelivery.find_or_create_by!(
+        broadcast: broadcast3,
+        sponsorship: sponsorship
+      ) do |d|
+        d.recipient = sponsorship.contact.email
+        d.recipient_cc = sponsorship.contact.email_cc
+        d.status = :ready
+        d.dispatched_at = nil
+      end
+    end
+
+    # Broadcast 4: Thank you Email (sent)
+    broadcast4 = Broadcast.find_or_create_by!(
+      conference: conference,
+      campaign: "thankyou-#{conference.id}"
+    ) do |b|
+      b.staff = staff
+      b.status = :sent
+      b.title = "Thank you from #{conference.name}"
+      b.description = "Appreciation"
+      b.body = <<~MARKDOWN
+        # Welcome to #{conference.name}!
+
+        Thank you for sponsoring #{conference.name}. We're excited to have you on board!
+
+        Best regards,
+        The #{conference.name} Team
+      MARKDOWN
+      b.dispatched_at = Time.zone.now - 2.weeks
+      b.hidden = false
+    end
+
+    # Create deliveries for all sponsorships (delivered status)
+    conference.sponsorships.includes(:contact).each do |sponsorship|
+      BroadcastDelivery.find_or_create_by!(
+        broadcast: broadcast4,
+        sponsorship: sponsorship
+      ) do |d|
+        d.recipient = sponsorship.contact.email
+        d.recipient_cc = sponsorship.contact.email_cc
+        d.status = :delivered
+        d.dispatched_at = broadcast4.dispatched_at
+      end
+    end
+
+    # Broadc
   end
 end
 
 
-ApplicationRecord.connection.execute("alter sequence sponsorships_id_seq restart with #{sponsorship_id_next.call}")
+ApplicationRecord.connection.execute("alter sequence sponsorships_id_seq restart with #{Sponsorship.maximum(:id).to_i + 1}")
 
 puts "Seeding complete!"
