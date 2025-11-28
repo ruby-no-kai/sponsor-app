@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   before_action :set_locale
+  before_action :populate_sentry_scope
 
   private
 
@@ -57,6 +58,48 @@ class ApplicationController < ActionController::Base
   def require_sponsorship_session
     unless current_sponsorship
       redirect_to new_user_session_path(back_to: url_for(params.to_unsafe_h.merge(only_path: true)))
+    end
+  end
+
+  def populate_sentry_scope
+    Sentry.configure_scope do |scope|
+      if current_staff
+        scope.set_context(
+          'sponsor-app.staff',
+          {
+            id: current_staff.id,
+            login: current_staff.login,
+          }
+        )
+      end
+
+      if current_sponsorship
+        scope.set_context(
+          'sponsor-app.sponsor',
+          {
+            id: current_sponsorship.id,
+            name: current_sponsorship.name,
+          }
+        )
+      end
+
+      if current_conference
+        scope.set_context(
+          'sponsor-app.conference',
+          {
+            id: current_conference.id,
+            slug: current_conference.slug,
+          }
+        )
+      end
+
+      case
+      when current_staff
+        Sentry.set_user(id: "staff_#{current_staff.id}", username: current_staff.login)
+      when current_sponsorship
+        email = session[:email] ||= current_sponsorship.contact&.email
+        Sentry.set_user(id: "#{current_sponsorship.id}", email: )
+      end
     end
   end
 end
