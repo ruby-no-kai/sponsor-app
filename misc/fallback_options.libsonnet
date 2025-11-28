@@ -41,7 +41,7 @@
     conditions: [
       { plans: ['Platinum'], booth_request: true },
     ],
-    priority_human: ['{plan}!no_booth', 'gold'],
+    priority_human: ['{plan}!no_booth', 'Gold'],
   },
   {
     value: 'platinum+booth,platinum,silver',
@@ -52,7 +52,7 @@
     conditions: [
       { plans: ['Platinum'], booth_request: true },
     ],
-    priority_human: ['{plan}!no_booth', 'silver'],
+    priority_human: ['{plan}!no_booth', 'Silver'],
   },
   {
     value: 'platinum+booth,platinum',
