@@ -397,7 +397,129 @@ ApplicationRecord.transaction do
       end
     end
 
-    # Broadc
+    # Announcements
+    puts "Creating announcements for #{conference.name}..."
+
+    # Announcement 1: Welcome (published, pinned)
+    Announcement.find_or_create_by!(
+      conference: conference,
+      issue: "welcome",
+      locale: "en"
+    ) do |a|
+      a.staff = staff
+      a.title = "Welcome Sponsors!"
+      a.body = <<~MARKDOWN
+        # Welcome to #{conference.name}
+
+        Thank you for your sponsorship! We're excited to have you as part of #{conference.name}.
+
+        Please check this page regularly for important updates and announcements.
+      MARKDOWN
+      a.published_at = Time.zone.now - 2.weeks
+      a.stickiness = 1
+      a.exhibitors_only = false
+    end
+
+    Announcement.find_or_create_by!(
+      conference: conference,
+      issue: "welcome",
+      locale: "ja"
+    ) do |a|
+      a.staff = staff
+      a.title = "スポンサーの皆様へ"
+      a.body = <<~MARKDOWN
+        # #{conference.name} へようこそ
+
+        この度はご協賛いただきありがとうございます！#{conference.name} の一員として、皆様をお迎えできることを嬉しく思います。
+
+        重要な更新やお知らせについては、このページを定期的にご確認ください。
+      MARKDOWN
+      a.published_at = Time.zone.now - 2.weeks
+      a.stickiness = 1
+      a.exhibitors_only = false
+    end
+
+    # Announcement 2: Important Information (published)
+    Announcement.find_or_create_by!(
+      conference: conference,
+      issue: "important-info",
+      locale: "en"
+    ) do |a|
+      a.staff = staff
+      a.title = "Important: Asset Submission Deadline"
+      a.body = <<~MARKDOWN
+        ## Asset Submission Reminder
+
+        Please remember to submit your logo and company information by the deadline.
+
+        If you have any questions, please contact us at #{conference.contact_email_address}.
+      MARKDOWN
+      a.published_at = Time.zone.now - 1.week
+      a.stickiness = 0
+      a.exhibitors_only = false
+    end
+
+    Announcement.find_or_create_by!(
+      conference: conference,
+      issue: "important-info",
+      locale: "ja"
+    ) do |a|
+      a.staff = staff
+      a.title = "重要: 素材提出期限について"
+      a.body = <<~MARKDOWN
+        ## 素材提出のお願い
+
+        期限までにロゴや企業情報をご提出いただきますようお願いいたします。
+
+        ご不明な点がございましたら、#{conference.contact_email_address} までお問い合わせください。
+      MARKDOWN
+      a.published_at = Time.zone.now - 1.week
+      a.stickiness = 0
+      a.exhibitors_only = false
+    end
+
+    # Announcement 3: Upcoming Event (unpublished draft)
+    Announcement.find_or_create_by!(
+      conference: conference,
+      issue: "upcoming-event",
+      locale: "en"
+    ) do |a|
+      a.staff = staff
+      a.title = "[DRAFT] Pre-Conference Meetup"
+      a.body = <<~MARKDOWN
+        ## Pre-Conference Sponsor Meetup
+
+        We're planning a pre-conference meetup for sponsors. Details coming soon!
+
+        - Date: TBA
+        - Time: TBA
+        - Location: TBA
+      MARKDOWN
+      a.published_at = nil
+      a.stickiness = 0
+      a.exhibitors_only = false
+    end
+
+    Announcement.find_or_create_by!(
+      conference: conference,
+      issue: "upcoming-event",
+      locale: "ja"
+    ) do |a|
+      a.staff = staff
+      a.title = "[下書き] カンファレンス前のミートアップ"
+      a.body = <<~MARKDOWN
+        ## スポンサー向けプレカンファレンスミートアップ
+
+        スポンサーの皆様向けのプレカンファレンスミートアップを企画中です。詳細は追ってお知らせします！
+
+        - 日時: 未定
+        - 時間: 未定
+        - 場所: 未定
+      MARKDOWN
+      a.published_at = nil
+      a.stickiness = 0
+      a.exhibitors_only = false
+    end
   end
 end
 
