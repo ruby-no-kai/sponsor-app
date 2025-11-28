@@ -223,8 +223,8 @@ ja:
           unique: '本 URL についてはスポンサーごと固有のものとなり、スポンサーチケット利用にあたり認証や身元確認はありません。URL の取り扱いには気をつけていただくようお願い致します。'
         view_redemptions: '利用状況を確認する'
       broadcasts:
-        title: 'メール履歴'
-        description: '過去に送信されたメールを閲覧できます。'
+        title: 'メール配信履歴'
+        description: 'その他、メールにて配信された過去のアナウンスを確認できます。'
         view_all: '全てのメールを見る'
       announcements: 'お知らせ'
     edit:
@@ -245,14 +245,14 @@ ja:
 
   broadcasts:
     index:
-      title: 'メール履歴'
-      header: '%{name} - メール履歴'
-      empty: 'まだメールは送信されていません。'
+      title: 'メール配信履歴'
+      header: '%{name} - メール配信履歴'
+      empty: 'まだメールは配信されていません。'
       notice:
-        email_announcements: 'このページには過去のメールベースのお知らせが含まれています。'
-        not_individual_emails_html: '%{contact_email} との個別のメールでのやり取りや記録は含まれていません。'
+        email_announcements: 'このページは過去にメールで配信されたアナウンスを表示しています。'
+        not_individual_emails_html: '%{contact_email} 等との個別のメールでのやり取りや記録は含まれていません。'
         sponsorship_portal: 'スポンサーポータル'
-        announcements_updated_html: '%{link}のお知らせ一覧は更新し続けており、最新の状況を反映したまとめとなっています。本ページを参照する際は、過去のメールに古くなった内容を含む可能性があるためご注意ください。'
+        announcements_updated_html: '%{link}のお知らせ一覧はメール配信と平行して、最新の情報を反映するよう更新しています。本ページを参照する際は、過去のメールには古くなった内容を含む可能性があるためご注意ください。'
 
   pass_redemptions:
     index:

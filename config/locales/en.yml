@@ -222,8 +222,8 @@ en:
           unique: 'This URL is unique and bound to your sponsorship. Note that there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
         view_redemptions: 'Review registrations'
       broadcasts:
-        title: 'Email History'
-        description: 'View past email communications sent to your organization.'
+        title: 'Email based Announcements'
+        description: 'You can review past announcements sent to you via email, in addition to the latest informations shown above.'
         view_all: 'View All Emails'
       announcements: 'Announcements'
     edit:
