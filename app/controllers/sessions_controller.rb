@@ -24,6 +24,7 @@ class SessionsController < ApplicationController
       return render :new, status: 403
     end
 
+    session[:email] = @session_token.email
     session[:session_token_id] = @session_token.id
     session[:sponsorship_ids] = @session_token.sponsorship_ids
 
