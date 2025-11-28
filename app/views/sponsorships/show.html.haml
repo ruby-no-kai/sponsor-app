@@ -90,6 +90,13 @@
           %p.card-text
             = link_to t('.tickets.view_redemptions'), user_conference_sponsorship_pass_redemptions_path(@conference), class: 'btn btn-sm btn-secondary'
 
+    .card.mt-2.text-dark
+      .card-header= t('.broadcasts.title')
+      .card-body
+        %p.card-text= t('.broadcasts.description')
+        %p.card-text
+          = link_to t('.broadcasts.view_all'), user_conference_sponsorship_broadcasts_path(@conference), class: 'btn btn-sm btn-secondary'
+
 - unless @announcements.empty?
   .row.py-2
     .col-md-12

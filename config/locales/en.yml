@@ -221,6 +221,11 @@ en:
           requirement: 'All people who visit the conference venue must exchange their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
           unique: 'This URL is unique and bound to your sponsorship. Note that there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
         view_redemptions: 'Review registrations'
+      broadcasts:
+        title: 'Email History'
+        description: 'View past email communications sent to your organization.'
+        view_all: 'View All Emails'
+      announcements: 'Announcements'
     edit:
       amendment_availability: "You can amend your application until %{ts}."
   exhibitions:
@@ -236,6 +241,17 @@ en:
       header: 'Booth Details'
       help: 'Please submit your booth plans in advance. Organizers will review your plan to ensure it complies with the venue rules. We may contact you if we have something to advise.'
       submit: 'Submit'
+
+  broadcasts:
+    index:
+      title: 'Email History'
+      header: '%{name} - Email History'
+      empty: 'No emails have been sent yet.'
+      notice:
+        email_announcements: 'This page contains past email-based announcements.'
+        not_individual_emails_html: 'Individual email conversations and transcripts with %{contact_email} are not included.'
+        sponsorship_portal: 'sponsorship portal'
+        announcements_updated_html: 'The announcements list on the %{link} is continuously updated and reflects the current status as a summary. When viewing this page, please note that past emails may contain outdated information.'
 
   pass_redemptions:
     index:

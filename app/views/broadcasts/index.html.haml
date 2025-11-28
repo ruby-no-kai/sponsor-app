@@ -1,0 +1,26 @@
+- content_for(:title) { t('.title') }
+
+%h2= t('.header', name: @conference.name)
+
+.row.py-2
+  .col-md-12
+    .alert.alert-info{role: 'alert'}
+      %ul.mb-0
+        %li= t('.notice.email_announcements')
+        %li= t('.notice.not_individual_emails_html', contact_email: @conference.contact_email_address)
+        %li= t('.notice.announcements_updated_html', link: link_to(t('.notice.sponsorship_portal'), user_conference_sponsorship_path(@conference)))
+
+.row.py-2
+  .col-md-12
+    - if @broadcast_deliveries.empty?
+      .card.text-dark
+        .card-body
+          %p.text-muted= t('.empty')
+    - else
+      - @broadcast_deliveries.each do |delivery|
+        .card.text-dark.mb-3{id: "broadcast-#{delivery.broadcast.id}"}
+          .card-header
+            %strong= delivery.broadcast.title
+            %small.text-muted.ml-2= l(delivery.broadcast.dispatched_at, format: :short)
+          .card-body
+            = replace_template_variables(delivery.broadcast.html)

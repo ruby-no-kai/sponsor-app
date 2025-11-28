@@ -222,6 +222,11 @@ ja:
           requirement: 'ブーススタッフを含む全参加者について上記 URL から各々チケットを取得する必要があります。御社内の参加者へ上記 URL を忘れずに共有してください。'
           unique: '本 URL についてはスポンサーごと固有のものとなり、スポンサーチケット利用にあたり認証や身元確認はありません。URL の取り扱いには気をつけていただくようお願い致します。'
         view_redemptions: '利用状況を確認する'
+      broadcasts:
+        title: 'メール履歴'
+        description: '過去に送信されたメールを閲覧できます。'
+        view_all: '全てのメールを見る'
+      announcements: 'お知らせ'
     edit:
       amendment_availability: "%{ts} まで修正することができます。"
   exhibitions:
@@ -237,6 +242,17 @@ ja:
       header: 'ブース詳細'
       help: '会場の利用ルールなどに抵触しないか事前に確認するため、ブース出展内容の詳細をお知らせください。何かしら確認が必要な内容があった場合はこちらからご連絡を差し上げます。'
       submit: '送信'
+
+  broadcasts:
+    index:
+      title: 'メール履歴'
+      header: '%{name} - メール履歴'
+      empty: 'まだメールは送信されていません。'
+      notice:
+        email_announcements: 'このページには過去のメールベースのお知らせが含まれています。'
+        not_individual_emails_html: '%{contact_email} との個別のメールでのやり取りや記録は含まれていません。'
+        sponsorship_portal: 'スポンサーポータル'
+        announcements_updated_html: '%{link}のお知らせ一覧は更新し続けており、最新の状況を反映したまとめとなっています。本ページを参照する際は、過去のメールに古くなった内容を含む可能性があるためご注意ください。'
 
   pass_redemptions:
     index:
