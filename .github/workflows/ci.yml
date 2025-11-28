@@ -80,6 +80,12 @@ jobs:
       - run: 'aws lambda update-function-code --function-name sponsor-app-lambdakiq-prd --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-lambdakiq-prd'
       - run: 'aws lambda update-function-code --function-name sponsor-app-web-prd --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-web-prd'
 
+  # because getsentry/action-release requires Docker runtime
+  notify-release-prod:
+    name: notify-release-prod
+    needs: ["deploy-prod"]
+    runs-on: ubuntu-latest
+    steps:
       - uses: getsentry/action-release@128c5058bbbe93c8e02147fe0a9c713f166259a6 # v3.4.0
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
