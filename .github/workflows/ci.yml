@@ -74,7 +74,16 @@ jobs:
           role-skip-session-tagging: true
           role-to-assume: "arn:aws:iam::005216166247:role/GhaSponsorDeploy"
           mask-aws-account-id: false
+
       - run: 'aws lambda update-function-code --function-name sponsor-app-runner-prd --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-runner-prd'
       - run: 'bundle exec ./deploy/lambrunner.rb sponsor-app-runner-prd bundle exec rake db:migrate'
       - run: 'aws lambda update-function-code --function-name sponsor-app-lambdakiq-prd --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-lambdakiq-prd'
       - run: 'aws lambda update-function-code --function-name sponsor-app-web-prd --image-uri "$IMAGE_URI" && aws lambda wait function-updated --function-name sponsor-app-web-prd'
+
+      - uses: getsentry/action-release@128c5058bbbe93c8e02147fe0a9c713f166259a6 # v3.4.0
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: rubykaigi
+          SENTRY_PROJECT: sponsor-app
+        with:
+          environment: production
