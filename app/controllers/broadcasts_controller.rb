@@ -5,11 +5,9 @@ class BroadcastsController < ApplicationController
     @conference = current_sponsorship.conference
 
     @broadcast_deliveries = BroadcastDelivery
-      .where(sponsorship: current_sponsorship)
-      .joins(:broadcast)
-      .merge(Broadcast.where(status: :sent))
       .includes(:broadcast)
-      .order('broadcasts.dispatched_at DESC')
+      .where(sponsorship: current_sponsorship, broadcast: {status: :sent})
+      .order(broadcast: {id: :desc})
   end
 
   private

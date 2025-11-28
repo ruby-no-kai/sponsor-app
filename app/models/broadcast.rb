@@ -13,8 +13,8 @@ class Broadcast < ApplicationRecord
   validates :title, presence: true
   validates :body, presence: true
 
-  def perform_later!
-    self.update!(status: :pending)
+  def perform_later!(now: Time.current)
+    self.update!(status: :pending, dispatched_at: now)
     self.deliveries.each do |delivery|
       delivery.update!(status: :pending)
       DispatchBroadcastDeliveryJob.perform_later(delivery)

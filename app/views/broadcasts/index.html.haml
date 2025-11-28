@@ -21,6 +21,6 @@
         .card.text-dark.mb-3{id: "broadcast-#{delivery.broadcast.id}"}
           .card-header
             %strong= delivery.broadcast.title
-            %small.text-muted.ml-2= l(delivery.broadcast.dispatched_at, format: :short)
+            %small.text-muted.ml-2= l(delivery.broadcast.dispatched_at || delivery.broadcast.created_at , format: :short)
           .card-body
             = replace_template_variables(delivery.broadcast.html)
