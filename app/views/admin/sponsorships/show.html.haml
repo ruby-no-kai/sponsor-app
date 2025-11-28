@@ -35,19 +35,24 @@
                 %dt.col-sm-4 Locale
                 %dd.col-sm-8= @sponsorship.locale
               .row
+                %dt.col-sm-4 Assets
+                %dd.col-sm-8
+                  &#x1F4C1;
+                  = link_to 'Download', download_asset_conference_sponsorship_path(@conference, @sponsorship), class: 'card-link'
+              .row
                 %dt.col-sm-4 Booth
                 %dd.col-sm-8
                   - case
                   - when @sponsorship.booth_assigned && !@sponsorship.booth_requested
-                    Assigned but Not requested (!?)
+                    &#x1F381; Assigned but Not requested (!?)
                   - when !@sponsorship.plan&.booth_eligible? && (@sponsorship.booth_assigned)
-                    Not Eligible but Assigned (!?)
+                    &#x1F49D; Not Eligible but Assigned (!?)
                   - when !@sponsorship.plan&.booth_eligible? && (@sponsorship.booth_requested)
-                    Not Eligible but Requested (!?)
+                    &#x2753; Not Eligible but Requested (!?)
                   - when @sponsorship.booth_assigned
-                    Assigned
+                    &#x2705; Assigned
                   - when @sponsorship.booth_requested
-                    Requested
+                    &#x1F5F3;&#xFE0F; Requested
                   - when @sponsorship.plan&.booth_eligible?
                     Eligible
                   - else
@@ -61,15 +66,18 @@
               %p.card-text
                 %span.badge.badge-danger UNDETERMINED
 
-            - case 
+            - if @sponsorship.fallback_option.present?
+              %p.card-text.small
+                Fallback:
+                %code= @sponsorship.fallback_option
+
+            - case
             - when @sponsorship.customized?
               %p.card-text Shown as: #{@sponsorship.customization_name}
             - when @sponsorship.customization_planned?
               %p.card-text
                 #{@sponsorship.customization_name}
                 %span.badge.badge-warning Custom Plan: Tentative
-
-            = link_to 'Download Asset', download_asset_conference_sponsorship_path(@conference, @sponsorship), class: 'card-link'
 
         .card.mt-2
           %h5.card-header
