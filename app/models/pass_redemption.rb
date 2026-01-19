@@ -41,7 +41,7 @@ class PassRedemption
 
       valid_discount_code = sponsorship&.tito_discount_codes&.pluck(:code)
       registrations = tito_registration_list.fetch(:registrations).map do |tito_registration|
-        tickets = tito_registration.fetch(:tickets).map do |tito_ticket|
+        tickets = tito_registration.fetch(:tickets, []).map do |tito_ticket|
           Ticket.new(
             id: tito_ticket[:id],
             reference: tito_ticket[:reference],
