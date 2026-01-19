@@ -40,7 +40,7 @@
           %h5.card-title= @sponsorship.plan.name
           - if @sponsorship.customized?
             %p.card-text #{t('.customized_plan')} (#{@sponsorship.customization_name})
-          - if @sponsorship.plan.talkable?
+          - if @sponsorship.plan.talkable? && !(@sponsorship.customized? || @sponsorship.customization_planned?)
             %p.card-text= t('.sponsor_talk_eligible')
           - case
           - when @sponsorship.booth_assigned
