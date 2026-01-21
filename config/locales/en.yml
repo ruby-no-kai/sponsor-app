@@ -43,7 +43,7 @@ en:
               unchangeable_after_finalization: "cannot be changed once the sponsorship is finalized."
               no_plan_not_allowed: "must be chosen (cannot be 'Other')"
             organization:
-              taken: "Exists: Looks like we already have received the sponsorship application from your organization. Contact us for details."
+              taken: "There is already a sponsorship application from your organization (determined by email domain). Choose a different email address or contact us if you want to have multiple sponsorships."
             booth_requested:
               not_eligible: "is not eligible in your selected plan."
             profile:
