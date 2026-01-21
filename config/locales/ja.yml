@@ -102,6 +102,7 @@ ja:
     form:
       optional: '(任意)'
       header: '%{name} スポンサーシップ申込フォーム'
+      affiliated_organization_notice: 'このスポンサー申込は %{organization} に紐付けられます。'
       copy:
         header: '過去の申込情報を利用する'
         explanation: '過去の申込情報を利用することができます。下記より既存のスポンサーシップ申込を選択してください。'

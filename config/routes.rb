@@ -38,7 +38,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :organizations, param: :slug, only: %i(index show edit update), constraints: {slug: /[^\/]+/}
+    resources :organizations, param: :slug, only: %i(index new create show edit update), constraints: {slug: /[^\/]+/}
 
     resource :session, only: %i(new destroy) do
       get :rise, as: :rise

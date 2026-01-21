@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_16_202113) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_21_135759) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -154,11 +154,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_16_202113) do
   end
 
   create_table "organizations", force: :cascade do |t|
+    t.string "affiliation_code", null: false
     t.boolean "auto_acceptance_disabled", default: false, null: false
     t.datetime "created_at", null: false
     t.string "domain", null: false
     t.string "name", null: false
     t.datetime "updated_at", null: false
+    t.index ["affiliation_code"], name: "index_organizations_on_affiliation_code", unique: true, where: "(affiliation_code IS NOT NULL)"
     t.index ["domain"], name: "index_organizations_on_domain", unique: true
   end
 

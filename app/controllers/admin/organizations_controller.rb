@@ -1,5 +1,5 @@
 class Admin::OrganizationsController < Admin::ApplicationController
-  before_action :set_organization, except: [:index]
+  before_action :set_organization, except: %i[index new create]
 
   def index
     @organizations = Organization.all.order(:name)
@@ -7,6 +7,22 @@ class Admin::OrganizationsController < Admin::ApplicationController
 
   def show
     @sponsorships = @organization.sponsorships.includes(:conference, :plan).order(id: :desc)
+    @conferences_open_for_application = Conference.application_open.order(id: :desc)
+  end
+
+  def new
+    @organization = Organization.new
+  end
+
+  def create
+    @organization = Organization.new(organization_params)
+    respond_to do |format|
+      if @organization.save
+        format.html { redirect_to organization_path(@organization), notice: 'Organization was successfully created.' }
+      else
+        format.html { render :new }
+      end
+    end
   end
 
   def edit

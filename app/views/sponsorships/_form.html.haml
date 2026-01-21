@@ -2,6 +2,11 @@
 - desc = conference.form_description_for_locale
 = form_with(model: sponsorship, url: user_conference_sponsorship_path(conference), local: true, class: 'sponsorships_form') do |form|
   = hidden_field_tag :invite_code, params[:invite_code]
+  = hidden_field_tag :affiliation, params[:affiliation]
+
+  - if @affiliated_organization
+    .alert.alert-info
+      = t('.affiliated_organization_notice', organization: @affiliated_organization.name)
 
   - if sponsorship.errors.any?
     - I18n.with_options(scope: %i(errors template)) do |lo|
