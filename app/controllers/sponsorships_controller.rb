@@ -29,6 +29,8 @@ class SponsorshipsController < ApplicationController
     return render(plain: '404', status: 404) unless @conference.verify_invite_code(params[:invite_code])
     return render(:closed, status: 403) if !@conference&.application_open? && !current_staff
 
+    @affiliated_organization = Organization.find_by_affiliation_code(params[:affiliation])
+
     @sponsorship = Sponsorship.new(copied_sponsorship_attributes)
     @sponsorship.conference = @conference
     @sponsorship.build_nested_attributes_associations
@@ -63,7 +65,8 @@ class SponsorshipsController < ApplicationController
 
     @sponsorship.locale = I18n.locale
     @sponsorship.conference = @conference
-    @sponsorship.assume_organization
+    affiliated_organization = Organization.find_by_affiliation_code(params[:affiliation])
+    @sponsorship.assume_organization(affiliated_organization:)
     @sponsorship.accept if @sponsorship.plan&.auto_acceptance && !@sponsorship.organization&.auto_acceptance_disabled
 
     respond_to do |format|

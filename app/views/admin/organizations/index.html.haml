@@ -5,7 +5,10 @@
     %li.breadcrumb-item= link_to 'Admin', dashboard_path
     %li.breadcrumb-item.active{aria: {current: 'page'}} Organizations
 
-%h1 Organizations
+.d-md-flex.justify-content-between
+  %h1 Organizations
+  %div
+    = link_to "New Organization", new_organization_path, class: 'btn btn-primary'
 
 - if @organizations.empty?
   %p.text-muted No organizations yet

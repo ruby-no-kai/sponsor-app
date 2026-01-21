@@ -32,6 +32,25 @@
                 %span.badge.badge-warning Disabled
               - else
                 %span.badge.badge-success Enabled
+          .row
+            %dt.col-sm-5 Affiliation Code
+            %dd.col-sm-7
+              %code= @organization.affiliation_code
+
+  .col-md-6
+    .card
+      %h5.card-header
+        Affiliation URLs
+      .card-body
+        %p.card-text.text-muted Share these URLs to allow sponsors to create multiple sponsorships under this organization.
+        - if @conferences_open_for_application.empty?
+          %p.text-muted No conferences are currently open for application.
+        - else
+          %ul.list-unstyled
+            - @conferences_open_for_application.each do |conference|
+              %li.mb-2
+                = link_to @organization.affiliation_url(conference), target: '_blank', rel: 'noopener' do
+                  = conference.name
 
 .row
   .col-md-12

@@ -164,8 +164,12 @@ class Sponsorship < ApplicationRecord
     alternate_billing_contact || contact
   end
 
-  def assume_organization
-    self.organization = Organization.create_with(name: self.name).find_or_initialize_by(domain: self.contact&.email&.split(?@, 2)&.last&.downcase)
+  def assume_organization(affiliated_organization: nil)
+    if affiliated_organization
+      self.organization = affiliated_organization
+    else
+      self.organization = Organization.create_with(name: self.name).find_or_initialize_by(domain: self.contact&.email&.split(?@, 2)&.last&.downcase)
+    end
   end
 
   def to_h_for_history

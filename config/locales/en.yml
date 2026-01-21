@@ -102,6 +102,7 @@ en:
     form:
       optional: '(Optional)'
       header: '%{name} Sponsorship Application Form'
+      affiliated_organization_notice: 'This application will be affiliated with %{organization}.'
       copy:
         header: 'Filling the same information with your sponsorship application in past?'
         explanation: 'Select an existing application from below, then the existing data will be filled in.'
@@ -362,6 +363,8 @@ en:
         title: Organizations
       show:
         title: "%{organization}"
+      new:
+        title: New Organization
       edit:
         title: Edit Organization
     plans:
