@@ -32,7 +32,7 @@ class TitoApi
   end
 
   def list_registrations(slug, query = {})
-    get("#{slug}/registrations", query).body
+    get("#{slug}/registrations", query.merge(version: '3.1')).body
   end
 
   def get_registration(event_slug, registration_slug, query = {})
