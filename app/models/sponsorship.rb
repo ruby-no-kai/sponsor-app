@@ -252,6 +252,11 @@ class Sponsorship < ApplicationRecord
     return self
   end
 
+  def tito_source_code
+     raise "Cannot generate tito source code without id" unless id
+     "ss_#{id}"
+  end
+
   private
 
   def validate_correct_plan

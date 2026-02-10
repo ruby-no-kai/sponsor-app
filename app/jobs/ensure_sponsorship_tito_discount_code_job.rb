@@ -79,7 +79,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     @tito_source ||= @sponsorship.tito_source || begin
       source = tito.create_source(
         @conference.tito_slug,
-        code: "ss_#{@sponsorship.id}",
+        code: @sponsorship.tito_source_code,
         name: "Sponsor: #{@sponsorship.name} (#{@sponsorship.id})",
         description: "Sponsor: #{@sponsorship.organization.name}, Conference: #{@conference.name} (#{@conference.id})",
       ).fetch(:source).fetch(:id)
