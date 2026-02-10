@@ -87,22 +87,22 @@ class PassRedemption
 
   def self.list_for_sponsorship(sponsorship)
     source = TitoSource.find_by!(sponsorship:, conference: sponsorship.conference)
-    list_for_source_id(sponsorship.conference.tito_slug, source.tito_source_id, sponsorship:)
+    list_for_source_id(sponsorship.conference.tito_slug, source.code, sponsorship:)
   rescue PaginationNotSupported
     raise PaginationNotSupported, "Pagination not supported, encountered for #{sponsorship.name.inspect} on event=#{sponsorship.conference.slug.inspect}"
   end
 
-  def self.list_for_source_id(tito_event, source_id, sponsorship: nil)
+  def self.list_for_source_id(tito_event, source, sponsorship: nil)
     Collection.from_tito_registration_list(
       TitoApi.new.list_registrations(
         tito_event,
         'expand' => 'tickets',
-        'search[source]' => source_id,
+        'search[source]' => source,
         'search[states]' => %w(paid unpaid complete confirmed incomplete cancelled),
       ),
       sponsorship:,
     )
   rescue PaginationNotSupported
-    raise PaginationNotSupported, "Pagination not supported, encountered for source=#{source_id.inspect} on event=#{tito_event.inspect}"
+    raise PaginationNotSupported, "Pagination not supported, encountered for source=#{source.inspect} on event=#{tito_event.inspect}"
   end
 end
