@@ -30,7 +30,7 @@ type Props = {
 
 const AssetFileForm = forwardRef<AssetFileFormAPI, Props>(
   (props, ref) => {
-    const [needUpload, setNeedUpload] = useState(props.needUpload);
+    const [needUpload, setNeedUpload] = useState(props.needUpload || !props.existingFileId);
     const [willReplace, setWillReplace] = useState(false);
     const [willRemove, setWillRemove] = useState(false);
     const [uploadState, setUploadState] = useState<UploadState | undefined>(
@@ -52,6 +52,7 @@ const AssetFileForm = forwardRef<AssetFileFormAPI, Props>(
         return null;
       }
       if (!file) {
+        if (!props.needUpload) return props.existingFileId || "";
         console.log("No file selected, cannot start upload");
         return null;
       }
