@@ -14,7 +14,6 @@ class SponsorEventAssetFilesController < ApplicationController
     return render(status: 403, json: { error: 403 }) if !current_conference&.event_submission_open?
     @asset_file = SponsorEventAssetFile.prepare(conference: @conference, sponsorship: current_sponsorship)
     @asset_file.save!
-    (session[:event_asset_file_ids] ||= []) << @asset_file.id
     render json: make_session
   end
 
@@ -30,16 +29,7 @@ class SponsorEventAssetFilesController < ApplicationController
   end
 
   def set_asset_file
-    session_file_ids = (session[:event_asset_file_ids] || []).map(&:to_i)
-    owned_event_ids = current_sponsorship.sponsor_events.pluck(:id)
-    @asset_file = SponsorEventAssetFile.find_by!(id: params[:id]).tap do |file|
-      authorized = if file.sponsor_event_id.nil?
-        session_file_ids.include?(file.id)
-      else
-        owned_event_ids.include?(file.sponsor_event_id)
-      end
-      raise ActiveRecord::RecordNotFound unless authorized
-    end
+    @asset_file = SponsorEventAssetFile.find_by!(id: params[:id], sponsorship: current_sponsorship)
   end
 
   def require_accepted_sponsorship

@@ -3,6 +3,7 @@ class SponsorEventAssetFile < ApplicationRecord
 
   MAX_FILE_SIZE = 20.megabytes
 
+  belongs_to :sponsorship
   belongs_to :sponsor_event, optional: true
 
   validates :extension, inclusion: { in: %w[png jpg jpeg webp] }, allow_nil: true
@@ -10,6 +11,7 @@ class SponsorEventAssetFile < ApplicationRecord
 
   def self.prepare(conference:, sponsorship:)
     record = new
+    record.sponsorship = sponsorship
     record.prefix = "c-#{conference.id}/events/s-#{sponsorship.id}/"
     record
   end

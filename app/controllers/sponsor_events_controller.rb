@@ -83,8 +83,7 @@ class SponsorEventsController < ApplicationController
     return if asset_file_id.blank?
 
     asset_file = SponsorEventAssetFile
-      .where(id: asset_file_id, sponsor_event_id: nil)
-      .where(id: session[:event_asset_file_ids] || [])
+      .where(id: asset_file_id, sponsor_event: nil, sponsorship: current_sponsorship)
       .first!
     @sponsor_event.asset_file = asset_file
   end
@@ -96,8 +95,7 @@ class SponsorEventsController < ApplicationController
       @sponsor_event.asset_file&.destroy!
     elsif asset_file_id.present? && asset_file_id.to_i != @sponsor_event.asset_file&.id
       new_file = SponsorEventAssetFile
-        .where(id: asset_file_id, sponsor_event_id: nil)
-        .where(id: session[:event_asset_file_ids] || [])
+        .where(id: asset_file_id, sponsor_event: nil, sponsorship: current_sponsorship)
         .first!
       @sponsor_event.asset_file&.destroy!
       @sponsor_event.asset_file = new_file

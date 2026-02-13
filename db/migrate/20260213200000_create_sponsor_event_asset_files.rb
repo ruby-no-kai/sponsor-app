@@ -1,6 +1,7 @@
 class CreateSponsorEventAssetFiles < ActiveRecord::Migration[8.1]
   def change
     create_table :sponsor_event_asset_files do |t|
+      t.references :sponsorship, foreign_key: true, null: false
       t.references :sponsor_event, foreign_key: true, index: false
       t.string :prefix, null: false
       t.string :handle, null: false

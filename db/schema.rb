@@ -210,10 +210,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_13_200000) do
     t.datetime "last_modified_at"
     t.string "prefix", null: false
     t.bigint "sponsor_event_id"
+    t.bigint "sponsorship_id", null: false
     t.datetime "updated_at", null: false
     t.string "version_id", default: "", null: false
     t.index ["handle"], name: "index_sponsor_event_asset_files_on_handle"
     t.index ["sponsor_event_id"], name: "index_sponsor_event_asset_files_on_sponsor_event_id", unique: true
+    t.index ["sponsorship_id"], name: "index_sponsor_event_asset_files_on_sponsorship_id"
   end
 
   create_table "sponsor_event_editing_histories", force: :cascade do |t|
@@ -420,6 +422,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_13_200000) do
   add_foreign_key "form_descriptions", "conferences"
   add_foreign_key "plans", "conferences"
   add_foreign_key "sponsor_event_asset_files", "sponsor_events"
+  add_foreign_key "sponsor_event_asset_files", "sponsorships"
   add_foreign_key "sponsor_event_editing_histories", "sponsor_events"
   add_foreign_key "sponsor_event_editing_histories", "staffs"
   add_foreign_key "sponsor_events", "conferences"
