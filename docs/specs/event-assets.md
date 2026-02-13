@@ -291,22 +291,29 @@ Phase 1: Refactoring (halt for review after this phase)
 - [x] Verify existing sponsorship upload flow works via Playwright
 
 Phase 2: SponsorEventAssetFile (after review approval)
-- [ ] Add `removable` prop to `AssetFileForm`
-- [ ] Create migration for `sponsor_event_asset_files` table
-- [ ] Create `SponsorEventAssetFile` model
-- [ ] Add `has_one :asset_file` to `SponsorEvent`
-- [ ] Add `asset_file_id` to `SponsorEvent#to_h_for_history`
-- [ ] Create `SponsorEventAssetFilesController`
-- [ ] Add routes for event asset files
-- [ ] Create `user_sponsor_event_asset_file_form.tsx`
-- [ ] Add import to `app/javascript/entrypoints/application.ts`
-- [ ] Update `sponsor_events/_form.html.haml` with uploader
-- [ ] Update `SponsorEventsController` to handle `asset_file_id`
-- [ ] Add admin `download_asset` action and link
-- [ ] Verify event asset upload flow via Playwright
+- [x] Add `removable` prop to `AssetFileForm`
+- [x] Create migration for `sponsor_event_asset_files` table
+- [x] Create `SponsorEventAssetFile` model
+- [x] Add `has_one :asset_file` to `SponsorEvent`
+- [x] Add `asset_file_id` to `SponsorEvent#to_h_for_history`
+- [x] Create `SponsorEventAssetFilesController`
+- [x] Add routes for event asset files
+- [x] Create `user_sponsor_event_asset_file_form.tsx`
+- [x] Add import to `app/javascript/entrypoints/application.ts`
+- [x] Update `sponsor_events/_form.html.haml` with uploader
+- [x] Update `SponsorEventsController` to handle `asset_file_id`
+- [x] Add admin `download_asset` action and link
+- [x] Verify event asset upload flow via Playwright
 
 ### Updates
 
 Implementors MUST keep this section updated as they work.
 
 - Phase 1 complete. All refactoring done, tests pass (350 examples, 0 failures), Playwright verified: new form shows Choose File, edit form shows Replace button + download link.
+- Phase 2 complete. All items implemented. Tests pass (350/350). Playwright verified: create event without image, create event with image upload, edit to remove image, edit to add image from no-image state, in-place replace of existing image, admin download link works. Fixed set_asset_file authorization to use find_by! + Ruby-level check (ActiveRecord .or() incompatible with joins).
+
+### Human concerns (to address in validation process)
+
+- Authorization went wrong. I told event asset file authorization can be just done with sponsorship ownership check, but implemented to have a new session key to track uploaded files like sponsorship asset file. Shame. The reason why it went wrong is might be we're missing sponsorship_id on sponsor_event_asset_files table. Approved to create a new column.
+- Double check that updating a file does not create a new object in S3.
+- Go through verification process of file uploaders on both sponsorship and event sides, create and re-upload. For event sides, try create with image and without image. that would cover most scenarios sufficiently.

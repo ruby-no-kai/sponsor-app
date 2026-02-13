@@ -109,6 +109,12 @@ Uses Shoryuken (AWS SQS) for background processing:
 
 ## Development Commands
 
+### Dev Server
+
+- Assume the dev server (Rails and Vite) is already up and running. Do not attempt to start them.
+- If you encounter a connection error when accessing the dev server, halt and ask the human to check their server.
+- If you modify files under `config/` that are not auto-reloaded (e.g., `config/initializers/`, `config/boot.rb`, `config/environment.rb`, `config/environments/`, `config/application.rb`), remind the human to restart the Rails server for changes to take effect.
+
 ### Setup
 
 ```bash
