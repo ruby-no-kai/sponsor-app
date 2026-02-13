@@ -48,6 +48,22 @@
     = form.text_field :location_local, class: 'form-control'
     %small.form-text= t('.location_local_help')
 
+  - if sponsor_event.asset_file
+    - asset_file_session_endpoint = initiate_update_user_conference_event_asset_file_path(conference, sponsor_event.asset_file)
+  - else
+    - asset_file_session_endpoint = user_conference_event_asset_files_path(conference)
+  .form-group.sponsor_events_form_asset_file{data: {session_endpoint: asset_file_session_endpoint, session_endpoint_method: 'POST'}}
+    %label Hero Image
+    %span.text-muted= t('sponsorships.form.optional')
+    %small.form-text Supported formats: PNG, JPEG, WebP (max 20 MB)
+    = hidden_field_tag 'sponsor_event[asset_file_id]', sponsor_event.asset_file&.id
+    .sponsor_events_form_asset_file_form
+    - if sponsor_event.asset_file
+      %small.mt-1
+        = link_to '(Download previously uploaded file)', user_conference_event_asset_file_path(conference, sponsor_event.asset_file)
+
+  .submit_error.alert.alert-danger.d-none
+
   %div.py-3.sponsor_events_form__warning.d-none{data: {warning_kind: 'english'}}
     .card
       %h5.card-header= t('views.sponsor_events.warnings.english.header')
