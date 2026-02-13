@@ -18,6 +18,10 @@ class ProcessSponsorEventEditJob < ApplicationJob
 
     should_update_yaml = @sponsor_event.accepted? || status_changed_in_edit?(edit)
     GenerateSponsorsYamlFileJob.perform_now(@conference) if should_update_yaml
+
+    if should_push_event_asset?(edit)
+      PushEventAssetFileJob.perform_later(edit)
+    end
   end
 
   private
@@ -26,5 +30,23 @@ class ProcessSponsorEventEditJob < ApplicationJob
     return false unless edit.diff
 
     edit.diff.any? { |change| change[1] == 'status' }
+  end
+
+  def should_push_event_asset?(edit)
+    return false unless @sponsor_event.accepted?
+    return false unless @sponsor_event.asset_file
+
+    return true if status_changed_to_accepted_in_edit?(edit)
+    return false unless edit.diff
+
+    edit.diff.any? do |change|
+      (change[1] == 'asset_file_id' || change[1] == 'asset_file_checksum_sha256') &&
+        change.last.present?
+    end
+  end
+
+  def status_changed_to_accepted_in_edit?(edit)
+    return false unless edit.diff
+    edit.diff.any? { |change| change[1] == 'status' && change.last == 'accepted' }
   end
 end

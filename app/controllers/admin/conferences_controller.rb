@@ -100,6 +100,7 @@ class Admin::ConferencesController < Admin::ApplicationController
       :contact_email_address,
       :additional_attendees_registration_open,
       :github_repo,
+      :github_repo_images_path,
       :tito_slug,
       :tito_booth_paid_flat_discount_amount,
       :hidden,

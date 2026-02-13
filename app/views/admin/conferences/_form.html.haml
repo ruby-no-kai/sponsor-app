@@ -20,6 +20,13 @@
     %small.form-text
       %code owner/repo[@branch]:path/to/file
   .form-group
+    = form.label :github_repo_images_path
+    = form.text_field :github_repo_images_path, class: 'form-control'
+    %small.form-text
+      Path prefix for event asset images within the GitHub repo, without trailing slash (e.g.
+      %code images
+      )
+  .form-group
     = form.label :tito_slug
     = form.text_field :tito_slug, class: 'form-control'
     %small.form-text
