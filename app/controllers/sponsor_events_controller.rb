@@ -38,9 +38,15 @@ class SponsorEventsController < ApplicationController
       return
     end
 
-    handle_asset_file_update
+    success = ActiveRecord::Base.transaction do
+      handle_asset_file_update
+      unless @sponsor_event.update(sponsor_event_params)
+        raise ActiveRecord::Rollback
+      end
+      true
+    end
 
-    if @sponsor_event.update(sponsor_event_params)
+    if success
       ProcessSponsorEventEditJob.perform_later(@sponsor_event.last_editing_history)
       redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), notice: t('.notice')
     else
