@@ -103,12 +103,20 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
 
     data = self.data()
     events = events_data
+    if data.nil? && events.blank?
+      @yaml_data = nil
+      return @yaml_data
+    end
+
     combined_data = data ? data.merge("_events" => events) : { "_events" => events }
-    @yaml_data = data ? [
-      "# last_editing_history: #{@last_id}, last_event_editing_history: #{@last_event_editing_history_id}",
+    comment_parts = []
+    comment_parts << "last_editing_history: #{@last_id}" if @last_id
+    comment_parts << "last_event_editing_history: #{@last_event_editing_history_id}" if @last_event_editing_history_id
+    @yaml_data = [
+      "# #{comment_parts.join(', ')}",
       combined_data.to_yaml,
       "",
-    ].join("\n") : nil
+    ].join("\n")
   end
 
   def json_data
@@ -121,7 +129,8 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
   def push_to_github
     return unless repo
     return if yaml_data.nil? # to generate
-    @branch_name = "sponsor-app/#{@last_id}"
+    push_id = @last_id || "event-#{@last_event_editing_history_id}"
+    @branch_name = "sponsor-app/#{push_id}"
     @filepath = repo.path
 
     begin
@@ -141,7 +150,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     octokit.update_contents(
       repo.name,
       @filepath,
-      "Update sponsors.yml for #{@conference.slug} (#{@last_id})",
+      "Update sponsors.yml for #{@conference.slug} (#{push_id})",
       blob_sha,
       yaml_data,
       branch: @branch_name,
@@ -150,7 +159,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       repo.name,
       base_branch,
       @branch_name,
-      "Update sponsors.yml for #{@conference.slug} (#{@last_id})",
+      "Update sponsors.yml for #{@conference.slug} (#{push_id})",
       nil,
     )
   end
