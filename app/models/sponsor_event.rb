@@ -48,7 +48,7 @@ class SponsorEvent < ApplicationRecord
   end
 
   def all_host_sponsorships
-    [sponsorship] + co_host_sponsorships.reject(&:withdrawn?)
+    ([sponsorship] + co_host_sponsorships).reject(&:withdrawn?)
   end
 
   private

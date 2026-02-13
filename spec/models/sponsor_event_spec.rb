@@ -157,6 +157,12 @@ RSpec.describe SponsorEvent, type: :model do
       event = FactoryBot.create(:sponsor_event, sponsorship:, co_host_sponsorship_ids: [co_host.id])
       expect(event.all_host_sponsorships).not_to include(co_host)
     end
+
+    it 'excludes withdrawn primary sponsorship' do
+      sponsorship.update!(withdrawn_at: Time.current)
+      event = FactoryBot.create(:sponsor_event, sponsorship:)
+      expect(event.all_host_sponsorships).not_to include(sponsorship)
+    end
   end
 
   describe 'editing history' do
