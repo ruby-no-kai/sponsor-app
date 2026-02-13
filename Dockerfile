@@ -74,7 +74,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,t
  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=vipsbuilder /opt/libvips /opt/libvips
-RUN ln -s /opt/libvips/bin/vipsthumbnail /usr/local/bin/vipsthumbnail \
+RUN for f in /opt/libvips/bin/vips*; do ln -s "$f" /usr/local/bin/; done \
  && echo /opt/libvips/lib > /etc/ld.so.conf.d/libvips.conf && ldconfig \
  && vipsthumbnail --vips-version
 

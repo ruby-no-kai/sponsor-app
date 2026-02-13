@@ -118,6 +118,24 @@ RSpec.describe PushEventAssetFileJob, type: :job do
       expect(Dir.exist?(tmpdir)).to be false
     end
 
+    it 'does not enlarge images smaller than 800px' do
+      allow(Open3).to receive(:capture3).and_call_original
+
+      vipsthumbnail_calls = []
+      allow(Open3).to receive(:capture3).and_wrap_original do |original, *args, **kwargs|
+        env, cmd, *rest = args
+        vipsthumbnail_calls << rest if cmd == 'vipsthumbnail'
+        original.call(*args, **kwargs)
+      end
+
+      described_class.perform_now(editing_history)
+
+      # test_image.png is 8x8 — size should be capped at input width
+      expect(vipsthumbnail_calls.length).to eq(1)
+      size_index = vipsthumbnail_calls.first.index('-s')
+      expect(vipsthumbnail_calls.first[size_index + 1]).to eq('8')
+    end
+
     it 'raises on vipsthumbnail failure' do
       allow(Open3).to receive(:capture3).and_return(['', 'error message', double(success?: false, exitstatus: 1)])
       expect { described_class.perform_now(editing_history) }.to raise_error(/vipsthumbnail failed/)
