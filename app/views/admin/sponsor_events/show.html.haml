@@ -56,6 +56,14 @@
             %dt.col-sm-3 Link Name
             %dd.col-sm-9= @sponsor_event.link_name.presence || '-'
 
+          .row
+            %dt.col-sm-3 Hero Image
+            %dd.col-sm-9
+              - if @sponsor_event.asset_file
+                = link_to 'Download', download_asset_conference_sponsor_event_path(@conference, @sponsor_event)
+              - else
+                \-
+
   .col-md-4
     .card
       %h5.card-header Status
