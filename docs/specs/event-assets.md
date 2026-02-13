@@ -34,6 +34,7 @@ end
 # SponsorEventAssetFile
 def self.prepare(conference:, sponsorship:)
   record = new
+  record.sponsorship = sponsorship
   record.prefix = "c-#{conference.id}/events/s-#{sponsorship.id}/"
   record
 end
@@ -82,14 +83,13 @@ The existing authorization code for SponsorshipAssetFile remains unchanged. Its 
 
 ### SponsorEventAssetFile
 
-SponsorEventAssetFile files are uploaded by an already-authenticated sponsor (with `current_sponsorship`). Authorization is simpler than the SponsorshipAssetFile flow:
+SponsorEventAssetFile files are uploaded by an already-authenticated sponsor (with `current_sponsorship`). Authorization uses `sponsorship_id` ownership — simpler than the SponsorshipAssetFile flow (no session tracking needed):
 
-- **create**: Requires active sponsorship session (`current_sponsorship`). Track the new file ID in `session[:event_asset_file_ids]` (separate key).
-- **show / update (report-back) / initiate_update**: The file is accessible if:
-  - Its ID is in `session[:event_asset_file_ids]` (freshly uploaded, not yet associated with an event), OR
-  - Its `sponsor_event` belongs to `current_sponsorship` (already associated)
+- The `sponsor_event_asset_files` table has a `sponsorship_id` column, set at creation time via `prepare`.
+- **create**: Requires active sponsorship session (`current_sponsorship`). The file is created with `sponsorship_id` set to `current_sponsorship.id`.
+- **show / update (report-back) / initiate_update**: The file is accessible if its `sponsorship_id` matches `current_sponsorship.id`.
 
-The existing `session[:asset_file_ids]` key is preserved for SponsorshipAssetFile only.
+No `session[:event_asset_file_ids]` key is needed. The existing `session[:asset_file_ids]` key is preserved for SponsorshipAssetFile only.
 
 ## Controller Design
 
@@ -121,19 +121,19 @@ URL pattern: `/conferences/:slug/sponsorship/event_asset_files(/:id)`
 
 Access control: `require_sponsorship_session` and `require_accepted_sponsorship`. Does not require `event_submission_open` — allows replacing images on existing events even when the submission window is closed.
 
-File lookup uses `session[:event_asset_file_ids]` for unassociated files, or sponsorship ownership through the sponsor_event for associated files.
+File lookup uses `sponsorship_id` ownership check (`where(sponsorship_id: current_sponsorship.id)`).
 
-- **create**: Calls `SponsorEventAssetFile.prepare(conference: @conference, sponsorship: current_sponsorship)`, saves, tracks ID in `session[:event_asset_file_ids]`, returns presigned upload session.
+- **create**: Calls `SponsorEventAssetFile.prepare(conference: @conference, sponsorship: current_sponsorship)`, saves, returns presigned upload session.
 - **show**: Redirects to presigned download URL.
 - **update**: Report-back (from controller concern).
 - **initiate_update**: Re-generates presigned upload session for replacing an existing file.
 
 ### SponsorEventsController Changes
 
-Add `asset_file_id` to permitted params.
+Handle `asset_file_id` from `params[:sponsor_event][:asset_file_id]` separately (not via `params.permit`) with explicit authorization checks against `sponsorship_id` ownership.
 
-- **create**: If `asset_file_id` present, associate the uploaded file with the new event.
-- **update**: If `asset_file_id` is non-empty, associate the file. If empty string, destroy the existing asset file (image removal).
+- **create**: If `asset_file_id` present, look up the unassociated file by ID with `sponsorship_id` ownership check, then associate with the new event.
+- **update**: If `asset_file_id` is non-empty, associate the file (with ownership check). If empty string, destroy the existing asset file (image removal).
 
 ### Admin
 
@@ -186,11 +186,12 @@ Add an asset file model to SponsorEvent. Unlike Sponsorship's asset (required lo
 ```ruby
 create_table :sponsor_event_asset_files do |t|
   t.references :sponsor_event, foreign_key: true  # nullable for pre-association uploads
+  t.references :sponsorship, foreign_key: true, null: false
   t.string :prefix, null: false
   t.string :handle, null: false
   t.string :extension
-  t.string :version_id
-  t.string :checksum_sha256
+  t.string :version_id, null: false, default: ''
+  t.string :checksum_sha256, null: false, default: ''
   t.datetime :last_modified_at
   t.timestamps
 end
@@ -202,7 +203,7 @@ The unique index on `sponsor_event_id` enforces the has_one relationship at the 
 
 ### Association
 
-`belongs_to :sponsor_event, optional: true`. Conference resolved via `sponsor_event.conference` when associated.
+`belongs_to :sponsor_event, optional: true`. `belongs_to :sponsorship`. Conference resolved via `sponsor_event.conference` when associated.
 
 Ownership validation: `sponsor_event_id` cannot be reassigned after initial association (same pattern as SponsorshipAssetFile's `validate_ownership_not_changed`).
 
@@ -307,10 +308,10 @@ Phase 2: SponsorEventAssetFile (after review approval)
 
 ### Discrepancies
 
-- **Authorization: sponsorship_id column not added** — Human Concerns approved adding `sponsorship_id` to `sponsor_event_asset_files` to simplify authorization (ownership check vs session tracking). Not yet implemented; still uses `session[:event_asset_file_ids]`. Resolution: pending
-- **SponsorEventAssetFilesController: event_submission_open checks** — Spec says controller does not require `event_submission_open`, but `create` and `initiate_update` both check it. The `initiate_update` check blocks image replacement when submission window closes, contradicting spec intent. Resolution: pending
-- **Migration: version_id/checksum_sha256 column constraints** — Spec shows these as nullable; migration uses `null: false, default: ''`. Matches existing SponsorshipAssetFile table pattern. Resolution: pending
-- **asset_file_id not in permitted params** — Spec says "Add asset_file_id to permitted params." Implementation handles it through separate `assign_new_asset_file`/`handle_asset_file_update` methods with authorization checks. Functionally equivalent. Resolution: pending
+- **Authorization: sponsorship_id column not added** — Human Concerns approved adding `sponsorship_id` to `sponsor_event_asset_files` to simplify authorization (ownership check vs session tracking). Not yet implemented; still uses `session[:event_asset_file_ids]`. Resolution: impl needs fixing — add column, rewrite authorization. Spec updated.
+- **SponsorEventAssetFilesController: event_submission_open checks** — Spec says controller does not require `event_submission_open`, but `create` and `initiate_update` both check it. Resolution: impl needs fixing — remove both checks.
+- **Migration: version_id/checksum_sha256 column constraints** — Spec shows these as nullable; migration uses `null: false, default: ''`. Matches existing SponsorshipAssetFile table pattern. Resolution: spec updated to match implementation.
+- **asset_file_id not in permitted params** — Spec says "Add asset_file_id to permitted params." Implementation handles it through separate methods with authorization checks. Resolution: spec updated to describe separate handling approach.
 
 ### Updates
 
@@ -318,10 +319,9 @@ Implementors MUST keep this section updated as they work.
 
 - Phase 1 complete. All refactoring done, tests pass (350 examples, 0 failures), Playwright verified: new form shows Choose File, edit form shows Replace button + download link.
 - Phase 2 complete. All items implemented. Tests pass (350/350). Playwright verified: create event without image, create event with image upload, edit to remove image, edit to add image from no-image state, in-place replace of existing image, admin download link works. Fixed set_asset_file authorization to use find_by! + Ruby-level check (ActiveRecord .or() incompatible with joins).
-- 2026-02-14: Validation started. 4 discrepancies found.
+- 2026-02-14: Validation started. 4 discrepancies found. Resolutions decided: 2 impl fixes needed (authorization rewrite, remove event_submission_open checks), 2 spec updates applied (column constraints, params handling). Spec updated for sponsorship_id authorization approach.
 
-### Human concerns (to address in validation process)
+### Human concerns (to address in validation session)
 
-- Authorization went wrong. I told event asset file authorization can be just done with sponsorship ownership check, but implemented to have a new session key to track uploaded files like sponsorship asset file. Shame. The reason why it went wrong is might be we're missing sponsorship_id on sponsor_event_asset_files table. Approved to create a new column.
 - Double check that updating a file does not create a new object in S3.
 - Go through verification process of file uploaders on both sponsorship and event sides, create and re-upload. For event sides, try create with image and without image. that would cover most scenarios sufficiently.
