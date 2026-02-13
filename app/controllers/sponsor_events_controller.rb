@@ -51,8 +51,7 @@ class SponsorEventsController < ApplicationController
       return
     end
 
-    @sponsor_event.withdrawn!
-    @sponsor_event.staff = nil
+    @sponsor_event.status = :withdrawn
     @sponsor_event.save!
     ProcessSponsorEventEditJob.perform_later(@sponsor_event.last_editing_history)
     redirect_to user_conference_sponsorship_path(conference: current_conference), notice: t('.notice')

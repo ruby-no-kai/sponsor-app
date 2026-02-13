@@ -179,5 +179,17 @@ RSpec.describe SponsorEvent, type: :model do
 
       expect(event.last_editing_history.staff).to eq(staff)
     end
+
+    it 'records status change in a single history when withdrawing via attribute assignment' do
+      event = FactoryBot.create(:sponsor_event, :accepted, sponsorship:)
+
+      expect {
+        event.status = :withdrawn
+        event.save!
+      }.to change(SponsorEventEditingHistory, :count).by(1)
+
+      history = event.last_editing_history
+      expect(history.raw.fetch('status')).to eq('withdrawn')
+    end
   end
 end
