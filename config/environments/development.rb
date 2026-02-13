@@ -112,4 +112,6 @@ Rails.application.configure do
   config.x.sentry.dsn = ENV['SENTRY_DSN']
 
   config.x.tito.token = ENV['TITO_API_TOKEN']
+
+  config.x.dev.sponsor_impersonation = true
 end

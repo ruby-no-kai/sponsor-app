@@ -249,4 +249,6 @@
           - if @sponsorship.withdrawn?
           - else
             = link_to "Withdraw", conference_sponsorship_path(@conference, @sponsorship), method: :delete, data: {confirm: 'Are you sure?'}, class: 'btn btn-danger'
+          - if Rails.configuration.x.dev.sponsor_impersonation
+            = link_to "Impersonate", conference_sponsorship_impersonation_path(@conference, @sponsorship), method: :post, class: 'btn btn-warning'
 
