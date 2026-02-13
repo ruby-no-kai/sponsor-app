@@ -1,17 +1,17 @@
 import * as React from "react";
 import { useState, useRef, useImperativeHandle, forwardRef } from "react";
 
-import SponsorshipAssetFileUploader, {
+import AssetFileUploader, {
   UploadProgress,
-} from "./SponsorshipAssetFileUploader";
+} from "./AssetFileUploader";
 
 interface UploadState {
-  uploader?: SponsorshipAssetFileUploader;
+  uploader?: AssetFileUploader;
   progress?: UploadProgress | null;
   error?: string | null;
 }
 
-export interface SponsorshipAssetFileFormAPI {
+export interface AssetFileFormAPI {
   startUpload: () => Promise<string | null>;
   ensureUpload: () => Promise<string | null>;
   needUpload: () => boolean;
@@ -23,10 +23,11 @@ type Props = {
   needUpload: boolean;
   sessionEndpoint: string;
   sessionEndpointMethod: string;
+  accept: string;
   onFileChange?: (file: File | null) => void;
 };
 
-const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
+const AssetFileForm = forwardRef<AssetFileFormAPI, Props>(
   (props, ref) => {
     const [needUpload, setNeedUpload] = useState(props.needUpload);
     const [willReplace, setWillReplace] = useState(false);
@@ -52,7 +53,7 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
         return null;
       }
 
-      const uploader = new SponsorshipAssetFileUploader({
+      const uploader = new AssetFileUploader({
         file,
         sessionEndpoint: props.sessionEndpoint,
         sessionEndpointMethod: props.sessionEndpointMethod,
@@ -138,7 +139,7 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
               type="file"
               onChange={onFileSelection}
               required={props.needUpload}
-              accept="image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"
+              accept={props.accept}
               disabled={!!uploadState}
             />
           </form>
@@ -178,6 +179,6 @@ const SponsorshipAssetFileForm = forwardRef<SponsorshipAssetFileFormAPI, Props>(
   },
 );
 
-SponsorshipAssetFileForm.displayName = "SponsorshipAssetFileForm";
+AssetFileForm.displayName = "AssetFileForm";
 
-export default SponsorshipAssetFileForm;
+export default AssetFileForm;

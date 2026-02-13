@@ -1,13 +1,13 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-import SponsorshipAssetFileForm, {
-  SponsorshipAssetFileFormAPI,
-} from "./SponsorshipAssetFileForm";
+import AssetFileForm, {
+  AssetFileFormAPI,
+} from "./AssetFileForm";
 
 declare global {
   interface Window {
-    rksSponsorshipAssetFileForms: React.RefObject<SponsorshipAssetFileFormAPI | null>[];
+    rksSponsorshipAssetFileForms: React.RefObject<AssetFileFormAPI | null>[];
     rksTriggerAllUploads: () => Promise<(string | null)[]>;
   }
 }
@@ -72,28 +72,29 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       };
 
-      const componentRef = React.createRef<SponsorshipAssetFileFormAPI>();
+      const componentRef = React.createRef<AssetFileFormAPI>();
 
       if (!dest) {
-        console.error("Destination element not found for SponsorshipAssetFileForm");
+        console.error("Destination element not found for AssetFileForm");
         return;
       }
 
       const root = createRoot(dest);
       root.render(
-        <SponsorshipAssetFileForm
+        <AssetFileForm
           ref={componentRef}
           needUpload={doCopy ? false : !existingFileId}
           existingFileId={existingFileId}
           sessionEndpoint={sessionEndpoint}
           sessionEndpointMethod={sessionEndpointMethod}
+          accept="image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"
           onFileChange={onFileChange}
         />
       );
 
       // Add ref to global array - it will be populated when component mounts
       window.rksSponsorshipAssetFileForms.push(componentRef);
-      console.log("Registered SponsorshipAssetFileForm (ref will be available after mount)");
+      console.log("Registered AssetFileForm (ref will be available after mount)");
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
         form
@@ -102,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           errorElem.classList.add("d-none");
           if (!componentRef.current) {
-            throw new Error("SponsorshipAssetFileForm ref is not available");
+            throw new Error("AssetFileForm ref is not available");
           }
           const fileId = await componentRef.current.ensureUpload();
           if (fileId !== null) {
