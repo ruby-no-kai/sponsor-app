@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_13_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_13_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -200,6 +200,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_13_100000) do
     t.index ["handle"], name: "index_session_tokens_on_handle", unique: true
     t.index ["sponsorship_id"], name: "index_session_tokens_on_sponsorship_id"
     t.index ["staff_id"], name: "index_session_tokens_on_staff_id"
+  end
+
+  create_table "sponsor_event_asset_files", force: :cascade do |t|
+    t.string "checksum_sha256", default: "", null: false
+    t.datetime "created_at", null: false
+    t.string "extension"
+    t.string "handle", null: false
+    t.datetime "last_modified_at"
+    t.string "prefix", null: false
+    t.bigint "sponsor_event_id"
+    t.datetime "updated_at", null: false
+    t.string "version_id", default: "", null: false
+    t.index ["handle"], name: "index_sponsor_event_asset_files_on_handle"
+    t.index ["sponsor_event_id"], name: "index_sponsor_event_asset_files_on_sponsor_event_id", unique: true
   end
 
   create_table "sponsor_event_editing_histories", force: :cascade do |t|
@@ -405,6 +419,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_13_100000) do
   add_foreign_key "exhibitions", "sponsorships"
   add_foreign_key "form_descriptions", "conferences"
   add_foreign_key "plans", "conferences"
+  add_foreign_key "sponsor_event_asset_files", "sponsor_events"
   add_foreign_key "sponsor_event_editing_histories", "sponsor_events"
   add_foreign_key "sponsor_event_editing_histories", "staffs"
   add_foreign_key "sponsor_events", "conferences"
