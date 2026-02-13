@@ -53,14 +53,14 @@
   - else
     - asset_file_session_endpoint = user_conference_event_asset_files_path(conference)
   .form-group.sponsor_events_form_asset_file{data: {session_endpoint: asset_file_session_endpoint, session_endpoint_method: 'POST'}}
-    %label Hero Image
+    %label= t('.asset_file')
     %span.text-muted= t('sponsorships.form.optional')
-    %small.form-text Supported formats: PNG, JPEG, WebP (max 20 MB)
+    %small.form-text= t('.asset_file_help')
     = hidden_field_tag 'sponsor_event[asset_file_id]', sponsor_event.asset_file&.id
     .sponsor_events_form_asset_file_form
     - if sponsor_event.asset_file
       %small.mt-1
-        = link_to '(Download previously uploaded file)', user_conference_event_asset_file_path(conference, sponsor_event.asset_file)
+        = link_to t('helpers.download_previously_uploaded'), user_conference_event_asset_file_path(conference, sponsor_event.asset_file)
 
   .submit_error.alert.alert-danger.d-none
 
