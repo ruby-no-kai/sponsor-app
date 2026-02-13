@@ -99,6 +99,7 @@ class SponsorEventsController < ApplicationController
 
     if asset_file_id == ""
       @sponsor_event.asset_file&.destroy!
+      @sponsor_event.reload_asset_file
     elsif asset_file_id.present? && asset_file_id.to_i != @sponsor_event.asset_file&.id
       new_file = SponsorEventAssetFile
         .where(id: asset_file_id, sponsor_event: nil, sponsorship: current_sponsorship)
