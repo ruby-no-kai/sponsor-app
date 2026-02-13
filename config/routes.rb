@@ -32,6 +32,9 @@ Rails.application.routes.draw do
 
       resources :sponsor_events, path: 'events', except: %i(new create destroy) do
         resources :sponsor_event_editing_histories, as: :editing_histories, path: 'editing_history', only: %i(index)
+        member do
+          get :download_asset
+        end
       end
 
       resources :announcements
@@ -71,6 +74,11 @@ Rails.application.routes.draw do
         end
       end
       resources :sponsorship_asset_files, only: %i(create update show) do
+        member do
+          post :initiate_update
+        end
+      end
+      resources :event_asset_files, controller: 'sponsor_event_asset_files', only: %i(create update show) do
         member do
           post :initiate_update
         end

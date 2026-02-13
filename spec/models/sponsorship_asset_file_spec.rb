@@ -51,7 +51,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
       allow(Aws::S3::Presigner).to receive(:new).with(client: client_double).and_return(presigner_double)
       expect(presigner_double).to receive(:presigned_url).with(
         :get_object,
-        bucket: SponsorshipAssetFile::BUCKET,
+        bucket: SponsorshipAssetFile.asset_file_bucket,
         key: file.object_key,
         expires_in: 3600,
         response_content_disposition: "attachment; filename=\"#{file.filename}\""
@@ -73,8 +73,8 @@ RSpec.describe SponsorshipAssetFile, type: :model do
       # Capture the new file's object key for assertions
       new_file_id = nil
       expect(s3_client).to receive(:copy_object) do |args|
-        expect(args[:bucket]).to eq(SponsorshipAssetFile::BUCKET)
-        expect(args[:copy_source]).to eq("#{SponsorshipAssetFile::BUCKET}/#{file.object_key}")
+        expect(args[:bucket]).to eq(SponsorshipAssetFile.asset_file_bucket)
+        expect(args[:copy_source]).to eq("#{SponsorshipAssetFile.asset_file_bucket}/#{file.object_key}")
         # Extract new file ID from the key argument
         new_file_id = args[:key].match(/--(\d+)$/)[1].to_i
         expect(args[:key]).to include("c-#{new_conference.id}/")
@@ -87,7 +87,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
         checksum_sha256: 'test-checksum-sha256'
       )
       expect(s3_client).to receive(:head_object) do |args|
-        expect(args[:bucket]).to eq(SponsorshipAssetFile::BUCKET)
+        expect(args[:bucket]).to eq(SponsorshipAssetFile.asset_file_bucket)
         expect(args[:checksum_mode]).to eq(:enabled)
         # Verify it's calling head_object on the new file's key
         expect(args[:key]).to match(/c-#{new_conference.id}\/.*--#{new_file_id}$/)

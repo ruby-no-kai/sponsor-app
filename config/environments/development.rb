@@ -3,6 +3,11 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST', 'localhost:3000')
 
+  config.x.asset_file_uploadable.region = ENV['S3_FILES_REGION']
+  config.x.asset_file_uploadable.bucket = ENV['S3_FILES_BUCKET']
+  config.x.asset_file_uploadable.prefix = ENV['S3_FILES_PREFIX']
+  config.x.asset_file_uploadable.role = ENV['S3_FILES_ROLE']
+
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Make code changes take effect immediately without server restart.

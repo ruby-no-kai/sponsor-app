@@ -1,6 +1,6 @@
 class Admin::SponsorEventsController < Admin::ApplicationController
   before_action :set_conference
-  before_action :set_sponsor_event, only: %i(show edit update)
+  before_action :set_sponsor_event, only: %i(show edit update download_asset)
 
   def index
     @sponsor_events = @conference.sponsor_events
@@ -12,6 +12,12 @@ class Admin::SponsorEventsController < Admin::ApplicationController
   end
 
   def edit
+  end
+
+  def download_asset
+    asset = @sponsor_event.asset_file
+    raise ActiveRecord::RecordNotFound unless asset
+    redirect_to asset.download_url, allow_other_host: true
   end
 
   def update

@@ -3,6 +3,7 @@ class SponsorEvent < ApplicationRecord
 
   belongs_to :sponsorship
   belongs_to :conference
+  has_one :asset_file, class_name: 'SponsorEventAssetFile', dependent: :destroy
 
   enum :status, { pending: 0, accepted: 1, rejected: 2, withdrawn: 3 }
 
@@ -38,6 +39,7 @@ class SponsorEvent < ApplicationRecord
       "co_host_sponsorship_ids" => co_host_sponsorship_ids,
       "link_name" => link_name,
       "admin_comment" => admin_comment,
+      "asset_file_id" => asset_file&.id,
       "policy_acknowledged_at" => policy_acknowledged_at&.iso8601,
     }
   end

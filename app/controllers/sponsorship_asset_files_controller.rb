@@ -1,4 +1,6 @@
 class SponsorshipAssetFilesController < ApplicationController
+  include AssetFileSessionable
+
   before_action :set_conference
   before_action :set_asset_file, only: [:show, :update, :initiate_update]
 
@@ -9,22 +11,10 @@ class SponsorshipAssetFilesController < ApplicationController
   def create
     return render(status: 403, json: {error: 403}) if current_sponsorship&.asset_file
     return render(status: 403, json: {error: 403}) if !@conference&.amendment_open? && !current_staff
-    @asset_file = SponsorshipAssetFile.create!(prefix: "c-#{@conference.id}/")
+    @asset_file = SponsorshipAssetFile.prepare(conference: @conference)
+    @asset_file.save!
     (session[:asset_file_ids] ||= []) << @asset_file.id
     render json: make_session
-  end
-
-  def update
-    @asset_file.assign_attributes(params.permit(:version_id))
-    @asset_file.extension = params[:extension]&.then { _1.downcase.gsub(/[^a-z0-9]/,'') } || 'unknown'
-
-    @asset_file.update_object_header()
-
-    if @asset_file.save
-      render json: {ok: true}
-    else
-      render status: 422, json: {ok: false, messages: @asset_file.errors.full_messages}
-    end
   end
 
   def initiate_update
@@ -32,11 +22,13 @@ class SponsorshipAssetFilesController < ApplicationController
     render json: make_session
   end
 
-  private def set_conference
+  private
+
+  def set_conference
     @conference = current_conference
   end
 
-  private def set_asset_file
+  def set_asset_file
     @asset_file = SponsorshipAssetFile
       .available_for_user(
         params[:id],
@@ -46,9 +38,7 @@ class SponsorshipAssetFilesController < ApplicationController
       .first!
   end
 
-  private def make_session
-    @asset_file.make_session.merge(
-      report_to: user_conference_sponsorship_asset_file_path(@conference, @asset_file)
-    )
+  def asset_file_report_to_url(asset_file)
+    user_conference_sponsorship_asset_file_path(@conference, asset_file)
   end
 end

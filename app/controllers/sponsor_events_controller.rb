@@ -13,6 +13,7 @@ class SponsorEventsController < ApplicationController
   def create
     @sponsor_event = current_sponsorship.sponsor_events.build(sponsor_event_params)
     @sponsor_event.policy_acknowledged_at = Time.zone.now if params[:sponsor_event][:policy_agreement] == '1'
+    assign_new_asset_file
 
     if @sponsor_event.save
       ProcessSponsorEventEditJob.perform_later(@sponsor_event.last_editing_history)
@@ -37,7 +38,15 @@ class SponsorEventsController < ApplicationController
       return
     end
 
-    if @sponsor_event.update(sponsor_event_params)
+    success = ActiveRecord::Base.transaction do
+      handle_asset_file_update
+      unless @sponsor_event.update(sponsor_event_params)
+        raise ActiveRecord::Rollback
+      end
+      true
+    end
+
+    if success
       ProcessSponsorEventEditJob.perform_later(@sponsor_event.last_editing_history)
       redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), notice: t('.notice')
     else
@@ -73,6 +82,31 @@ class SponsorEventsController < ApplicationController
 
   def set_sponsor_event
     @sponsor_event = current_sponsorship.sponsor_events.find(params[:id])
+  end
+
+  def assign_new_asset_file
+    asset_file_id = params[:sponsor_event][:asset_file_id]
+    return if asset_file_id.blank?
+
+    asset_file = SponsorEventAssetFile
+      .where(id: asset_file_id, sponsor_event: nil, sponsorship: current_sponsorship)
+      .first!
+    @sponsor_event.asset_file = asset_file
+  end
+
+  def handle_asset_file_update
+    asset_file_id = params[:sponsor_event][:asset_file_id]
+
+    if asset_file_id == ""
+      @sponsor_event.asset_file&.destroy!
+      @sponsor_event.reload_asset_file
+    elsif asset_file_id.present? && asset_file_id.to_i != @sponsor_event.asset_file&.id
+      new_file = SponsorEventAssetFile
+        .where(id: asset_file_id, sponsor_event: nil, sponsorship: current_sponsorship)
+        .first!
+      @sponsor_event.asset_file&.destroy!
+      @sponsor_event.asset_file = new_file
+    end
   end
 
   def sponsor_event_params

@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@types/jquery": "^3.5.33",
+    "playwright": "^1.58.2",
     "prettier": "^3.1.1",
     "vite": "^7.2.2",
     "vite-plugin-checker": "^0.11.0",

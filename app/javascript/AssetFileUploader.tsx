@@ -19,7 +19,7 @@ type SessionData = {
   max_size?: number;
 };
 
-export default class SponsorshipAssetFileUploader {
+export default class AssetFileUploader {
   public file: File;
   public sessionEndpoint: string;
   public sessionEndpointMethod: string;

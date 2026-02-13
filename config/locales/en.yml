@@ -66,6 +66,7 @@ en:
               too_long: "is too long; maximum is about %{maximum} words on your selected plan"
 
   helpers:
+    download_previously_uploaded: '(Download previously uploaded file)'
     label:
       'sponsorship[billing_request_attributes]': *billing_request
       'sponsorship[customization_request_attributes]': *customization_request
@@ -166,7 +167,6 @@ en:
       information_help: |
         Please provide a short introduction of your company. Note that the length of the introduction will vary depending on the sponsorship plan you chose. If you submit a preliminary information or prefer to submit later, let us know via [Others] field below. We'll hold the information from publication on our website.
       logo: 'Logo'
-      download_logo: '(Download previously uploaded file)'
       logo_help: |
         Upload your company logo file for the sponsors page in our website, and the venue onsite. Please make sure your file is in vector format (like .ai, .eps, .svg).
       logo_zip_help: |
@@ -294,6 +294,8 @@ en:
       notice: 'Your event has been withdrawn.'
       withdrawn_not_editable: 'Withdrawn events cannot be edited.'
     form:
+      asset_file: 'Image'
+      asset_file_help: 'A optional header/hero/banner image to show in the public event listing. Supported formats: PNG, JPEG, WebP (max 20 MB)'
       url_help: 'URL of the webpage for your event details or registration.'
       location_local_help: 'We require the location name in the local language to help attendees find the venue.'
       capacity_placeholder: 'e.g., 100'

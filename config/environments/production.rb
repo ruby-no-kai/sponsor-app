@@ -3,6 +3,11 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST')
 
+  config.x.asset_file_uploadable.region = ENV['S3_FILES_REGION']
+  config.x.asset_file_uploadable.bucket = ENV['S3_FILES_BUCKET']
+  config.x.asset_file_uploadable.prefix = ENV['S3_FILES_PREFIX']
+  config.x.asset_file_uploadable.role = ENV['S3_FILES_ROLE']
+
   config.x.org_name = ENV.fetch('ORG_NAME')
 
   config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
