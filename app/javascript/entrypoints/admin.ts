@@ -17,6 +17,7 @@ import "bootstrap";
 import Rails from "@rails/ujs";
 Rails.start();
 
+import "../admin_datetime_now";
 import "../user_sponsorships_form";
 import "../broadcast_new_recipient_fields";
 import "../booth_assignments";
