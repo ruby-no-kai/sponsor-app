@@ -11,14 +11,12 @@ class SponsorEventAssetFilesController < ApplicationController
   end
 
   def create
-    return render(status: 403, json: { error: 403 }) if !current_conference&.event_submission_open?
     @asset_file = SponsorEventAssetFile.prepare(conference: @conference, sponsorship: current_sponsorship)
     @asset_file.save!
     render json: make_session
   end
 
   def initiate_update
-    return render(status: 403, json: { error: 403 }) if !current_conference&.event_submission_open?
     render json: make_session
   end
 
