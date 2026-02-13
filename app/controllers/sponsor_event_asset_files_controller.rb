@@ -30,13 +30,16 @@ class SponsorEventAssetFilesController < ApplicationController
   end
 
   def set_asset_file
-    @asset_file = SponsorEventAssetFile
-      .where(id: params[:id])
-      .where(
-        SponsorEventAssetFile.where(sponsor_event_id: nil, id: session[:event_asset_file_ids] || [])
-          .or(SponsorEventAssetFile.joins(:sponsor_event).where(sponsor_events: { sponsorship_id: current_sponsorship.id }))
-      )
-      .first!
+    session_file_ids = (session[:event_asset_file_ids] || []).map(&:to_i)
+    owned_event_ids = current_sponsorship.sponsor_events.pluck(:id)
+    @asset_file = SponsorEventAssetFile.find_by!(id: params[:id]).tap do |file|
+      authorized = if file.sponsor_event_id.nil?
+        session_file_ids.include?(file.id)
+      else
+        owned_event_ids.include?(file.sponsor_event_id)
+      end
+      raise ActiveRecord::RecordNotFound unless authorized
+    end
   end
 
   def require_accepted_sponsorship
