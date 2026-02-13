@@ -2,7 +2,7 @@ class SponsorEventsController < ApplicationController
   include Rails.application.routes.url_helpers
 
   before_action :require_sponsorship_session
-  before_action :require_event_submission_open
+  before_action :require_event_submission_open, only: %i(new create edit update destroy)
   before_action :require_accepted_sponsorship
   before_action :set_sponsor_event, only: %i(show edit update destroy)
 

@@ -62,7 +62,7 @@
             %strong= SponsorEvent.human_attribute_name(:admin_comment)
           %p.card-text= @sponsor_event.admin_comment
 
-    - if @sponsor_event.editable_by_sponsor?
+    - if @sponsor_event.editable_by_sponsor? && current_conference.event_submission_open?
       .card.mt-2.text-dark
         .card-header= t('.actions')
         .card-body
