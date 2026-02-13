@@ -1,5 +1,5 @@
 class GenerateSponsorsYamlFileJob < ApplicationJob
-  GITHUB_MEDIA_TYPE = 'application/vnd.github.machine-man-preview+json'
+  delegate :octokit, :base_branch, to: :github_installation
 
   def perform(conference, push: true)
     @conference = conference
@@ -164,48 +164,14 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     )
   end
 
-  def base_branch
-    @base_branch ||= repo.branch || default_branch
-  end
-
-  def default_branch
-    octokit.repository(repo.name)[:default_branch]
-  end
-
-  def octokit
-    @octokit ||= Octokit::Client.new(
-      access_token: github_installation_token,
-    )
-  end
-
-  def github_installation_token
-    return @github_installation_token if defined? @github_installation_token
-
-    installation = app_octokit.find_repository_installation(repo.name, accept: GITHUB_MEDIA_TYPE)
-    raise "no github app installation found for #{repo.name.inspect}" unless installation
-
-    issuance = app_octokit.create_app_installation_access_token(installation[:id], accept: GITHUB_MEDIA_TYPE)
-    @github_installation_token = issuance[:token]
-  end
-
-  def app_octokit
-    @app_octokit ||= Octokit::Client.new(
-      bearer_token: github_jwt,
-    )
-  end
-
-  def github_jwt
-    iat = Time.now.to_i
-    payload = {
-      iss: Rails.application.config.x.github.app_id,
-      iat: iat,
-      exp: iat + (3*60),
-    }
-    JWT.encode(payload, Rails.application.config.x.github.private_key, 'RS256')
-  end
-
   # For debugging
   def self.get_octokit(repo)
-    self.new(Struct.new(:github_repo).new(Struct.new(:name).new(repo)), push: false).tap(&:perform_now).octokit
+    GithubInstallation.new(repo).octokit
+  end
+
+  private
+
+  def github_installation
+    @github_installation ||= GithubInstallation.new(repo.name, branch: repo.branch)
   end
 end
