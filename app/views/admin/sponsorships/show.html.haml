@@ -11,7 +11,7 @@
   %div
     = link_to "Edit", edit_conference_sponsorship_path(@conference, @sponsorship), class: 'btn btn-primary'
     = link_to "History", conference_sponsorship_editing_histories_path(@conference, @sponsorship), class: 'btn btn-secondary'
-    = link_to "Compose Email", front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address), class: 'btn btn-info', target: '_blank'
+    = link_to "Compose Email", front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address, cc: @sponsorship.contact.email_ccs), class: 'btn btn-info', target: '_blank'
 
 .row
   .col-md-8
@@ -212,7 +212,7 @@
         .row
         %p.card-text
           #{@sponsorship.contact.name}
-          = link_to @sponsorship.contact.email, front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address), target: '_blank'
+          = link_to @sponsorship.contact.email, front_mail_to_link(@sponsorship.contact.email, from: @conference.contact_email_address, cc: @sponsorship.contact.email_ccs), target: '_blank'
         %p.card-text
           - if @sponsorship.contact.unit
             = @sponsorship.contact.unit
@@ -230,7 +230,7 @@
       .card-body
         %p.card-text
           #{@sponsorship.billing_contact.name}
-          = link_to @sponsorship.billing_contact.email, front_mail_to_link(@sponsorship.billing_contact.email, from: @conference.contact_email_address), target: '_blank'
+          = link_to @sponsorship.billing_contact.email, front_mail_to_link(@sponsorship.billing_contact.email, from: @conference.contact_email_address, cc: @sponsorship.billing_contact.email_ccs), target: '_blank'
         %p.card-text
           - if @sponsorship.billing_contact.unit
             = @sponsorship.billing_contact.unit
