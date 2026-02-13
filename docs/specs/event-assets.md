@@ -275,7 +275,7 @@ When a sponsor withdraws an event, the associated asset file is preserved (not d
 
 ## Current Status
 
-Interview complete.
+Validation in progress.
 
 ### Implementation Checklist
 
@@ -305,12 +305,20 @@ Phase 2: SponsorEventAssetFile (after review approval)
 - [x] Add admin `download_asset` action and link
 - [x] Verify event asset upload flow via Playwright
 
+### Discrepancies
+
+- **Authorization: sponsorship_id column not added** — Human Concerns approved adding `sponsorship_id` to `sponsor_event_asset_files` to simplify authorization (ownership check vs session tracking). Not yet implemented; still uses `session[:event_asset_file_ids]`. Resolution: pending
+- **SponsorEventAssetFilesController: event_submission_open checks** — Spec says controller does not require `event_submission_open`, but `create` and `initiate_update` both check it. The `initiate_update` check blocks image replacement when submission window closes, contradicting spec intent. Resolution: pending
+- **Migration: version_id/checksum_sha256 column constraints** — Spec shows these as nullable; migration uses `null: false, default: ''`. Matches existing SponsorshipAssetFile table pattern. Resolution: pending
+- **asset_file_id not in permitted params** — Spec says "Add asset_file_id to permitted params." Implementation handles it through separate `assign_new_asset_file`/`handle_asset_file_update` methods with authorization checks. Functionally equivalent. Resolution: pending
+
 ### Updates
 
 Implementors MUST keep this section updated as they work.
 
 - Phase 1 complete. All refactoring done, tests pass (350 examples, 0 failures), Playwright verified: new form shows Choose File, edit form shows Replace button + download link.
 - Phase 2 complete. All items implemented. Tests pass (350/350). Playwright verified: create event without image, create event with image upload, edit to remove image, edit to add image from no-image state, in-place replace of existing image, admin download link works. Fixed set_asset_file authorization to use find_by! + Ruby-level check (ActiveRecord .or() incompatible with joins).
+- 2026-02-14: Validation started. 4 discrepancies found.
 
 ### Human concerns (to address in validation process)
 
