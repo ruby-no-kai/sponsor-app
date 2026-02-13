@@ -46,6 +46,8 @@ class Admin::FormDescriptionsController < Admin::ApplicationController
       :policy_help,
       :ticket_help,
       :fallback_options,
+      :sponsor_event_help,
+      :event_policy,
     )
   end
 

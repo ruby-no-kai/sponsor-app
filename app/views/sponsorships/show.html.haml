@@ -32,6 +32,30 @@
               %span.badge.badge-danger= t('.booth_details.not_submitted')
             %p.card-text= link_to t('.booth_details.new'), new_user_conference_sponsorship_exhibition_path(@conference), class: 'btn btn-primary'
 
+    - if @conference.event_submission_open? && @sponsorship.accepted?
+      .card.mt-2.text-dark
+        .card-header= t('.events.title')
+        .card-body
+          - events = @sponsorship.sponsor_events.by_starts_at
+          - if events.any?
+            %ul.list-unstyled
+              - events.each do |event|
+                %li.mb-2
+                  = link_to event.title, user_conference_sponsorship_event_path(conference: @conference, id: event)
+                  - case event.status
+                  - when 'pending'
+                    %span.badge.badge-warning= t('.events.status_pending')
+                  - when 'accepted'
+                    %span.badge.badge-success= t('.events.status_accepted')
+                  - when 'rejected'
+                    %span.badge.badge-danger= t('.events.status_rejected')
+                  - when 'withdrawn'
+                    %span.badge.badge-secondary= t('.events.status_withdrawn')
+          - else
+            %p.card-text.text-muted= t('.events.no_events')
+          %p.card-text.mt-2
+            = link_to t('.events.submit_new'), new_user_conference_sponsorship_event_path(conference: @conference), class: 'btn btn-primary btn-sm'
+
   .col-md-6
     .card.text-dark
       .card-header= t('.your_sponsorship_plan')

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_21_135759) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_13_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,6 +80,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_135759) do
     t.integer "booth_capacity", default: 0, null: false
     t.string "contact_email_address"
     t.datetime "created_at", null: false
+    t.datetime "event_submission_starts_at"
     t.string "github_repo"
     t.boolean "hidden", default: false, null: false
     t.string "invite_code"
@@ -138,6 +139,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_135759) do
     t.text "booth_help_html"
     t.bigint "conference_id", null: false
     t.datetime "created_at", null: false
+    t.text "event_policy", default: "", null: false
+    t.text "event_policy_html", default: "", null: false
     t.jsonb "fallback_options", default: {}, null: false
     t.text "head"
     t.text "head_html"
@@ -146,6 +149,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_135759) do
     t.text "plan_help_html"
     t.text "policy_help"
     t.text "policy_help_html"
+    t.text "sponsor_event_help", default: "", null: false
+    t.text "sponsor_event_help_html", default: "", null: false
     t.text "ticket_help"
     t.text "ticket_help_html"
     t.datetime "updated_at", null: false
@@ -195,6 +200,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_135759) do
     t.index ["handle"], name: "index_session_tokens_on_handle", unique: true
     t.index ["sponsorship_id"], name: "index_session_tokens_on_sponsorship_id"
     t.index ["staff_id"], name: "index_session_tokens_on_staff_id"
+  end
+
+  create_table "sponsor_event_editing_histories", force: :cascade do |t|
+    t.string "comment", default: "", null: false
+    t.datetime "created_at", null: false
+    t.jsonb "diff"
+    t.jsonb "raw"
+    t.bigint "sponsor_event_id"
+    t.bigint "staff_id"
+    t.datetime "updated_at", null: false
+    t.index ["sponsor_event_id", "id"], name: "idx_on_sponsor_event_id_id_d783c3dd3c"
+    t.index ["sponsor_event_id"], name: "index_sponsor_event_editing_histories_on_sponsor_event_id"
+    t.index ["staff_id"], name: "index_sponsor_event_editing_histories_on_staff_id"
+  end
+
+  create_table "sponsor_events", force: :cascade do |t|
+    t.text "admin_comment", default: "", null: false
+    t.string "capacity", default: "", null: false
+    t.jsonb "co_host_sponsorship_ids", default: [], null: false
+    t.bigint "conference_id", null: false
+    t.datetime "created_at", null: false
+    t.string "link_name", default: "", null: false
+    t.string "location_en", default: "", null: false
+    t.string "location_local", default: "", null: false
+    t.datetime "policy_acknowledged_at"
+    t.string "price", default: "", null: false
+    t.string "slug", null: false
+    t.bigint "sponsorship_id", null: false
+    t.datetime "starts_at", null: false
+    t.integer "status", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.string "url", null: false
+    t.index ["conference_id", "slug"], name: "index_sponsor_events_on_conference_id_and_slug", unique: true
+    t.index ["conference_id"], name: "index_sponsor_events_on_conference_id"
+    t.index ["sponsorship_id", "id"], name: "index_sponsor_events_on_sponsorship_id_and_id"
+    t.index ["sponsorship_id"], name: "index_sponsor_events_on_sponsorship_id"
   end
 
   create_table "sponsorship_asset_files", force: :cascade do |t|
@@ -363,6 +405,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_135759) do
   add_foreign_key "exhibitions", "sponsorships"
   add_foreign_key "form_descriptions", "conferences"
   add_foreign_key "plans", "conferences"
+  add_foreign_key "sponsor_event_editing_histories", "sponsor_events"
+  add_foreign_key "sponsor_event_editing_histories", "staffs"
+  add_foreign_key "sponsor_events", "conferences"
+  add_foreign_key "sponsor_events", "sponsorships"
   add_foreign_key "sponsorship_asset_files", "sponsorships"
   add_foreign_key "sponsorship_editing_histories", "sponsorships"
   add_foreign_key "sponsorship_editing_histories", "staffs"

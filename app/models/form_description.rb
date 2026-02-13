@@ -118,9 +118,11 @@ class FormDescription < ApplicationRecord
       booth_help
       policy_help
       ticket_help
+      sponsor_event_help
+      event_policy
     ).each do |field|
       self[:"#{field}_html"] = Commonmarker.to_html(
-        self[field],
+        self[field] || '',
         options: {
           render: {
             unsafe: true,

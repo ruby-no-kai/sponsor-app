@@ -63,13 +63,50 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     end.to_h
   end
 
+  def events_data
+    events = @conference.sponsor_events
+      .accepted
+      .includes(sponsorship: :organization)
+      .order(starts_at: :asc)
+
+    @last_event_editing_history_id = SponsorEventEditingHistory
+      .where(sponsor_event_id: events.map(&:id))
+      .maximum(:id)
+
+    events.map do |event|
+      hosts = event.all_host_sponsorships.map do |sponsorship|
+        {
+          slug: sponsorship.slug,
+          name: sponsorship.name,
+          url: sponsorship.url,
+        }
+      end
+
+      {
+        id: event.id,
+        slug: event.slug,
+        title: event.title,
+        starts_at: event.starts_at.iso8601,
+        url: event.url,
+        price: event.price,
+        capacity: event.capacity,
+        location_en: event.location_en,
+        location_local: event.location_local,
+        link_name: event.link_name,
+        hosts:,
+      }.compact
+    end
+  end
+
   def yaml_data
     return @yaml_data if defined? @yaml_data
 
     data = self.data()
+    events = events_data
+    combined_data = data ? data.merge("_events" => events) : { "_events" => events }
     @yaml_data = data ? [
-      "# last_editing_history: #{@last_id}",
-      data.to_yaml,
+      "# last_editing_history: #{@last_id}, last_event_editing_history: #{@last_event_editing_history_id}",
+      combined_data.to_yaml,
       "",
     ].join("\n") : nil
   end

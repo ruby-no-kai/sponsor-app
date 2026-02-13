@@ -256,3 +256,4 @@ terraform apply -target=aws_apprunner_service.prd
 - Available locales: `[:en, :ja]`
 - Locale stored per sponsorship for email communications
 - Form descriptions localized per conference
+- Admin interfaces don't need localization. Embed text directly into views.

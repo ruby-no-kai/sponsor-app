@@ -34,6 +34,22 @@ ja:
 
       exhibition:
         description: 'ブース詳細'
+
+      sponsor_event:
+        title: 'イベント名'
+        starts_at: '開始日時'
+        url: 'イベントURL'
+        price: '参加費'
+        capacity: '定員'
+        location_en: '開催場所 (英語)'
+        location_local: '開催場所 (日本語)'
+        slug: 'Slug'
+        status: 'ステータス'
+        link_name: 'ボタンテキスト'
+        admin_comment: '管理者コメント'
+        policy_acknowledged_at: 'ポリシー同意日時'
+        policy_agreement: '上記ポリシーに同意する'
+
     errors:
       models:
         sponsorship:
@@ -211,6 +227,14 @@ ja:
         edit: '修正'
         new: '申請する'
         not_submitted: '未提出'
+      events:
+        title: 'スポンサー開催イベント'
+        no_events: 'まだイベントは登録されていません。'
+        submit_new: '新しいイベントを登録'
+        status_pending: '確認待ち'
+        status_accepted: '承認済'
+        status_rejected: '却下'
+        status_withdrawn: '取り下げ済'
       tickets:
         title: 'スポンサーチケット'
         attendee_url: '本編チケット'
@@ -243,6 +267,48 @@ ja:
       header: 'ブース詳細'
       help: '会場の利用ルールなどに抵触しないか事前に確認するため、ブース出展内容の詳細をお知らせください。何かしら確認が必要な内容があった場合はこちらからご連絡を差し上げます。'
       submit: '送信'
+
+  sponsor_events:
+    event_submission_not_open: 'イベント登録はまだ開始されていません。'
+    sponsorship_not_accepted: 'イベントを登録するには、スポンサーシップが承認されている必要があります。'
+    new:
+      title: イベント登録
+      header: イベント登録
+    edit:
+      title: イベント編集
+      header: イベント編集
+      withdrawn_not_editable: '取り下げ済みのイベントは編集できません。変更が必要な場合は、スポンサー窓口までご連絡ください。'
+    show:
+      title: イベント詳細
+      event_details: イベント詳細
+      actions: 操作
+      edit: 編集
+      withdraw: 取り下げ
+      withdraw_confirm: 'このイベントを取り下げますか？この操作はご自身では元に戻せません。'
+      back_to_sponsorship: 'スポンサーポータルに戻る'
+    create:
+      notice: 'イベントが登録されました。'
+    update:
+      notice: 'イベントが更新されました。'
+      withdrawn_not_editable: '取り下げ済みのイベントは編集できません。'
+    destroy:
+      notice: 'イベントを取り下げました。'
+      withdrawn_not_editable: '取り下げ済みのイベントは編集できません。'
+    form:
+      url_help: 'イベントの詳細や登録ページのURLを入力してください。'
+      location_local_help: '開催場所は日本語での名称も必須としています。参加者が会場を見つけやすくするためです。'
+      capacity_placeholder: '例: 100'
+      price_placeholder: '例: Free, 1000 JPY'
+      submit: 送信
+
+  views:
+    sponsor_events:
+      warnings:
+        english:
+          header: 'イベント情報に英語以外の文字が含まれている可能性があります'
+          body1: 'イベント情報は「開催場所 (日本語)」を除き、すべて英語での入力をお願いしております。英語のみで構成されていることをご確認いただくか、誤検知と思われる場合は下記のチェックボックスをご利用ください。'
+          body2: '提出後の確認で英語以外の文字が見つかった場合、公開前に修正をお願いする可能性があります。'
+          acknowledge: '上記の入力は英語のみで構成されています。'
 
   broadcasts:
     index:

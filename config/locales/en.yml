@@ -34,6 +34,22 @@ en:
 
       exhibition:
         description: 'Booth Plan'
+
+      sponsor_event:
+        title: 'Event Title'
+        starts_at: 'Start Time'
+        url: 'Event URL'
+        price: 'Price'
+        capacity: 'Capacity'
+        location_en: 'Location (English)'
+        location_local: 'Location (Japanese)'
+        slug: 'Slug'
+        status: 'Status'
+        link_name: 'Button Text'
+        admin_comment: 'Admin Comment'
+        policy_acknowledged_at: 'Policy Acknowledged At'
+        policy_agreement: 'I agree to the event policy'
+
     errors:
       models:
         sponsorship:
@@ -210,6 +226,14 @@ en:
         edit: 'Edit'
         new: 'Edit'
         not_submitted: 'Not Submitted Yet'
+      events:
+        title: 'Sponsor-hosted Events'
+        no_events: 'No events submitted yet.'
+        submit_new: 'Submit New Event'
+        status_pending: 'In review'
+        status_accepted: 'Accepted'
+        status_rejected: 'Rejected'
+        status_withdrawn: 'Withdrawn'
       tickets:
         title: 'Invitation and Passes'
         attendee_url: 'Conference invitations'
@@ -242,6 +266,48 @@ en:
       header: 'Booth Details'
       help: 'Please submit your booth plans in advance. Organizers will review your plan to ensure it complies with the venue rules. We may contact you if we have something to advise.'
       submit: 'Submit'
+
+  sponsor_events:
+    event_submission_not_open: 'Event submission is not open yet.'
+    sponsorship_not_accepted: 'Your sponsorship must be accepted before you can submit events.'
+    new:
+      title: Submit Event
+      header: Submit Event
+    edit:
+      title: Edit Event
+      header: Edit Event
+      withdrawn_not_editable: 'Withdrawn events cannot be edited. To make changes, please contact sponsor relations.'
+    show:
+      title: Event Details
+      event_details: Event Details
+      actions: Actions
+      edit: Edit
+      withdraw: Withdraw
+      withdraw_confirm: 'Are you sure you want to withdraw this event? This cannot be undone by yourself.'
+      back_to_sponsorship: 'Back to Sponsorship Portal'
+    create:
+      notice: 'Your event has been submitted successfully.'
+    update:
+      notice: 'Your event has been updated successfully.'
+      withdrawn_not_editable: 'Withdrawn events cannot be edited.'
+    destroy:
+      notice: 'Your event has been withdrawn.'
+      withdrawn_not_editable: 'Withdrawn events cannot be edited.'
+    form:
+      url_help: 'URL of the webpage for your event details or registration.'
+      location_local_help: 'We require the location name in the local language to help attendees find the venue.'
+      capacity_placeholder: 'e.g., 100'
+      price_placeholder: 'e.g., Free, 1000 JPY'
+      submit: Submit
+
+  views:
+    sponsor_events:
+      warnings:
+        english:
+          header: 'The event information may contain non-English text'
+          body1: 'We require all event information (except Location (Japanese)) to be in English. Please confirm the fields contain only English text, or check the box below if this detection is incorrect.'
+          body2: 'If non-English text is found upon review, we may ask you to correct it before your event is published.'
+          acknowledge: 'Yes, I acknowledge that the fields contain English text.'
 
   broadcasts:
     index:
@@ -400,3 +466,13 @@ en:
     booth_assignments:
       show:
         title: Booth Assignments
+    sponsor_events:
+      index:
+        title: Events
+      show:
+        title: "%{event}"
+      edit:
+        title: Edit Event
+    sponsor_event_editing_histories:
+      index:
+        title: History

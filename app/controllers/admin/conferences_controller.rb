@@ -95,6 +95,7 @@ class Admin::ConferencesController < Admin::ApplicationController
       :ticket_distribution_starts_at,
       :pass_retraction_disables_at,
       :amendment_closes_at,
+      :event_submission_starts_at,
       :booth_capacity,
       :contact_email_address,
       :additional_attendees_registration_open,

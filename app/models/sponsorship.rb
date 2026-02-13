@@ -29,6 +29,8 @@ class Sponsorship < ApplicationRecord
 
   has_one :exhibition
 
+  has_many :sponsor_events, dependent: :destroy
+
   has_many :broadcast_deliveries, dependent: :nullify
 
   has_many :tito_discount_codes, dependent: :destroy

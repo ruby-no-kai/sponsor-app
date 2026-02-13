@@ -1,0 +1,66 @@
+- content_for(:title) { t('.title') }
+
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Events
+
+%h3 Sponsor Events
+
+- if @sponsor_events.empty?
+  %p.text-muted No events submitted yet.
+- else
+  - SponsorEvent.statuses.keys.each do |status|
+    - events_in_status = @sponsor_events.select { |e| e.status == status }
+    - next if events_in_status.empty?
+
+    %h5.mt-4
+      - case status
+      - when 'pending'
+        %span.badge.badge-warning= status.titleize
+      - when 'accepted'
+        %span.badge.badge-success= status.titleize
+      - when 'rejected'
+        %span.badge.badge-danger= status.titleize
+      - when 'withdrawn'
+        %span.badge.badge-secondary= status.titleize
+
+    .row.py-2
+      - events_in_status.sort_by(&:starts_at).each do |event|
+        .col-md-6.mb-3
+          .card
+            .card-body
+              %h5.card-title
+                = link_to event.title, conference_sponsor_event_path(@conference, event)
+              %dl.row.mb-2
+                %dt.col-sm-4 Date/Time
+                %dd.col-sm-8= l(event.starts_at, format: :long)
+
+                %dt.col-sm-4 Price
+                %dd.col-sm-8= event.price.presence || 'Free'
+
+                %dt.col-sm-4 Capacity
+                %dd.col-sm-8= event.capacity.present? ? event.capacity : '-'
+
+                - if event.location_en.present? || event.location_local.present?
+                  %dt.col-sm-4 Location
+                  %dd.col-sm-8
+                    = event.location_en
+                    - if event.location_local.present? && event.location_local != event.location_en
+                      %br
+                      %small.text-muted= event.location_local
+
+                %dt.col-sm-4 Host
+                %dd.col-sm-8
+                  - event.all_host_sponsorships.each_with_index do |s, i|
+                    - if i > 0
+                      ,
+                    = link_to s.name, conference_sponsorship_path(@conference, s)
+
+                %dt.col-sm-4 URL
+                %dd.col-sm-8
+                  = link_to (event.link_name.presence || 'Link'), event.url, target: '_blank', rel: 'noopener'
+
+              .btn-group
+                = link_to 'View', conference_sponsor_event_path(@conference, event), class: 'btn btn-sm btn-secondary'
+                = link_to 'Edit', edit_conference_sponsor_event_path(@conference, event), class: 'btn btn-sm btn-primary'

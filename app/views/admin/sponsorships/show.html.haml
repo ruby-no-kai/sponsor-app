@@ -158,6 +158,25 @@
                 %p.card-text
                   %span.badge.badge-warning Not submitted
 
+        - events = @sponsorship.sponsor_events.by_starts_at
+        - if events.any?
+          .card.mt-2
+            %h5.card-header
+              Events
+            %ul.list-group.list-group-flush
+              - events.each do |event|
+                %li.list-group-item.d-flex.justify-content-between.align-items-center
+                  = link_to event.title, conference_sponsor_event_path(@conference, event)
+                  - case event.status
+                  - when 'pending'
+                    %span.badge.badge-warning pending
+                  - when 'accepted'
+                    %span.badge.badge-success accepted
+                  - when 'rejected'
+                    %span.badge.badge-danger rejected
+                  - when 'withdrawn'
+                    %span.badge.badge-secondary withdrawn
+
     .row
       .col-md-12
         .card.mt-2

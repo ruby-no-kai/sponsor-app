@@ -29,6 +29,10 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :sponsor_events, path: 'events', except: %i(new create destroy) do
+        resources :sponsor_event_editing_histories, as: :editing_histories, path: 'editing_history', only: %i(index)
+      end
+
       resources :announcements
       resources :broadcasts do
         resources :broadcast_deliveries, as: :deliveries, path: 'deliveries', only: %i(create destroy)
@@ -58,6 +62,7 @@ Rails.application.routes.draw do
       resource :sponsorship, only: %i(new create show edit update) do
         resources :broadcasts, only: %i(index)
         resource :exhibition, only: %i(new create edit update)
+        resources :events, controller: 'sponsor_events', only: %i(new create show edit update destroy)
         resources :pass_redemptions, only: %i(index) do
           member do
             resource :retraction, only: %i(new create show), controller: 'pass_retractions'

@@ -99,7 +99,8 @@ ApplicationRecord.transaction do
         capacity: 10000,
       }
     ].each do |plan_params|
-      conference.plans.find_or_create_by!(name: plan_params.fetch(:name)).update!(plan_params)
+      plan = conference.plans.find_or_initialize_by(name: plan_params.fetch(:name))
+      plan.update!(plan_params)
     end
 
     # FormDescriptions
@@ -112,6 +113,23 @@ ApplicationRecord.transaction do
         booth_help: "Sponsor booth is only applicable for sponsors in Ruby and Platinum plan as a paid add-on.",
         policy_help: "Please read the following policies and all agree to avide by. Note that the policy is required for all participants including attendees and booth staff.",
         ticket_help: "Select the tickets you'd like to include.",
+        sponsor_event_help: "Submit your event to be listed on the official conference website.",
+        event_policy: <<~MARKDOWN,
+          To have your event information listed on the official #{conference.name} website, the following
+          requirements must be met:
+
+          - The event must be hosted by a sponsor or by a community.
+          - The event must take place in the host city.
+          - The event must require attendees to comply with the #{conference.name} Anti-harassment Policy.
+            - This must also state that in the event of harassment, the event organizers will take action, such as removing harassing individuals from the event.
+          - The event registration page must have an English version
+          - You must follow the registration start time designated by #{conference.name}
+          - You must prohibit participation from attendees possessing a booth pass (Exhibitor lanyard), except organizers of the event itself.
+
+          For custom sponsors hosting events such as drinkups or parties: at least 80% of participants must be from public registration. The remaining capacity may include the hosting sponsor's staff and related parties, whose expenses (food, beverages, etc.) may also be covered.
+
+          Some exceptions may be granted at #{conference.name}'s discretion.
+        MARKDOWN
         fallback_options: JSON.generate(Jsonnet.load(Rails.root.join("misc", "fallback_options_en.jsonnet"))),
       },
       {
@@ -121,6 +139,22 @@ ApplicationRecord.transaction do
         booth_help: "Ruby, Platinum スポンサーはスポンサーブースを出展することができます。詳細は募集要項をご参照ください。",
         policy_help: "RubyKaigi ではスポンサー (ブーススタッフ) を含む全ての参加者に下記ポリシーへの同意を求めています。必要に応じてブース担当者や招待チケット利用者にもご共有ください。",
         ticket_help: "含めたいチケットを選択してください。",
+        sponsor_event_help: "公式サイトへのイベント掲載を申請できます。",
+        event_policy: <<~MARKDOWN,
+          リスト掲載にあたっては、イベントが下記の条件を満たすようにしてください:
+
+          - #{conference.name} スポンサー主催、あるいは有志のコミュニティ主催であること
+          - 開催地で開催されるイベントであること
+          - 参加者の #{conference.name} 公式 Anti-harassment Policy への遵守をお願いする記載
+            - またハラスメント発生時はイベント運営者が追放といった対応をすること
+          - 募集ページは英語表記が存在すること (日本語のみは不可)
+          - #{conference.name} から参加登録開始タイミングを指示するため、それに従うこと。
+          - イベント主催者以外のブースパス (Exhibitor 名札) での参加をお断りすること
+
+          カスタムスポンサーが Drinkup やパーティ等のイベントを開催する場合、参加者の 80% 以上は一般募集による参加者である必要があります。残りの枠については、主催スポンサーの関係者 (社員等) が参加し、その経費 (飲食費用等) を含めることは問題ありません。
+
+          以上の条件は #{conference.name} 側の裁量において、一部例外が認められる場合があります。
+        MARKDOWN
         fallback_options: JSON.generate(Jsonnet.load(Rails.root.join("misc", "fallback_options_ja.jsonnet"))),
       }
     ].each do |form_desc_params|
@@ -218,6 +252,84 @@ ApplicationRecord.transaction do
       sponsorship.accept if sponsorship.plan&.auto_acceptance || conference.name == 'RubyKaigi 2048'
       sponsorship.booth_assigned = sponsorship.booth_requested if conference.name == 'RubyKaigi 2048'
       sponsorship.save!
+    end
+
+    # Sponsor Events (only for RubyKaigi 2048 where sponsorships are accepted)
+    if conference.name == 'RubyKaigi 2048'
+      puts "Creating sponsor events for #{conference.name}..."
+
+      conference.update!(event_submission_starts_at: Time.zone.now - 1.week - 1.year)
+
+      events_data = [
+        {
+          domain: "great-ruby.invalid",
+          events: [
+            {
+              title: "Ruby Networking Night",
+              status: :accepted,
+              starts_at: conference.application_opens_at + 2.months,
+              url: "https://great-ruby.invalid/events/networking-night",
+              price: "Free",
+              capacity: "100",
+              location_en: "Downtown Conference Center",
+              location_local: "",
+            },
+            {
+              title: "Code Review Workshop",
+              status: :pending,
+              starts_at: conference.application_opens_at + 2.months + 1.day,
+              url: "https://great-ruby.invalid/events/code-review-workshop",
+              price: "2000 JPY",
+              capacity: "30",
+              location_en: "Great Ruby HQ",
+              location_local: "",
+            },
+          ],
+        },
+        {
+          domain: "little-rubyists.invalid",
+          events: [
+            {
+              title: "Beginner's Ruby Meetup",
+              status: :accepted,
+              starts_at: conference.application_opens_at + 2.months,
+              url: "https://little-rubyists.invalid/events/beginners-meetup",
+              price: "Free",
+              capacity: "50",
+              location_en: "Community Hall",
+              location_local: "コミュニティホール",
+            },
+            {
+              title: "Ruby Book Club",
+              status: :pending,
+              starts_at: conference.application_opens_at + 2.months + 2.days,
+              url: "https://little-rubyists.invalid/events/book-club",
+              price: "Free",
+              capacity: "20",
+              location_en: "Little Rubyists Office",
+              location_local: "Little Rubyists オフィス",
+            },
+          ],
+        },
+      ]
+
+      events_data.each do |org_data|
+        sponsorship = conference.sponsorships.joins(:organization)
+                               .find_by(organizations: { domain: org_data[:domain] })
+        next unless sponsorship&.accepted?
+
+        org_data[:events].each_with_index do |event_params, idx|
+          SponsorEvent.find_or_initialize_by(
+            conference:,
+            slug: "#{org_data[:domain]}-#{idx + 1}"
+          ).tap do |e|
+            e.sponsorship = sponsorship
+            e.assign_attributes(event_params)
+            e.policy_acknowledged_at ||= Time.zone.now - 1.year
+            e.save!
+          end
+        end
+      end
     end
 
     # Broadcasts and Deliveries
