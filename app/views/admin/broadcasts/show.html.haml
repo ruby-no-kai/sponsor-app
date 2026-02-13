@@ -40,7 +40,7 @@
         %th{scope: :col}
         %th{scope: :col}
     %tbody
-      - @broadcast.deliveries.includes(sponsorship: :conference).each do |delivery|
+      - @broadcast.deliveries.includes(sponsorship: :conference).left_joins(:sponsorship).order("sponsorships.name ASC, recipient ASC").each do |delivery|
         %tr
           - if delivery.sponsorship
             %td= link_to delivery.sponsorship.name, conference_sponsorship_path(delivery.sponsorship.conference, delivery.sponsorship)
