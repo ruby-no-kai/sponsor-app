@@ -48,10 +48,12 @@ class PushEventAssetFileJob < ApplicationJob
       asset_file.get_object(response_target: f)
     end
 
+    thumbnail_size = thumbnail_size_for(input_path)
+
     _stdout, stderr, status = Open3.capture3(
       { 'VIPS_BLOCK_UNTRUSTED' => '1' },
       'vipsthumbnail', input_path.to_s,
-      '-s', '800',
+      '-s', thumbnail_size,
       '-o', output_path.to_s + '[Q=72,preset=drawing,smart_subsample=true,effort=6,strip=true]'
     )
     raise "vipsthumbnail failed (status=#{status.exitstatus}): #{stderr}" unless status.success?
@@ -59,6 +61,23 @@ class PushEventAssetFileJob < ApplicationJob
     content = File.binread(output_path)
     FileUtils.rm_rf(tmpdir)
     content
+  end
+
+  THUMBNAIL_MAX_SIZE = 800
+
+  # Avoid enlarging images smaller than THUMBNAIL_MAX_SIZE
+  def thumbnail_size_for(input_path)
+    stdout, _, status = Open3.capture3(
+      { 'VIPS_BLOCK_UNTRUSTED' => '1' },
+      'vipsheader', '-f', 'width', input_path.to_s
+    )
+    if status.success?
+      input_width = stdout.strip.to_i
+      if input_width > 0 && input_width < THUMBNAIL_MAX_SIZE
+        return input_width.to_s
+      end
+    end
+    THUMBNAIL_MAX_SIZE.to_s
   end
 
   def push_to_github(gi, repo, asset_file, webp_content)
