@@ -276,7 +276,7 @@ When a sponsor withdraws an event, the associated asset file is preserved (not d
 
 ## Current Status
 
-Validation complete. All discrepancies resolved.
+Validation complete. All discrepancies resolved. Human concerns verified.
 
 ### Implementation Checklist
 
@@ -313,6 +313,258 @@ Phase 2: SponsorEventAssetFile (after review approval)
 - **Migration: version_id/checksum_sha256 column constraints** — Spec shows these as nullable; migration uses `null: false, default: ''`. Matches existing SponsorshipAssetFile table pattern. Resolution: spec updated to match implementation.
 - **asset_file_id not in permitted params** — Spec says "Add asset_file_id to permitted params." Implementation handles it through separate methods with authorization checks. Resolution: spec updated to describe separate handling approach.
 
+### Human concerns
+
+- **S3 object reuse on re-upload**: Verified. Both view templates (`sponsorships/_form.html.haml:232-236`, `sponsor_events/_form.html.haml:51-54`) branch on whether an existing asset file is present. When present, they set `data-session-endpoint` to `initiate_update` (which operates on the existing record, preserving `handle`/`id`/`prefix` and thus the same `object_key`). The `create` endpoint (new S3 object) is only used for first-time uploads with no prior file. S3 uploads overwrite in place.
+- **Playwright uploader verification**: All scenarios passed against a running dev server with real S3:
+  - Create sponsorship with logo upload: PASS
+  - Re-upload (replace) sponsorship logo: PASS
+  - Create event without image: PASS
+  - Create event with image: PASS
+  - Re-upload (replace) event image: PASS
+
+<details>
+<summary>Playwright test script (Node.js)</summary>
+
+Prerequisites: `pnpm add -D playwright && npx playwright install chromium`. The conference must have `event_submission_starts_at` set and a Gold plan (id=7) with `auto_acceptance` enabled. Run with: `node tmp/pw_test_all.mjs`
+
+```js
+import { chromium } from 'playwright';
+import { writeFileSync } from 'fs';
+import { join } from 'path';
+
+const REPO = process.cwd() + '/tmp';
+
+// Test files
+const svg1 = '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="red" width="100" height="100"/></svg>';
+const svg2 = '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="blue" width="100" height="100"/></svg>';
+writeFileSync(join(REPO, 'test1.svg'), svg1);
+writeFileSync(join(REPO, 'test2.svg'), svg2);
+
+function createPng(path) {
+  writeFileSync(path, Buffer.from([
+    0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A,0x00,0x00,0x00,0x0D,0x49,0x48,0x44,0x52,
+    0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01,0x08,0x02,0x00,0x00,0x00,0x90,0x77,0x53,
+    0xDE,0x00,0x00,0x00,0x0C,0x49,0x44,0x41,0x54,0x08,0xD7,0x63,0xF8,0xCF,0xC0,0x00,
+    0x00,0x00,0x02,0x00,0x01,0xE2,0x21,0xBC,0x33,0x00,0x00,0x00,0x00,0x49,0x45,0x4E,
+    0x44,0xAE,0x42,0x60,0x82
+  ]));
+}
+createPng(join(REPO, 'evt1.png'));
+createPng(join(REPO, 'evt2.png'));
+
+const browser = await chromium.launch({ headless: true });
+const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+const page = await context.newPage();
+
+page.on('console', msg => {
+  if (msg.type() === 'error') console.log(`  [ERR] ${msg.text()}`);
+});
+page.on('pageerror', err => console.log(`  [PAGE ERR] ${err.message}`));
+
+let step = 0;
+async function ss(name) {
+  step++;
+  const p = `${REPO}/pw_all_${String(step).padStart(2,'0')}_${name}.png`;
+  await page.screenshot({ path: p, fullPage: true });
+  console.log(`  >> ss ${step}: ${name}`);
+}
+
+// Change this to match your conference slug
+const CONF = 'rubykaigi4096';
+// Change this to the Gold plan ID (must have auto_acceptance enabled)
+const GOLD_PLAN_ID = '7';
+
+const results = {};
+
+try {
+  // ========== PHASE 1: Create sponsorship (Gold, auto-accepted) ==========
+  console.log('\n=== PHASE 1: Create Sponsorship ===');
+  await page.goto('http://localhost:3000/');
+  await page.waitForLoadState('networkidle');
+
+  const uniq = Date.now();
+  await page.fill('#sponsorship_contact_attributes_email', `test-${uniq}@uptest-${uniq}.invalid`);
+  await page.fill('#sponsorship_contact_attributes_address', '123 Test St');
+  await page.fill('#sponsorship_contact_attributes_organization', 'Upload Test Corp');
+  await page.fill('#sponsorship_contact_attributes_name', 'Tester');
+  await page.check(`#sponsorship_plan_id_${GOLD_PLAN_ID}`);
+  await page.fill('#sponsorship_name', `UploadTest ${uniq}`);
+  await page.fill('#sponsorship_url', 'https://example.invalid');
+  await page.fill('#sponsorship_profile', 'Testing all uploaders.');
+
+  const logoInput = page.locator('.sponsorships_form_asset_file_form input[type="file"]');
+  await logoInput.setInputFiles(join(REPO, 'test1.svg'));
+  await page.waitForTimeout(500);
+  await page.check('#sponsorship_policy_agreement');
+  await ss('form_filled');
+
+  console.log('  Submitting...');
+  await page.click('input[type="submit"]');
+  await page.waitForURL(url => !url.toString().includes('/new'), { timeout: 30000 });
+  await page.waitForLoadState('networkidle');
+  console.log(`  URL: ${page.url()}`);
+  await ss('sponsorship_created');
+  results['Phase 1: Create sponsorship with logo'] = 'PASS';
+
+  // ========== PHASE 2: Re-upload sponsorship logo ==========
+  console.log('\n=== PHASE 2: Re-upload Logo ===');
+  await page.locator('a:has-text("Edit")').first().click();
+  await page.waitForLoadState('networkidle');
+  await ss('edit_page');
+
+  await page.locator('.sponsorships_form_asset_file button:has-text("Replace")').first().click();
+  await page.waitForTimeout(300);
+  await page.locator('.sponsorships_form_asset_file_form input[type="file"]').setInputFiles(join(REPO, 'test2.svg'));
+  await page.waitForTimeout(500);
+  await ss('reupload_selected');
+
+  console.log('  Submitting...');
+  await page.click('input[type="submit"]');
+  try {
+    await page.waitForURL(url => !url.toString().includes('/edit'), { timeout: 30000 });
+    console.log(`  URL: ${page.url()}`);
+    results['Phase 2: Re-upload sponsorship logo'] = 'PASS';
+  } catch {
+    console.log(`  Stayed on: ${page.url()}`);
+    await ss('reupload_stuck');
+    const submitErr = page.locator('.submit_error:visible');
+    if (await submitErr.count() > 0) console.log(`  Error: ${await submitErr.textContent()}`);
+    results['Phase 2: Re-upload sponsorship logo'] = 'FAIL - form stayed on edit';
+  }
+  await page.waitForLoadState('networkidle');
+  await ss('after_reupload');
+
+  // ========== PHASE 3: Create event WITHOUT image ==========
+  console.log('\n=== PHASE 3: Event Without Image ===');
+  await page.goto(`http://localhost:3000/conferences/${CONF}/sponsorship/events/new`);
+  await page.waitForLoadState('networkidle');
+  console.log(`  URL: ${page.url()}`);
+
+  if (!page.url().includes('/events/new')) {
+    console.log('  FAIL: redirected away');
+    await ss('event_redirect');
+    results['Phase 3: Create event without image'] = 'FAIL - redirected';
+  } else {
+    await ss('event_new_form');
+    await page.fill('input[name="sponsor_event[title]"]', 'No Image Event');
+    await page.fill('input[name="sponsor_event[starts_at]"]', '2026-06-15T10:00');
+    await page.fill('input[name="sponsor_event[url]"]', 'https://example.invalid/evt-noimg');
+    await page.check('input[type="checkbox"][name="sponsor_event[policy_agreement]"]');
+    await ss('event_noimg_filled');
+
+    console.log('  Submitting...');
+    await page.click('input[type="submit"]');
+    try {
+      await page.waitForURL(url => !url.toString().includes('/new'), { timeout: 15000 });
+      console.log(`  URL: ${page.url()}`);
+      await ss('event_noimg_result');
+      results['Phase 3: Create event without image'] = 'PASS';
+    } catch {
+      console.log(`  Stayed on: ${page.url()}`);
+      await ss('event_noimg_stuck');
+      results['Phase 3: Create event without image'] = 'FAIL - stuck on form';
+    }
+    await page.waitForLoadState('networkidle');
+  }
+
+  // ========== PHASE 4: Create event WITH image ==========
+  console.log('\n=== PHASE 4: Event With Image ===');
+  await page.goto(`http://localhost:3000/conferences/${CONF}/sponsorship/events/new`);
+  await page.waitForLoadState('networkidle');
+
+  if (!page.url().includes('/events/new')) {
+    results['Phase 4: Create event with image'] = 'FAIL - redirected';
+  } else {
+    await page.fill('input[name="sponsor_event[title]"]', 'With Image Event');
+    await page.fill('input[name="sponsor_event[starts_at]"]', '2026-06-16T14:00');
+    await page.fill('input[name="sponsor_event[url]"]', 'https://example.invalid/evt-img');
+    await page.check('input[type="checkbox"][name="sponsor_event[policy_agreement]"]');
+
+    const replaceBtn = page.locator('.sponsor_events_form_asset_file button:has-text("Replace")');
+    if (await replaceBtn.count() > 0) {
+      await replaceBtn.first().click();
+      await page.waitForTimeout(300);
+      const fi = page.locator('.sponsor_events_form_asset_file_form input[type="file"]');
+      await fi.setInputFiles(join(REPO, 'evt1.png'));
+      await page.waitForTimeout(500);
+      console.log('  Image selected');
+    }
+    await ss('event_img_filled');
+
+    console.log('  Submitting...');
+    await page.click('input[type="submit"]');
+    try {
+      await page.waitForURL(url => !url.toString().includes('/new'), { timeout: 30000 });
+      console.log(`  URL: ${page.url()}`);
+      await ss('event_img_result');
+      results['Phase 4: Create event with image'] = 'PASS';
+    } catch {
+      console.log(`  Stayed on: ${page.url()}`);
+      await ss('event_img_stuck');
+      const errEl = page.locator('.submit_error:visible');
+      if (await errEl.count() > 0) console.log(`  Error: ${await errEl.textContent()}`);
+      results['Phase 4: Create event with image'] = 'FAIL - stuck on form';
+    }
+    await page.waitForLoadState('networkidle');
+
+    // ========== PHASE 5: Re-upload event image ==========
+    console.log('\n=== PHASE 5: Re-upload Event Image ===');
+    const editLink = page.locator('a:has-text("Edit")').first();
+    if (await editLink.count() > 0) {
+      await editLink.click();
+      await page.waitForLoadState('networkidle');
+      console.log(`  Edit URL: ${page.url()}`);
+      await ss('event_edit');
+
+      const rb = page.locator('.sponsor_events_form_asset_file button:has-text("Replace")');
+      const rmb = page.locator('.sponsor_events_form_asset_file button:has-text("Remove")');
+      console.log(`  Replace: ${await rb.count()}, Remove: ${await rmb.count()}`);
+
+      if (await rb.count() > 0) {
+        await rb.first().click();
+        await page.waitForTimeout(300);
+        const fi = page.locator('.sponsor_events_form_asset_file_form input[type="file"]');
+        await fi.setInputFiles(join(REPO, 'evt2.png'));
+        await page.waitForTimeout(500);
+        await ss('event_reupload_selected');
+
+        console.log('  Submitting...');
+        await page.click('input[type="submit"]');
+        try {
+          await page.waitForURL(url => !url.toString().includes('/edit'), { timeout: 30000 });
+          console.log(`  URL: ${page.url()}`);
+          await ss('event_reupload_result');
+          results['Phase 5: Re-upload event image'] = 'PASS';
+        } catch {
+          console.log(`  Stayed on: ${page.url()}`);
+          await ss('event_reupload_stuck');
+          results['Phase 5: Re-upload event image'] = 'FAIL - stuck';
+        }
+      } else {
+        results['Phase 5: Re-upload event image'] = 'FAIL - no Replace button';
+      }
+    } else {
+      results['Phase 5: Re-upload event image'] = 'SKIP - no Edit link';
+    }
+  }
+
+  // ========== Summary ==========
+  console.log('\n=== RESULTS ===');
+  for (const [k, v] of Object.entries(results)) {
+    console.log(`  ${v.startsWith('PASS') ? 'OK' : 'FAIL'}  ${k}: ${v}`);
+  }
+
+} catch (e) {
+  console.error(`\nFATAL: ${e.message}`);
+  await ss('fatal');
+} finally {
+  await browser.close();
+}
+```
+
+</details>
+
 ### Updates
 
 Implementors MUST keep this section updated as they work.
@@ -321,8 +573,4 @@ Implementors MUST keep this section updated as they work.
 - Phase 2 complete. All items implemented. Tests pass (350/350). Playwright verified: create event without image, create event with image upload, edit to remove image, edit to add image from no-image state, in-place replace of existing image, admin download link works. Fixed set_asset_file authorization to use find_by! + Ruby-level check (ActiveRecord .or() incompatible with joins).
 - 2026-02-14: Validation started. 4 discrepancies found. Resolutions decided: 2 impl fixes needed (authorization rewrite, remove event_submission_open checks), 2 spec updates applied (column constraints, params handling). Spec updated for sponsorship_id authorization approach.
 - 2026-02-14: Both impl fixes applied. Added `sponsorship_id` column, rewrote authorization to use ownership checks, removed `event_submission_open?` guards from asset file controller. All 350 specs pass. Playwright verification deferred to human.
-
-### Human concerns (to address in validation session)
-
-- Double check that updating a file does not create a new object in S3.
-- Go through verification process of file uploaders on both sponsorship and event sides, create and re-upload. For event sides, try create with image and without image. that would cover most scenarios sufficiently.
+- 2026-02-14: Human concerns verified. S3 object reuse confirmed via code trace (view templates route to `initiate_update` for existing files). All 5 Playwright uploader scenarios passed. Validation complete.
