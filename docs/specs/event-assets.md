@@ -14,7 +14,7 @@ Extract SponsorshipAssetFile's core functionality into a reusable concern named 
 - Validates `handle` presence
 
 The concern does NOT include:
-- `copy_to!` — remains on SponsorshipAssetFile only (cross-conference sponsorship copy flow)
+- `copy_to!` — remains on SponsorshipAssetFile only (cross-conference sponsorship copy flow). Update `copy_to!` to use `prepare` + `save!` instead of `create!` for consistency.
 - `available_for_user` scope — remains on SponsorshipAssetFile only (specialized pre-sponsorship auth)
 - Ownership validation — each model defines its own
 - `filename` — each model implements its own (concern calls it in `download_url`)
@@ -119,6 +119,10 @@ end
 
 URL pattern: `/conferences/:slug/sponsorship/event_asset_files(/:id)`
 
+Access control: `require_sponsorship_session` and `require_accepted_sponsorship`. Does not require `event_submission_open` — allows replacing images on existing events even when the submission window is closed.
+
+File lookup uses `session[:event_asset_file_ids]` for unassociated files, or sponsorship ownership through the sponsor_event for associated files.
+
 - **create**: Calls `SponsorEventAssetFile.prepare(conference: @conference, sponsorship: current_sponsorship)`, saves, tracks ID in `session[:event_asset_file_ids]`, returns presigned upload session.
 - **show**: Redirects to presigned download URL.
 - **update**: Report-back (from controller concern).
@@ -142,7 +146,7 @@ Rename the existing browser-side uploader files to reflect model-agnostic use:
 - `SponsorshipAssetFileUploader.tsx` -> `AssetFileUploader.tsx` (class name: `AssetFileUploader`)
 - `SponsorshipAssetFileForm.tsx` -> `AssetFileForm.tsx` (component name: `AssetFileForm`)
 - `user_sponsorship_asset_file_form.tsx` remains as-is (sponsorship-specific integration). Update imports to reference renamed files.
-- New `user_sponsor_event_asset_file_form.tsx` for event asset integration
+- New `user_sponsor_event_asset_file_form.tsx` for event asset integration (separate file from the existing `user_sponsor_events_form.ts` which handles English text warnings; both imported in `application.ts`)
 
 ### AssetFileForm Props
 
@@ -151,7 +155,13 @@ Add props to the `AssetFileForm` component:
 - `accept` (Phase 1): MIME type accept string for the file input
   - Sponsorship integration: `"image/svg,image/svg+xml,application/pdf,application/zip,.ai,.eps"`
   - Event integration: `"image/png,image/jpeg,image/webp"`
-- `removable` (Phase 2): Boolean. When true and an existing file is present, renders a "Remove" button alongside "Replace". When removal is selected, `ensureUpload()` returns empty string. This is new functionality added alongside SponsorEventAssetFile, not part of the refactoring phase.
+- `removable` (Phase 2): Boolean. When true and an existing file is present, renders a "Remove" button alongside "Replace". This is new functionality added alongside SponsorEventAssetFile, not part of the refactoring phase.
+
+`ensureUpload()` return values:
+- No file selected, no existing file: `null` (nothing to do)
+- Existing file, no user interaction (no Replace/Remove clicked): returns the existing file ID (no-op)
+- File selected for upload: performs upload, returns new file ID
+- Remove clicked: returns empty string (signals removal to controller)
 
 ### Form Submission Flow
 
@@ -216,7 +226,11 @@ end
 
 ### Extension Validation
 
-Server-side model validation restricts `extension` to allowed raster formats: `png`, `jpg`, `jpeg`, `webp`.
+Server-side model validation restricts `extension` to allowed raster formats: `png`, `jpg`, `jpeg`, `webp`. Uses `allow_nil: true` since extension is nil at initial creation time (set during report-back `update`).
+
+```ruby
+validates :extension, inclusion: { in: %w[png jpg jpeg webp] }, allow_nil: true
+```
 
 ### Editing History
 
@@ -266,15 +280,15 @@ Interview complete.
 ### Implementation Checklist
 
 Phase 1: Refactoring (halt for review after this phase)
-- [ ] Create `AssetFileUploadable` concern in `app/models/concerns/`
-- [ ] Create `AssetFileSessionable` controller concern in `app/controllers/concerns/`
-- [ ] Add `config.x.asset_file_uploadable.*` to all environment config files
-- [ ] Refactor `SponsorshipAssetFile` to use the concern
-- [ ] Refactor `SponsorshipAssetFilesController` to use the controller concern
-- [ ] Rename `SponsorshipAssetFileUploader.tsx` -> `AssetFileUploader.tsx`
-- [ ] Rename `SponsorshipAssetFileForm.tsx` -> `AssetFileForm.tsx`, add `accept` prop
-- [ ] Update `user_sponsorship_asset_file_form.tsx` imports
-- [ ] Verify existing sponsorship upload flow works via Playwright
+- [x] Create `AssetFileUploadable` concern in `app/models/concerns/`
+- [x] Create `AssetFileSessionable` controller concern in `app/controllers/concerns/`
+- [x] Add `config.x.asset_file_uploadable.*` to all environment config files
+- [x] Refactor `SponsorshipAssetFile` to use the concern (including `copy_to!` to use `prepare`)
+- [x] Refactor `SponsorshipAssetFilesController` to use the controller concern
+- [x] Rename `SponsorshipAssetFileUploader.tsx` -> `AssetFileUploader.tsx`
+- [x] Rename `SponsorshipAssetFileForm.tsx` -> `AssetFileForm.tsx`, add `accept` prop
+- [x] Update `user_sponsorship_asset_file_form.tsx` imports
+- [x] Verify existing sponsorship upload flow works via Playwright
 
 Phase 2: SponsorEventAssetFile (after review approval)
 - [ ] Add `removable` prop to `AssetFileForm`
@@ -285,6 +299,7 @@ Phase 2: SponsorEventAssetFile (after review approval)
 - [ ] Create `SponsorEventAssetFilesController`
 - [ ] Add routes for event asset files
 - [ ] Create `user_sponsor_event_asset_file_form.tsx`
+- [ ] Add import to `app/javascript/entrypoints/application.ts`
 - [ ] Update `sponsor_events/_form.html.haml` with uploader
 - [ ] Update `SponsorEventsController` to handle `asset_file_id`
 - [ ] Add admin `download_asset` action and link
@@ -293,3 +308,5 @@ Phase 2: SponsorEventAssetFile (after review approval)
 ### Updates
 
 Implementors MUST keep this section updated as they work.
+
+- Phase 1 complete. All refactoring done, tests pass (350 examples, 0 failures), Playwright verified: new form shows Choose File, edit form shows Replace button + download link.
