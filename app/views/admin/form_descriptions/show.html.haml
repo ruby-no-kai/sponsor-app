@@ -5,7 +5,7 @@
 %p
   = link_to 'Edit', edit_conference_form_description_path(@conference, @form_description), class: 'btn btn-primary'
 
-- %i(head_html plan_help_html booth_help_html policy_help_html ticket_help_html).each do |field|
+- %i(head_html plan_help_html booth_help_html policy_help_html ticket_help_html sponsor_event_help_html event_policy_html).each do |field|
   %div
     %h4 #{field}
     = @form_description[field]&.html_safe
