@@ -49,6 +49,11 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
 
+  config.x.asset_file_uploadable.region = ENV['S3_FILES_REGION']
+  config.x.asset_file_uploadable.bucket = ENV['S3_FILES_BUCKET']
+  config.x.asset_file_uploadable.prefix = ENV['S3_FILES_PREFIX']
+  config.x.asset_file_uploadable.role = ENV['S3_FILES_ROLE']
+
   config.x.org_name = "RubyKaigi"
 
   config.x.default_email_address = 'sponsorapp@localhost'
