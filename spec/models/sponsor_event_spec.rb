@@ -137,6 +137,27 @@ RSpec.describe SponsorEvent, type: :model do
         'status' => 'pending'
       )
     end
+
+    it 'includes asset file fields when asset file exists' do
+      asset_file = FactoryBot.create(:sponsor_event_asset_file, sponsorship:, checksum_sha256: 'sha256hash', version_id: 'v1')
+      event = FactoryBot.create(:sponsor_event, sponsorship:, asset_file:)
+      history = event.to_h_for_history
+
+      expect(history).to include(
+        'asset_file_id' => asset_file.id,
+        'asset_file_version_id' => 'v1',
+        'asset_file_checksum_sha256' => 'sha256hash'
+      )
+    end
+
+    it 'returns nil for asset file fields when no asset file' do
+      event = FactoryBot.create(:sponsor_event, sponsorship:)
+      history = event.to_h_for_history
+
+      expect(history['asset_file_id']).to be_nil
+      expect(history['asset_file_version_id']).to be_nil
+      expect(history['asset_file_checksum_sha256']).to be_nil
+    end
   end
 
   describe '#all_host_sponsorships' do

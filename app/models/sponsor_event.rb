@@ -40,6 +40,8 @@ class SponsorEvent < ApplicationRecord
       "link_name" => link_name,
       "admin_comment" => admin_comment,
       "asset_file_id" => asset_file&.id,
+      "asset_file_version_id" => asset_file&.version_id,
+      "asset_file_checksum_sha256" => asset_file&.checksum_sha256,
       "policy_acknowledged_at" => policy_acknowledged_at&.iso8601,
     }
   end

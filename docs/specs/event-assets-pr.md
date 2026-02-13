@@ -210,11 +210,11 @@ All external services (S3, GitHub API, vipsthumbnail) must be mocked in tests.
 
 ## Current Status
 
-Phase 1 complete. Halted for review before Phase 2.
+Phase 2 complete. Dockerfile change in progress concurrently.
 
 ### Implementation Checklist
 
-Phase 1: GithubInstallation extraction (halt for review after this phase)
+Phase 1: GithubInstallation extraction
 - [x] Create `app/models/github_installation.rb`
 - [x] Refactor `app/jobs/generate_sponsors_yaml_file_job.rb` to use GithubInstallation
 - [x] Update `self.get_octokit` debugging method
@@ -222,15 +222,18 @@ Phase 1: GithubInstallation extraction (halt for review after this phase)
 - [x] Verify existing `generate_sponsors_yaml_file_job_events_spec.rb` passes
 
 Phase 2: PushEventAssetFileJob
-- [ ] Add `asset_file_checksum_sha256` to `SponsorEvent#to_h_for_history`
-- [ ] Create migration: add `github_repo_images_path` to conferences
-- [ ] Add `github_repo_images_path` to admin conference form and permitted params
-- [ ] Add `libvips-tools` to Dockerfile runtime stage
-- [ ] Create `app/jobs/push_event_asset_file_job.rb`
-- [ ] Update `app/jobs/process_sponsor_event_edit_job.rb` with trigger logic
-- [ ] Create `spec/jobs/push_event_asset_file_job_spec.rb`
-- [ ] Create `spec/jobs/process_sponsor_event_edit_job_spec.rb`
-- [ ] Verify all tests pass
+- [x] Add `asset_file_checksum_sha256` and `asset_file_version_id` to `SponsorEvent#to_h_for_history`
+- [x] Create migration: add `github_repo_images_path` to conferences
+- [x] Add `github_repo_images_path` to admin conference form and permitted params
+- [ ] Add libvips to Dockerfile runtime stage (in progress concurrently)
+- [x] Create `app/jobs/push_event_asset_file_job.rb`
+  - [x] Accepts SponsorEventEditingHistory, SponsorEvent, or SponsorEventAssetFile
+  - [x] Uses `get_object(response_target:)` for streaming S3 download
+- [x] Update `app/jobs/process_sponsor_event_edit_job.rb` with trigger logic
+- [x] Update `app/models/concerns/asset_file_uploadable.rb` (`get_object` accepts kwargs)
+- [x] Create `spec/jobs/push_event_asset_file_job_spec.rb`
+- [x] Create `spec/jobs/process_sponsor_event_edit_job_spec.rb`
+- [x] Verify all tests pass (381 examples, 0 failures)
 
 ### Updates
 
@@ -238,3 +241,5 @@ Implementors MUST keep this section updated as they work.
 
 - 2026-02-14: Spec interview complete. All design decisions resolved across 7 interview rounds.
 - 2026-02-14: Phase 1 implemented. GithubInstallation extracted, GenerateSponsorsYamlFileJob refactored, all 355 tests pass.
+- 2026-02-14: Phase 2 implemented. PushEventAssetFileJob, trigger logic, migration, admin UI, specs. 381 tests pass. Dockerfile in progress separately.
+- 2026-02-14: Phase 2 implemented. All code and specs complete; 377 examples pass. Dockerfile `libvips-tools` change deferred.

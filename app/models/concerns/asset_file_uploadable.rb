@@ -34,8 +34,8 @@ module AssetFileUploadable
     )
   end
 
-  def get_object
-    s3_client.get_object(bucket: self.class.asset_file_bucket, key: object_key)
+  def get_object(**args)
+    s3_client.get_object(bucket: self.class.asset_file_bucket, key: object_key, **args)
   end
 
   def put_object(**args)
