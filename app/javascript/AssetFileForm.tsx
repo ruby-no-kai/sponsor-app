@@ -24,6 +24,7 @@ type Props = {
   sessionEndpoint: string;
   sessionEndpointMethod: string;
   accept: string;
+  removable?: boolean;
   onFileChange?: (file: File | null) => void;
 };
 
@@ -31,6 +32,7 @@ const AssetFileForm = forwardRef<AssetFileFormAPI, Props>(
   (props, ref) => {
     const [needUpload, setNeedUpload] = useState(props.needUpload);
     const [willReplace, setWillReplace] = useState(false);
+    const [willRemove, setWillRemove] = useState(false);
     const [uploadState, setUploadState] = useState<UploadState | undefined>(
       undefined,
     );
@@ -41,6 +43,7 @@ const AssetFileForm = forwardRef<AssetFileFormAPI, Props>(
     const cachedResultRef = useRef<string | null | undefined>(undefined);
 
     const startUpload = async (): Promise<string | null> => {
+      if (willRemove) return "";
       if (!needUpload && !props.needUpload)
         return props.existingFileId || "";
       const form = formRef.current;
@@ -98,7 +101,7 @@ const AssetFileForm = forwardRef<AssetFileFormAPI, Props>(
         needUpload: () => needUpload,
         uploadRequired: () => props.needUpload,
       }),
-      [file, needUpload, props.existingFileId, props.needUpload],
+      [file, needUpload, willRemove, props.existingFileId, props.needUpload],
     );
 
     const onReuploadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -115,6 +118,18 @@ const AssetFileForm = forwardRef<AssetFileFormAPI, Props>(
       props.onFileChange?.(null);
     };
 
+    const onRemoveClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      setWillRemove(true);
+      cachedResultRef.current = "";
+    };
+
+    const onUndoRemoveClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      setWillRemove(false);
+      cachedResultRef.current = undefined;
+    };
+
     const onFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!(e.target.files && e.target.files[0])) return;
       const selectedFile = e.target.files[0];
@@ -123,6 +138,20 @@ const AssetFileForm = forwardRef<AssetFileFormAPI, Props>(
       setFilename(selectedFile.name);
       props.onFileChange?.(selectedFile);
     };
+
+    if (willRemove) {
+      return (
+        <div>
+          <span className="text-muted mr-2">File will be removed on save.</span>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={onUndoRemoveClick}
+          >
+            Undo Remove
+          </button>
+        </div>
+      );
+    }
 
     if (needUpload) {
       const progressPercentage =
@@ -171,9 +200,19 @@ const AssetFileForm = forwardRef<AssetFileFormAPI, Props>(
       );
     } else {
       return (
-        <button className="btn btn-info" onClick={onReuploadClick}>
-          Replace
-        </button>
+        <div>
+          <button className="btn btn-info" onClick={onReuploadClick}>
+            Replace
+          </button>
+          {props.removable && (
+            <button
+              className="btn btn-danger btn-sm ml-2"
+              onClick={onRemoveClick}
+            >
+              Remove
+            </button>
+          )}
+        </div>
       );
     }
   },
