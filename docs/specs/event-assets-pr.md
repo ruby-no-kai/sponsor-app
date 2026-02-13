@@ -210,7 +210,7 @@ All external services (S3, GitHub API, vipsthumbnail) must be mocked in tests.
 
 ## Current Status
 
-Phase 2 complete. Dockerfile change in progress concurrently.
+Implementation complete.
 
 ### Implementation Checklist
 
@@ -225,7 +225,7 @@ Phase 2: PushEventAssetFileJob
 - [x] Add `asset_file_checksum_sha256` and `asset_file_version_id` to `SponsorEvent#to_h_for_history`
 - [x] Create migration: add `github_repo_images_path` to conferences
 - [x] Add `github_repo_images_path` to admin conference form and permitted params
-- [ ] Add libvips to Dockerfile runtime stage (in progress concurrently)
+- [x] Add libvips to Dockerfile runtime stage
 - [x] Create `app/jobs/push_event_asset_file_job.rb`
   - [x] Accepts SponsorEventEditingHistory, SponsorEvent, or SponsorEventAssetFile
   - [x] Uses `get_object(response_target:)` for streaming S3 download
@@ -243,3 +243,4 @@ Implementors MUST keep this section updated as they work.
 - 2026-02-14: Phase 1 implemented. GithubInstallation extracted, GenerateSponsorsYamlFileJob refactored, all 355 tests pass.
 - 2026-02-14: Phase 2 implemented. PushEventAssetFileJob, trigger logic, migration, admin UI, specs. 381 tests pass. Dockerfile in progress separately.
 - 2026-02-14: Phase 2 implemented. All code and specs complete; 377 examples pass. Dockerfile `libvips-tools` change deferred.
+- 2026-02-14: Dockerfile complete. Built minimal libvips 8.18.0 from source (multi-stage, JPEG/PNG/WebP only) instead of `libvips-tools` apt package to avoid pulling dozens of unnecessary transitive dependencies. Installed to `/opt/libvips` with symlink in `/usr/local/bin`. All deliverables done.
