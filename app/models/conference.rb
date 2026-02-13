@@ -8,6 +8,7 @@ class Conference < ApplicationRecord
   has_many :form_descriptions, dependent: :destroy
   has_many :plans, -> { order(rank: :asc) }, dependent: :destroy
   has_many :sponsorships, dependent: :destroy
+  has_many :sponsor_events, dependent: :destroy
   has_many :announcements, dependent: :destroy
   has_many :broadcasts, dependent: :destroy
 
@@ -47,6 +48,11 @@ class Conference < ApplicationRecord
   def pass_retraction_enabled?
     t = Time.now
     pass_retraction_disables_at.nil? || t < pass_retraction_disables_at
+  end
+
+  def event_submission_open?
+    t = Time.now
+    event_submission_starts_at && event_submission_starts_at <= t
   end
 
   def form_description_for_locale

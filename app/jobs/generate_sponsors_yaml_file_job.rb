@@ -63,15 +63,60 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     end.to_h
   end
 
+  def events_data
+    events = @conference.sponsor_events
+      .accepted
+      .includes(sponsorship: :organization)
+      .order(starts_at: :asc)
+
+    @last_event_editing_history_id = SponsorEventEditingHistory
+      .where(sponsor_event_id: events.map(&:id))
+      .maximum(:id)
+
+    events.map do |event|
+      hosts = event.all_host_sponsorships.map do |sponsorship|
+        {
+          slug: sponsorship.slug,
+          name: sponsorship.name,
+          url: sponsorship.url,
+        }
+      end
+
+      {
+        id: event.id,
+        slug: event.slug,
+        title: event.title,
+        starts_at: event.starts_at.iso8601,
+        url: event.url,
+        price: event.price,
+        capacity: event.capacity,
+        location_en: event.location_en,
+        location_local: event.location_local,
+        link_name: event.link_name,
+        hosts:,
+      }.compact
+    end
+  end
+
   def yaml_data
     return @yaml_data if defined? @yaml_data
 
     data = self.data()
-    @yaml_data = data ? [
-      "# last_editing_history: #{@last_id}",
-      data.to_yaml,
+    events = events_data
+    if data.nil? && events.blank?
+      @yaml_data = nil
+      return @yaml_data
+    end
+
+    combined_data = data ? data.merge("_events" => events) : { "_events" => events }
+    comment_parts = []
+    comment_parts << "last_editing_history: #{@last_id}" if @last_id
+    comment_parts << "last_event_editing_history: #{@last_event_editing_history_id}" if @last_event_editing_history_id
+    @yaml_data = [
+      "# #{comment_parts.join(', ')}",
+      combined_data.to_yaml,
       "",
-    ].join("\n") : nil
+    ].join("\n")
   end
 
   def json_data
@@ -84,7 +129,8 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
   def push_to_github
     return unless repo
     return if yaml_data.nil? # to generate
-    @branch_name = "sponsor-app/#{@last_id}"
+    push_id = @last_id || "event-#{@last_event_editing_history_id}"
+    @branch_name = "sponsor-app/#{push_id}"
     @filepath = repo.path
 
     begin
@@ -104,7 +150,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     octokit.update_contents(
       repo.name,
       @filepath,
-      "Update sponsors.yml for #{@conference.slug} (#{@last_id})",
+      "Update sponsors.yml for #{@conference.slug} (#{push_id})",
       blob_sha,
       yaml_data,
       branch: @branch_name,
@@ -113,7 +159,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       repo.name,
       base_branch,
       @branch_name,
-      "Update sponsors.yml for #{@conference.slug} (#{@last_id})",
+      "Update sponsors.yml for #{@conference.slug} (#{push_id})",
       nil,
     )
   end

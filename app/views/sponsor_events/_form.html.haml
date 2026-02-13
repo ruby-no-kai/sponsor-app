@@ -1,0 +1,79 @@
+- conference = current_sponsorship.conference
+- form_description = conference.form_description_for_locale
+
+= form_with(model: sponsor_event, url: (sponsor_event.persisted? ? user_conference_sponsorship_event_path(conference, sponsor_event) : user_conference_sponsorship_events_path(conference)), local: true, class: 'sponsor_events_form') do |form|
+  - if sponsor_event.errors.any?
+    - I18n.with_options(scope: %i(errors template)) do |lo|
+      .alert.alert-danger
+        %p= lo.t :header, count: sponsor_event.errors.count, model: sponsor_event.class.name
+        %ul
+          - sponsor_event.errors.full_messages.each do |message|
+            %li= message
+
+  - if form_description&.sponsor_event_help_html.present?
+    .form-group.py-2
+      = form_description.sponsor_event_help_html.html_safe
+
+  .form-group
+    = form.label :title
+    = form.text_field :title, class: 'form-control', required: true
+
+  .form-group
+    = form.label :starts_at
+    = form.datetime_local_field :starts_at, class: 'form-control', required: true
+
+  .form-group
+    = form.label :url
+    = form.url_field :url, class: 'form-control', required: true, placeholder: 'https://'
+    %small.form-text= t('.url_help')
+
+  .form-group
+    = form.label :price
+    %span.text-muted= t('sponsorships.form.optional')
+    = form.text_field :price, class: 'form-control', placeholder: t('.price_placeholder')
+
+  .form-group
+    = form.label :capacity
+    %span.text-muted= t('sponsorships.form.optional')
+    = form.text_field :capacity, class: 'form-control', placeholder: t('.capacity_placeholder')
+
+  .form-group
+    = form.label :location_en
+    %span.text-muted= t('sponsorships.form.optional')
+    = form.text_field :location_en, class: 'form-control'
+
+  .form-group
+    = form.label :location_local
+    %span.text-muted= t('sponsorships.form.optional')
+    = form.text_field :location_local, class: 'form-control'
+    %small.form-text= t('.location_local_help')
+
+  %div.py-3.sponsor_events_form__warning.d-none{data: {warning_kind: 'english'}}
+    .card
+      %h5.card-header= t('views.sponsor_events.warnings.english.header')
+      .card-body
+        %p.card-text= t('views.sponsor_events.warnings.english.body1')
+        %p.card-text= t('views.sponsor_events.warnings.english.body2')
+        .form-group.mb-0
+          .form-check
+            %input.form-check-input#sponsor_events_form_english_ack{type: 'checkbox'}
+            %label.form-check-label{for: 'sponsor_events_form_english_ack'}
+              = t('views.sponsor_events.warnings.english.acknowledge')
+
+  - if form_description&.event_policy_html.present?
+    .form-group.py-2
+      .card
+        .card-body
+          = form_description.event_policy_html.html_safe
+
+  .form-group
+    .form-check
+      - if sponsor_event.persisted?
+        = form.check_box :policy_agreement, class: 'form-check-input', disabled: true, checked: true
+        = form.label :policy_agreement, SponsorEvent.human_attribute_name(:policy_agreement), class: 'form-check-label text-muted'
+      - else
+        = form.check_box :policy_agreement, class: 'form-check-input', required: true
+        = form.label :policy_agreement, SponsorEvent.human_attribute_name(:policy_agreement), class: 'form-check-label'
+
+  .form-group
+    = form.submit t('.submit'), class: 'btn btn-primary'

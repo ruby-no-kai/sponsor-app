@@ -19,5 +19,6 @@ Rails.start();
 
 import "../user_sponsorships_form";
 import "../user_sponsorship_asset_file_form";
+import "../user_sponsor_events_form";
 
 import "../../stylesheets/application.sass";

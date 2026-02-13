@@ -1,0 +1,104 @@
+- content_for(:title) { t('.title', event: @sponsor_event.title) }
+
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item= link_to @sponsorship.name, conference_sponsorship_path(@conference, @sponsorship)
+    %li.breadcrumb-item.active{aria: {current: 'page'}}= @sponsor_event.title
+
+.d-md-flex.justify-content-between
+  %h3= @sponsor_event.title
+  %div
+    = link_to 'Edit', edit_conference_sponsor_event_path(@conference, @sponsor_event), class: 'btn btn-primary'
+    = link_to 'History', conference_sponsor_event_editing_histories_path(@conference, @sponsor_event), class: 'btn btn-secondary'
+
+.row.mt-3
+  .col-md-8
+    .card
+      %h5.card-header Event Details
+      .card-body
+        %dl
+          .row
+            %dt.col-sm-3 Title
+            %dd.col-sm-9= @sponsor_event.title
+
+          .row
+            %dt.col-sm-3 Slug
+            %dd.col-sm-9
+              %code= @sponsor_event.slug
+
+          .row
+            %dt.col-sm-3 Starts At
+            %dd.col-sm-9= l(@sponsor_event.starts_at, format: :long)
+
+          .row
+            %dt.col-sm-3 URL
+            %dd.col-sm-9
+              = link_to @sponsor_event.url, @sponsor_event.url, target: '_blank'
+
+          .row
+            %dt.col-sm-3 Price
+            %dd.col-sm-9= @sponsor_event.price.presence || '-'
+
+          .row
+            %dt.col-sm-3 Capacity
+            %dd.col-sm-9= @sponsor_event.capacity.presence || '-'
+
+          .row
+            %dt.col-sm-3 Location (EN)
+            %dd.col-sm-9= @sponsor_event.location_en.presence || '-'
+
+          .row
+            %dt.col-sm-3 Location (Local)
+            %dd.col-sm-9= @sponsor_event.location_local.presence || '-'
+
+          .row
+            %dt.col-sm-3 Link Name
+            %dd.col-sm-9= @sponsor_event.link_name.presence || '-'
+
+  .col-md-4
+    .card
+      %h5.card-header Status
+      .card-body
+        %p.card-text
+          - case @sponsor_event.status
+          - when 'pending'
+            %span.badge.badge-warning Pending
+          - when 'accepted'
+            %span.badge.badge-success Accepted
+          - when 'rejected'
+            %span.badge.badge-danger Rejected
+          - when 'withdrawn'
+            %span.badge.badge-secondary Withdrawn
+
+        %p.card-text
+          %strong Policy Acknowledged:
+          - if @sponsor_event.policy_acknowledged_at
+            = l(@sponsor_event.policy_acknowledged_at, format: :short)
+          - else
+            Not acknowledged
+
+    .card.mt-2
+      %h5.card-header Sponsorship
+      .card-body
+        %p.card-text
+          = link_to @sponsorship.name, conference_sponsorship_path(@conference, @sponsorship)
+
+    - if @sponsor_event.co_host_sponsorship_ids.present?
+      .card.mt-2
+        %h5.card-header Co-Hosts
+        %ul.list-group.list-group-flush
+          - @sponsor_event.co_host_sponsorships.each do |co_host|
+            %li.list-group-item
+              = link_to co_host.name, conference_sponsorship_path(@conference, co_host)
+              - if co_host.withdrawn?
+                %span.badge.badge-secondary withdrawn
+
+    - if @sponsor_event.admin_comment.present?
+      .card.mt-2
+        %h5.card-header Admin Comment
+        .card-body
+          %p.card-text
+            - @sponsor_event.admin_comment.each_line do |l|
+              = l
+              %br

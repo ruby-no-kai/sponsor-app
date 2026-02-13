@@ -1,0 +1,69 @@
+= form_with(model: [@conference, sponsor_event], local: true) do |form|
+  - if sponsor_event.errors.any?
+    .alert.alert-danger
+      %p #{sponsor_event.errors.count} error(s) prohibited this event from being saved:
+      %ul
+        - sponsor_event.errors.full_messages.each do |message|
+          %li= message
+
+  .row
+    .col-md-6
+      %h5 Event Details
+
+      .form-group
+        = form.label :title
+        = form.text_field :title, class: 'form-control', required: true
+
+      .form-group
+        = form.label :slug
+        = form.text_field :slug, class: 'form-control', required: true
+
+      .form-group
+        = form.label :starts_at
+        = form.datetime_local_field :starts_at, class: 'form-control', required: true
+
+      .form-group
+        = form.label :url
+        = form.url_field :url, class: 'form-control', required: true
+
+      .form-group
+        = form.label :price
+        = form.text_field :price, class: 'form-control'
+
+      .form-group
+        = form.label :capacity
+        = form.text_field :capacity, class: 'form-control'
+
+      .form-group
+        = form.label :location_en
+        = form.text_field :location_en, class: 'form-control'
+
+      .form-group
+        = form.label :location_local
+        = form.text_field :location_local, class: 'form-control'
+
+    .col-md-6
+      %h5 Admin Fields
+
+      .form-group
+        = form.label :status
+        = form.select :status, SponsorEvent.statuses.keys.map { |s| [s.titleize, s] }, {}, class: 'form-control'
+
+      .form-group
+        = form.label :link_name
+        %small.form-text.text-muted Display text for URL in published listing
+        = form.text_field :link_name, class: 'form-control', placeholder: 'e.g., Registration, Details'
+
+      .form-group
+        = form.label :co_host_sponsorship_ids, 'Co-Host Sponsorship IDs'
+        %small.form-text.text-muted Comma-separated sponsorship IDs for co-hosts
+        = form.text_field :co_host_sponsorship_ids, class: 'form-control', value: sponsor_event.co_host_sponsorship_ids.join(', ')
+
+      .form-group
+        = form.label :admin_comment
+        %small.form-text.text-muted Visible to sponsors
+        = form.text_area :admin_comment, class: 'form-control', rows: 4
+
+  .form-group.mt-4
+    = form.submit 'Update Event', class: 'btn btn-primary'
+    = link_to 'Cancel', conference_sponsor_event_path(@conference, sponsor_event), class: 'btn btn-secondary'

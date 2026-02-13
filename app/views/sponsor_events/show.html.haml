@@ -1,0 +1,77 @@
+- content_for(:title) { t('.title') }
+
+%h2= @sponsor_event.title
+
+.row.py-2
+  .col-md-8
+    .card.text-dark
+      .card-header= t('.event_details')
+      .card-body
+        %p.card-text
+          %strong= SponsorEvent.human_attribute_name(:starts_at)
+          %br
+          = l(@sponsor_event.starts_at, format: :long)
+
+        %p.card-text
+          %strong= SponsorEvent.human_attribute_name(:url)
+          %br
+          = link_to @sponsor_event.url, @sponsor_event.url
+
+        - if @sponsor_event.price.present?
+          %p.card-text
+            %strong= SponsorEvent.human_attribute_name(:price)
+            %br
+            = @sponsor_event.price
+
+        - if @sponsor_event.capacity.present?
+          %p.card-text
+            %strong= SponsorEvent.human_attribute_name(:capacity)
+            %br
+            = @sponsor_event.capacity
+
+        - if @sponsor_event.location_en.present?
+          %p.card-text
+            %strong= SponsorEvent.human_attribute_name(:location_en)
+            %br
+            = @sponsor_event.location_en
+
+        - if @sponsor_event.location_local.present?
+          %p.card-text
+            %strong= SponsorEvent.human_attribute_name(:location_local)
+            %br
+            = @sponsor_event.location_local
+
+  .col-md-4
+    .card.text-dark
+      .card-header= SponsorEvent.human_attribute_name(:status)
+      .card-body
+        %p.card-text
+          - case @sponsor_event.status
+          - when 'pending'
+            %span.badge.badge-warning= t('sponsorships.show.events.status_pending')
+          - when 'accepted'
+            %span.badge.badge-success= t('sponsorships.show.events.status_accepted')
+          - when 'rejected'
+            %span.badge.badge-danger= t('sponsorships.show.events.status_rejected')
+          - when 'withdrawn'
+            %span.badge.badge-secondary= t('sponsorships.show.events.status_withdrawn')
+
+        - if @sponsor_event.admin_comment.present?
+          %hr
+          %p.card-text
+            %strong= SponsorEvent.human_attribute_name(:admin_comment)
+          %p.card-text= @sponsor_event.admin_comment
+
+    - if @sponsor_event.editable_by_sponsor?
+      .card.mt-2.text-dark
+        .card-header= t('.actions')
+        .card-body
+          %p.card-text
+            = link_to t('.edit'), edit_user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), class: 'btn btn-primary'
+
+          %hr
+          %p.card-text.text-danger
+            = button_to t('.withdraw'), user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), method: :delete, class: 'btn btn-outline-danger', data: { confirm: t('.withdraw_confirm') }
+
+%p.mt-4
+  = link_to t('.back_to_sponsorship'), user_conference_sponsorship_path(conference: current_conference), class: 'btn btn-secondary'
