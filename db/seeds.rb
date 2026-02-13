@@ -113,7 +113,11 @@ ApplicationRecord.transaction do
         booth_help: "Sponsor booth is only applicable for sponsors in Ruby and Platinum plan as a paid add-on.",
         policy_help: "Please read the following policies and all agree to avide by. Note that the policy is required for all participants including attendees and booth staff.",
         ticket_help: "Select the tickets you'd like to include.",
-        sponsor_event_help: "Submit your event to be listed on the official conference website.",
+        sponsor_event_help: <<~TEXT,
+          You can submit information about sponsor-hosted events from this page for listing on the official #{conference.name} website.
+
+          As with sponsor information, submissions will be reviewed by the #{conference.name} team and published to the website accordingly. If there are any issues, listing will be put on hold and you will be notified via email.
+        TEXT
         event_policy: <<~MARKDOWN,
           To have your event information listed on the official #{conference.name} website, the following
           requirements must be met:
@@ -139,7 +143,11 @@ ApplicationRecord.transaction do
         booth_help: "Ruby, Platinum スポンサーはスポンサーブースを出展することができます。詳細は募集要項をご参照ください。",
         policy_help: "RubyKaigi ではスポンサー (ブーススタッフ) を含む全ての参加者に下記ポリシーへの同意を求めています。必要に応じてブース担当者や招待チケット利用者にもご共有ください。",
         ticket_help: "含めたいチケットを選択してください。",
-        sponsor_event_help: "公式サイトへのイベント掲載を申請できます。",
+        sponsor_event_help: <<~TEXT,
+          このページからはスポンサー主催のイベント情報を、#{conference.name} 公式サイトへの掲載のために申請することができます。
+
+          スポンサー情報同様に、申請された内容は #{conference.name} 側で随時確認しサイトへの反映を進めます。問題がある場合は掲載を保留し、#{conference.name} よりメール等でお知らせします。
+        TEXT
         event_policy: <<~MARKDOWN,
           リスト掲載にあたっては、イベントが下記の条件を満たすようにしてください:
 
