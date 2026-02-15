@@ -9,6 +9,7 @@ Rails.application.configure do
   config.x.asset_file_uploadable.role = ENV['S3_FILES_ROLE']
 
   config.x.org_name = ENV.fetch('ORG_NAME')
+  config.x.locale_cookie_name = '__Host-rk-sponsorapp2-hl'
 
   config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS')
   config.x.default_email_reply_to = ENV.fetch('DEFAULT_EMAIL_REPLY_TO', config.x.default_email_address)

@@ -55,6 +55,7 @@ Rails.application.configure do
   config.x.asset_file_uploadable.role = ENV['S3_FILES_ROLE']
 
   config.x.org_name = "RubyKaigi"
+  config.x.locale_cookie_name = '__Host-rk-sponsorapp2-hl'
 
   config.x.default_email_address = 'sponsorapp@localhost'
   config.x.default_email_host_part = 'sponsorapp@localhost'

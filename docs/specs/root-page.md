@@ -63,11 +63,9 @@ Migrate locale preference from `session[:hl]` to a dedicated cookie across the e
 ### Cookie configuration
 
 Cookie name configured via `config.x.locale_cookie_name` in each environment file:
-- **Production** (`config/environments/production.rb`): `__Host-rk-sponsorapp2-hl`
-- **Development** (`config/environments/development.rb`): `rk-sponsorapp2-hl`
-- **Test** (`config/environments/test.rb`): `rk-sponsorapp2-hl`
+- **All environments**: `__Host-rk-sponsorapp2-hl`
 
-The `__Host-` prefix requires `Secure; Path=/; no Domain`, which doesn't work on HTTP localhost. Development and test use the unprefixed name.
+`Secure; Path=/; httponly=false`. localhost is a trustworthy origin so `__Host-` works on all environments.
 
 Cookie expiration: **1 year**.
 
@@ -76,7 +74,7 @@ Cookie expiration: **1 year**.
 Priority order for locale detection:
 1. `params[:hl]` — if present and valid, write to locale cookie
 2. Locale cookie — read from `cookies[config.x.locale_cookie_name]`
-3. `session[:hl]` — fallback for backward compatibility with existing sessions
+3. `session[:hl]` — fallback for backward compatibility; migrates value to cookie
 4. `CloudFront-Viewer-Country` header — if `jp`, set locale to `:ja` and write to cookie
 
 When `params[:hl]` is present but not a valid locale, delete the locale cookie.
@@ -157,8 +155,13 @@ Interview complete.
 
 ### Implementation checklist
 
-- [ ] Add `config.x.locale_cookie_name` to production, development, and test environment files
-- [ ] Migrate `ApplicationController#set_locale` from session to cookie
+Locale storage migration is a standalone refactoring. Commit it separately before the root page changes to ease review.
+
+**Commit 1: Locale storage migration (refactoring)**
+- [x] Add `config.x.locale_cookie_name` to production, development, and test environment files
+- [x] Migrate `ApplicationController#set_locale` from session to cookie
+
+**Commit 2: Cacheable root page**
 - [ ] Rewrite `RootController#index` with logged-in redirect and cacheable rendering
 - [ ] Conditional CSRF meta tag omission in `app/views/layouts/application.html.haml`
 - [ ] Create `app/views/root/index.html.haml` with all three content states
