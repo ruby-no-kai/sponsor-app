@@ -13,6 +13,12 @@ jobs:
       - uses: ruby/setup-ruby@09a7688d3b55cf0e976497ff046b70949eeaccfd # v1.288.0
         with:
           bundler-cache: true
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
       - run: bundle exec rails db:create db:migrate RAILS_ENV=test
       - run: bundle exec rspec -f j -o tmp/rspec_results.json -f d spec
       # - uses: SonicGarden/rspec-report-action@1db4b15383ec30ec6ecfc9e7f92488647f7900bd # v6.0.1
