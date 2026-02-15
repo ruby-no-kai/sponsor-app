@@ -96,7 +96,7 @@ resource "aws_cloudfront_distribution" "main" {
       query_string_cache_keys = []
       cookies {
         forward           = "whitelist"
-        whitelisted_names = ["__Host-rk-sponsorapp2-hl"]
+        whitelisted_names = ["__Host-rk-sponsorapp2-hl", "__Host-rk-sponsorapp2-sess"]
       }
     }
   }
