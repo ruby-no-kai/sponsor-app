@@ -1,0 +1,21 @@
+%h1.text-center.mt-5= "#{Rails.application.config.x.org_name} Sponsorships Portal"
+
+- if @conferences.empty?
+  .row.py-5
+    .col-md-8.offset-md-2.text-center
+      %p.lead= t('.no_open_applications', org_name: Rails.application.config.x.org_name)
+      = link_to t('.login'), new_user_session_path, class: 'btn btn-primary'
+
+- else
+  .row.py-5
+    .col-md-6.text-center
+      %h2= t('.become_a_sponsor')
+      - if @conferences.many?
+        %p= t('.choose_conference')
+      %ul.list-unstyled
+        - @conferences.each do |conference|
+          %li.my-2
+            = link_to t('.sponsor_conference', conference: conference.name), new_user_conference_sponsorship_path(conference), class: 'btn btn-primary'
+    .col-md-6.text-center
+      %h2= t('.already_a_sponsor')
+      %p= link_to t('.login'), new_user_session_path, class: 'btn btn-primary'

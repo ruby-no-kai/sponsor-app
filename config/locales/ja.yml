@@ -82,6 +82,15 @@ ja:
       login: 'ログイン'
       logout: 'ログアウト'
 
+  root:
+    index:
+      become_a_sponsor: "新規スポンサー申し込み"
+      sponsor_conference: "%{conference} をスポンサーする"
+      already_a_sponsor: "すでにスポンサーの場合"
+      login: "ログイン"
+      no_open_applications: "現在 %{org_name} はスポンサー申し込みは受け付けておりません。受付期間を過ぎているか、まだ受付がはじまっていません。"
+      choose_conference: "カンファレンスを選択してください"
+
   conferences:
     index:
       title: イベント一覧

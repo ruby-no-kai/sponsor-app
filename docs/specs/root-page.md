@@ -162,13 +162,18 @@ Locale storage migration is a standalone refactoring. Commit it separately befor
 - [x] Migrate `ApplicationController#set_locale` from session to cookie
 
 **Commit 2: Cacheable root page**
-- [ ] Rewrite `RootController#index` with logged-in redirect and cacheable rendering
-- [ ] Conditional CSRF meta tag omission in `app/views/layouts/application.html.haml`
-- [ ] Create `app/views/root/index.html.haml` with all three content states
-- [ ] Add i18n keys to `config/locales/en.yml` and `config/locales/ja.yml`
-- [ ] Add ordered cache behavior for `/` in `tf/cloudfront.tf`
-- [ ] Update default cache behavior cookies in `tf/cloudfront.tf` (add locale, remove `sponsorapp2`)
-- [ ] Write `spec/requests/root_spec.rb` with security, content, logged-in, and locale tests
+- [x] Rewrite `RootController#index` with logged-in redirect and cacheable rendering
+- [x] Conditional CSRF meta tag omission in `app/views/layouts/application.html.haml`
+- [x] Create `app/views/root/index.html.haml` with all three content states
+- [x] Add i18n keys to `config/locales/en.yml` and `config/locales/ja.yml`
+- [x] Add ordered cache behavior for `/` in `tf/cloudfront.tf`
+- [x] Update default cache behavior cookies in `tf/cloudfront.tf` (add locale, remove `sponsorapp2`)
+- [x] Write `spec/requests/root_spec.rb` with security, content, logged-in, and locale tests
+
+**Post-implementation: Locale review**
+- [x] Remove unused `root.index.new_application` key from en.yml and ja.yml
+- [x] Revise English translations (`no_open_applications`, `choose_conference`)
+- [x] Revise Japanese translations (`become_a_sponsor`, `sponsor_conference`, `already_a_sponsor`, `no_open_applications`, `choose_conference`)
 
 ### Updates
 
