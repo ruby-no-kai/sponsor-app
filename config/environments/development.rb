@@ -97,6 +97,7 @@ Rails.application.configure do
   config.action_dispatch.tld_length = 2
 
   config.x.org_name = "RubyKaigi"
+  config.x.locale_cookie_name = '__Host-rk-sponsorapp2-hl'
 
   config.x.default_email_address = ENV.fetch('DEFAULT_EMAIL_ADDRESS',  'sponsorapp@localhost')
   config.x.default_email_reply_to = ENV.fetch('DEFAULT_EMAIL_REPLY_TO', config.x.default_email_address)

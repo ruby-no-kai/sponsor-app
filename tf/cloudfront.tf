@@ -77,6 +77,30 @@ resource "aws_cloudfront_distribution" "main" {
     viewer_protocol_policy = "redirect-to-https"
   }
 
+  ordered_cache_behavior {
+    target_origin_id = "functionurl"
+    path_pattern     = "/"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 3600
+
+    forwarded_values {
+      headers                 = ["CloudFront-Viewer-Country"]
+      query_string            = true
+      query_string_cache_keys = []
+      cookies {
+        forward           = "whitelist"
+        whitelisted_names = ["__Host-rk-sponsorapp2-hl"]
+      }
+    }
+  }
+
   default_cache_behavior {
     target_origin_id = "functionurl"
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -96,7 +120,7 @@ resource "aws_cloudfront_distribution" "main" {
       query_string_cache_keys = []
       cookies {
         forward           = "whitelist"
-        whitelisted_names = ["__Host-rk-sponsorapp2-sess", "sponsorapp2"]
+        whitelisted_names = ["__Host-rk-sponsorapp2-sess", "__Host-rk-sponsorapp2-hl"]
       }
     }
   }

@@ -82,6 +82,15 @@ en:
       login: 'Log in'
       logout: 'Log out'
 
+  root:
+    index:
+      become_a_sponsor: "Become a sponsor"
+      sponsor_conference: "Sponsor %{conference}"
+      already_a_sponsor: "Already a sponsor?"
+      login: "Login"
+      no_open_applications: "There are currently no open sponsorship applications for %{org_name}. The application period has either ended or not yet begun."
+      choose_conference: "Choose a conference from below"
+
   conferences:
     index:
       title: Conferences

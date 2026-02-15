@@ -17,7 +17,8 @@
         %title= "#{page_title} | #{site_name}"
     - else
       %title= site_name
-    = csrf_meta_tags
+    - unless @cacheable
+      = csrf_meta_tags
     = csp_meta_tag
     = vite_stylesheet_tag 'application.css'
 
