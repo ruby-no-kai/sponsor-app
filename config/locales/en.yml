@@ -305,6 +305,7 @@ en:
     form:
       asset_file: 'Image'
       asset_file_help: 'A optional header/hero/banner image to show in the public event listing. Supported formats: PNG, JPEG, WebP (max 20 MB)'
+      starts_at_help: 'The start time of the event itself, not the doors/reception opening time.'
       url_help: 'URL of the webpage for your event details or registration.'
       location_local_help: 'We require the location name in the local language to help attendees find the venue.'
       capacity_placeholder: 'e.g., 100'
