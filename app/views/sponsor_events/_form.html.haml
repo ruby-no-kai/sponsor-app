@@ -21,6 +21,7 @@
   .form-group
     = form.label :starts_at
     = form.datetime_local_field :starts_at, class: 'form-control', required: true
+    %small.form-text= t('.starts_at_help')
 
   .form-group
     = form.label :url

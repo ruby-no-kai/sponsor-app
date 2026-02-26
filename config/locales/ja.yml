@@ -306,6 +306,7 @@ ja:
     form:
       asset_file: '画像'
       asset_file_help: '公開イベント一覧に表示するヘッダー/バナー/OGP画像 (オプション)。対応フォーマット: PNG, JPEG, WebP (最大20MB)'
+      starts_at_help: '開場・受付開始時刻ではなく、イベント自体の開始時刻を入力してください。'
       url_help: 'イベントの詳細や登録ページのURLを入力してください。'
       location_local_help: '開催場所は日本語での名称も必須としています。参加者が会場を見つけやすくするためです。'
       capacity_placeholder: '例: 100'
