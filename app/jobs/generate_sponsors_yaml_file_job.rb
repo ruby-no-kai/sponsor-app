@@ -126,13 +126,23 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     @json_data = data ? "#{data.to_json}\n" : nil
   end
 
+  MAX_PUSH_RETRIES = 3
+
   def push_to_github
     return unless repo
     return if yaml_data.nil? # to generate
     push_id = @last_id || "event-#{@last_event_editing_history_id}"
-    @branch_name = "sponsor-app/#{push_id}"
+    @branch_name = "sponsor-app/#{@conference.slug}"
     @filepath = repo.path
+    pr_title = "Update sponsors.yml for #{@conference.slug} (#{push_id})"
 
+    # Check if existing branch already has newer data
+    if branch_has_newer_data?
+      Rails.logger.info "GenerateSponsorsYamlFileJob: branch has newer data, skipping"
+      return
+    end
+
+    # Delete and recreate branch from base HEAD
     begin
       octokit.delete_branch(repo.name, @branch_name)
     rescue Octokit::UnprocessableEntity
@@ -141,27 +151,35 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     head = octokit.branch(repo.name, base_branch)
     octokit.create_ref(repo.name, "refs/heads/#{@branch_name}", head[:commit][:sha])
 
+    # Get blob_sha from base branch (acts as optimistic lock)
     begin
       blob_sha = octokit.contents(repo.name, path: @filepath)[:sha]
     rescue Octokit::NotFound
       blob_sha = nil
     end
 
-    octokit.update_contents(
-      repo.name,
-      @filepath,
-      "Update sponsors.yml for #{@conference.slug} (#{push_id})",
-      blob_sha,
-      yaml_data,
-      branch: @branch_name,
-    )
-    octokit.create_pull_request(
-      repo.name,
-      base_branch,
-      @branch_name,
-      "Update sponsors.yml for #{@conference.slug} (#{push_id})",
-      nil,
-    )
+    push_retries = 0
+    begin
+      octokit.update_contents(repo.name, @filepath, pr_title, blob_sha, yaml_data, branch: @branch_name)
+    rescue Octokit::Conflict, Octokit::UnprocessableEntity => e
+      # Conflict: another job committed first. Check if our data is newer.
+      if push_retries < MAX_PUSH_RETRIES && !branch_has_newer_data?
+        push_retries += 1
+        # Re-read blob_sha from the branch (now updated by the other job)
+        begin
+          blob_sha = octokit.contents(repo.name, path: @filepath, ref: @branch_name)[:sha]
+        rescue Octokit::NotFound
+          blob_sha = nil
+        end
+        Rails.logger.info "GenerateSponsorsYamlFileJob: commit conflict, retrying (#{push_retries}/#{MAX_PUSH_RETRIES})"
+        retry
+      else
+        Rails.logger.info "GenerateSponsorsYamlFileJob: commit conflict and branch has newer data (or max retries), skipping"
+        return
+      end
+    end
+
+    create_or_update_pull_request(pr_title)
   end
 
   # For debugging
@@ -170,6 +188,33 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
   end
 
   private
+
+  def branch_has_newer_data?
+    existing = octokit.contents(repo.name, path: @filepath, ref: @branch_name)
+    existing_content = Base64.decode64(existing[:content])
+    if existing_content =~ /last_editing_history: (\d+)/
+      return @last_id && $1.to_i > @last_id
+    end
+    false
+  rescue Octokit::NotFound
+    false # Branch or file doesn't exist
+  end
+
+  def create_or_update_pull_request(pr_title)
+    owner = repo.name.split('/')[0]
+    existing_prs = octokit.pull_requests(repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
+    if existing_prs.any?
+      octokit.update_pull_request(repo.name, existing_prs[0][:number], title: pr_title)
+    else
+      begin
+        octokit.create_pull_request(repo.name, base_branch, @branch_name, pr_title, nil)
+      rescue Octokit::UnprocessableEntity
+        # Concurrent job already created PR
+        existing_prs = octokit.pull_requests(repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
+        octokit.update_pull_request(repo.name, existing_prs[0][:number], title: pr_title) if existing_prs.any?
+      end
+    end
+  end
 
   def github_installation
     @github_installation ||= GithubInstallation.new(repo.name, branch: repo.branch)
