@@ -169,12 +169,28 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
         return
       end
 
+      read_previous_ids
       ensure_branch
       commit_content
       create_or_update_pull_request
     end
 
     private
+
+    def read_previous_ids
+      @base_last_id, @base_last_event_id = read_ids_from_ref(base_branch)
+      @prev_last_id, @prev_last_event_id = read_ids_from_ref(@branch_name)
+    end
+
+    def read_ids_from_ref(ref)
+      existing = octokit.contents(@repo.name, path: @filepath, ref: ref)
+      content = Base64.decode64(existing[:content])
+      last_id = content =~ /\blast_editing_history: (\d+)/ ? $1.to_i : 0
+      last_event_id = content =~ /\blast_event_editing_history: (\d+)/ ? $1.to_i : 0
+      [last_id, last_event_id]
+    rescue Octokit::NotFound
+      [0, 0]
+    end
 
     def ensure_branch
       octokit.branch(@repo.name, @branch_name)
@@ -224,18 +240,63 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       false # Branch or file doesn't exist
     end
 
+    def build_summary(from_last_id:, from_last_event_id:)
+      sections = []
+
+      if from_last_id < @last_id
+        edits = SponsorshipEditingHistory
+          .where(id: (from_last_id + 1)..@last_id)
+          .includes(:sponsorship, :staff)
+          .order(id: :asc)
+        if edits.any?
+          lines = edits.map do |edit|
+            actor = edit.staff ? "#{edit.staff.login} (staff)" : "sponsor"
+            fields = edit.diff_summary.map { |s| "`#{s}`" }.join(", ")
+            "- **#{edit.sponsorship.name}** (#{fields}) — by #{actor}"
+          end
+          sections << "**Sponsorship changes:**\n#{lines.join("\n")}"
+        end
+      end
+
+      if from_last_event_id < @last_event_id
+        event_edits = SponsorEventEditingHistory
+          .where(id: (from_last_event_id + 1)..@last_event_id)
+          .includes(:sponsor_event, :staff)
+          .order(id: :asc)
+        if event_edits.any?
+          lines = event_edits.map do |edit|
+            actor = edit.staff ? "#{edit.staff.login} (staff)" : "sponsor"
+            fields = edit.diff_summary.map { |s| "`#{s}`" }.join(", ")
+            "- **#{edit.sponsor_event.title}** (#{fields}) — by #{actor}"
+          end
+          sections << "**Event changes:**\n#{lines.join("\n")}"
+        end
+      end
+
+      sections.any? ? sections.join("\n\n") : nil
+    end
+
     def create_or_update_pull_request
+      full_summary = build_summary(from_last_id: @base_last_id, from_last_event_id: @base_last_event_id)
       owner = @repo.name.split('/')[0]
       existing_prs = octokit.pull_requests(@repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
       if existing_prs.any?
-        octokit.update_pull_request(@repo.name, existing_prs[0][:number], title: @pr_title)
+        pr_number = existing_prs[0][:number]
+        octokit.update_pull_request(@repo.name, pr_number, title: @pr_title, body: full_summary)
+        incremental = build_summary(from_last_id: @prev_last_id, from_last_event_id: @prev_last_event_id)
+        octokit.add_comment(@repo.name, pr_number, incremental) if incremental
       else
         begin
-          octokit.create_pull_request(@repo.name, base_branch, @branch_name, @pr_title, nil)
+          octokit.create_pull_request(@repo.name, base_branch, @branch_name, @pr_title, full_summary)
         rescue Octokit::UnprocessableEntity
           # Concurrent job already created PR
           existing_prs = octokit.pull_requests(@repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
-          octokit.update_pull_request(@repo.name, existing_prs[0][:number], title: @pr_title) if existing_prs.any?
+          if existing_prs.any?
+            pr_number = existing_prs[0][:number]
+            octokit.update_pull_request(@repo.name, pr_number, title: @pr_title, body: full_summary)
+            incremental = build_summary(from_last_id: @prev_last_id, from_last_event_id: @prev_last_event_id)
+            octokit.add_comment(@repo.name, pr_number, incremental) if incremental
+          end
         end
       end
     end
