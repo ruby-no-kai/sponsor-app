@@ -137,7 +137,48 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       last_editing_history_id: @last_id,
       last_event_editing_history_id: @last_event_editing_history_id,
       push_id:,
+      build_summary: method(:build_edit_summary),
     ).push
+  end
+
+  private
+
+  def build_edit_summary(from_last_id, from_last_event_id)
+    last_id = @last_id || 0
+    last_event_id = @last_event_editing_history_id || 0
+    sections = []
+
+    if from_last_id < last_id
+      edits = SponsorshipEditingHistory
+        .where(id: (from_last_id + 1)..last_id)
+        .includes(:sponsorship, :staff)
+        .order(id: :asc)
+      if edits.any?
+        lines = edits.map do |edit|
+          actor = edit.staff ? "#{edit.staff.login} (staff)" : "sponsor"
+          fields = edit.diff_summary.map { |s| "`#{s}`" }.join(", ")
+          "- **#{edit.sponsorship.name}** (#{fields}) — by #{actor}"
+        end
+        sections << "**Sponsorship changes:**\n#{lines.join("\n")}"
+      end
+    end
+
+    if from_last_event_id < last_event_id
+      event_edits = SponsorEventEditingHistory
+        .where(id: (from_last_event_id + 1)..last_event_id)
+        .includes(:sponsor_event, :staff)
+        .order(id: :asc)
+      if event_edits.any?
+        lines = event_edits.map do |edit|
+          actor = edit.staff ? "#{edit.staff.login} (staff)" : "sponsor"
+          fields = edit.diff_summary.map { |s| "`#{s}`" }.join(", ")
+          "- **#{edit.sponsor_event.title}** (#{fields}) — by #{actor}"
+        end
+        sections << "**Event changes:**\n#{lines.join("\n")}"
+      end
+    end
+
+    sections.any? ? sections.join("\n\n") : nil
   end
 
   # For debugging
@@ -150,7 +191,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
 
     delegate :octokit, :base_branch, to: :github_installation
 
-    def initialize(conference:, filepath:, content:, last_editing_history_id:, last_event_editing_history_id:, push_id:)
+    def initialize(conference:, filepath:, content:, last_editing_history_id:, last_event_editing_history_id:, push_id:, build_summary: nil)
       @conference = conference
       @repo = conference.github_repo
       @filepath = filepath
@@ -159,6 +200,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       @last_event_id = last_event_editing_history_id || 0
       @branch_name = "sponsor-app/#{conference.slug}"
       @pr_title = "Update sponsors.yml for #{conference.slug} (#{push_id})"
+      @build_summary = build_summary
     end
 
     def push
@@ -240,50 +282,14 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       false # Branch or file doesn't exist
     end
 
-    def build_summary(from_last_id:, from_last_event_id:)
-      sections = []
-
-      if from_last_id < @last_id
-        edits = SponsorshipEditingHistory
-          .where(id: (from_last_id + 1)..@last_id)
-          .includes(:sponsorship, :staff)
-          .order(id: :asc)
-        if edits.any?
-          lines = edits.map do |edit|
-            actor = edit.staff ? "#{edit.staff.login} (staff)" : "sponsor"
-            fields = edit.diff_summary.map { |s| "`#{s}`" }.join(", ")
-            "- **#{edit.sponsorship.name}** (#{fields}) — by #{actor}"
-          end
-          sections << "**Sponsorship changes:**\n#{lines.join("\n")}"
-        end
-      end
-
-      if from_last_event_id < @last_event_id
-        event_edits = SponsorEventEditingHistory
-          .where(id: (from_last_event_id + 1)..@last_event_id)
-          .includes(:sponsor_event, :staff)
-          .order(id: :asc)
-        if event_edits.any?
-          lines = event_edits.map do |edit|
-            actor = edit.staff ? "#{edit.staff.login} (staff)" : "sponsor"
-            fields = edit.diff_summary.map { |s| "`#{s}`" }.join(", ")
-            "- **#{edit.sponsor_event.title}** (#{fields}) — by #{actor}"
-          end
-          sections << "**Event changes:**\n#{lines.join("\n")}"
-        end
-      end
-
-      sections.any? ? sections.join("\n\n") : nil
-    end
-
     def create_or_update_pull_request
-      full_summary = build_summary(from_last_id: @base_last_id, from_last_event_id: @base_last_event_id)
+      full_summary = @build_summary&.call(@base_last_id, @base_last_event_id)
       owner = @repo.name.split('/')[0]
       existing_prs = octokit.pull_requests(@repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
       if existing_prs.any?
         pr_number = existing_prs[0][:number]
         octokit.update_pull_request(@repo.name, pr_number, title: @pr_title, body: full_summary)
-        incremental = build_summary(from_last_id: @prev_last_id, from_last_event_id: @prev_last_event_id)
+        incremental = @build_summary&.call(@prev_last_id, @prev_last_event_id)
         octokit.add_comment(@repo.name, pr_number, incremental) if incremental
       else
         begin
@@ -294,7 +300,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
           if existing_prs.any?
             pr_number = existing_prs[0][:number]
             octokit.update_pull_request(@repo.name, pr_number, title: @pr_title, body: full_summary)
-            incremental = build_summary(from_last_id: @prev_last_id, from_last_event_id: @prev_last_event_id)
+            incremental = @build_summary&.call(@prev_last_id, @prev_last_event_id)
             octokit.add_comment(@repo.name, pr_number, incremental) if incremental
           end
         end
