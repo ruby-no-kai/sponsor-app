@@ -107,9 +107,10 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     end
 
     combined_data = data ? data.merge("_events" => events) : { "_events" => events }
-    comment_parts = []
-    comment_parts << "last_editing_history: #{@last_id}" if @last_id
-    comment_parts << "last_event_editing_history: #{@last_event_editing_history_id}" if @last_event_editing_history_id
+    comment_parts = [
+      "last_editing_history: #{@last_id || 0}",
+      "last_event_editing_history: #{@last_event_editing_history_id || 0}",
+    ]
     @yaml_data = [
       "# #{comment_parts.join(', ')}",
       combined_data.to_yaml,
@@ -134,6 +135,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       filepath: repo.path,
       content: yaml_data,
       last_editing_history_id: @last_id,
+      last_event_editing_history_id: @last_event_editing_history_id,
       push_id:,
     ).push
   end
@@ -148,12 +150,13 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
 
     delegate :octokit, :base_branch, to: :github_installation
 
-    def initialize(conference:, filepath:, content:, last_editing_history_id:, push_id:)
+    def initialize(conference:, filepath:, content:, last_editing_history_id:, last_event_editing_history_id:, push_id:)
       @conference = conference
       @repo = conference.github_repo
       @filepath = filepath
       @content = content
-      @last_id = last_editing_history_id
+      @last_id = last_editing_history_id || 0
+      @last_event_id = last_event_editing_history_id || 0
       @branch_name = "sponsor-app/#{conference.slug}"
       @pr_title = "Update sponsors.yml for #{conference.slug} (#{push_id})"
     end
@@ -213,10 +216,13 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     def branch_has_newer_data?
       existing = octokit.contents(@repo.name, path: @filepath, ref: @branch_name)
       existing_content = Base64.decode64(existing[:content])
-      if existing_content =~ /last_editing_history: (\d+)/
-        return @last_id && $1.to_i > @last_id
-      end
-      false
+
+      branch_last_id = existing_content =~ /\blast_editing_history: (\d+)/ ? $1.to_i : 0
+      branch_last_event_id = existing_content =~ /\blast_event_editing_history: (\d+)/ ? $1.to_i : 0
+
+      # Branch is newer when both IDs are >= ours and at least one is strictly greater
+      branch_last_id >= @last_id && branch_last_event_id >= @last_event_id &&
+        (branch_last_id > @last_id || branch_last_event_id > @last_event_id)
     rescue Octokit::NotFound
       false # Branch or file doesn't exist
     end
