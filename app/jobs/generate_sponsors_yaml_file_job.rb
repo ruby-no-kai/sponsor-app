@@ -188,7 +188,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
 
     def commit_content
       begin
-        blob_sha = octokit.contents(@repo.name, path: @filepath)[:sha]
+        blob_sha = octokit.contents(@repo.name, path: @filepath, ref: base_branch)[:sha]
       rescue Octokit::NotFound
         blob_sha = nil
       end
