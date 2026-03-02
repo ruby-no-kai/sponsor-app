@@ -169,26 +169,23 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
         return
       end
 
-      reset_branch
+      ensure_branch
       commit_content
       create_or_update_pull_request
     end
 
     private
 
-    def reset_branch
-      begin
-        octokit.delete_branch(@repo.name, @branch_name)
-      rescue Octokit::UnprocessableEntity
-      end
-
-      head = octokit.branch(@repo.name, base_branch)
-      octokit.create_ref(@repo.name, "refs/heads/#{@branch_name}", head[:commit][:sha])
+    def ensure_branch
+      octokit.branch(@repo.name, @branch_name)
+    rescue Octokit::NotFound
+      head_sha = octokit.branch(@repo.name, base_branch)[:commit][:sha]
+      octokit.create_ref(@repo.name, "refs/heads/#{@branch_name}", head_sha)
     end
 
     def commit_content
       begin
-        blob_sha = octokit.contents(@repo.name, path: @filepath, ref: base_branch)[:sha]
+        blob_sha = octokit.contents(@repo.name, path: @filepath, ref: @branch_name)[:sha]
       rescue Octokit::NotFound
         blob_sha = nil
       end
