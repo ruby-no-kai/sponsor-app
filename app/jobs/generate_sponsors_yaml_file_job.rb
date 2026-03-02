@@ -178,13 +178,18 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     private
 
     def read_previous_ids
-      existing = octokit.contents(@repo.name, path: @filepath, ref: @branch_name)
-      existing_content = Base64.decode64(existing[:content])
-      @prev_last_id = existing_content =~ /\blast_editing_history: (\d+)/ ? $1.to_i : 0
-      @prev_last_event_id = existing_content =~ /\blast_event_editing_history: (\d+)/ ? $1.to_i : 0
+      @base_last_id, @base_last_event_id = read_ids_from_ref(base_branch)
+      @prev_last_id, @prev_last_event_id = read_ids_from_ref(@branch_name)
+    end
+
+    def read_ids_from_ref(ref)
+      existing = octokit.contents(@repo.name, path: @filepath, ref: ref)
+      content = Base64.decode64(existing[:content])
+      last_id = content =~ /\blast_editing_history: (\d+)/ ? $1.to_i : 0
+      last_event_id = content =~ /\blast_event_editing_history: (\d+)/ ? $1.to_i : 0
+      [last_id, last_event_id]
     rescue Octokit::NotFound
-      @prev_last_id = 0
-      @prev_last_event_id = 0
+      [0, 0]
     end
 
     def ensure_branch
@@ -235,12 +240,12 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       false # Branch or file doesn't exist
     end
 
-    def build_summary
+    def build_summary(from_last_id:, from_last_event_id:)
       sections = []
 
-      if @prev_last_id < @last_id
+      if from_last_id < @last_id
         edits = SponsorshipEditingHistory
-          .where(id: (@prev_last_id + 1)..@last_id)
+          .where(id: (from_last_id + 1)..@last_id)
           .includes(:sponsorship, :staff)
           .order(id: :asc)
         if edits.any?
@@ -253,9 +258,9 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
         end
       end
 
-      if @prev_last_event_id < @last_event_id
+      if from_last_event_id < @last_event_id
         event_edits = SponsorEventEditingHistory
-          .where(id: (@prev_last_event_id + 1)..@last_event_id)
+          .where(id: (from_last_event_id + 1)..@last_event_id)
           .includes(:sponsor_event, :staff)
           .order(id: :asc)
         if event_edits.any?
@@ -272,23 +277,25 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     end
 
     def create_or_update_pull_request
-      summary = build_summary
+      full_summary = build_summary(from_last_id: @base_last_id, from_last_event_id: @base_last_event_id)
       owner = @repo.name.split('/')[0]
       existing_prs = octokit.pull_requests(@repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
       if existing_prs.any?
         pr_number = existing_prs[0][:number]
-        octokit.update_pull_request(@repo.name, pr_number, title: @pr_title)
-        octokit.add_comment(@repo.name, pr_number, summary) if summary
+        octokit.update_pull_request(@repo.name, pr_number, title: @pr_title, body: full_summary)
+        incremental = build_summary(from_last_id: @prev_last_id, from_last_event_id: @prev_last_event_id)
+        octokit.add_comment(@repo.name, pr_number, incremental) if incremental
       else
         begin
-          octokit.create_pull_request(@repo.name, base_branch, @branch_name, @pr_title, summary)
+          octokit.create_pull_request(@repo.name, base_branch, @branch_name, @pr_title, full_summary)
         rescue Octokit::UnprocessableEntity
           # Concurrent job already created PR
           existing_prs = octokit.pull_requests(@repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
           if existing_prs.any?
             pr_number = existing_prs[0][:number]
-            octokit.update_pull_request(@repo.name, pr_number, title: @pr_title)
-            octokit.add_comment(@repo.name, pr_number, summary) if summary
+            octokit.update_pull_request(@repo.name, pr_number, title: @pr_title, body: full_summary)
+            incremental = build_summary(from_last_id: @prev_last_id, from_last_event_id: @prev_last_event_id)
+            octokit.add_comment(@repo.name, pr_number, incremental) if incremental
           end
         end
       end
