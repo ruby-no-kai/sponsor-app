@@ -65,14 +65,14 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     events = @conference.sponsor_events
       .accepted
       .includes(sponsorship: :organization)
-      .order(starts_at: :asc)
+      .order(starts_at: :asc, id: :asc)
 
     @last_event_editing_history_id = SponsorEventEditingHistory
       .where(sponsor_event_id: events.map(&:id))
       .maximum(:id)
 
     events.map do |event|
-      hosts = event.all_host_sponsorships.map do |sponsorship|
+      hosts = event.all_host_sponsorships.sort_by(&:id).map do |sponsorship|
         {
           slug: sponsorship.slug,
           name: sponsorship.name,
