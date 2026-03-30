@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe FormDescription, type: :model do
@@ -12,7 +14,7 @@ RSpec.describe FormDescription, type: :model do
     it 'returns different locales correctly' do
       form_en = FactoryBot.create(:form_description, conference:, locale: 'en')
       form_ja = FactoryBot.create(:form_description, conference:, locale: 'ja')
-      
+
       expect(form_en.to_param).to eq('en')
       expect(form_ja.to_param).to eq('ja')
     end
@@ -20,11 +22,12 @@ RSpec.describe FormDescription, type: :model do
 
   describe '#render_markdown callback' do
     it 'renders markdown fields to HTML on save' do
-      form = FactoryBot.create(:form_description,
+      form = FactoryBot.create(
+        :form_description,
         conference:,
         locale: 'en',
         head: '# Welcome',
-        plan_help: '## Plans'
+        plan_help: '## Plans',
       )
 
       expect(form.head_html).to include('<h1')
@@ -34,14 +37,15 @@ RSpec.describe FormDescription, type: :model do
     end
 
     it 'renders all markdown fields' do
-      form = FactoryBot.create(:form_description,
+      form = FactoryBot.create(
+        :form_description,
         conference:,
         locale: 'en',
         head: '# Head',
         plan_help: '# Plan',
         booth_help: '# Booth',
         policy_help: '# Policy',
-        ticket_help: '# Ticket'
+        ticket_help: '# Ticket',
       )
 
       expect(form.head_html).to be_present
@@ -65,7 +69,7 @@ RSpec.describe FormDescription, type: :model do
       expect(form.fallback_options[0].conditions[0].plans).to eq(['Ruby'])
       expect(form.fallback_options[1].value).to eq('option2')
       expect(form.fallback_options[1].name).to eq('Second Option')
-      expect(form.fallback_options[1].conditions[0].booth_request).to eq(true)
+      expect(form.fallback_options[1].conditions[0].booth_request).to be(true)
     end
 
     it 'accepts array directly' do
@@ -94,7 +98,7 @@ RSpec.describe FormDescription, type: :model do
 
       expect(form.fallback_options[0].conditions.size).to eq(2)
       expect(form.fallback_options[0].conditions[0].plans).to eq(['Ruby'])
-      expect(form.fallback_options[0].conditions[1].booth_request).to eq(true)
+      expect(form.fallback_options[0].conditions[1].booth_request).to be(true)
     end
 
     it 'converts conditions to JSON in to_dataset' do

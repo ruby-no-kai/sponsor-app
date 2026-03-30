@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'open3'
 
 class PushEventAssetFileJob < ApplicationJob
@@ -7,9 +9,11 @@ class PushEventAssetFileJob < ApplicationJob
     @conference = @event.conference
 
     return if @conference.github_repo_images_path.blank?
+
     repo = @conference.github_repo
     return unless repo
     return unless @event.accepted?
+
     asset_file = @event.asset_file
     return unless asset_file
 
@@ -18,9 +22,7 @@ class PushEventAssetFileJob < ApplicationJob
     push_to_github(gi, repo, asset_file, webp_content)
   end
 
-  private
-
-  def resolve_record(record)
+  private def resolve_record(record)
     case record
     when SponsorEventEditingHistory
       @editing_history = record
@@ -31,13 +33,14 @@ class PushEventAssetFileJob < ApplicationJob
     when SponsorEventAssetFile
       @event = record.sponsor_event
       raise ArgumentError, "SponsorEventAssetFile##{record.id} has no associated sponsor_event" unless @event
+
       @editing_history = @event.last_editing_history
     else
       raise ArgumentError, "expected SponsorEventEditingHistory, SponsorEvent, or SponsorEventAssetFile, got #{record.class}"
     end
   end
 
-  def convert_to_webp(asset_file)
+  private def convert_to_webp(asset_file)
     tmpdir = Rails.root.join('tmp', "PushEventAssetFileJob-#{job_id}-#{asset_file.id}")
     FileUtils.mkdir_p(tmpdir)
 
@@ -51,7 +54,7 @@ class PushEventAssetFileJob < ApplicationJob
     thumbnail_size = thumbnail_size_for(input_path)
 
     _stdout, stderr, status = Open3.capture3(
-      { 'VIPS_BLOCK_UNTRUSTED' => '1' },
+      {'VIPS_BLOCK_UNTRUSTED' => '1'},
       'vipsthumbnail', input_path.to_s,
       '-s', thumbnail_size,
       '-o', output_path.to_s + '[Q=72,preset=drawing,smart_subsample=true,effort=6,strip=true]'
@@ -66,9 +69,9 @@ class PushEventAssetFileJob < ApplicationJob
   THUMBNAIL_MAX_SIZE = 800
 
   # Avoid enlarging images smaller than THUMBNAIL_MAX_SIZE
-  def thumbnail_size_for(input_path)
+  private def thumbnail_size_for(input_path)
     stdout, _, status = Open3.capture3(
-      { 'VIPS_BLOCK_UNTRUSTED' => '1' },
+      {'VIPS_BLOCK_UNTRUSTED' => '1'},
       'vipsheader', '-f', 'width', input_path.to_s
     )
     if status.success?
@@ -80,7 +83,7 @@ class PushEventAssetFileJob < ApplicationJob
     THUMBNAIL_MAX_SIZE.to_s
   end
 
-  def push_to_github(gi, repo, asset_file, webp_content)
+  private def push_to_github(gi, repo, asset_file, webp_content)
     octokit = gi.octokit
     images_path = @conference.github_repo_images_path.chomp('/')
     filepath = "#{images_path}/events/#{@sponsorship.id}-#{@event.id}.webp"
@@ -90,6 +93,7 @@ class PushEventAssetFileJob < ApplicationJob
     begin
       octokit.delete_branch(repo.name, branch_name)
     rescue Octokit::UnprocessableEntity
+      # Branch doesn't exist, ignore
     end
 
     head = octokit.branch(repo.name, gi.base_branch)
@@ -103,7 +107,7 @@ class PushEventAssetFileJob < ApplicationJob
 
     octokit.update_contents(
       repo.name, filepath, pr_title, blob_sha, webp_content,
-      branch: branch_name,
+      branch: branch_name
     )
 
     body = <<~MARKDOWN

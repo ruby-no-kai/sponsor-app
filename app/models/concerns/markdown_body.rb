@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module MarkdownBody
   def html
-    if self.persisted?
-      Rails.cache.fetch("#{self.class.name}:html:#{id}/#{updated_at.to_f}", expires_in: 1.month) { render_html }.html_safe
+    if persisted?
+      Rails.cache.fetch("#{self.class.name}:html:#{id}/#{updated_at.to_f}", expires_in: 1.month) { render_html }.html_safe # rubocop:disable Rails/OutputSafety
     else
-      render_html.html_safe
+      render_html.html_safe # rubocop:disable Rails/OutputSafety
     end
   end
 
@@ -21,7 +23,7 @@ module MarkdownBody
           autolink: true,
           tasklist: true,
           superscript: true,
-          header_ids: "#{self.id}--",
+          header_ids: "#{id}--",
           footnotes: true,
           description_lists: true,
           front_matter_delimiter: '---',

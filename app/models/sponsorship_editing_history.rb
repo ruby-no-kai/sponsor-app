@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SponsorshipEditingHistory < ApplicationRecord
   belongs_to :sponsorship
   include EditingHistory

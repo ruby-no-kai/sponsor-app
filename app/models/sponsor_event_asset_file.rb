@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SponsorEventAssetFile < ApplicationRecord
   include AssetFileUploadable
 
@@ -6,7 +8,7 @@ class SponsorEventAssetFile < ApplicationRecord
   belongs_to :sponsorship
   belongs_to :sponsor_event, optional: true
 
-  validates :extension, inclusion: { in: %w[png jpg jpeg webp] }, allow_nil: true
+  validates :extension, inclusion: {in: %w[png jpg jpeg webp]}, allow_nil: true
   validate :validate_ownership_not_changed
 
   def self.prepare(conference:, sponsorship:)
@@ -20,9 +22,7 @@ class SponsorEventAssetFile < ApplicationRecord
     "E#{id}_#{sponsor_event&.slug}.#{extension}"
   end
 
-  private
-
-  def validate_ownership_not_changed
+  private def validate_ownership_not_changed
     if sponsor_event_id_changed? && !sponsor_event_id_was.nil?
       errors.add :sponsor_event_id, "cannot be changed"
     end

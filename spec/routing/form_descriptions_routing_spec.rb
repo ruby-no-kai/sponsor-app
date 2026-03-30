@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Admin::FormDescriptionsController, type: :routing do
@@ -6,7 +8,7 @@ RSpec.describe Admin::FormDescriptionsController, type: :routing do
       expect(get: '/admin/conferences/rk2025/form_descriptions/new').to route_to(
         controller: 'admin/form_descriptions',
         action: 'new',
-        conference_slug: 'rk2025'
+        conference_slug: 'rk2025',
       )
     end
 
@@ -14,7 +16,7 @@ RSpec.describe Admin::FormDescriptionsController, type: :routing do
       expect(post: '/admin/conferences/rk2025/form_descriptions').to route_to(
         controller: 'admin/form_descriptions',
         action: 'create',
-        conference_slug: 'rk2025'
+        conference_slug: 'rk2025',
       )
     end
 
@@ -23,7 +25,7 @@ RSpec.describe Admin::FormDescriptionsController, type: :routing do
         controller: 'admin/form_descriptions',
         action: 'show',
         conference_slug: 'rk2025',
-        locale: 'en'
+        locale: 'en',
       )
     end
 
@@ -32,7 +34,7 @@ RSpec.describe Admin::FormDescriptionsController, type: :routing do
         controller: 'admin/form_descriptions',
         action: 'edit',
         conference_slug: 'rk2025',
-        locale: 'ja'
+        locale: 'ja',
       )
     end
 
@@ -41,7 +43,7 @@ RSpec.describe Admin::FormDescriptionsController, type: :routing do
         controller: 'admin/form_descriptions',
         action: 'update',
         conference_slug: 'rk2025',
-        locale: 'en'
+        locale: 'en',
       )
     end
 
@@ -50,7 +52,7 @@ RSpec.describe Admin::FormDescriptionsController, type: :routing do
         controller: 'admin/form_descriptions',
         action: 'update',
         conference_slug: 'rk2025',
-        locale: 'en'
+        locale: 'en',
       )
     end
 
@@ -59,7 +61,7 @@ RSpec.describe Admin::FormDescriptionsController, type: :routing do
         controller: 'admin/form_descriptions',
         action: 'destroy',
         conference_slug: 'rk2025',
-        locale: 'ja'
+        locale: 'ja',
       )
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SessionTokenMailer < ApplicationMailer
   def notify
     @token = params[:token]
@@ -7,7 +9,7 @@ class SessionTokenMailer < ApplicationMailer
     list_name 'login'
     mail(
       to: @token.email,
-      subject: make_subject(),
+      subject: make_subject,
     )
   end
 end

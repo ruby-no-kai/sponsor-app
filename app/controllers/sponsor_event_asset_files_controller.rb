@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SponsorEventAssetFilesController < ApplicationController
   include AssetFileSessionable
 
@@ -10,6 +12,8 @@ class SponsorEventAssetFilesController < ApplicationController
     redirect_to @asset_file.download_url, allow_other_host: true
   end
 
+  def update = super
+
   def create
     @asset_file = SponsorEventAssetFile.prepare(conference: @conference, sponsorship: current_sponsorship)
     @asset_file.save!
@@ -20,23 +24,21 @@ class SponsorEventAssetFilesController < ApplicationController
     render json: make_session
   end
 
-  private
-
-  def set_conference
+  private def set_conference
     @conference = current_conference
   end
 
-  def set_asset_file
+  private def set_asset_file
     @asset_file = SponsorEventAssetFile.find_by!(id: params[:id], sponsorship: current_sponsorship)
   end
 
-  def require_accepted_sponsorship
+  private def require_accepted_sponsorship
     unless current_sponsorship&.accepted?
-      render status: 403, json: { error: 'sponsorship_not_accepted' }
+      render status: :forbidden, json: {error: 'sponsorship_not_accepted'}
     end
   end
 
-  def asset_file_report_to_url(asset_file)
+  private def asset_file_report_to_url(asset_file)
     user_conference_event_asset_file_path(@conference, asset_file)
   end
 end

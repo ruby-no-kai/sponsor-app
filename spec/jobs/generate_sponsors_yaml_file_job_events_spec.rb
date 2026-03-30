@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe GenerateSponsorsYamlFileJob, '#events_data and #yaml_data' do
+RSpec.describe GenerateSponsorsYamlFileJob, '#events_data and #yaml_data' do # rubocop:disable RSpec/SpecFilePathFormat
   let(:conference) { FactoryBot.create(:conference, :full) }
 
   def run_job

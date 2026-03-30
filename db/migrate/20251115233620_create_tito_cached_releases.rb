@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTitoCachedReleases < ActiveRecord::Migration[8.1]
   def change
     create_table :tito_cached_releases do |t|

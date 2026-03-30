@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe "Root page", type: :request do
@@ -11,7 +13,7 @@ RSpec.describe "Root page", type: :request do
 
       it "renders the root page with sponsorship and login links" do
         get '/'
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
         expect(response.body).to include(new_user_conference_sponsorship_path(conference))
         expect(response.body).to include(new_user_session_path)
       end
@@ -34,18 +36,18 @@ RSpec.describe "Root page", type: :request do
     end
 
     context "when unauthenticated with multiple open conferences" do
-      let!(:conference1) do
+      let!(:first_conference) do
         FactoryBot.create(:conference, application_opens_at: 1.day.ago, hidden: false)
       end
-      let!(:conference2) do
+      let!(:second_conference) do
         FactoryBot.create(:conference, application_opens_at: 1.day.ago, hidden: false)
       end
 
       it "renders links for each conference" do
         get '/'
-        expect(response).to have_http_status(200)
-        expect(response.body).to include(new_user_conference_sponsorship_path(conference1))
-        expect(response.body).to include(new_user_conference_sponsorship_path(conference2))
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(new_user_conference_sponsorship_path(first_conference))
+        expect(response.body).to include(new_user_conference_sponsorship_path(second_conference))
         expect(response.body).to include(new_user_session_path)
       end
     end
@@ -53,7 +55,7 @@ RSpec.describe "Root page", type: :request do
     context "when unauthenticated with no open conferences" do
       it "renders a message with org name and login link" do
         get '/'
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
         expect(response.body).to include(Rails.application.config.x.org_name)
         expect(response.body).to include(new_user_session_path)
       end
@@ -81,7 +83,7 @@ RSpec.describe "Root page", type: :request do
 
       it "renders the root page" do
         get '/'
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
         expect(response.body).to include(new_user_session_path)
       end
 
@@ -91,17 +93,17 @@ RSpec.describe "Root page", type: :request do
       end
     end
 
-    context "locale" do
+    context "with locale" do
       it "renders in Japanese when hl=ja" do
-        get '/', params: { hl: 'ja' }
-        expect(response).to have_http_status(200)
+        get '/', params: {hl: 'ja'}
+        expect(response).to have_http_status(:ok)
         expect(response.body).to include('ログイン')
       end
 
       it "reads locale from cookie" do
         cookies[session_cookie_name] = 'ja'
         get '/'
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
         expect(response.body).to include('ログイン')
       end
     end

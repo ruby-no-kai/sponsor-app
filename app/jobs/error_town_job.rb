@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ErrorTownJob < ApplicationJob
   class Boom < StandardError; end
 

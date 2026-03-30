@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
@@ -54,13 +56,13 @@ Rails.application.configure do
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
-  config.ssl_options = { hsts: { subdomains: false } } # TODO: update
+  config.ssl_options = {hsts: {subdomains: false}} # TODO: update
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Log to STDOUT with the current request id as a default log tag.
-  config.log_tags = [ :request_id ]
-  config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
+  config.log_tags = [:request_id]
+  config.logger   = ActiveSupport::TaggedLogging.logger($stdout)
 
   # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
@@ -74,7 +76,8 @@ Rails.application.configure do
   # Replace the default in-process memory cache store with a durable alternative.
   # config.cache_store = :mem_cache_store
 
-  config.session_store(:cookie_store,
+  config.session_store(
+    :cookie_store,
     expire_after: 14.days,
     key: '__Host-rk-sponsorapp2-sess',
     same_site: :lax,
@@ -97,12 +100,12 @@ Rails.application.configure do
 
   if ENV['MAILGUN_SMTP_PASSWORD']
     config.action_mailer.smtp_settings = {
-      :port           => ENV['MAILGUN_SMTP_PORT'],
-      :address        => ENV['MAILGUN_SMTP_SERVER'],
-      :user_name      => ENV['MAILGUN_SMTP_LOGIN'],
-      :password       => ENV['MAILGUN_SMTP_PASSWORD'],
-      :domain         => ENV.fetch('DEFAULT_EMAIL_HOST'),
-      :authentication => :plain,
+      port: ENV['MAILGUN_SMTP_PORT'],
+      address: ENV['MAILGUN_SMTP_SERVER'],
+      user_name: ENV['MAILGUN_SMTP_LOGIN'],
+      password: ENV['MAILGUN_SMTP_PASSWORD'],
+      domain: ENV.fetch('DEFAULT_EMAIL_HOST'),
+      authentication: :plain,
       enable_starttls_auto: true,
     }
     config.action_mailer.delivery_method = :smtp
@@ -116,7 +119,7 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Only use :id for inspections in production.
-  config.active_record.attributes_for_inspect = [ :id ]
+  config.active_record.attributes_for_inspect = [:id]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [

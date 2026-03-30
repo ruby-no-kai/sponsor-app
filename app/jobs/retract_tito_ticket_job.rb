@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 class RetractTitoTicketJob < ApplicationJob
   class Unable < StandardError; end
 
   # @param retraction [TitoTicketRetraction]
   def perform(retraction)
-    logger.tagged(retraction_id: retraction.id, sponsorship_id: retraction.sponsorship_id, tito_registration_id: retraction.tito_registration_id, tito_registration_reference: retraction.order_reference) do |log|
+    logger.tagged(retraction_id: retraction.id, sponsorship_id: retraction.sponsorship_id, tito_registration_id: retraction.tito_registration_id, tito_registration_reference: retraction.order_reference) do |_log|
       if retraction.completed?
         logger.info("RetractTitoTicketJob: completed, skipeed")
-        return
+        next
       end
 
       api = TitoApi.new
@@ -15,11 +17,11 @@ class RetractTitoTicketJob < ApplicationJob
         logger.info("RetractTitoTicketJob: registration already cancelled, marking retraction as completed")
         retraction.restore_tito_registration!
         retraction.update!(completed: true)
-        return
+        next
       end
 
       unless retraction.retractable?
-        raise Unable, "Precondition not met; retraction_id=#{retraction.id.inspect}; #{retraction.preconditions.inspect}" 
+        raise Unable, "Precondition not met; retraction_id=#{retraction.id.inspect}; #{retraction.preconditions.inspect}"
       end
 
       logger.info("RetractTitoTicketJob: proceeding with cancellation")
@@ -42,7 +44,7 @@ class RetractTitoTicketJob < ApplicationJob
       sponsorship = retraction.sponsorship
       SlackWebhookJob.perform_later(
         {
-          text: ":rewind: <#{conference_sponsorship_url(conference, sponsorship)}|#{sponsorship.name}> retracted their Tito order <#{retraction.tito_admin_url}|#{retraction.order_reference}> (#{retraction.ticket_release_slugs.join(?,)}).\n\n>>> *Reason:* #{retraction.reason.truncate(500)}",
+          text: ":rewind: <#{conference_sponsorship_url(conference, sponsorship)}|#{sponsorship.name}> retracted their Tito order <#{retraction.tito_admin_url}|#{retraction.order_reference}> (#{retraction.ticket_release_slugs.join(",")}).\n\n>>> *Reason:* #{retraction.reason.truncate(500)}",
         },
         hook_name: :feed,
       )

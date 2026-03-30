@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SponsorshipWelcomeMailer < ApplicationMailer
   def user_email
     @sponsorship = params[:sponsorship]
@@ -18,7 +20,7 @@ class SponsorshipWelcomeMailer < ApplicationMailer
     mail(
       to: @sponsorship.contact.email,
       cc: @sponsorship.contact.email_ccs,
-      subject: make_subject(),
+      subject: make_subject,
       reply_to: @email,
     )
   end
@@ -41,9 +43,7 @@ class SponsorshipWelcomeMailer < ApplicationMailer
     )
   end
 
-  private
-
-  def subject_prefix
+  private def subject_prefix
     "[#{@sponsorship.conference.name}] "
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SponsorshipAssetFile < ApplicationRecord
   include AssetFileUploadable
 
@@ -7,7 +9,7 @@ class SponsorshipAssetFile < ApplicationRecord
     where(id:)
       .merge(
         SponsorshipAssetFile.where(sponsorship_id: available_sponsorship_ids)
-          .or(SponsorshipAssetFile.where(sponsorship_id: nil, id: session_asset_file_ids || []))
+          .or(SponsorshipAssetFile.where(sponsorship_id: nil, id: session_asset_file_ids || [])),
       )
   end
 
@@ -21,7 +23,7 @@ class SponsorshipAssetFile < ApplicationRecord
 
   def copy_to!(conference)
     dst = self.class.prepare(conference:)
-    dst.extension = self.extension
+    dst.extension = extension
     dst.save!
     s3_client.copy_object(
       bucket: self.class.asset_file_bucket,
@@ -36,9 +38,7 @@ class SponsorshipAssetFile < ApplicationRecord
     "S#{id}_#{sponsorship&.slug}.#{extension}"
   end
 
-  private
-
-  def validate_ownership_not_changed
+  private def validate_ownership_not_changed
     if sponsorship_id_changed? && !sponsorship_id_was.nil?
       errors.add :sponsorship_id, "cannot be changed"
     end

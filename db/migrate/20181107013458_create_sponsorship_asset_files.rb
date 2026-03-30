@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateSponsorshipAssetFiles < ActiveRecord::Migration[5.2]
   def change
     create_table :sponsorship_asset_files do |t|
@@ -10,6 +12,6 @@ class CreateSponsorshipAssetFiles < ActiveRecord::Migration[5.2]
     end
 
     add_index :sponsorship_asset_files, [:handle]
-    remove_column :sponsorships, :logo_key
+    remove_column :sponsorships, :logo_key, :string
   end
 end

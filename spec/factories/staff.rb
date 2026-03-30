@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :staff do
     sequence(:login) { |n| "orgz#{n}" }
-    sequence(:name ) { |n| "Orgz #{n}" }
+    sequence(:name) { |n| "Orgz #{n}" }
     sequence(:uid) { |n| "uid_#{n}" }
   end
 end

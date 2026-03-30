@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'jwt'
 
 class GithubInstallation
@@ -23,9 +25,7 @@ class GithubInstallation
     @base_branch ||= @branch || default_branch
   end
 
-  private
-
-  def github_installation_token
+  private def github_installation_token
     @github_installation_token ||= begin
       installation = app_octokit.find_repository_installation(repo_name, accept: GITHUB_MEDIA_TYPE)
       raise "no github app installation found for #{repo_name.inspect}" unless installation
@@ -35,13 +35,13 @@ class GithubInstallation
     end
   end
 
-  def app_octokit
+  private def app_octokit
     @app_octokit ||= Octokit::Client.new(
       bearer_token: github_jwt,
     )
   end
 
-  def github_jwt
+  private def github_jwt
     iat = Time.now.to_i
     payload = {
       iss: Rails.application.config.x.github.app_id,
@@ -51,7 +51,7 @@ class GithubInstallation
     JWT.encode(payload, Rails.application.config.x.github.private_key, 'RS256')
   end
 
-  def default_branch
+  private def default_branch
     octokit.repository(repo_name)[:default_branch]
   end
 end

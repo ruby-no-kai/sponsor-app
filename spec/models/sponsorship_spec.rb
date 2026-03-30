@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Sponsorship, type: :model do
@@ -23,70 +25,70 @@ RSpec.describe Sponsorship, type: :model do
 
     describe '.active' do
       it 'includes accepted and not withdrawn sponsorships' do
-        expect(Sponsorship.active).to include(active_sponsorship)
+        expect(described_class.active).to include(active_sponsorship)
       end
 
       it 'excludes pending sponsorships' do
-        expect(Sponsorship.active).not_to include(pending_sponsorship)
+        expect(described_class.active).not_to include(pending_sponsorship)
       end
 
       it 'excludes withdrawn sponsorships' do
-        expect(Sponsorship.active).not_to include(withdrawn_sponsorship)
+        expect(described_class.active).not_to include(withdrawn_sponsorship)
       end
     end
 
     describe '.pending' do
       it 'includes not accepted and not withdrawn sponsorships' do
-        expect(Sponsorship.pending).to include(pending_sponsorship)
+        expect(described_class.pending).to include(pending_sponsorship)
       end
 
       it 'excludes accepted sponsorships' do
-        expect(Sponsorship.pending).not_to include(active_sponsorship)
+        expect(described_class.pending).not_to include(active_sponsorship)
       end
 
       it 'excludes withdrawn sponsorships' do
-        expect(Sponsorship.pending).not_to include(withdrawn_sponsorship)
+        expect(described_class.pending).not_to include(withdrawn_sponsorship)
       end
     end
 
     describe '.accepted' do
       it 'includes sponsorships with accepted_at set' do
-        expect(Sponsorship.accepted).to include(active_sponsorship)
+        expect(described_class.accepted).to include(active_sponsorship)
       end
 
       it 'excludes sponsorships without accepted_at' do
-        expect(Sponsorship.accepted).not_to include(pending_sponsorship)
+        expect(described_class.accepted).not_to include(pending_sponsorship)
       end
     end
 
     describe '.not_accepted' do
       it 'includes sponsorships without accepted_at' do
-        expect(Sponsorship.not_accepted).to include(pending_sponsorship)
+        expect(described_class.not_accepted).to include(pending_sponsorship)
       end
 
       it 'excludes accepted sponsorships' do
-        expect(Sponsorship.not_accepted).not_to include(active_sponsorship)
+        expect(described_class.not_accepted).not_to include(active_sponsorship)
       end
     end
 
     describe '.withdrawn' do
       it 'includes sponsorships with withdrawn_at set' do
-        expect(Sponsorship.withdrawn).to include(withdrawn_sponsorship)
+        expect(described_class.withdrawn).to include(withdrawn_sponsorship)
       end
 
       it 'excludes sponsorships without withdrawn_at' do
-        expect(Sponsorship.withdrawn).not_to include(active_sponsorship)
+        expect(described_class.withdrawn).not_to include(active_sponsorship)
       end
     end
 
     describe '.not_withdrawn' do
       it 'includes sponsorships without withdrawn_at' do
-        expect(Sponsorship.not_withdrawn).to include(active_sponsorship)
-        expect(Sponsorship.not_withdrawn).to include(pending_sponsorship)
+        expect(described_class.not_withdrawn).to include(active_sponsorship)
+        expect(described_class.not_withdrawn).to include(pending_sponsorship)
       end
 
       it 'excludes withdrawn sponsorships' do
-        expect(Sponsorship.not_withdrawn).not_to include(withdrawn_sponsorship)
+        expect(described_class.not_withdrawn).not_to include(withdrawn_sponsorship)
       end
     end
 
@@ -96,11 +98,11 @@ RSpec.describe Sponsorship, type: :model do
       end
 
       it 'includes sponsorships with plan' do
-        expect(Sponsorship.plan_determined).to include(active_sponsorship)
+        expect(described_class.plan_determined).to include(active_sponsorship)
       end
 
       it 'excludes sponsorships without plan' do
-        expect(Sponsorship.plan_determined).not_to include(no_plan_sponsorship)
+        expect(described_class.plan_determined).not_to include(no_plan_sponsorship)
       end
     end
 
@@ -112,20 +114,20 @@ RSpec.describe Sponsorship, type: :model do
       end
 
       it 'includes active, plan-determined, non-suspended sponsorships' do
-        expect(Sponsorship.have_presence).to include(active_sponsorship)
+        expect(described_class.have_presence).to include(active_sponsorship)
       end
 
       it 'excludes suspended sponsorships' do
-        expect(Sponsorship.have_presence).not_to include(suspended_sponsorship)
+        expect(described_class.have_presence).not_to include(suspended_sponsorship)
       end
 
       it 'excludes pending sponsorships' do
         pending_sponsorship.update!(plan:)
-        expect(Sponsorship.have_presence).not_to include(pending_sponsorship)
+        expect(described_class.have_presence).not_to include(pending_sponsorship)
       end
 
       it 'excludes sponsorships without plan' do
-        expect(Sponsorship.have_presence).not_to include(pending_sponsorship)
+        expect(described_class.have_presence).not_to include(pending_sponsorship)
       end
     end
   end
@@ -136,15 +138,15 @@ RSpec.describe Sponsorship, type: :model do
       FactoryBot.create(:sponsorship, conference:)
       # Manually set the organization after creation to match the existing one
       existing_sponsorship = conference.sponsorships.first
-      existing_sponsorship.update_column(:organization_id, organization.id)
+      existing_sponsorship.update_column(:organization_id, organization.id) # rubocop:disable Rails/SkipsModelValidations
 
-      duplicate = Sponsorship.new(
+      duplicate = described_class.new(
         conference:,
         organization:,
         name: 'Test',
         url: 'https://example.com',
         profile: 'Test profile',
-        locale: 'en'
+        locale: 'en',
       )
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:organization]).to be_present
@@ -157,10 +159,6 @@ RSpec.describe Sponsorship, type: :model do
       other_sponsorship = FactoryBot.build(:sponsorship, conference: other_conference, organization:)
       expect(other_sponsorship).to be_valid
     end
-
-
-
-
   end
 
   describe 'state management' do
@@ -354,9 +352,9 @@ RSpec.describe Sponsorship, type: :model do
   describe 'EditingHistoryTarget concern' do
     it 'creates editing history on save' do
       sponsorship = FactoryBot.build(:sponsorship, conference:)
-      expect {
+      expect do
         sponsorship.save!
-      }.to change { SponsorshipEditingHistory.count }.by(1)
+      end.to change(SponsorshipEditingHistory, :count).by(1)
     end
 
     it 'creates editing history on update' do
@@ -431,7 +429,8 @@ RSpec.describe Sponsorship, type: :model do
         asset_file:,
       )
 
-      sponsorship.contact = FactoryBot.build(:contact,
+      sponsorship.contact = FactoryBot.build(
+        :contact,
         email: "test@#{organization.domain}",
       )
 
@@ -450,7 +449,7 @@ RSpec.describe Sponsorship, type: :model do
       it 'auto-accepts when organization has auto_acceptance_disabled false' do
         sponsorship = create_sponsorship_for_auto_acceptance_test(
           plan:,
-          org_auto_acceptance_disabled: false
+          org_auto_acceptance_disabled: false,
         )
 
         expect(sponsorship.accepted?).to be true
@@ -460,7 +459,7 @@ RSpec.describe Sponsorship, type: :model do
       it 'does NOT auto-accept when organization has auto_acceptance_disabled true' do
         sponsorship = create_sponsorship_for_auto_acceptance_test(
           plan:,
-          org_auto_acceptance_disabled: true
+          org_auto_acceptance_disabled: true,
         )
 
         expect(sponsorship.accepted?).to be false
@@ -474,7 +473,7 @@ RSpec.describe Sponsorship, type: :model do
       it 'does NOT auto-accept when organization has auto_acceptance_disabled false' do
         sponsorship = create_sponsorship_for_auto_acceptance_test(
           plan:,
-          org_auto_acceptance_disabled: false
+          org_auto_acceptance_disabled: false,
         )
 
         expect(sponsorship.accepted?).to be false
@@ -484,7 +483,7 @@ RSpec.describe Sponsorship, type: :model do
       it 'does NOT auto-accept when organization has auto_acceptance_disabled true' do
         sponsorship = create_sponsorship_for_auto_acceptance_test(
           plan:,
-          org_auto_acceptance_disabled: true
+          org_auto_acceptance_disabled: true,
         )
 
         expect(sponsorship.accepted?).to be false

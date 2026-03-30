@@ -1,12 +1,16 @@
-module Admin::SponsorshipsHelper
-  def front_mail_to_link(to, from: nil, cc: [])
-    base = "mailto:#{URI.encode_www_form_component(to).gsub('%40', ?@)}"
-    extras = []
-    extras << "cc=#{cc.map { |e| URI.encode_www_form_component(e).gsub('%40', ?@) }.join(',')}" if cc.present?
-    extras << "from=#{URI.encode_www_form_component(from).gsub('%40', ?@)}" if from
-    unless extras.empty?
-      base << "?#{extras.join(?&)}"
+# frozen_string_literal: true
+
+module Admin
+  module SponsorshipsHelper
+    def front_mail_to_link(to, from: nil, cc: [])
+      base = "mailto:#{URI.encode_www_form_component(to).gsub("%40", "@")}"
+      extras = []
+      extras << "cc=#{cc.map { |e| URI.encode_www_form_component(e).gsub("%40", "@") }.join(",")}" if cc.present?
+      extras << "from=#{URI.encode_www_form_component(from).gsub("%40", "@")}" if from
+      unless extras.empty?
+        base << "?#{extras.join("&")}"
+      end
+      "https://app.frontapp.com/compose?mailto=#{URI.encode_www_form_component(base)}"
     end
-    "https://app.frontapp.com/compose?mailto=#{URI.encode_www_form_component(base)}"
   end
 end

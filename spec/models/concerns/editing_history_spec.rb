@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe EditingHistory do
@@ -20,17 +22,17 @@ RSpec.describe EditingHistory do
     end
 
     context 'when there is previous history' do
-      let!(:first_history) do
+      let!(:first_history) do # rubocop:disable RSpec/LetSetup
         SponsorshipEditingHistory.create!(
           sponsorship:,
-          raw: {name: 'First', url: 'http://example.com'}
+          raw: {name: 'First', url: 'http://example.com'},
         )
       end
 
       it 'calculates diff from last history' do
         second_history = SponsorshipEditingHistory.create!(
           sponsorship:,
-          raw: {name: 'Second', url: 'http://example.com'}
+          raw: {name: 'Second', url: 'http://example.com'},
         )
 
         expect(second_history.diff).not_to be_nil
@@ -40,7 +42,7 @@ RSpec.describe EditingHistory do
       it 'uses Hashdiff to calculate differences' do
         second_history = SponsorshipEditingHistory.new(
           sponsorship:,
-          raw: {name: 'Second', url: 'http://example.com', new_field: 'value'}
+          raw: {name: 'Second', url: 'http://example.com', new_field: 'value'},
         )
 
         second_history.save!
@@ -53,7 +55,7 @@ RSpec.describe EditingHistory do
       it 'does not recalculate diff if already set' do
         second_history = SponsorshipEditingHistory.new(
           sponsorship:,
-          raw: {name: 'Second', url: 'http://example.com'}
+          raw: {name: 'Second', url: 'http://example.com'},
         )
         second_history.diff = [['existing', 'diff']]
         second_history.save!
@@ -68,7 +70,7 @@ RSpec.describe EditingHistory do
       history = SponsorshipEditingHistory.new(sponsorship:, raw: {})
       history.diff = [
         ['~', 'name', 'Old Name', 'New Name'],
-        ['+', 'new_field', 'value']
+        ['+', 'new_field', 'value'],
       ]
 
       summary = history.diff_summary
@@ -85,19 +87,19 @@ RSpec.describe EditingHistory do
   end
 
   describe '#last_raw (private method)' do
-    context 'for a new record' do
+    context 'when record is new' do
       it 'returns last history raw data' do
         # Clear auto-created history first
         sponsorship.editing_histories.delete_all
 
-        first_history = SponsorshipEditingHistory.create!(
+        SponsorshipEditingHistory.create!(
           sponsorship:,
-          raw: {'name' => 'First'}
+          raw: {'name' => 'First'},
         )
 
         second_history = SponsorshipEditingHistory.new(
           sponsorship:,
-          raw: {'name' => 'Second'}
+          raw: {'name' => 'Second'},
         )
 
         # Access private method for testing
@@ -114,19 +116,19 @@ RSpec.describe EditingHistory do
       end
     end
 
-    context 'for a persisted record' do
+    context 'when record is persisted' do
       it 'returns previous history raw data' do
-        first_history = SponsorshipEditingHistory.create!(
+        SponsorshipEditingHistory.create!(
           sponsorship:,
-          raw: {'name' => 'First'}
+          raw: {'name' => 'First'},
         )
         second_history = SponsorshipEditingHistory.create!(
           sponsorship:,
-          raw: {'name' => 'Second'}
+          raw: {'name' => 'Second'},
         )
-        third_history = SponsorshipEditingHistory.create!(
+        SponsorshipEditingHistory.create!(
           sponsorship:,
-          raw: {'name' => 'Third'}
+          raw: {'name' => 'Third'},
         )
 
         # For second_history, last_raw should be first_history

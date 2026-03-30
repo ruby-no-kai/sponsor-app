@@ -1,13 +1,16 @@
+# frozen_string_literal: true
+
 Rails.application.configure do
   ENV['JOB_ADAPTER'] ||= 'shoryuken' if ENV['ENABLE_SHORYUKEN']
-  case ENV['JOB_ADAPTER']
+  adapter = case ENV['JOB_ADAPTER']
   when 'shoryuken'
-    ActiveJob::Base.queue_adapter = config.active_job.queue_adapter = :shoryuken
+    :shoryuken
   when 'lambdakiq'
-    ActiveJob::Base.queue_adapter = config.active_job.queue_adapter = :lambdakiq
+    :lambdakiq
   else
-    ActiveJob::Base.queue_adapter = config.active_job.queue_adapter = :inline
+    :inline
   end
+  ActiveJob::Base.queue_adapter = config.active_job.queue_adapter = adapter
 end
 
 ActiveJob::Base.queue_as ENV['LAMBDAKIQ_QUEUE'] if ENV['LAMBDAKIQ_QUEUE']

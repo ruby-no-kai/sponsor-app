@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PassRedemptionsController < ApplicationController
   before_action :require_sponsorship_session
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DispatchBroadcastDeliveryJob < ApplicationJob
   def perform(delivery, force: false)
     Rails.logger.info "Delivering (#{delivery.id}): #{delivery.broadcast.description} (broadcast=#{delivery.broadcast.id}))"
@@ -10,12 +12,12 @@ class DispatchBroadcastDeliveryJob < ApplicationJob
   def perform_real(delivery, force: false)
     ApplicationRecord.transaction do
       if !force && !(delivery.created? || delivery.pending?)
-        Rails.logger.info  "Delivering (#{delivery.id}): skip (force=#{force}, created?=#{delivery.created?}, pending?=#{delivery.pending?})"
+        Rails.logger.info "Delivering (#{delivery.id}): skip (force=#{force}, created?=#{delivery.created?}, pending?=#{delivery.pending?})"
         return
       end
       delivery.with_lock do
         if !force && !(delivery.created? || delivery.pending?)
-          Rails.logger.info  "Delivering (#{delivery.id}): skip (force=#{force}, created?=#{delivery.created?}, pending?=#{delivery.pending?})"
+          Rails.logger.info "Delivering (#{delivery.id}): skip (force=#{force}, created?=#{delivery.created?}, pending?=#{delivery.pending?})"
           return
         end
         delivery.update!(status: :sending)
@@ -36,10 +38,11 @@ class DispatchBroadcastDeliveryJob < ApplicationJob
     end
   ensure
     begin
-      p delivery.broadcast.deliveries.distinct.order(status: :asc).pluck(:status)
+      Rails.logger.debug { delivery.broadcast.deliveries.distinct.order(status: :asc).pluck(:status).inspect }
       delivery.broadcast.update_status.save!
     rescue => e
       raise if Rails.env.development?
+
       Sentry.capture_exception(e)
     end
   end

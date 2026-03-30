@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SessionsController < ApplicationController
   def new
   end
@@ -7,10 +9,10 @@ class SessionsController < ApplicationController
 
     unless contact
       flash.now[:alert] = t('.no_email_found')
-      return render :new, status: 401
+      return render :new, status: :unauthorized
     end
 
-    set_back_to()
+    set_back_to
 
     token = SessionToken.create!(email: contact.email)
     SessionTokenMailer.with(token: token).notify.deliver_now
@@ -21,7 +23,7 @@ class SessionsController < ApplicationController
     @session_token = SessionToken.find_by!(handle: params[:handle])
     if @session_token.expired?
       flash[:alert] = t('.expired')
-      return render :new, status: 403
+      return render :new, status: :forbidden
     end
 
     session[:email] = @session_token.email
@@ -31,7 +33,7 @@ class SessionsController < ApplicationController
     staff_id = @session_token.staff&.id
     session[:staff_id] = staff_id if staff_id
 
-    set_back_to()
+    set_back_to
 
     @sponsorships = @session_token.sponsorships.reject(&:withdrawn?)
     @sponsorship = @sponsorships&.last
@@ -49,15 +51,12 @@ class SessionsController < ApplicationController
     redirect_to '/'
   end
 
-  private
-
-  def set_back_to()
+  private def set_back_to
     if params[:back_to]
       uri = Addressable::URI.parse(params[:back_to])
       if uri && uri.host.nil? && uri.scheme.nil? && uri.path.start_with?('/')
         session[:back_to] = params[:back_to]
       end
     end
-
   end
 end

@@ -1,10 +1,10 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::Base
   before_action :set_locale
   before_action :populate_sentry_scope
 
-  private
-
-  def set_locale
+  private def set_locale
     locale_cookie_name = Rails.application.config.x.locale_cookie_name
 
     case
@@ -27,21 +27,22 @@ class ApplicationController < ActionController::Base
     I18n.locale = hl if hl && I18n.available_locales.include?(hl)
   end
 
-  def write_locale_cookie(locale)
+  private def write_locale_cookie(locale)
     name = Rails.application.config.x.locale_cookie_name
-    opts = { value: locale.to_s, expires: 1.year, path: '/', same_site: :lax, secure: true, httponly: false }
+    opts = {value: locale.to_s, expires: 1.year, path: '/', same_site: :lax, secure: true, httponly: false}
     cookies[name] = opts
   end
 
   helper_method def current_staff
     return @current_staff if defined? @current_staff
+
     @current_staff = session[:staff_id] && Staff.find_by(id: session[:staff_id])
   end
 
   helper_method def current_sponsorship
     return @current_sponsorship if defined? @current_sponsorship
-    return nil unless params[:conference_slug]
-    return nil unless session[:sponsorship_ids]
+    return unless params[:conference_slug]
+    return unless session[:sponsorship_ids]
 
     @current_sponsorship = Sponsorship.where(id: session[:sponsorship_ids])
       .joins(:conference)
@@ -52,29 +53,31 @@ class ApplicationController < ActionController::Base
 
   helper_method def current_conference
     return @current_conference if defined? @current_conference
-    return nil unless params[:conference_slug]
+    return unless params[:conference_slug]
+
     @current_conference = current_sponsorship&.conference || Conference.find_by(slug: params[:conference_slug])
   end
 
   helper_method def current_available_sponsorships
     return @current_available_sponsorships if defined? @current_available_sponsorships
-    return nil unless session[:sponsorship_ids]
+    return unless session[:sponsorship_ids]
+
     @current_available_sponsorships = Sponsorship.includes(:conference).where(id: session[:sponsorship_ids]).not_withdrawn.order(id: :desc)
   end
 
-  def require_staff
+  private def require_staff
     unless current_staff
       redirect_to new_session_path(back_to: url_for(params.to_unsafe_h.merge(only_path: true)))
     end
   end
 
-  def require_sponsorship_session
+  private def require_sponsorship_session
     unless current_sponsorship
       redirect_to new_user_session_path(back_to: url_for(params.to_unsafe_h.merge(only_path: true)))
     end
   end
 
-  def populate_sentry_scope
+  private def populate_sentry_scope
     Sentry.configure_scope do |scope|
       if current_staff
         scope.set_context(
@@ -82,7 +85,7 @@ class ApplicationController < ActionController::Base
           {
             id: current_staff.id,
             login: current_staff.login,
-          }
+          },
         )
       end
 
@@ -92,7 +95,7 @@ class ApplicationController < ActionController::Base
           {
             id: current_sponsorship.id,
             name: current_sponsorship.name,
-          }
+          },
         )
       end
 
@@ -102,7 +105,7 @@ class ApplicationController < ActionController::Base
           {
             id: current_conference.id,
             slug: current_conference.slug,
-          }
+          },
         )
       end
 
@@ -111,7 +114,7 @@ class ApplicationController < ActionController::Base
         Sentry.set_user(id: "staff_#{current_staff.id}", username: current_staff.login)
       when current_sponsorship
         email = session[:email] ||= current_sponsorship.contact&.email
-        Sentry.set_user(id: "#{current_sponsorship.id}", email: )
+        Sentry.set_user(id: current_sponsorship.id.to_s, email:)
       end
     end
   end

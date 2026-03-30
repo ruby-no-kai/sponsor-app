@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ConferencesController < ApplicationController
   def index
     @conferences = Conference.application_open.publicly_visible.order(id: :asc)

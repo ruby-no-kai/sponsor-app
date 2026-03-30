@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe EditingHistoryTarget do
@@ -8,9 +10,10 @@ RSpec.describe EditingHistoryTarget do
 
   describe 'associations' do
     it 'has many editing_histories ordered by id desc' do
-      sponsorship = FactoryBot.create(:sponsorship,
+      sponsorship = FactoryBot.create(
+        :sponsorship,
         conference:,
-        name: 'Test'
+        name: 'Test',
       )
 
       # Histories are created automatically via around_save
@@ -19,9 +22,10 @@ RSpec.describe EditingHistoryTarget do
     end
 
     it 'destroys editing_histories when target is destroyed' do
-      sponsorship = FactoryBot.create(:sponsorship,
+      sponsorship = FactoryBot.create(
+        :sponsorship,
         conference:,
-        name: "Test"
+        name: "Test",
       )
 
       history_ids = sponsorship.editing_histories.pluck(:id)
@@ -39,7 +43,7 @@ RSpec.describe EditingHistoryTarget do
     it 'provides staff attribute accessor' do
       sponsorship = Sponsorship.new(
         conference:,
-        name: "Test"
+        name: "Test",
       )
 
       expect(sponsorship).to respond_to(:staff)
@@ -52,14 +56,15 @@ RSpec.describe EditingHistoryTarget do
 
   describe '#create_history' do
     it 'creates editing history on save' do
-      sponsorship = FactoryBot.build(:sponsorship,
+      sponsorship = FactoryBot.build(
+        :sponsorship,
         conference:,
-        name: "Test"
+        name: "Test",
       )
 
-      expect {
+      expect do
         sponsorship.save!
-      }.to change { SponsorshipEditingHistory.count }.by(1)
+      end.to change(SponsorshipEditingHistory, :count).by(1)
 
       history = sponsorship.editing_histories.first
       expect(history.raw).to be_present
@@ -67,9 +72,10 @@ RSpec.describe EditingHistoryTarget do
     end
 
     it 'associates staff with history when staff is set' do
-      sponsorship = FactoryBot.build(:sponsorship,
+      sponsorship = FactoryBot.build(
+        :sponsorship,
         conference:,
-        name: "Test"
+        name: "Test",
       )
       sponsorship.staff = staff
 
@@ -80,9 +86,10 @@ RSpec.describe EditingHistoryTarget do
     end
 
     it 'creates history without staff when staff is not set' do
-      sponsorship = FactoryBot.build(:sponsorship,
+      sponsorship = FactoryBot.build(
+        :sponsorship,
         conference:,
-        name: "Test"
+        name: "Test",
       )
 
       sponsorship.save!
@@ -92,7 +99,8 @@ RSpec.describe EditingHistoryTarget do
     end
 
     it 'calls to_h_for_history to capture snapshot' do
-      sponsorship = FactoryBot.build(:sponsorship,
+      sponsorship = FactoryBot.build(
+        :sponsorship,
         conference:,
         name: 'Test Sponsor',
       )
@@ -106,7 +114,8 @@ RSpec.describe EditingHistoryTarget do
     end
 
     it 'creates history on update' do
-      sponsorship = FactoryBot.create(:sponsorship,
+      sponsorship = FactoryBot.create(
+        :sponsorship,
         conference:,
         name: 'Initial Name',
       )
@@ -122,7 +131,8 @@ RSpec.describe EditingHistoryTarget do
     end
 
     it 'tracks changes between saves' do
-      sponsorship = FactoryBot.create(:sponsorship,
+      sponsorship = FactoryBot.create(
+        :sponsorship,
         conference:,
         name: 'First Name',
         profile: 'First profile',
@@ -143,9 +153,10 @@ RSpec.describe EditingHistoryTarget do
 
   describe '#last_editing_history' do
     it 'returns the most recent editing history by id asc' do
-      sponsorship = FactoryBot.create(:sponsorship,
+      sponsorship = FactoryBot.create(
+        :sponsorship,
         conference:,
-        name: "Test"
+        name: "Test",
       )
 
       sponsorship.update!(name: 'Updated')
@@ -160,9 +171,10 @@ RSpec.describe EditingHistoryTarget do
     end
 
     it 'memoizes the result' do
-      sponsorship = FactoryBot.create(:sponsorship,
+      sponsorship = FactoryBot.create(
+        :sponsorship,
         conference:,
-        name: "Test"
+        name: "Test",
       )
 
       first_call = sponsorship.last_editing_history

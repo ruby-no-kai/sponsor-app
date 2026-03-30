@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProcessSponsorEventEditJob < ApplicationJob
   include Rails.application.routes.url_helpers
 
@@ -11,7 +13,7 @@ class ProcessSponsorEventEditJob < ApplicationJob
     action = is_new_submission ? 'filed' : 'edited'
     SlackWebhookJob.perform_now(
       {
-        text: ":calendar: <#{conference_sponsor_event_url(@conference, @sponsor_event)}|#{@sponsor_event.title}> (<#{conference_sponsorship_url(@conference, @sponsorship)}|#{@sponsorship.name}>): #{action} by #{actor} [#{edit.diff_summary.map { |_| "`#{_}`" }.join(', ')}] <#{conference_sponsor_event_editing_histories_url(@conference, @sponsor_event)}|diff>",
+        text: ":calendar: <#{conference_sponsor_event_url(@conference, @sponsor_event)}|#{@sponsor_event.title}> (<#{conference_sponsorship_url(@conference, @sponsorship)}|#{@sponsorship.name}>): #{action} by #{actor} [#{edit.diff_summary.map { |s| "`#{s}`" }.join(", ")}] <#{conference_sponsor_event_editing_histories_url(@conference, @sponsor_event)}|diff>",
       },
       hook_name: :feed,
     )
@@ -24,15 +26,13 @@ class ProcessSponsorEventEditJob < ApplicationJob
     end
   end
 
-  private
-
-  def status_changed_in_edit?(edit)
+  private def status_changed_in_edit?(edit)
     return false unless edit.diff
 
     edit.diff.any? { |change| change[1] == 'status' }
   end
 
-  def should_push_event_asset?(edit)
+  private def should_push_event_asset?(edit)
     return false unless @sponsor_event.accepted?
     return false unless @sponsor_event.asset_file
 
@@ -45,8 +45,9 @@ class ProcessSponsorEventEditJob < ApplicationJob
     end
   end
 
-  def status_changed_to_accepted_in_edit?(edit)
+  private def status_changed_to_accepted_in_edit?(edit)
     return false unless edit.diff
+
     edit.diff.any? { |change| change[1] == 'status' && change.last == 'accepted' }
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Exhibition < ApplicationRecord
   include EditingHistoryTarget
   belongs_to :sponsorship

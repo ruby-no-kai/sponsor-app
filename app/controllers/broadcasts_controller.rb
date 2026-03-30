@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BroadcastsController < ApplicationController
   before_action :require_sponsorship_session
 
@@ -15,6 +17,6 @@ class BroadcastsController < ApplicationController
   helper_method def replace_template_variables(html)
     sponsorship_url = user_conference_sponsorship_url(@conference)
     link = "<a href=\"#{sponsorship_url}\">#{sponsorship_url}</a>"
-    html.gsub(/@LOGIN@|@FORM@/, link).html_safe
+    html.gsub(/@LOGIN@|@FORM@/, link).html_safe # rubocop:disable Rails/OutputSafety
   end
 end

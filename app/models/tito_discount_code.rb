@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 class TitoDiscountCode < ApplicationRecord
   belongs_to :sponsorship
 
-  enum :kind, %i(attendee booth_staff booth_paid)
+  enum :kind, {attendee: 0, booth_staff: 1, booth_paid: 2}
 
   def url
     "https://ti.to/#{sponsorship.conference.tito_slug}/discount/#{code}"

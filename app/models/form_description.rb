@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FormDescription < ApplicationRecord
   FallbackOptionCondition = Data.define(:plans, :booth_request) do
     def as_json = to_h.compact
@@ -11,9 +13,10 @@ class FormDescription < ApplicationRecord
 
   FallbackOption = Data.define(:value, :name, :conditions, :priority_human) do
     def valid?
-      return false unless value.present? && name.present?
+      return false if value.blank? || name.blank?
       return false if priority_human.present? && !priority_human.is_a?(Array)
       return true if conditions.nil?
+
       conditions.is_a?(Array) && conditions.all?(&:valid?)
     end
 
@@ -79,7 +82,7 @@ class FormDescription < ApplicationRecord
 
   private def build_fallback_options(raw_array)
     if raw_array.is_a?(Hash)
-      return raw_array.map { |value, name|  FallbackOption.new(value:, name:, conditions: nil, priority_human: nil) }
+      return raw_array.map { |value, name| FallbackOption.new(value:, name:, conditions: nil, priority_human: nil) }
     end
 
     return [] if raw_array.blank?
@@ -89,18 +92,16 @@ class FormDescription < ApplicationRecord
         opt['conditions'].map do |cond|
           FallbackOptionCondition.new(
             plans: cond['plans'],
-            booth_request: cond['booth_request']
+            booth_request: cond['booth_request'],
           )
         end
-      else
-        nil
       end
 
       FallbackOption.new(
         value: opt['value'],
         name: opt['name'],
         conditions:,
-        priority_human: opt['priority_human']
+        priority_human: opt['priority_human'],
       )
     end
   end
@@ -134,7 +135,7 @@ class FormDescription < ApplicationRecord
             autolink: true,
             tasklist: true,
             superscript: true,
-            header_ids: "#{self.id}--",
+            header_ids: "#{id}--",
             footnotes: true,
             description_lists: true,
             front_matter_delimiter: '---',

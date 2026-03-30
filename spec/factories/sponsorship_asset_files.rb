@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :sponsorship_asset_file do
-    #sponsorship
+    # sponsorship
     prefix { "test/" }
     extension { "jpg" }
   end

@@ -1,111 +1,113 @@
-class Admin::ConferencesController < Admin::ApplicationController
-  before_action :require_unrestricted_staff, only: [:index, :new, :create]
-  before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :sponsors_json, :asset_urls, :table_view]
+# frozen_string_literal: true
 
-  def index
-    @conferences = Conference.all
-  end
+module Admin
+  class ConferencesController < Admin::ApplicationController
+    before_action :require_unrestricted_staff, only: [:index, :new, :create]
+    before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :sponsors_json, :asset_urls, :table_view]
 
-  def show
-    @plans_with_count = @conference
-      .plans
-      .left_joins(:sponsorships)
-      .group(:id)
-      .select('plans.*, COUNT(sponsorships.plan_id) as cnt')
-      .map {|_| [_, _.cnt, _.capacity] }
-      .sort_by { |plan, _cnt, _capa| plan.rank }
-  end
+    def index
+      @conferences = Conference.all
+    end
 
-  def attendees_keeper
-  end
+    def show
+      @plans_with_count = @conference
+        .plans
+        .left_joins(:sponsorships)
+        .group(:id)
+        .select('plans.*, COUNT(sponsorships.plan_id) as cnt')
+        .map { |plan| [plan, plan.cnt, plan.capacity] }
+        .sort_by { |plan, _cnt, _capa| plan.rank }
+    end
 
-  def sponsors_yml
-    render plain: GenerateSponsorsYamlFileJob.new(@conference, push: false).tap(&:perform_now).yaml_data
-  end
+    def attendees_keeper
+    end
 
-  def sponsors_json
-    render plain: GenerateSponsorsYamlFileJob.new(@conference, push: false).tap(&:perform_now).json_data
-  end
+    def sponsors_yml
+      render plain: GenerateSponsorsYamlFileJob.new(@conference, push: false).tap(&:perform_now).yaml_data
+    end
 
-  def table_view
-    @sponsorships = @conference.sponsorships
-      .includes_contacts
-      .includes_requests
-  end
+    def sponsors_json
+      render plain: GenerateSponsorsYamlFileJob.new(@conference, push: false).tap(&:perform_now).json_data
+    end
 
-  def asset_urls
-    render json: {
-      files: @conference.sponsorships.includes(:asset_file).map(&:asset_file).compact.map do |asset|
-        [asset.filename, asset.download_url]
-      end,
-    }.to_json
-  end
+    def table_view
+      @sponsorships = @conference.sponsorships
+        .includes_contacts
+        .includes_requests
+    end
 
-  def new
-    @conference = Conference.new
-  end
+    def asset_urls
+      render json: {
+        files: @conference.sponsorships.includes(:asset_file).map(&:asset_file).compact.map do |asset|
+          [asset.filename, asset.download_url]
+        end,
+      }.to_json
+    end
 
-  def edit
-  end
+    def new
+      @conference = Conference.new
+    end
 
-  def create
-    @conference = Conference.new(conference_params)
+    def edit
+    end
 
-    respond_to do |format|
-      if @conference.save
-        format.html { redirect_to @conference, notice: 'Conference was successfully created.' }
-      else
-        format.html { render :new }
+    def create
+      @conference = Conference.new(conference_params)
+
+      respond_to do |format|
+        if @conference.save
+          format.html { redirect_to @conference, notice: 'Conference was successfully created.' }
+        else
+          format.html { render :new }
+        end
       end
     end
-  end
 
-  def update
-    @conference.assign_attributes(conference_params)
-    @conference.allow_restricted_access = true if current_staff.restricted_repos
-    respond_to do |format|
-      if @conference.save
-        format.html { redirect_to @conference, notice: 'Conference was successfully updated.' }
-      else
-        format.html { render :edit }
+    def update
+      @conference.assign_attributes(conference_params)
+      @conference.allow_restricted_access = true if current_staff.restricted_repos
+      respond_to do |format|
+        if @conference.save
+          format.html { redirect_to @conference, notice: 'Conference was successfully updated.' }
+        else
+          format.html { render :edit }
+        end
       end
     end
-  end
 
-  def destroy
-    @conference.destroy
-    respond_to do |format|
-      format.html { redirect_to _conferences_url, notice: 'Conference was successfully destroyed.' }
+    def destroy
+      @conference.destroy
+      respond_to do |format|
+        format.html { redirect_to _conferences_url, notice: 'Conference was successfully destroyed.' }
+      end
     end
-  end
 
-  private
+    private def set_conference
+      @conference = Conference.find_by!(slug: params[:slug])
+      check_staff_conference_authorization!(@conference)
+    end
 
-  def set_conference
-    @conference = Conference.find_by!(slug: params[:slug])
-    check_staff_conference_authorization!(@conference)
-  end
-
-  def conference_params
-    params.require(:conference).permit(
-      :name,
-      :slug,
-      :application_opens_at,
-      :application_closes_at,
-      :ticket_distribution_starts_at,
-      :pass_retraction_disables_at,
-      :amendment_closes_at,
-      :event_submission_starts_at,
-      :booth_capacity,
-      :contact_email_address,
-      :additional_attendees_registration_open,
-      :github_repo,
-      :github_repo_images_path,
-      :tito_slug,
-      :tito_booth_paid_flat_discount_amount,
-      :hidden,
-      :no_plan_allowed,
-      :allow_restricted_access,
-    )
+    private def conference_params
+      params.require(:conference).permit(
+        :name,
+        :slug,
+        :application_opens_at,
+        :application_closes_at,
+        :ticket_distribution_starts_at,
+        :pass_retraction_disables_at,
+        :amendment_closes_at,
+        :event_submission_starts_at,
+        :booth_capacity,
+        :contact_email_address,
+        :additional_attendees_registration_open,
+        :github_repo,
+        :github_repo_images_path,
+        :tito_slug,
+        :tito_booth_paid_flat_discount_amount,
+        :hidden,
+        :no_plan_allowed,
+        :allow_restricted_access,
+      )
+    end
   end
 end

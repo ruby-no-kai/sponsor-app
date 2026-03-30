@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProcessBroadcastDeliveryMailgunEventJob < ApplicationJob
   def perform(event_data)
     @event_data = event_data
@@ -34,5 +36,4 @@ class ProcessBroadcastDeliveryMailgunEventJob < ApplicationJob
   def user_variables
     event_data['user-variables'] || {}
   end
-
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :sponsorship do
     conference
@@ -8,7 +10,7 @@ FactoryBot.define do
     sequence(:profile) { |n| "we're #{n}" }
     asset_file { association(:sponsorship_asset_file, sponsorship: nil) }
 
-    after(:build) do |instance, ctx|
+    after(:build) do |instance, _ctx|
       instance.contact = FactoryBot.build(:contact, sponsorship: nil)
       instance.assume_organization
     end

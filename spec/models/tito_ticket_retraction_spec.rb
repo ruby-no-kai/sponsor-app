@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
+# rubocop:disable RSpec/NestedGroups
 RSpec.describe TitoTicketRetraction, type: :model do
   let(:conference) { FactoryBot.create(:conference, tito_slug: 'rubykaigi/2025') }
   let(:plan) { FactoryBot.create(:plan, conference:) }
@@ -30,9 +33,9 @@ RSpec.describe TitoTicketRetraction, type: :model do
         'tickets' => [
           {
             'release_id' => 'rel_1',
-            'discount_code_used' => 'CODE'
-          }
-        ]
+            'discount_code_used' => 'CODE',
+          },
+        ],
       }
     end
 
@@ -114,10 +117,10 @@ RSpec.describe TitoTicketRetraction, type: :model do
           'tickets' => [
             {
               'release_id' => 'rel_1',
-              'discount_code_used' => 'SPONSOR2025'
-            }
-          ]
-        }
+              'discount_code_used' => 'SPONSOR2025',
+            },
+          ],
+        },
       }
     end
 
@@ -129,7 +132,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
     it 'creates a new retraction instance with proper attributes' do
       retraction = described_class.prepare(sponsorship, tito_registration_id)
 
-      expect(retraction).to be_a(TitoTicketRetraction)
+      expect(retraction).to be_a(described_class)
       expect(retraction.sponsorship).to eq(sponsorship)
       expect(retraction.conference).to eq(conference)
       expect(retraction.tito_registration_id).to eq('reg_123')
@@ -144,7 +147,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
       expect(mock_api).to have_received(:get_registration).with(
         'rubykaigi/2025',
         'reg_123',
-        'expand' => 'tickets'
+        'expand' => 'tickets',
       )
     end
   end
@@ -165,22 +168,27 @@ RSpec.describe TitoTicketRetraction, type: :model do
           'tickets' => [
             {
               'release_id' => 'rel_2',
-              'discount_code_used' => 'SPONSOR2025'
-            }
-          ]
-        }
+              'discount_code_used' => 'SPONSOR2025',
+            },
+          ],
+        },
       }
     end
 
     it 'fetches and updates tito_registration data' do
-      expect(mock_api).to receive(:get_registration).with(
+      allow(mock_api).to receive(:get_registration).with(
         'rubykaigi/2025',
         'reg_123',
-        'expand' => 'tickets'
+        'expand' => 'tickets',
       ).and_return(api_response)
 
       result = retraction.refresh_tito_registration(api: mock_api)
 
+      expect(mock_api).to have_received(:get_registration).with(
+        'rubykaigi/2025',
+        'reg_123',
+        'expand' => 'tickets',
+      )
       expect(result).to eq(retraction)
       expect(retraction.tito_registration).to eq(api_response[:registration])
     end
@@ -196,7 +204,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
 
     context 'with valid registration data' do
-      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') }
+      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :with_tito_registration, sponsorship:) }
 
       it 'returns preconditions hash' do
@@ -217,7 +225,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
 
     context 'with multiple releases' do
-      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') }
+      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :multiple_releases, sponsorship:) }
 
       it 'counts multiple releases' do
@@ -229,7 +237,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
 
     context 'with invalid discount code' do
-      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') }
+      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :invalid_discount_code, sponsorship:) }
 
       it 'identifies invalid discount codes' do
@@ -252,7 +260,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
 
     context 'when all conditions are met' do
-      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') }
+      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :with_tito_registration, sponsorship:) }
 
       it 'returns true' do
@@ -261,7 +269,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
 
     context 'when ticket is paid' do
-      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') }
+      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :paid, sponsorship:) }
 
       it 'returns false' do
@@ -270,7 +278,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
 
     context 'when ticket is cancelled' do
-      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') }
+      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :cancelled, sponsorship:) }
 
       it 'returns false' do
@@ -279,7 +287,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
 
     context 'when multiple releases' do
-      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') }
+      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :multiple_releases, sponsorship:) }
 
       it 'returns false' do
@@ -288,7 +296,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
 
     context 'when invalid discount code' do
-      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') }
+      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :invalid_discount_code, sponsorship:) }
 
       it 'returns false' do
@@ -338,10 +346,11 @@ RSpec.describe TitoTicketRetraction, type: :model do
 
   describe '#ticket_release_slugs' do
     let(:tito_cached_release) do
-      FactoryBot.create(:tito_cached_release,
+      FactoryBot.create(
+        :tito_cached_release,
         conference:,
         tito_release_id: 'rel_1',
-        tito_release_slug: 'early-bird'
+        tito_release_slug: 'early-bird',
       )
     end
 
@@ -371,18 +380,18 @@ RSpec.describe TitoTicketRetraction, type: :model do
 
     context 'with multiple releases' do
       let(:tito_cached_release_2) do
-        FactoryBot.create(:tito_cached_release,
+        FactoryBot.create(
+          :tito_cached_release,
           conference:,
           tito_release_id: 'rel_2',
-          tito_release_slug: 'regular'
+          tito_release_slug: 'regular',
         )
       end
+      let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :multiple_releases, sponsorship:) }
 
       before do
         tito_cached_release_2
       end
-
-      let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :multiple_releases, sponsorship:) }
 
       it 'returns unique release slugs' do
         expect(retraction.ticket_release_slugs).to contain_exactly('early-bird', 'regular')
@@ -402,3 +411,4 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
   end
 end
+# rubocop:enable RSpec/NestedGroups

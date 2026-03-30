@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTitoDiscountCodes < ActiveRecord::Migration[6.0]
   def change
     create_table :tito_discount_codes do |t|

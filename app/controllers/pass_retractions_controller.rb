@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PassRetractionsController < ApplicationController
   before_action :require_sponsorship_session
   before_action :set_conference_and_sponsorship
@@ -28,30 +30,28 @@ class PassRetractionsController < ApplicationController
   def show
     @retraction = TitoTicketRetraction.find_by!(
       sponsorship: @sponsorship,
-      tito_registration_id: params[:id]
+      tito_registration_id: params[:id],
     )
   end
 
-  private
-
-  def set_conference_and_sponsorship
+  private def set_conference_and_sponsorship
     @sponsorship = current_sponsorship
     @conference = @sponsorship.conference
-    raise ActiveRecord::RecordNotFound unless @conference.tito_slug.present?
+    raise ActiveRecord::RecordNotFound if @conference.tito_slug.blank?
   end
 
-  def find_or_prepare_retraction
+  private def find_or_prepare_retraction
     TitoTicketRetraction.find_by(
       sponsorship: @sponsorship,
-      tito_registration_id: params[:id]
+      tito_registration_id: params[:id],
     ) || TitoTicketRetraction.prepare(@sponsorship, params[:id])
   end
 
-  def retraction_params
+  private def retraction_params
     params.require(:tito_ticket_retraction).permit(:reason)
   end
 
-  def require_pass_retraction_enabled
+  private def require_pass_retraction_enabled
     raise ActiveRecord::RecordNotFound unless @conference.pass_retraction_enabled?
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EditingHistory
   extend ActiveSupport::Concern
 
@@ -10,20 +12,18 @@ module EditingHistory
   end
 
   def diff_summary
-    diff.map{ |_| "#{_[0]}#{_[1]}" }
+    diff.map { |d| "#{d[0]}#{d[1]}" }
   end
 
-  private
-
-  def calculate_diff
-    if last_raw && !self.diff
+  private def calculate_diff
+    if last_raw && !diff
       self.diff = Hashdiff.diff(last_raw, raw)
     end
   end
 
-  def last_raw
-    @last_raw ||= if self.persisted?
-      target.editing_histories.order(id: :desc).where('id < ?', self.id).first&.raw || {}
+  private def last_raw
+    @last_raw ||= if persisted?
+      target.editing_histories.order(id: :desc).where('id < ?', id).first&.raw || {}
     else
       target&.editing_histories&.order(id: :desc)&.first&.raw || {}
     end

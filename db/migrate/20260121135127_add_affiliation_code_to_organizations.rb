@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddAffiliationCodeToOrganizations < ActiveRecord::Migration[8.1]
   def change
     add_column :organizations, :affiliation_code, :string

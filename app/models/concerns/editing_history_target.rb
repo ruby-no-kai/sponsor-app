@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module EditingHistoryTarget
   extend ActiveSupport::Concern
 
   included do
-    has_many :editing_histories, -> { order(id: :desc) }, class_name: "#{self.name}EditingHistory", dependent: :destroy
+    has_many :editing_histories, -> { order(id: :desc) }, class_name: "#{name}EditingHistory", dependent: :destroy, inverse_of: false
     around_save :create_history
 
     attr_accessor :staff
@@ -16,7 +18,7 @@ module EditingHistoryTarget
     yield
     @last_editing_history = editing_histories.create!(
       staff: staff,
-      raw: self.to_h_for_history,
+      raw: to_h_for_history,
     )
   end
 end

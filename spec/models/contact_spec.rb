@@ -1,14 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Contact, type: :model do
   let(:sponsorship) { FactoryBot.create(:sponsorship) }
 
   describe 'validations' do
-
-
-
-
-
     describe 'email_cc format validation' do
       it 'accepts blank email_cc' do
         contact = FactoryBot.build(:contact, email_cc: '')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :tito_ticket_retraction do
     sponsorship
@@ -19,9 +21,9 @@ FactoryBot.define do
           'tickets' => [
             {
               'release_id' => 'rel_1',
-              'discount_code_used' => 'SPONSOR2025'
-            }
-          ]
+              'discount_code_used' => 'SPONSOR2025',
+            },
+          ],
         }
       end
     end
@@ -39,9 +41,9 @@ FactoryBot.define do
           'tickets' => [
             {
               'release_id' => 'rel_1',
-              'discount_code_used' => 'SPONSOR2025'
-            }
-          ]
+              'discount_code_used' => 'SPONSOR2025',
+            },
+          ],
         }
       end
     end
@@ -59,9 +61,9 @@ FactoryBot.define do
           'tickets' => [
             {
               'release_id' => 'rel_1',
-              'discount_code_used' => 'SPONSOR2025'
-            }
-          ]
+              'discount_code_used' => 'SPONSOR2025',
+            },
+          ],
         }
       end
     end
@@ -79,13 +81,13 @@ FactoryBot.define do
           'tickets' => [
             {
               'release_id' => 'rel_1',
-              'discount_code_used' => 'SPONSOR2025'
+              'discount_code_used' => 'SPONSOR2025',
             },
             {
               'release_id' => 'rel_2',
-              'discount_code_used' => 'SPONSOR2025'
-            }
-          ]
+              'discount_code_used' => 'SPONSOR2025',
+            },
+          ],
         }
       end
     end
@@ -103,9 +105,9 @@ FactoryBot.define do
           'tickets' => [
             {
               'release_id' => 'rel_1',
-              'discount_code_used' => 'INVALID_CODE'
-            }
-          ]
+              'discount_code_used' => 'INVALID_CODE',
+            },
+          ],
         }
       end
     end

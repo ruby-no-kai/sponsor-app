@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe SponsorEvent, type: :model do
@@ -6,11 +8,11 @@ RSpec.describe SponsorEvent, type: :model do
 
   describe 'associations' do
     it 'belongs to sponsorship' do
-      expect(SponsorEvent.reflect_on_association(:sponsorship).macro).to eq(:belongs_to)
+      expect(described_class.reflect_on_association(:sponsorship).macro).to eq(:belongs_to)
     end
 
     it 'belongs to conference' do
-      expect(SponsorEvent.reflect_on_association(:conference).macro).to eq(:belongs_to)
+      expect(described_class.reflect_on_association(:conference).macro).to eq(:belongs_to)
     end
   end
 
@@ -134,7 +136,7 @@ RSpec.describe SponsorEvent, type: :model do
         'slug' => event.slug,
         'title' => event.title,
         'url' => event.url,
-        'status' => 'pending'
+        'status' => 'pending',
       )
     end
 
@@ -146,7 +148,7 @@ RSpec.describe SponsorEvent, type: :model do
       expect(history).to include(
         'asset_file_id' => asset_file.id,
         'asset_file_version_id' => 'v1',
-        'asset_file_checksum_sha256' => 'sha256hash'
+        'asset_file_checksum_sha256' => 'sha256hash',
       )
     end
 
@@ -204,10 +206,10 @@ RSpec.describe SponsorEvent, type: :model do
     it 'records status change in a single history when withdrawing via attribute assignment' do
       event = FactoryBot.create(:sponsor_event, :accepted, sponsorship:)
 
-      expect {
+      expect do
         event.status = :withdrawn
         event.save!
-      }.to change(SponsorEventEditingHistory, :count).by(1)
+      end.to change(SponsorEventEditingHistory, :count).by(1)
 
       history = event.last_editing_history
       expect(history.raw.fetch('status')).to eq('withdrawn')

@@ -1,19 +1,24 @@
+# frozen_string_literal: true
+
 class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
   def perform(sponsorship, kind, ignore_quantity: false)
     return unless Rails.application.config.x.tito.token
+
     @kind = kind
     @sponsorship = sponsorship
     @conference = @sponsorship.conference
-    return unless @conference.tito_slug.present?
+    return if @conference.tito_slug.blank?
 
     @discount_code = @sponsorship.tito_discount_codes.where(kind: kind).first
 
     if @discount_code
       return if @discount_code.quantity == quantity && !ignore_quantity
+
       tito.update_discount_code(@conference.tito_slug, @discount_code.tito_discount_code_id, **discount_code_attributes)
       @discount_code.update!(quantity: quantity)
     else
       return if quantity < 1
+
       tito_discount_code = tito.create_discount_code(@conference.tito_slug, **discount_code_attributes)
       TitoDiscountCode.create!(
         sponsorship: @sponsorship,
@@ -24,9 +29,9 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
       )
     end
   end
-  
+
   def code
-    "#{code_prefix}_#{@sponsorship.id}_#{@sponsorship.ticket_key[0,12]}"
+    "#{code_prefix}_#{@sponsorship.id}_#{@sponsorship.ticket_key[0, 12]}"
   end
 
   def discount_code_attributes
@@ -101,7 +106,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
             tito_release_slug: slug,
             tito_release_id: id.to_s,
           ).tito_release_id
-          end
+        end
       end
     end
   end

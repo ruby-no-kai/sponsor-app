@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/concern'
 
 module AssetFileUploadable
@@ -14,7 +16,8 @@ module AssetFileUploadable
   end
 
   def object_key
-    raise unless self.persisted?
+    raise unless persisted?
+
     "#{self.class.asset_file_global_prefix}#{prefix}#{handle}--#{id}"
   end
 
@@ -51,7 +54,7 @@ module AssetFileUploadable
       self.class.asset_file_bucket,
       {
         key: object_key,
-        signature_expiration: Time.now+900,
+        signature_expiration: Time.zone.now + 900,
         content_length_range: 0..max_file_size,
         use_accelerate_endpoint: true,
         allow_any: ['Content-Type', 'x-amz-checksum-algorithm', 'x-amz-checksum-sha256'],
@@ -76,9 +79,7 @@ module AssetFileUploadable
     @s3_client ||= Aws::S3::Client.new(use_dualstack_endpoint: true, region: self.class.asset_file_region, logger: Rails.logger)
   end
 
-  private
-
-  def presigner
+  private def presigner
     @presigner ||= Aws::S3::Presigner.new(client: s3_client)
   end
 
@@ -145,7 +146,7 @@ module AssetFileUploadable
       @role_session ||= sts.assume_role(
         duration_seconds: 900,
         role_arn: file.class.asset_file_role,
-        role_session_name: "file-#{file.id.to_s}",
+        role_session_name: "file-#{file.id}",
         policy: iam_policy.to_json,
       )
     end

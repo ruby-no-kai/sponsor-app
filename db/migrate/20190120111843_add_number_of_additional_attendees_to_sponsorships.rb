@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddNumberOfAdditionalAttendeesToSponsorships < ActiveRecord::Migration[5.2]
   def change
     add_column :conferences, :additional_attendees_registration_open, :boolean, default: false, null: false

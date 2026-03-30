@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SponsorEvent < ApplicationRecord
   include EditingHistoryTarget
 
@@ -5,12 +7,12 @@ class SponsorEvent < ApplicationRecord
   belongs_to :conference
   has_one :asset_file, class_name: 'SponsorEventAssetFile', dependent: :destroy
 
-  enum :status, { pending: 0, accepted: 1, rejected: 2, withdrawn: 3 }
+  enum :status, {pending: 0, accepted: 1, rejected: 2, withdrawn: 3}
 
-  validates :slug, presence: true, uniqueness: { scope: :conference_id }
+  validates :slug, presence: true, uniqueness: {scope: :conference_id}
   validates :title, presence: true
   validates :starts_at, presence: true
-  validates :url, presence: true, format: { with: %r{\Ahttps?://}, message: "must be a valid HTTP(S) URL" }
+  validates :url, presence: true, format: {with: %r{\Ahttps?://}, message: "must be a valid HTTP(S) URL"}
   validate :validate_co_host_sponsorship_ids
   validate :validate_policy_acknowledged_on_create, on: :create
 
@@ -48,6 +50,7 @@ class SponsorEvent < ApplicationRecord
 
   def co_host_sponsorships
     return [] if co_host_sponsorship_ids.blank?
+
     Sponsorship.where(id: co_host_sponsorship_ids, conference_id:)
   end
 
@@ -55,13 +58,11 @@ class SponsorEvent < ApplicationRecord
     ([sponsorship] + co_host_sponsorships).reject(&:withdrawn?)
   end
 
-  private
-
-  def set_conference_from_sponsorship
+  private def set_conference_from_sponsorship
     self.conference_id ||= sponsorship&.conference_id
   end
 
-  def generate_slug
+  private def generate_slug
     return if slug.present?
     return unless sponsorship&.organization
 
@@ -69,7 +70,7 @@ class SponsorEvent < ApplicationRecord
     self.slug = "#{sponsorship.organization.domain}-#{sequence}"
   end
 
-  def validate_co_host_sponsorship_ids
+  private def validate_co_host_sponsorship_ids
     return if co_host_sponsorship_ids.blank?
 
     invalid_ids = co_host_sponsorship_ids.reject do |id|
@@ -77,11 +78,11 @@ class SponsorEvent < ApplicationRecord
     end
 
     if invalid_ids.any?
-      errors.add(:co_host_sponsorship_ids, "contains invalid sponsorship IDs: #{invalid_ids.join(', ')}")
+      errors.add(:co_host_sponsorship_ids, "contains invalid sponsorship IDs: #{invalid_ids.join(", ")}")
     end
   end
 
-  def validate_policy_acknowledged_on_create
+  private def validate_policy_acknowledged_on_create
     if policy_acknowledged_at.blank?
       errors.add(:policy_acknowledged_at, "must be acknowledged")
     end

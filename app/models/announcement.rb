@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Announcement < ApplicationRecord
   include MarkdownBody
 
@@ -20,14 +22,15 @@ class Announcement < ApplicationRecord
   end
 
   def all_locales
-    self.conference.announcements.where(issue: issue)
+    conference.announcements.where(issue: issue)
   end
 
   def generate_issue
-    if conference && !self.persisted? && self.issue.blank?
-      begin
+    if conference && !persisted? && issue.blank?
+      loop do
         self.issue = SecureRandom.urlsafe_base64(8)
-      end while self.class.where(conference: conference, issue: issue).exists?
+        break unless self.class.where(conference: conference, issue: issue).exists?
+      end
     end
   end
 
@@ -47,13 +50,13 @@ class Announcement < ApplicationRecord
     when !flag
       self.published_at = nil
     end
-    flag
+    flag # rubocop:disable Lint/Void
   end
 
   def published
     !!published_at
   end
-  alias published? published
+  alias_method :published?, :published
 
   def draft?
     !published?
@@ -65,10 +68,10 @@ class Announcement < ApplicationRecord
 
   def new_revision=(flag)
     flag = flag == '1' if flag.is_a?(String)
-    if flag
-      self.revision = (revision_was || 0) + 1
+    self.revision = if flag
+      (revision_was || 0) + 1
     else
-      self.revision = (revision_was || 0)
+      revision_was || 0
     end
   end
 
@@ -81,6 +84,6 @@ class Announcement < ApplicationRecord
   end
 
   def revision_behind?
-     self.revision < latest_revision
+    revision < latest_revision
   end
 end

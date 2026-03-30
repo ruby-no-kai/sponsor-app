@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateSponsorshipEditingHistories < ActiveRecord::Migration[5.2]
   def change
     create_table :sponsorship_editing_histories do |t|

@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 class Contact < ApplicationRecord
   # Trust the foreign key: https://github.com/rails/rails/issues/25198
   belongs_to :sponsorship, optional: true
-  enum :kind, %i(primary billing)
+  enum :kind, {primary: 0, billing: 1}
 
   validates :kind, presence: true
   validates :email, presence: true
   validates :address, presence: true
   validates :name, presence: true
-  validates :email_cc, format: { with: /(.+?@.+?(?:[,;]\s*|$))+/}, allow_blank: true
+  validates :email_cc, format: {with: /(.+?@.+?(?:[,;]\s*|$))+/}, allow_blank: true
 
   validate :validate_email_ccs
 
@@ -15,7 +17,8 @@ class Contact < ApplicationRecord
 
   def _keep
     return @_keep if defined? @_keep
-    @_keep = self.persisted?
+
+    @_keep = persisted?
   end
 
   def email_ccs

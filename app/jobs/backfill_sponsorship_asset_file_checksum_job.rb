@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 class BackfillSponsorshipAssetFileChecksumJob < ApplicationJob
   def perform(sponsorship_asset_file)
     sponsorship = sponsorship_asset_file.sponsorship
-    resp = sponsorship_asset_file.get_object()
+    resp = sponsorship_asset_file.get_object
     sponsorship_asset_file.put_object(body: resp.body, checksum_algorithm: 'SHA256', content_type: resp.content_type)
     sponsorship_asset_file.update_object_header
 

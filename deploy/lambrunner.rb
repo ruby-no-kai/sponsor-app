@@ -1,9 +1,12 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'aws-sdk-lambda'
 require 'base64'
 
-function_name, command = ARGV[0], ARGV[1..]
-abort "Usage: #$0 <function_name> <command1> [<command2> ...]" if function_name.nil? || command.empty?
+function_name = ARGV[0]
+command = ARGV[1..]
+abort "Usage: #{$0} <function_name> <command1> [<command2> ...]" if function_name.nil? || command.empty?
 
 @lambda = Aws::Lambda::Client.new
 
@@ -22,7 +25,7 @@ else
   j = JSON.parse(invocation.payload.read)
   puts j['output']
 
-  case 
+  case
   when j['status'].is_a?(Integer)
     exit j['status']
   when j['ok'] == false
@@ -31,4 +34,3 @@ else
     raise "Unknown response status"
   end
 end
-

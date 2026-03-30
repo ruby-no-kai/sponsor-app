@@ -1,13 +1,18 @@
+# frozen_string_literal: true
+
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
 
 require "securerandom"
 require 'jsonnet'
 
-puts "Creating Conferences..."
+Rails.logger.debug "Creating Conferences..."
 
 sponsorship_id_base = SecureRandom.random_number(1000..9999) * 1000
-sponsorship_id_next = -> { sponsorship_id_base += 1; sponsorship_id_base }
+sponsorship_id_next = -> {
+  sponsorship_id_base += 1
+  sponsorship_id_base
+}
 
 contact_emails = {}
 generate_contact_email = ->(domain) {
@@ -16,7 +21,7 @@ generate_contact_email = ->(domain) {
 
 ApplicationRecord.transaction do
   # Create admin staff for broadcasts
-  puts "Creating staff..."
+  Rails.logger.debug "Creating staff..."
   staff = Staff.find_or_create_by!(login: "admin") do |s|
     s.name = "Admin User"
     s.uid = "12345"
@@ -48,7 +53,7 @@ ApplicationRecord.transaction do
       booth_capacity: 50,
       github_repo: nil,
       hidden: false,
-    }
+    },
   ]
 
   conferences.each do |conf_params|
@@ -56,7 +61,7 @@ ApplicationRecord.transaction do
     conference.update!(conf_params.except(:id))
 
     # Plans
-    puts "Creating plans for #{conference.name}..."
+    Rails.logger.debug "Creating plans for #{conference.name}..."
     [
       {
         name: "Ruby",
@@ -67,7 +72,7 @@ ApplicationRecord.transaction do
         capacity: 6,
         number_of_guests: 8,
         auto_acceptance: false,
-        closes_at: Time.now + 30.days
+        closes_at: Time.zone.now + 30.days,
       },
       {
         name: "Platinum",
@@ -78,7 +83,7 @@ ApplicationRecord.transaction do
         capacity: 30,
         number_of_guests: 4,
         auto_acceptance: false,
-        closes_at: Time.now + 30.days
+        closes_at: Time.zone.now + 30.days,
       },
       {
         name: "Gold",
@@ -97,14 +102,14 @@ ApplicationRecord.transaction do
         booth_size: nil,
         number_of_guests: 1,
         capacity: 10000,
-      }
+      },
     ].each do |plan_params|
       plan = conference.plans.find_or_initialize_by(name: plan_params.fetch(:name))
       plan.update!(plan_params)
     end
 
     # FormDescriptions
-    puts "Creating form_descriptions for #{conference.name}..."
+    Rails.logger.debug "Creating form_descriptions for #{conference.name}..."
     [
       {
         locale: "en",
@@ -164,21 +169,21 @@ ApplicationRecord.transaction do
           以上の条件は #{conference.name} 側の裁量において、一部例外が認められる場合があります。
         MARKDOWN
         fallback_options: JSON.generate(Jsonnet.load(Rails.root.join("misc", "fallback_options_ja.jsonnet"))),
-      }
+      },
     ].each do |form_desc_params|
       conference.form_descriptions.find_or_create_by!(locale: form_desc_params.fetch(:locale)).update!(form_desc_params)
     end
 
     # Organizations
     organizations = [
-      { name: "ふつうのRubyの株式会社", domain: "ordinary-ruby.invalid", locale: "ja", plan: "Ruby", request: :customization },
-      { name: "Great Ruby Inc.", domain: "great-ruby.invalid", locale: "en", plan: "Platinum", request: :billing, billing_contact: true },
-      conference.name == 'RubyKaigi 2048' ? { name: "Amazing Ruby Inc.", domain: "amazing-ruby.invalid", locale: "en", plan: "Platinum", request: :note } : nil,
-      { name: "合同会社ゆかいなRubyists", domain: "cheerfull-rubyists.invalid", locale: "ja", plan: "Gold", billing_contact: true },
-      { name: "Little Rubyists LLC", domain: "little-rubyists.invalid", locale: "en", plan: "Silver", request: :note },
+      {name: "ふつうのRubyの株式会社", domain: "ordinary-ruby.invalid", locale: "ja", plan: "Ruby", request: :customization},
+      {name: "Great Ruby Inc.", domain: "great-ruby.invalid", locale: "en", plan: "Platinum", request: :billing, billing_contact: true},
+      conference.name == 'RubyKaigi 2048' ? {name: "Amazing Ruby Inc.", domain: "amazing-ruby.invalid", locale: "en", plan: "Platinum", request: :note} : nil,
+      {name: "合同会社ゆかいなRubyists", domain: "cheerfull-rubyists.invalid", locale: "ja", plan: "Gold", billing_contact: true},
+      {name: "Little Rubyists LLC", domain: "little-rubyists.invalid", locale: "en", plan: "Silver", request: :note},
     ].compact
 
-    puts "Creating organizations and sponsorships for #{conference.name}..."
+    Rails.logger.debug "Creating organizations and sponsorships for #{conference.name}..."
     organizations.each do |org_params|
       organization = Organization.find_or_create_by!(name: org_params[:name]) do |org|
         org.domain = org_params[:domain]
@@ -188,7 +193,7 @@ ApplicationRecord.transaction do
       plans = conference.plans
       sponsorship = Sponsorship.find_or_initialize_by(
         conference: conference,
-        name: organization.name
+        name: organization.name,
       )
 
       # Assign ID only for new records
@@ -210,12 +215,12 @@ ApplicationRecord.transaction do
       if sponsorship.asset_file
         sponsorship.asset_file.assign_attributes(
           prefix: "c-#{conference.id}/",
-          extension: "zip"
+          extension: "zip",
         )
       else
         sponsorship.build_asset_file(
           prefix: "c-#{conference.id}/",
-          extension: "zip"
+          extension: "zip",
         )
       end
 
@@ -229,7 +234,7 @@ ApplicationRecord.transaction do
         email: generate_contact_email.call(organization.domain),
         kind: :primary,
         address: Faker::Address.full_address,
-        email_cc: "#{Faker::Internet.email(domain: organization.domain)}, #{Faker::Internet.email(domain: organization.domain)}"
+        email_cc: "#{Faker::Internet.email(domain: organization.domain)}, #{Faker::Internet.email(domain: organization.domain)}",
       )
 
       # Contacts (:billing)
@@ -239,7 +244,7 @@ ApplicationRecord.transaction do
           name: Faker::Name.name,
           email: Faker::Internet.email(domain: organization.domain),
           kind: :billing,
-          address: Faker::Address.full_address
+          address: Faker::Address.full_address,
         )
       end
 
@@ -249,11 +254,11 @@ ApplicationRecord.transaction do
       # Sponsorship Requests
       if org_params[:request]
         body = if sponsorship.locale == "ja"
-                 "#{sponsorship.name}のリクエストです。"
-               else
-                 "Hello from #{sponsorship.name}!"
-               end
-        request = SponsorshipRequest.new(kind: org_params[:request], body: )
+          "#{sponsorship.name}のリクエストです。"
+        else
+          "Hello from #{sponsorship.name}!"
+        end
+        request = SponsorshipRequest.new(kind: org_params[:request], body:)
         sponsorship.requests << request
       end
 
@@ -264,7 +269,7 @@ ApplicationRecord.transaction do
 
     # Sponsor Events (only for RubyKaigi 2048 where sponsorships are accepted)
     if conference.name == 'RubyKaigi 2048'
-      puts "Creating sponsor events for #{conference.name}..."
+      Rails.logger.debug "Creating sponsor events for #{conference.name}..."
 
       conference.update!(event_submission_starts_at: Time.zone.now - 1.week - 1.year)
 
@@ -323,13 +328,13 @@ ApplicationRecord.transaction do
 
       events_data.each do |org_data|
         sponsorship = conference.sponsorships.joins(:organization)
-                               .find_by(organizations: { domain: org_data[:domain] })
+          .find_by(organizations: {domain: org_data[:domain]})
         next unless sponsorship&.accepted?
 
         org_data[:events].each_with_index do |event_params, idx|
           SponsorEvent.find_or_initialize_by(
             conference:,
-            slug: "#{org_data[:domain]}-#{idx + 1}"
+            slug: "#{org_data[:domain]}-#{idx + 1}",
           ).tap do |e|
             e.sponsorship = sponsorship
             e.assign_attributes(event_params)
@@ -341,12 +346,12 @@ ApplicationRecord.transaction do
     end
 
     # Broadcasts and Deliveries
-    puts "Creating broadcasts and deliveries for #{conference.name}..."
+    Rails.logger.debug "Creating broadcasts and deliveries for #{conference.name}..."
 
     # Broadcast 1: Welcome Email (sent)
     broadcast1 = Broadcast.find_or_create_by!(
       conference: conference,
-      campaign: "welcome-#{conference.id}"
+      campaign: "welcome-#{conference.id}",
     ) do |b|
       b.staff = staff
       b.status = :sent
@@ -373,10 +378,10 @@ ApplicationRecord.transaction do
     end
 
     # Create deliveries for all sponsorships (delivered status)
-    conference.sponsorships.includes(:contact).each do |sponsorship|
+    conference.sponsorships.includes(:contact).find_each do |sponsorship|
       BroadcastDelivery.find_or_create_by!(
         broadcast: broadcast1,
-        sponsorship: sponsorship
+        sponsorship: sponsorship,
       ) do |d|
         d.recipient = sponsorship.contact.email
         d.recipient_cc = sponsorship.contact.email_cc
@@ -388,7 +393,7 @@ ApplicationRecord.transaction do
     # Broadcast 2: Booth Information (sent, only to booth sponsors)
     broadcast2 = Broadcast.find_or_create_by!(
       conference: conference,
-      campaign: "booth-info-#{conference.id}"
+      campaign: "booth-info-#{conference.id}",
     ) do |b|
       b.staff = staff
       b.status = :sent
@@ -425,7 +430,7 @@ ApplicationRecord.transaction do
     booth_sponsorships.each_with_index do |sponsorship, idx|
       BroadcastDelivery.find_or_create_by!(
         broadcast: broadcast2,
-        sponsorship: sponsorship
+        sponsorship: sponsorship,
       ) do |d|
         d.recipient = sponsorship.contact.email
         d.recipient_cc = sponsorship.contact.email_cc
@@ -438,7 +443,7 @@ ApplicationRecord.transaction do
     # Broadcast 3: Important Update (ready, not sent yet)
     broadcast3 = Broadcast.find_or_create_by!(
       conference: conference,
-      campaign: "update-#{conference.id}"
+      campaign: "update-#{conference.id}",
     ) do |b|
       b.staff = staff
       b.status = :ready
@@ -471,10 +476,10 @@ ApplicationRecord.transaction do
     end
 
     # Create deliveries for all sponsorships (ready status, not sent)
-    conference.sponsorships.includes(:contact).each do |sponsorship|
+    conference.sponsorships.includes(:contact).find_each do |sponsorship|
       BroadcastDelivery.find_or_create_by!(
         broadcast: broadcast3,
-        sponsorship: sponsorship
+        sponsorship: sponsorship,
       ) do |d|
         d.recipient = sponsorship.contact.email
         d.recipient_cc = sponsorship.contact.email_cc
@@ -486,7 +491,7 @@ ApplicationRecord.transaction do
     # Broadcast 4: Thank you Email (sent)
     broadcast4 = Broadcast.find_or_create_by!(
       conference: conference,
-      campaign: "thankyou-#{conference.id}"
+      campaign: "thankyou-#{conference.id}",
     ) do |b|
       b.staff = staff
       b.status = :sent
@@ -505,10 +510,10 @@ ApplicationRecord.transaction do
     end
 
     # Create deliveries for all sponsorships (delivered status)
-    conference.sponsorships.includes(:contact).each do |sponsorship|
+    conference.sponsorships.includes(:contact).find_each do |sponsorship|
       BroadcastDelivery.find_or_create_by!(
         broadcast: broadcast4,
-        sponsorship: sponsorship
+        sponsorship: sponsorship,
       ) do |d|
         d.recipient = sponsorship.contact.email
         d.recipient_cc = sponsorship.contact.email_cc
@@ -518,13 +523,13 @@ ApplicationRecord.transaction do
     end
 
     # Announcements
-    puts "Creating announcements for #{conference.name}..."
+    Rails.logger.debug "Creating announcements for #{conference.name}..."
 
     # Announcement 1: Welcome (published, pinned)
     Announcement.find_or_create_by!(
       conference: conference,
       issue: "welcome",
-      locale: "en"
+      locale: "en",
     ) do |a|
       a.staff = staff
       a.title = "Welcome Sponsors!"
@@ -543,7 +548,7 @@ ApplicationRecord.transaction do
     Announcement.find_or_create_by!(
       conference: conference,
       issue: "welcome",
-      locale: "ja"
+      locale: "ja",
     ) do |a|
       a.staff = staff
       a.title = "スポンサーの皆様へ"
@@ -563,7 +568,7 @@ ApplicationRecord.transaction do
     Announcement.find_or_create_by!(
       conference: conference,
       issue: "important-info",
-      locale: "en"
+      locale: "en",
     ) do |a|
       a.staff = staff
       a.title = "Important: Asset Submission Deadline"
@@ -582,7 +587,7 @@ ApplicationRecord.transaction do
     Announcement.find_or_create_by!(
       conference: conference,
       issue: "important-info",
-      locale: "ja"
+      locale: "ja",
     ) do |a|
       a.staff = staff
       a.title = "重要: 素材提出期限について"
@@ -602,7 +607,7 @@ ApplicationRecord.transaction do
     Announcement.find_or_create_by!(
       conference: conference,
       issue: "upcoming-event",
-      locale: "en"
+      locale: "en",
     ) do |a|
       a.staff = staff
       a.title = "[DRAFT] Pre-Conference Meetup"
@@ -623,7 +628,7 @@ ApplicationRecord.transaction do
     Announcement.find_or_create_by!(
       conference: conference,
       issue: "upcoming-event",
-      locale: "ja"
+      locale: "ja",
     ) do |a|
       a.staff = staff
       a.title = "[下書き] カンファレンス前のミートアップ"
@@ -643,7 +648,6 @@ ApplicationRecord.transaction do
   end
 end
 
-
 ApplicationRecord.connection.execute("alter sequence sponsorships_id_seq restart with #{Sponsorship.maximum(:id).to_i + 1}")
 
-puts "Seeding complete!"
+Rails.logger.debug "Seeding complete!"

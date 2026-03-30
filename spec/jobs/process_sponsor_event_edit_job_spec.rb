@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe ProcessSponsorEventEditJob, type: :job do
@@ -15,11 +17,11 @@ RSpec.describe ProcessSponsorEventEditJob, type: :job do
     context 'when asset_file_id changes (new file)' do
       it 'triggers PushEventAssetFileJob' do
         event = FactoryBot.create(:sponsor_event, :accepted, sponsorship:)
-        asset_file = FactoryBot.create(:sponsor_event_asset_file, sponsorship:, sponsor_event: event)
+        FactoryBot.create(:sponsor_event_asset_file, sponsorship:, sponsor_event: event)
         event.reload
 
         # Simulate a save that records the asset_file_id change
-        event.touch
+        event.touch # rubocop:disable Rails/SkipsModelValidations
         edit = event.last_editing_history
 
         described_class.perform_now(edit)
@@ -36,7 +38,7 @@ RSpec.describe ProcessSponsorEventEditJob, type: :job do
 
         # Update checksum and trigger new history
         asset_file.update!(checksum_sha256: 'new_checksum')
-        event.touch
+        event.touch # rubocop:disable Rails/SkipsModelValidations
         edit = event.last_editing_history
 
         described_class.perform_now(edit)
@@ -69,7 +71,7 @@ RSpec.describe ProcessSponsorEventEditJob, type: :job do
         # Destroy the asset file (simulating removal) and trigger new history
         asset_file.destroy!
         event.reload
-        event.touch
+        event.touch # rubocop:disable Rails/SkipsModelValidations
         edit = event.last_editing_history
 
         described_class.perform_now(edit)
@@ -81,10 +83,10 @@ RSpec.describe ProcessSponsorEventEditJob, type: :job do
     context 'when event is not accepted with asset file changes' do
       it 'does not trigger PushEventAssetFileJob' do
         event = FactoryBot.create(:sponsor_event, :pending, sponsorship:)
-        asset_file = FactoryBot.create(:sponsor_event_asset_file, sponsorship:, sponsor_event: event)
+        FactoryBot.create(:sponsor_event_asset_file, sponsorship:, sponsor_event: event)
         event.reload
 
-        event.touch
+        event.touch # rubocop:disable Rails/SkipsModelValidations
         edit = event.last_editing_history
 
         described_class.perform_now(edit)

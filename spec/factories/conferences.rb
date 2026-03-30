@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :conference do
     sequence(:name) { |n| "Conf #{n}" }
@@ -6,7 +8,7 @@ FactoryBot.define do
     sequence(:contact_email_address) { |n| "info+#{n}@conf.test.invalid" }
 
     trait :full do
-      after(:create) do |conference, context|
+      after(:create) do |conference, _context|
         FactoryBot.create(:form_description, conference:)
         FactoryBot.create(:plan, conference:)
       end

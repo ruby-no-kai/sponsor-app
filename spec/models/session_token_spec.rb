@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe SessionToken, type: :model do
@@ -59,11 +61,11 @@ RSpec.describe SessionToken, type: :model do
       let!(:expired_token) { FactoryBot.create(:session_token, :expired) }
 
       it 'includes tokens that have not expired' do
-        expect(SessionToken.active).to include(active_token)
+        expect(described_class.active).to include(active_token)
       end
 
       it 'excludes expired tokens' do
-        expect(SessionToken.active).not_to include(expired_token)
+        expect(described_class.active).not_to include(expired_token)
       end
     end
   end

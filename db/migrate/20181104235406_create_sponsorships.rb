@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateSponsorships < ActiveRecord::Migration[5.2]
   def change
     create_table :sponsorships do |t|
@@ -14,7 +16,7 @@ class CreateSponsorships < ActiveRecord::Migration[5.2]
       t.text :profile, null: false
       t.string :logo_key
 
-      t.boolean :booth_requested, default: false,  null: false
+      t.boolean :booth_requested, default: false, null: false
       t.boolean :booth_assigned, default: false, null: false
 
       t.timestamps

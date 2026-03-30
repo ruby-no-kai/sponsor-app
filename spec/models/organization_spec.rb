@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Organization, type: :model do
-
   describe '#slug' do
     it 'returns the domain' do
       organization = FactoryBot.build_stubbed(:organization, domain: 'example.com')

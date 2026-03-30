@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateBroadcastDeliveriesJob < ApplicationJob
   Recipient = Struct.new(:sponsorship, :email, :email_ccs, keyword_init: true)
 
@@ -45,17 +47,13 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
 
       private def locale_scope
         if params[:locale].present?
-          Sponsorship.where(locale: params[:locale]) 
-        else
-          nil
+          Sponsorship.where(locale: params[:locale])
         end
       end
 
       private def exhibitor_scope
         if params[:exhibitors].present?
-          Sponsorship.exhibitor 
-        else
-          nil
+          Sponsorship.exhibitor
         end
       end
 
@@ -65,7 +63,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
           plan_scope,
           locale_scope,
           exhibitor_scope,
-        ].inject(scope) do |r,i|
+        ].inject(scope) do |r, i|
           i ? r.merge(i) : r
         end
       end
@@ -146,6 +144,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
 
       recipients.map do |recipient|
         next if existing_emails[recipient.email]
+
         broadcast.deliveries.create!(
           status: :ready,
           sponsorship: recipient.sponsorship,

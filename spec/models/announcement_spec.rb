@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Announcement, type: :model do
@@ -22,11 +24,11 @@ RSpec.describe Announcement, type: :model do
       let!(:exhibitor_announcement) { FactoryBot.create(:announcement, :exhibitors_only, staff:, conference:) }
 
       it 'includes non-exhibitor-only announcements' do
-        expect(Announcement.for_sponsors).to include(sponsor_announcement)
+        expect(described_class.for_sponsors).to include(sponsor_announcement)
       end
 
       it 'excludes exhibitor-only announcements' do
-        expect(Announcement.for_sponsors).not_to include(exhibitor_announcement)
+        expect(described_class.for_sponsors).not_to include(exhibitor_announcement)
       end
     end
   end

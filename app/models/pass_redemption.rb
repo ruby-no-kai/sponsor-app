@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Controls Tito registrations and tickets thru source attributed to a sponsorship, for self managed pass management.
 class PassRedemption
   class PaginationNotSupported < StandardError; end
@@ -8,10 +10,10 @@ class PassRedemption
     :email,
     :state,
     :free, :paid, :cancelled, :refunded, :partially_refunded,
-    :tickets,
+    :tickets
   ) do
     def retractable? # XXX: dupe with TitoTicketRetraction
-      free && !cancelled && !paid && !refunded && !partially_refunded && tickets.group_by { |t| t.release_id }.size == 1 && tickets.group_by { |t| t.discount_code }.size == 1
+      free && !cancelled && !paid && !refunded && !partially_refunded && tickets.group_by(&:release_id).size == 1 && tickets.group_by(&:discount_code).size == 1
     end
 
     def as_json
@@ -26,18 +28,18 @@ class PassRedemption
     :discount_code, :release, :release_id,
     :email,
     :state,
-    :void, :assigned,
+    :void, :assigned
   ) do
     def as_json = to_h
   end
 
   class Collection
     def self.from_tito_registration_list(tito_registration_list, sponsorship: nil, conference: sponsorship&.conference)
-      if (tito_registration_list.dig('meta','total_pages') || 0) > 1
+      if (tito_registration_list.dig('meta', 'total_pages') || 0) > 1
         raise PaginationNotSupported
       end
 
-      releases = conference ? TitoCachedRelease.where(conference:).map { |r| [r.tito_release_id, r] }.to_h : {}
+      releases = conference ? TitoCachedRelease.where(conference:).index_by(&:tito_release_id) : {}
 
       valid_discount_code = sponsorship&.tito_discount_codes&.pluck(:code)
       registrations = tito_registration_list.fetch(:registrations).map do |tito_registration|

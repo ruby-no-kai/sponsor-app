@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 class SponsorshipsController < ApplicationController
   def show
     unless current_sponsorship
       return redirect_to new_user_conference_sponsorship_path(conference: @conference)
     end
+
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
     raise ActiveRecord::RecordNotFound unless @conference
@@ -23,13 +26,13 @@ class SponsorshipsController < ApplicationController
   end
 
   def new
-    return render(status: 404, plain: '404') if current_sponsorship
+    return render(status: :not_found, plain: '404') if current_sponsorship
 
     @conference = Conference.find_by!(slug: params[:conference_slug])
-    return render(plain: '404', status: 404) unless @conference.verify_invite_code(params[:invite_code])
-    return render(:closed, status: 403) if !@conference&.application_open? && !current_staff
+    return render(plain: '404', status: :not_found) unless @conference.verify_invite_code(params[:invite_code])
+    return render(:closed, status: :forbidden) if !@conference&.application_open? && !current_staff
 
-    @affiliated_organization = Organization.find_by_affiliation_code(params[:affiliation])
+    @affiliated_organization = Organization.find_by(affiliation_code: params[:affiliation])
 
     @sponsorship = Sponsorship.new(copied_sponsorship_attributes)
     @sponsorship.conference = @conference
@@ -37,15 +40,15 @@ class SponsorshipsController < ApplicationController
   end
 
   def create
-    return render(status: 404, plain: '404') if current_sponsorship
+    return render(status: :not_found, plain: '404') if current_sponsorship
 
     @conference = Conference.find_by!(slug: params[:conference_slug])
-    return render(plain: '404', status: 404) unless @conference.verify_invite_code(params[:invite_code])
-    return render(:closed, status: 403) if !@conference&.application_open? && !current_staff
+    return render(plain: '404', status: :not_found) unless @conference.verify_invite_code(params[:invite_code])
+    return render(:closed, status: :forbidden) if !@conference&.application_open? && !current_staff
 
     @sponsorship = Sponsorship.new(sponsorship_params.except(:asset_file_id))
 
-    if sponsorship_params[:asset_file_id].present? 
+    if sponsorship_params[:asset_file_id].present?
       asset_src = SponsorshipAssetFile
         .available_for_user(
           sponsorship_params[:asset_file_id],
@@ -53,7 +56,8 @@ class SponsorshipsController < ApplicationController
           available_sponsorship_ids: current_available_sponsorships&.pluck(:id) || [],
         )
         .first
-      return render(plain: '404 asset not found', status: 404) unless asset_src
+      return render(plain: '404 asset not found', status: :not_found) unless asset_src
+
       if asset_src.sponsorship_id.present?
         new_asset = asset_src.copy_to!(@conference)
         (session[:asset_file_ids] ||= []) << new_asset.id
@@ -65,7 +69,7 @@ class SponsorshipsController < ApplicationController
 
     @sponsorship.locale = I18n.locale
     @sponsorship.conference = @conference
-    affiliated_organization = Organization.find_by_affiliation_code(params[:affiliation])
+    affiliated_organization = Organization.find_by(affiliation_code: params[:affiliation])
     @sponsorship.assume_organization(affiliated_organization:)
     @sponsorship.accept if @sponsorship.plan&.auto_acceptance && !@sponsorship.organization&.auto_acceptance_disabled
 
@@ -102,9 +106,7 @@ class SponsorshipsController < ApplicationController
     end
   end
 
-  private
-
-  def sponsorship_params
+  private def sponsorship_params
     params.require(:sponsorship).permit(
       :plan_id,
       :name,
@@ -129,18 +131,20 @@ class SponsorshipsController < ApplicationController
         customization_request_attributes
         note_attributes
       ).each do |k|
-        unless sp.dig(k, :body).present?
+        if sp.dig(k, :body).blank?
           sp[k][:_destroy] = '1' if sp[k]
         end
       end
     end
   end
 
-  def copied_sponsorship_attributes
-    return {} unless params[:sponsorship_id_to_copy].present?
+  private def copied_sponsorship_attributes
+    return {} if params[:sponsorship_id_to_copy].blank?
     return {} unless session[:sponsorship_ids]&.include?(params[:sponsorship_id_to_copy].to_i)
+
     src = Sponsorship.find_by(id: params[:sponsorship_id_to_copy])
     return {} unless src
+
     src.attributes_for_copy
   end
 end

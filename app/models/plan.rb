@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class Plan < ApplicationRecord
   belongs_to :conference
-  has_many :sponsorships
+  has_many :sponsorships, dependent: nil
 
   validates :name, presence: true
   validates :price_text, presence: true
@@ -23,7 +25,7 @@ class Plan < ApplicationRecord
   end
 
   def words_limit_hard
-    # TODO:
+    # TODO: make configurable
     (words_limit || 0) * 1.1
   end
 end

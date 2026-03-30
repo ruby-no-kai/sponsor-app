@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Plan, type: :model do
-
   describe '#booth_eligible?' do
     it 'returns true when booth_size is greater than 0' do
       plan = FactoryBot.build_stubbed(:plan, booth_size: 6)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Shoryuken
   module Middleware
     module Server
@@ -6,21 +8,19 @@ module Shoryuken
           return block.call unless ::Sentry.initialized?
 
           ::Sentry.with_scope do |scope|
-            begin
-              contexts = generate_contexts(worker_instance, queue, sqs_msg, body)
-              scope.set_contexts(**contexts)
-              scope.set_tags("shoryuken.queue" => queue)
-              name = contexts.dig(:'Active-Job', :job_class) || contexts.dig(:Shoryuken, :job_class)
-              scope.set_transaction_name(name, source: :task)
-              transaction = ::Sentry.start_transaction(name: scope.transaction_name, source: scope.transaction_source, op: "queue.shoryuken")
-              scope.set_span(transaction) if transaction
+            contexts = generate_contexts(worker_instance, queue, sqs_msg, body)
+            scope.set_contexts(**contexts)
+            scope.set_tags("shoryuken.queue" => queue)
+            name = contexts.dig(:'Active-Job', :job_class) || contexts.dig(:Shoryuken, :job_class)
+            scope.set_transaction_name(name, source: :task)
+            transaction = ::Sentry.start_transaction(name: scope.transaction_name, source: scope.transaction_source, op: "queue.shoryuken")
+            scope.set_span(transaction) if transaction
 
-              yield
-            rescue Exception => exception
-              ::Sentry.capture_exception(exception, hint: { background: false })
-              finish_transaction(transaction, 500)
-              raise
-            end
+            yield
+          rescue Exception => exception # rubocop:disable Lint/RescueException
+            ::Sentry.capture_exception(exception, hint: {background: false})
+            finish_transaction(transaction, 500)
+            raise
           end
         end
 
@@ -35,7 +35,7 @@ module Shoryuken
           }
 
           if job_class == 'ActiveJob::QueueAdapters::ShoryukenAdapter::JobWrapper'
-            context[:"Active-Job"] = {
+            context[:'Active-Job'] = {
               job_class: body["job_class"],
               job_id: body["job_id"],
               arguments: body["arguments"],

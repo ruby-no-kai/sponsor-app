@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
@@ -46,7 +48,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :organizations, param: :slug, only: %i(index new create show edit update), constraints: {slug: /[^\/]+/}
+    resources :organizations, param: :slug, only: %i(index new create show edit update), constraints: {slug: %r{[^/]+}}
 
     resource :session, only: %i(new destroy) do
       get :rise, as: :rise
@@ -85,10 +87,8 @@ Rails.application.routes.draw do
       end
     end
 
-
     post '/webhooks/mailgun' => 'webhooks/mailgun#webhook'
   end
-
 
   get '/site/sha' => RevisionPlate::App.new(File.join(__dir__, '..', 'REVISION'))
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

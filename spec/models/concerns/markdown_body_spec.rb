@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe MarkdownBody do
@@ -80,8 +82,9 @@ RSpec.describe MarkdownBody do
       end
 
       it 'does not use Rails cache' do
-        expect(Rails.cache).not_to receive(:fetch)
+        allow(Rails.cache).to receive(:fetch).and_call_original
         instance.html
+        expect(Rails.cache).not_to have_received(:fetch)
       end
     end
 
@@ -100,8 +103,9 @@ RSpec.describe MarkdownBody do
 
       it 'uses Rails cache with appropriate key' do
         cache_key = "MarkdownBodyTest:html:#{instance.id}/#{instance.updated_at.to_f}"
-        expect(Rails.cache).to receive(:fetch).with(cache_key, expires_in: 1.month).and_call_original
+        allow(Rails.cache).to receive(:fetch).and_call_original
         instance.html
+        expect(Rails.cache).to have_received(:fetch).with(cache_key, expires_in: 1.month)
       end
 
       it 'returns cached result on subsequent calls' do
@@ -113,10 +117,11 @@ RSpec.describe MarkdownBody do
         allow(Rails.cache).to receive(:fetch).with(cache_key, expires_in: 1.month).and_return(first_result)
 
         # Stub render_html to ensure it's not called again
-        expect(instance).not_to receive(:render_html)
+        allow(instance).to receive(:render_html).and_call_original
 
         # Second call should use cache
         second_result = instance.html
+        expect(instance).not_to have_received(:render_html)
         expect(second_result).to eq(first_result)
       end
 

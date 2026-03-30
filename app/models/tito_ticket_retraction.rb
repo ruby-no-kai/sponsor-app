@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TitoTicketRetraction < ApplicationRecord
   belongs_to :conference
   belongs_to :sponsorship
@@ -16,9 +18,7 @@ class TitoTicketRetraction < ApplicationRecord
       conference: sponsorship.conference,
       tito_registration_id: tito_registration_id.to_s,
       completed: false,
-    ).tap do |r|
-      r.refresh_tito_registration
-    end
+    ).tap(&:refresh_tito_registration)
   end
 
   def refresh_tito_registration(api: TitoApi.new)
@@ -27,7 +27,7 @@ class TitoTicketRetraction < ApplicationRecord
   end
 
   def preconditions
-    reg = tito_registration or return nil
+    reg = tito_registration or return
     valid_discount_codes = sponsorship&.tito_discount_codes&.pluck(:code)
     discount_codes_used = reg.fetch('tickets').map { |t| t.fetch('discount_code_used') }.uniq
     {
@@ -61,11 +61,11 @@ class TitoTicketRetraction < ApplicationRecord
   end
 
   def tito_admin_url
-    "https://dashboard.tito.io/#{conference.tito_slug}/registrations/#{URI.encode_www_form_component(tito_registration&.fetch('slug')&.to_s)}"
+    "https://dashboard.tito.io/#{conference.tito_slug}/registrations/#{URI.encode_www_form_component(tito_registration&.fetch("slug")&.to_s)}"
   end
 
   def ticket_release_slugs
-    releases = conference ? TitoCachedRelease.where(conference:).map { |r| [r.tito_release_id, r] }.to_h : {}
+    releases = conference ? TitoCachedRelease.where(conference:).index_by(&:tito_release_id) : {}
     tito_registration&.fetch('tickets')&.map { |t| releases[t.fetch('release_id').to_s]&.tito_release_slug }&.uniq
   end
 

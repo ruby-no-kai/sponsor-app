@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BroadcastMailer < ApplicationMailer
   def announce
     @delivery = params[:delivery]
@@ -6,7 +8,7 @@ class BroadcastMailer < ApplicationMailer
     @conference = @broadcast.conference
 
     message_id_for "broadcasts/#{@broadcast.id}/deliveries/#{@delivery.id}"
-    tag "broadcast:#{@broadcast.id}"
+    tag "broadcast:#{@broadcast.id}" # rubocop:disable Rails/ContentTag
     variable broadcast_id: @broadcast.id, delivery_id: @delivery.id
     list_name 'broadcast'
     headers 'X-Auto-Response-Suppress' => 'All'
@@ -18,7 +20,7 @@ class BroadcastMailer < ApplicationMailer
     )
   end
 
-  helper_method def form_url()
+  helper_method def form_url
     path = Addressable::URI.parse(new_user_conference_sponsorship_url(@conference)).request_uri
     login_url(back_to: path)
   end
@@ -30,12 +32,10 @@ class BroadcastMailer < ApplicationMailer
     else
       url = new_user_session_url(**additional_params)
     end
-    "<a href=\"#{url}\">#{url}</a>".html_safe
+    "<a href=\"#{url}\">#{url}</a>".html_safe # rubocop:disable Rails/OutputSafety
   end
 
-  private
-
-  def subject_prefix
+  private def subject_prefix
     "[#{@broadcast.conference.name}] "
   end
 end

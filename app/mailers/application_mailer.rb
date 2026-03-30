@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationMailer < ActionMailer::Base
   default(
     from: "#{Rails.application.config.x.org_name} Sponsorships <#{Rails.application.config.x.default_email_address}>",
@@ -14,9 +16,7 @@ class ApplicationMailer < ActionMailer::Base
 
   default subject: -> { make_subject }
 
-  private
-
-  def message_id_for(local, reference = nil)
+  private def message_id_for(local, reference = nil)
     headers 'Message-ID' => nil
     headers 'Message-ID' => "<#{local}@#{Rails.application.config.x.default_email_host_part}>"
     if reference
@@ -27,13 +27,14 @@ class ApplicationMailer < ActionMailer::Base
     end
   end
 
-  def add_mailer_mailgun_tag
+  private def add_mailer_mailgun_tag
     tag self.class.name
     variable mailer: self.class.name
   end
 
-  def add_sponsorship_mailgun_tag
-    return unless @sponsorship && @sponsorship.is_a?(Sponsorship)
+  private def add_sponsorship_mailgun_tag
+    return unless @sponsorship&.is_a?(Sponsorship)
+
     possible_admin_address = [
       @sponsorship.conference.contact_email_address,
       Rails.application.config.x.default_email_address,
@@ -41,60 +42,65 @@ class ApplicationMailer < ActionMailer::Base
     ]
     prefix = possible_admin_address.include?(mail.to) ? 'admin/' : ''
 
-    tag "#{prefix}sponsorship:#{@sponsorship.id}"
-    #tag "#{prefix}organization:#{@sponsorship.organization.id}"
-    #tag "#{prefix}conference:#{@sponsorship.conference.id}"
+    tag "#{prefix}sponsorship:#{@sponsorship.id}" # rubocop:disable Rails/ContentTag
+    # tag "#{prefix}organization:#{@sponsorship.organization.id}"
+    # tag "#{prefix}conference:#{@sponsorship.conference.id}"
   end
 
-  def tag(*tags)
+  private def tag(*tags)
     raise "BUG: used after commit" if @mailgun_tags == :committed
+
     (@mailgun_tags ||= []).push(*tags)
   end
 
-  def variable(h)
+  private def variable(h)
     raise "BUG: used after commit" if @mailgun_variables == :committed
+
     (@mailgun_variables ||= {}).merge!(h)
   end
 
-  def list_name(n)
+  private def list_name(n)
     raise "BUG: used after commit" if @list_name == :committed
+
     (@list_name ||= []).push(n)
   end
 
-  def commit_mailgun_tag
+  private def commit_mailgun_tag
     (@mailgun_tags || []).uniq.each do |t|
       headers 'X-Mailgun-Tag' => t
     end
     @mailgun_tags = :committed
   end
 
-  def commit_mailgun_variables
+  private def commit_mailgun_variables
     raise "BUG: used after commit" if @mailgun_variables == :committed
+
     if @mailgun_variables
       headers 'X-Mailgun-Variables' => @mailgun_variables.to_json
     end
     @mailgun_variables = :committed
   end
 
-  def commit_list_id
+  private def commit_list_id
     raise "BUG: used after commit" if @list_name == :committed
+
     @list_name ||= []
-    if @conference && @conference.is_a?(Conference)
-      @list_name.push @conference.slug 
-    elsif @sponsorship && @sponsorship.is_a?(Sponsorship)
+    if @conference&.is_a?(Conference)
+      @list_name.push @conference.slug
+    elsif @sponsorship&.is_a?(Sponsorship)
       @list_name.push @sponsorship.conference.slug
     end
     unless @list_name.empty?
-      headers 'List-ID' => "<#{@list_name.join('.')}.#{Rails.application.config.x.default_email_host_part}>"
+      headers 'List-ID' => "<#{@list_name.join(".")}.#{Rails.application.config.x.default_email_host_part}>"
     end
     @list_name = :committed
   end
 
-  def subject_prefix
+  private def subject_prefix
     @subject_prefix ||= "[#{Rails.application.config.x.org_name}] "
   end
 
-  def make_subject(**params)
+  private def make_subject(**params)
     "#{subject_prefix}#{default_i18n_subject(**params)}"
   end
 end

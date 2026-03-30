@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # XXX: move this to somewhere else (is this a model???)
 
 class TitoApi
@@ -44,7 +46,7 @@ class TitoApi
   end
 
   def create_registration_note(event_slug, registration_slug, content:)
-    post("#{event_slug}/registrations/#{escape(registration_slug.to_s)}/notes", note: { content: }).body
+    post("#{event_slug}/registrations/#{escape(registration_slug.to_s)}/notes", note: {content:}).body
   end
 
   def get_ticket(account_event_slug, ticket_slug)
@@ -69,8 +71,8 @@ class TitoApi
     @faraday ||= Faraday.new(headers: default_headers, url: endpoint) do |builder|
       builder.use Faraday::Response::Logger, Rails.logger, bodies: true do |log|
         log.filter(/^authorization:.+$/i, 'authorization: [redacted]')
-      end if true
-      builder.use FaradayMiddleware::ParseJson, :content_type => /\bjson$/, :parser_options => { :symbolize_names => true }
+      end
+      builder.use FaradayMiddleware::ParseJson, content_type: /\bjson$/, parser_options: {symbolize_names: true}
       builder.use FaradayMiddleware::EncodeJson
       builder.use Faraday::Response::RaiseError
 
@@ -94,11 +96,11 @@ class TitoApi
     request(:post, path, params, body || bodyhash, headers: headers, timeout: timeout)
   end
 
-  def request(method, path, params = {}, body, conn: faraday, headers: nil, timeout: 20)
+  def request(method, path, params = {}, body, conn: faraday, headers: nil, timeout: 20) # rubocop:disable Style/OptionalArguments
     conn.send(method) do |req|
       req.url(path, params)
       if body
-        req.body = body 
+        req.body = body
         req.headers['Accept'] = 'application/json'
         req.headers['Content-Type'] = 'application/json'
       end

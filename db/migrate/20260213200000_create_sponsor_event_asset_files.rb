@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateSponsorEventAssetFiles < ActiveRecord::Migration[8.1]
   def change
     create_table :sponsor_event_asset_files do |t|

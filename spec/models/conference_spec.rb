@@ -1,17 +1,13 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Conference, type: :model do
-
   describe 'associations' do
-
     it 'has many plans' do
-      expect(Conference.reflect_on_association(:plans).macro).to eq(:has_many)
-      expect(Conference.reflect_on_association(:plans).options[:dependent]).to eq(:destroy)
+      expect(described_class.reflect_on_association(:plans).macro).to eq(:has_many)
+      expect(described_class.reflect_on_association(:plans).options[:dependent]).to eq(:destroy)
     end
-
-
-
-
 
     it 'orders plans by rank ascending' do
       conference = FactoryBot.create(:conference)
@@ -24,8 +20,6 @@ RSpec.describe Conference, type: :model do
   end
 
   describe 'validations' do
-
-
     it 'auto-generates slug from name' do
       conference = FactoryBot.build(:conference, name: 'RubyKaigi 2025', slug: nil)
       conference.valid?
@@ -38,7 +32,6 @@ RSpec.describe Conference, type: :model do
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:slug]).to include('has already been taken')
     end
-
 
     describe 'tito_slug format validation' do
       it 'accepts valid format' do
@@ -94,105 +87,113 @@ RSpec.describe Conference, type: :model do
 
   describe 'scopes' do
     let!(:open_conference) do
-      FactoryBot.create(:conference,
+      FactoryBot.create(
+        :conference,
         application_opens_at: 1.day.ago,
-        application_closes_at: 1.day.from_now
+        application_closes_at: 1.day.from_now,
       )
     end
 
     let!(:closed_conference) do
-      FactoryBot.create(:conference,
+      FactoryBot.create(
+        :conference,
         application_opens_at: 2.days.ago,
-        application_closes_at: 1.day.ago
+        application_closes_at: 1.day.ago,
       )
     end
 
     let!(:not_yet_open_conference) do
-      FactoryBot.create(:conference,
-        application_opens_at: 1.day.from_now
+      FactoryBot.create(
+        :conference,
+        application_opens_at: 1.day.from_now,
       )
     end
 
     let!(:open_no_close_date) do
-      FactoryBot.create(:conference,
+      FactoryBot.create(
+        :conference,
         application_opens_at: 1.day.ago,
-        application_closes_at: nil
+        application_closes_at: nil,
       )
     end
 
     describe '.application_open' do
       it 'includes conferences with open applications' do
-        expect(Conference.application_open).to include(open_conference)
+        expect(described_class.application_open).to include(open_conference)
       end
 
       it 'includes conferences with no close date' do
-        expect(Conference.application_open).to include(open_no_close_date)
+        expect(described_class.application_open).to include(open_no_close_date)
       end
 
       it 'excludes conferences with closed applications' do
-        expect(Conference.application_open).not_to include(closed_conference)
+        expect(described_class.application_open).not_to include(closed_conference)
       end
 
       it 'excludes conferences not yet open' do
-        expect(Conference.application_open).not_to include(not_yet_open_conference)
+        expect(described_class.application_open).not_to include(not_yet_open_conference)
       end
     end
 
     describe '.amendment_open' do
       let!(:amendment_open_conference) do
-        FactoryBot.create(:conference,
+        FactoryBot.create(
+          :conference,
           name: 'Amendment Open',
           slug: 'amendment-2025',
           contact_email_address: 'amendment@example.com',
           application_opens_at: 2.days.ago,
-          amendment_closes_at: 1.day.from_now
+          amendment_closes_at: 1.day.from_now,
         )
       end
 
       let!(:amendment_closed_conference) do
-        FactoryBot.create(:conference,
+        FactoryBot.create(
+          :conference,
           name: 'Amendment Closed',
           slug: 'amendment-closed-2024',
           contact_email_address: 'closed-amendment@example.com',
           application_opens_at: 3.days.ago,
-          amendment_closes_at: 1.day.ago
+          amendment_closes_at: 1.day.ago,
         )
       end
 
       it 'includes conferences with open amendments' do
-        expect(Conference.amendment_open).to include(amendment_open_conference)
+        expect(described_class.amendment_open).to include(amendment_open_conference)
       end
 
       it 'excludes conferences with closed amendments' do
-        expect(Conference.amendment_open).not_to include(amendment_closed_conference)
+        expect(described_class.amendment_open).not_to include(amendment_closed_conference)
       end
     end
 
     describe '.publicly_visible' do
       let!(:visible_conference) do
-        FactoryBot.create(:conference,
+        FactoryBot.create(
+          :conference,
           name: 'Visible',
           slug: 'visible',
           contact_email_address: 'visible@example.com',
-          hidden: false
+          hidden: false,
         )
       end
 
       let!(:hidden_conference) do
-        FactoryBot.create(:conference,
+        FactoryBot.create(
+          :conference,
           name: 'Hidden',
           slug: 'hidden',
           contact_email_address: 'hidden@example.com',
-          hidden: true
+          hidden: true,
         )
       end
 
       it 'includes non-hidden conferences' do
-        expect(Conference.publicly_visible).to include(visible_conference)
+        expect(described_class.publicly_visible).to include(visible_conference)
       end
 
       it 'excludes hidden conferences' do
-        expect(Conference.publicly_visible).not_to include(hidden_conference)
+        expect(described_class.publicly_visible).not_to include(hidden_conference)
       end
     end
   end
@@ -259,32 +260,36 @@ RSpec.describe Conference, type: :model do
 
   describe '#application_open?' do
     it 'returns true when currently open' do
-      conference = FactoryBot.build_stubbed(:conference,
+      conference = FactoryBot.build_stubbed(
+        :conference,
         application_opens_at: 1.day.ago,
-        application_closes_at: 1.day.from_now
+        application_closes_at: 1.day.from_now,
       )
       expect(conference.application_open?).to be true
     end
 
     it 'returns true when open with no close date' do
-      conference = FactoryBot.build_stubbed(:conference,
+      conference = FactoryBot.build_stubbed(
+        :conference,
         application_opens_at: 1.day.ago,
-        application_closes_at: nil
+        application_closes_at: nil,
       )
       expect(conference.application_open?).to be true
     end
 
     it 'returns false when closed' do
-      conference = FactoryBot.build_stubbed(:conference,
+      conference = FactoryBot.build_stubbed(
+        :conference,
         application_opens_at: 2.days.ago,
-        application_closes_at: 1.day.ago
+        application_closes_at: 1.day.ago,
       )
       expect(conference.application_open?).to be false
     end
 
     it 'returns false when not yet open' do
-      conference = FactoryBot.build_stubbed(:conference,
-        application_opens_at: 1.day.from_now
+      conference = FactoryBot.build_stubbed(
+        :conference,
+        application_opens_at: 1.day.from_now,
       )
       expect(conference.application_open?).to be false
     end
@@ -297,25 +302,28 @@ RSpec.describe Conference, type: :model do
 
   describe '#amendment_open?' do
     it 'returns true when currently open' do
-      conference = FactoryBot.build_stubbed(:conference,
+      conference = FactoryBot.build_stubbed(
+        :conference,
         application_opens_at: 1.day.ago,
-        amendment_closes_at: 1.day.from_now
+        amendment_closes_at: 1.day.from_now,
       )
       expect(conference.amendment_open?).to be true
     end
 
     it 'returns true when open with no close date' do
-      conference = FactoryBot.build_stubbed(:conference,
+      conference = FactoryBot.build_stubbed(
+        :conference,
         application_opens_at: 1.day.ago,
-        amendment_closes_at: nil
+        amendment_closes_at: nil,
       )
       expect(conference.amendment_open?).to be true
     end
 
     it 'returns false when closed' do
-      conference = FactoryBot.build_stubbed(:conference,
+      conference = FactoryBot.build_stubbed(
+        :conference,
         application_opens_at: 2.days.ago,
-        amendment_closes_at: 1.day.ago
+        amendment_closes_at: 1.day.ago,
       )
       expect(conference.amendment_open?).to be false
     end
@@ -323,15 +331,17 @@ RSpec.describe Conference, type: :model do
 
   describe '#distributing_ticket?' do
     it 'returns true when distribution has started' do
-      conference = FactoryBot.build_stubbed(:conference,
-        ticket_distribution_starts_at: 1.day.ago
+      conference = FactoryBot.build_stubbed(
+        :conference,
+        ticket_distribution_starts_at: 1.day.ago,
       )
       expect(conference.distributing_ticket?).to be true
     end
 
     it 'returns false when distribution has not started' do
-      conference = FactoryBot.build_stubbed(:conference,
-        ticket_distribution_starts_at: 1.day.from_now
+      conference = FactoryBot.build_stubbed(
+        :conference,
+        ticket_distribution_starts_at: 1.day.from_now,
       )
       expect(conference.distributing_ticket?).to be false
     end
@@ -361,9 +371,9 @@ RSpec.describe Conference, type: :model do
 
     it 'raises error when English locale not found' do
       I18n.with_locale(:ja) do
-        expect {
+        expect do
           conference.form_description_for_locale
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -427,7 +437,7 @@ RSpec.describe Conference, type: :model do
   end
 
   describe '#verify_invite_code' do
-    context 'for visible conferences' do
+    context 'when conference is visible' do
       let(:conference) { FactoryBot.create(:conference, hidden: false) }
 
       it 'returns true for any code' do
@@ -439,7 +449,7 @@ RSpec.describe Conference, type: :model do
       end
     end
 
-    context 'for hidden conferences' do
+    context 'when conference is hidden' do
       let(:conference) { FactoryBot.create(:conference, hidden: true) }
 
       it 'returns true for correct invite code' do
@@ -457,7 +467,6 @@ RSpec.describe Conference, type: :model do
       it 'returns false for nil code' do
         expect(conference.verify_invite_code(nil)).to be false
       end
-
     end
   end
 end

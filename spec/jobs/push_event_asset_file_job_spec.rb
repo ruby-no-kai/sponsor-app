@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe PushEventAssetFileJob, type: :job do
@@ -23,12 +25,12 @@ RSpec.describe PushEventAssetFileJob, type: :job do
 
     allow(GithubInstallation).to receive(:new).and_return(gh_installation)
 
-    allow_any_instance_of(SponsorEventAssetFile).to receive(:get_object) do |_asset_file, **args|
-      args[:response_target].write(test_image_data) if args[:response_target]
+    allow_any_instance_of(SponsorEventAssetFile).to receive(:get_object) do |_asset_file, **args| # rubocop:disable RSpec/AnyInstance
+      args[:response_target]&.write(test_image_data)
     end
 
     allow(octokit).to receive(:delete_branch)
-    allow(octokit).to receive(:branch).and_return({ commit: { sha: 'abc123' } })
+    allow(octokit).to receive(:branch).and_return({commit: {sha: 'abc123'}})
     allow(octokit).to receive(:create_ref)
     allow(octokit).to receive(:contents).and_raise(Octokit::NotFound.new)
     allow(octokit).to receive(:update_contents)
@@ -42,7 +44,7 @@ RSpec.describe PushEventAssetFileJob, type: :job do
       expect(octokit).to have_received(:create_pull_request).with(
         anything, anything,
         a_string_including(editing_history.id.to_s),
-        anything, anything,
+        anything, anything
       )
     end
 
@@ -52,7 +54,7 @@ RSpec.describe PushEventAssetFileJob, type: :job do
       expect(octokit).to have_received(:create_pull_request).with(
         anything, anything,
         a_string_including(editing_history.id.to_s),
-        anything, anything,
+        anything, anything
       )
     end
 
@@ -96,7 +98,7 @@ RSpec.describe PushEventAssetFileJob, type: :job do
 
   describe 'image conversion' do
     it 'downloads image from S3 via asset_file.get_object with response_target' do
-      expect_any_instance_of(SponsorEventAssetFile).to receive(:get_object).with(response_target: an_instance_of(File)) do |_asset_file, **args|
+      expect_any_instance_of(SponsorEventAssetFile).to receive(:get_object).with(response_target: an_instance_of(File)) do |_asset_file, **args| # rubocop:disable RSpec/AnyInstance
         args[:response_target].write(test_image_data)
       end
       described_class.perform_now(editing_history)
@@ -105,7 +107,7 @@ RSpec.describe PushEventAssetFileJob, type: :job do
     it 'converts image to webp using vipsthumbnail' do
       described_class.perform_now(editing_history)
 
-      expect(octokit).to have_received(:update_contents) do |_repo, _path, _msg, _sha, content, **_opts|
+      expect(octokit).to have_received(:update_contents) do |_repo, _path, _msg, _sha, content, **_opts| # rubocop:disable Metrics/ParameterLists
         expect(content[0..3]).to eq("RIFF")
         expect(content[8..11]).to eq("WEBP")
       end
@@ -123,7 +125,7 @@ RSpec.describe PushEventAssetFileJob, type: :job do
 
       vipsthumbnail_calls = []
       allow(Open3).to receive(:capture3).and_wrap_original do |original, *args, **kwargs|
-        env, cmd, *rest = args
+        _, cmd, *rest = args
         vipsthumbnail_calls << rest if cmd == 'vipsthumbnail'
         original.call(*args, **kwargs)
       end
@@ -150,7 +152,7 @@ RSpec.describe PushEventAssetFileJob, type: :job do
       expect(octokit).to have_received(:create_ref).with(
         'ruby-no-kai/rubykaigi.org',
         "refs/heads/sponsor-app/event-asset/#{sponsorship.id}-#{event.id}/#{editing_history.id}",
-        'abc123'
+        'abc123',
       )
     end
 
@@ -169,14 +171,14 @@ RSpec.describe PushEventAssetFileJob, type: :job do
     end
 
     it 'uses existing blob sha when file already exists on base branch' do
-      allow(octokit).to receive(:contents).and_return({ sha: 'existing_blob_sha' })
+      allow(octokit).to receive(:contents).and_return({sha: 'existing_blob_sha'})
       described_class.perform_now(editing_history)
 
       expect(octokit).to have_received(:update_contents).with(
         anything, anything, anything,
         'existing_blob_sha',
         anything,
-        anything,
+        anything
       )
     end
 
@@ -213,7 +215,7 @@ RSpec.describe PushEventAssetFileJob, type: :job do
 
       expected_path = "images/events/#{sponsorship.id}-#{event.id}.webp"
       expect(octokit).to have_received(:update_contents).with(
-        anything, expected_path, anything, anything, anything, anything,
+        anything, expected_path, anything, anything, anything, anything
       )
     end
   end

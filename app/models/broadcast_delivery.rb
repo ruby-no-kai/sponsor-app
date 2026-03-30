@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BroadcastDelivery < ApplicationRecord
   belongs_to :broadcast
   belongs_to :sponsorship, optional: true
@@ -5,7 +7,7 @@ class BroadcastDelivery < ApplicationRecord
   validates :recipient, presence: true
   validates :status, presence: true
 
-  enum :status, %i(created preparing ready pending sending sent failed rejected accepted delivered opened clicked)
+  enum :status, {created: 0, preparing: 1, ready: 2, pending: 3, sending: 4, sent: 5, failed: 6, rejected: 7, accepted: 8, delivered: 9, opened: 10, clicked: 11}
 
   def mailgun_events
     (self.meta ||= {})['mailgun_events'] ||= []
@@ -13,7 +15,7 @@ class BroadcastDelivery < ApplicationRecord
 
   def add_mailgun_event(event)
     mailgun_events << event
-    mailgun_events.sort_by!{ |_| _['timestamp'] || 0 }
+    mailgun_events.sort_by! { |e| e['timestamp'] || 0 }
   end
 
   def recipient_ccs
