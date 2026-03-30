@@ -1,0 +1,40 @@
+amends "package://github.com/jdx/hk/releases/download/v1.36.0/hk@1.36.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.36.0/hk@1.36.0#/Builtins.pkl"
+
+local linters = new Mapping<String, Step> {
+  ["rubocop"] {
+    workspace_indicator = ".rubocop.yml"
+    check = "cd {{workspace}} && bundle exec rubocop --force-exclusion {{ workspace_files }}"
+    fix = "cd {{workspace}} && bundle exec rubocop --force-exclusion --autocorrect {{ workspace_files }}"
+    batch = true
+  }
+  ["actionlint"] = Builtins.actionlint
+  ["newlines"] = Builtins.newlines
+
+  ["oxfmt"] {
+    workspace_indicator = "pnpm-workspace.yaml"
+    check = "cd {{workspace}} && npx oxfmt --check {{ workspace_files }}"
+    check_list_files = "cd {{workspace}} && npx oxfmt --list-different {{ workspace_files }}"
+    fix = "cd {{workspace}} && npx oxfmt --write {{ workspace_files }}"
+    batch = true
+  }
+  ["crossbar-protoc"] {
+    glob = "proto/**/*"
+    check_diff = "mise run protoc && mise run openapi"
+  }
+}
+
+hooks {
+    ["pre-commit"] {
+        fix = true
+        stash = "git"
+        steps = linters
+    }
+    ["fix"] {
+        fix = true
+        steps = linters
+    }
+    ["check"] {
+        steps = linters
+    }
+}

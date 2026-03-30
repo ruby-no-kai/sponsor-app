@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 gem 'rails', '~> 8.1.0'
@@ -58,6 +60,13 @@ group :development, :test do
   gem 'letter_opener_web'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+
+  gem "rubocop", require: false
+  gem "rubocop-shopify", require: false
+  gem "rubocop-rspec", require: false
+  gem "rubocop-rspec_rails", require: false
+  gem "rubocop-rails", require: false
+  gem "rubocop-factory_bot", require: false
 end
 
 group :development do
