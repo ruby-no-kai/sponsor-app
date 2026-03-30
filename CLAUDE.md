@@ -176,12 +176,7 @@ bundle exec shoryuken -R -C config/shoryuken.yml
 
 ### Authentication Backdoor
 
-Set `BACKDOOR_SECRET` environment variable, then visit:
-```
-http://localhost:3000/admin/session/new?backdoor=BACKDOOR_SECRET&login=YOUR_GITHUB_LOGIN
-```
-
-This bypasses GitHub OAuth for local development.
+In development, visit http://localhost:3000/admin/session/new and use the "Development Backdoor" form to sign in without GitHub OAuth.
 
 ### Email Testing
 

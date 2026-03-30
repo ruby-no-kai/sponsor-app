@@ -52,6 +52,7 @@ Rails.application.routes.draw do
 
     resource :session, only: %i(new destroy) do
       get :rise, as: :rise
+      post :backdoor
     end
   end
 
