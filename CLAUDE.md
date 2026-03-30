@@ -176,13 +176,13 @@ bundle exec shoryuken -R -C config/shoryuken.yml
 
 ### Authentication Backdoor
 
-In development, visit http://localhost:3000/admin/session/new and use the "Development Backdoor" form to sign in without GitHub OAuth.
+In development, visit https://sponsor-app.localhost:1355/admin/session/new and use the "Development Backdoor" form to sign in without GitHub OAuth.
 
 ### Email Testing
 
 In development, emails are captured by Letter Opener gem. Use either method to view sent emails:
 
-- Visit http://localhost:3000/letter_opener
+- Visit https://sponsor-app.localhost:1355/letter_opener
 - Check `tmp/letter_opener` directory and its files
 
 ### Environment Variables

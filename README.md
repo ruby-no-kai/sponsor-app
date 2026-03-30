@@ -9,8 +9,8 @@ rails s
 bin/vite dev
 ```
 
-- http://localhost:3000/
-- http://localhost:3000/admin
+- https://sponsor-app.localhost:1355/
+- https://sponsor-app.localhost:1355/admin
 
 ### Environment variables
 
@@ -45,7 +45,7 @@ And you need to manually install the app to the repositories.
   - `openssl pkey -in /path/to/private-key.pem -outform der | openssl base64 -A`
   - (or concat Base64 part of PEM into a one line)
 
-But during development, visit http://localhost:3000/admin/session/new and use the "Development Backdoor" form to login without genuine OAuth2 dance.
+But during development, visit https://sponsor-app.localhost:1355/admin/session/new and use the "Development Backdoor" form to login without genuine OAuth2 dance.
 
 #### Slack
 
