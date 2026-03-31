@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
-import type {
-  EditorProps,
-  ExpenseReport,
-  ExpenseFile,
-  CalculateResponse,
-} from "./types";
+import type { EditorProps, ExpenseReport, ExpenseFile, CalculateResponse } from "./types";
 import { fetchReport, fetchCalculate } from "./api";
 import { LeftPane } from "./LeftPane";
 import { CenterPane } from "./CenterPane";
 import { RightPane } from "./RightPane";
 import { AdminReviewForm } from "./AdminReviewForm";
+import { FileDropOverlay } from "./FileDropOverlay";
+import { useFileUpload } from "./useFileUpload";
+import { UploadDialog } from "./UploadDialog";
+import { updateLineItem } from "./api";
 
 export function ExpenseReportEditor(props: EditorProps) {
   const [report, setReport] = useState<ExpenseReport | null>(null);
@@ -22,8 +21,7 @@ export function ExpenseReportEditor(props: EditorProps) {
   const opts = { csrfToken: props.csrfToken };
 
   const isReadOnly =
-    report?.status === "approved" ||
-    (props.role === "sponsor" && report?.status === "submitted");
+    report?.status === "approved" || (props.role === "sponsor" && report?.status === "submitted");
 
   const refreshReport = useCallback(async () => {
     try {
@@ -49,6 +47,23 @@ export function ExpenseReportEditor(props: EditorProps) {
     setReport(updatedReport);
     setError(null);
   }, []);
+
+  // File upload with modal dialog
+  const { dialogState, startUpload, handleRetry, handleDiscard } = useFileUpload({
+    filesUrl: props.filesUrl,
+    reportUrl: props.reportUrl,
+    lineItemsUrl: props.lineItemsUrl,
+    csrfToken: props.csrfToken,
+    onReportUpdate: handleReportUpdate,
+    onError: setError,
+  });
+
+  const handleDropUnlinked = useCallback((files: File[]) => startUpload(files), [startUpload]);
+
+  const handleDropLinked = useCallback(
+    (files: File[]) => startUpload(files, selectedItemId),
+    [startUpload, selectedItemId],
+  );
 
   const selectedItem = report?.line_items.find((i) => i.id === selectedItemId);
   const previewFile = report?.files.find((f) => f.id === previewFileId);
@@ -76,11 +91,7 @@ export function ExpenseReportEditor(props: EditorProps) {
       {error && (
         <div className="alert alert-warning alert-dismissible" role="alert">
           {error}
-          <button
-            type="button"
-            className="close"
-            onClick={() => setError(null)}
-          >
+          <button type="button" className="close" onClick={() => setError(null)}>
             <span>&times;</span>
           </button>
         </div>
@@ -92,28 +103,33 @@ export function ExpenseReportEditor(props: EditorProps) {
           {calcData && (
             <span className="ml-3 text-muted">
               Total: {formatAmount(report.total_amount)} + tax{" "}
-              {formatAmount(report.total_tax_amount)} / Fee:{" "}
-              {formatAmount(calcData.total_fee)}
+              {formatAmount(report.total_tax_amount)} / Fee: {formatAmount(calcData.total_fee)}
             </span>
           )}
         </div>
         <div>
-          {!isReadOnly && props.role === "sponsor" && report.status === "draft" && props.submissionUrl && (
-            <SubmitButton
-              submissionUrl={props.submissionUrl}
-              opts={opts}
-              onUpdate={handleReportUpdate}
-              onError={setError}
-            />
-          )}
-          {!isReadOnly && props.role === "sponsor" && report.status === "submitted" && props.submissionUrl && (
-            <WithdrawButton
-              submissionUrl={props.submissionUrl}
-              opts={opts}
-              onUpdate={handleReportUpdate}
-              onError={setError}
-            />
-          )}
+          {!isReadOnly &&
+            props.role === "sponsor" &&
+            report.status === "draft" &&
+            props.submissionUrl && (
+              <SubmitButton
+                submissionUrl={props.submissionUrl}
+                opts={opts}
+                onUpdate={handleReportUpdate}
+                onError={setError}
+              />
+            )}
+          {!isReadOnly &&
+            props.role === "sponsor" &&
+            report.status === "submitted" &&
+            props.submissionUrl && (
+              <WithdrawButton
+                submissionUrl={props.submissionUrl}
+                opts={opts}
+                onUpdate={handleReportUpdate}
+                onError={setError}
+              />
+            )}
         </div>
       </div>
 
@@ -125,37 +141,40 @@ export function ExpenseReportEditor(props: EditorProps) {
           </div>
         )}
 
-      <div
-        className="d-flex border rounded"
-        style={{ height: "80vh", overflow: "hidden" }}
+      <FileDropOverlay
+        selectedItem={selectedItem || null}
+        disabled={isReadOnly}
+        onDropUnlinked={handleDropUnlinked}
+        onDropLinked={handleDropLinked}
       >
-        <LeftPane
-          report={report}
-          selectedItemId={selectedItemId}
-          onSelectItem={setSelectedItemId}
-          onSelectFile={setPreviewFileId}
-          isReadOnly={isReadOnly}
-          lineItemsUrl={props.lineItemsUrl}
-          filesUrl={props.filesUrl}
-          opts={opts}
-          onUpdate={handleReportUpdate}
-          onError={setError}
-          onRefresh={refreshReport}
-        />
-        <CenterPane
-          item={selectedItem || null}
-          report={report}
-          calcData={calcData}
-          isReadOnly={isReadOnly}
-          lineItemsUrl={props.lineItemsUrl}
-          filesUrl={props.filesUrl}
-          opts={opts}
-          onUpdate={handleReportUpdate}
-          onError={setError}
-          onPreviewFile={setPreviewFileId}
-        />
-        <RightPane file={previewFile || null} filesUrl={props.filesUrl} />
-      </div>
+        <div className="d-flex border rounded" style={{ height: "80vh", overflow: "hidden" }}>
+          <LeftPane
+            report={report}
+            selectedItemId={selectedItemId}
+            onSelectItem={setSelectedItemId}
+            onSelectFile={setPreviewFileId}
+            isReadOnly={isReadOnly}
+            lineItemsUrl={props.lineItemsUrl}
+            opts={opts}
+            onUpdate={handleReportUpdate}
+            onError={setError}
+            onUploadFiles={handleDropUnlinked}
+          />
+          <CenterPane
+            item={selectedItem || null}
+            report={report}
+            calcData={calcData}
+            isReadOnly={isReadOnly}
+            lineItemsUrl={props.lineItemsUrl}
+            filesUrl={props.filesUrl}
+            opts={opts}
+            onUpdate={handleReportUpdate}
+            onError={setError}
+            onPreviewFile={setPreviewFileId}
+          />
+          <RightPane file={previewFile || null} filesUrl={props.filesUrl} />
+        </div>
+      </FileDropOverlay>
 
       {props.role === "admin" && props.reviewsUrl && (
         <AdminReviewForm
@@ -166,6 +185,8 @@ export function ExpenseReportEditor(props: EditorProps) {
           onError={setError}
         />
       )}
+
+      <UploadDialog state={dialogState} onRetry={handleRetry} onDiscard={handleDiscard} />
     </div>
   );
 }
@@ -213,11 +234,7 @@ function SubmitButton({
   };
 
   return (
-    <button
-      className="btn btn-primary btn-sm"
-      onClick={handleSubmit}
-      disabled={submitting}
-    >
+    <button className="btn btn-primary btn-sm" onClick={handleSubmit} disabled={submitting}>
       {submitting ? "Submitting..." : "Submit for Review"}
     </button>
   );
@@ -251,11 +268,7 @@ function WithdrawButton({
   };
 
   return (
-    <button
-      className="btn btn-warning btn-sm"
-      onClick={handleWithdraw}
-      disabled={withdrawing}
-    >
+    <button className="btn btn-warning btn-sm" onClick={handleWithdraw} disabled={withdrawing}>
       {withdrawing ? "Withdrawing..." : "Withdraw Submission"}
     </button>
   );

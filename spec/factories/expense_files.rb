@@ -6,5 +6,6 @@ FactoryBot.define do
     prefix { "c-1/expenses/s-1/" }
     filename { 'receipt.pdf' }
     content_type { 'application/pdf' }
+    status { 'uploaded' }
   end
 end

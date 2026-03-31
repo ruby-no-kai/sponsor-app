@@ -1,8 +1,6 @@
 import React, { useState, useRef } from "react";
 import type { ExpenseReport } from "./types";
 import { createLineItem, updateLineItem } from "./api";
-import { FileDropZone } from "./FileDropZone";
-import { useFileUpload } from "./useFileUpload";
 import { SortableLineItemList } from "./SortableLineItemList";
 
 type LeftPaneProps = {
@@ -12,11 +10,10 @@ type LeftPaneProps = {
   onSelectFile: (id: number | null) => void;
   isReadOnly: boolean;
   lineItemsUrl: string;
-  filesUrl: string;
   opts: { csrfToken: string };
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
-  onRefresh: () => void;
+  onUploadFiles: (files: File[]) => void;
 };
 
 export function LeftPane({
@@ -26,25 +23,15 @@ export function LeftPane({
   onSelectFile,
   isReadOnly,
   lineItemsUrl,
-  filesUrl,
   opts,
   onUpdate,
   onError,
-  onRefresh,
+  onUploadFiles,
 }: LeftPaneProps) {
   const [adding, setAdding] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { uploading, uploadFiles } = useFileUpload({
-    filesUrl,
-    csrfToken: opts.csrfToken,
-    onFileUploaded: () => onRefresh(),
-    onError,
-  });
-
-  const linkedFileIds = new Set(
-    report.line_items.flatMap((item) => item.file_ids),
-  );
+  const linkedFileIds = new Set(report.line_items.flatMap((item) => item.file_ids));
   const unlinkedFiles = report.files.filter((f) => !linkedFileIds.has(f.id));
 
   const handleReorder = async (activeId: number, overId: number) => {
@@ -53,15 +40,9 @@ export function LeftPane({
     const overIdx = items.findIndex((i) => i.id === overId);
     if (activeIdx < 0 || overIdx < 0) return;
 
-    // Compute new position: take the over item's position
     const newPosition = items[overIdx].position;
     try {
-      const result = await updateLineItem(
-        lineItemsUrl,
-        activeId,
-        { position: newPosition },
-        opts,
-      );
+      const result = await updateLineItem(lineItemsUrl, activeId, { position: newPosition }, opts);
       onUpdate(result);
     } catch (e) {
       onError(e instanceof Error ? e.message : "Failed to reorder");
@@ -88,14 +69,12 @@ export function LeftPane({
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length > 0) uploadFiles(files);
+    if (files.length > 0) onUploadFiles(files);
     e.target.value = "";
   };
 
   return (
-    <FileDropZone
-      onFilesDropped={uploadFiles}
-      disabled={isReadOnly || uploading}
+    <div
       className="border-right d-flex flex-column"
       style={{ width: "250px", minWidth: "250px", overflow: "auto" }}
     >
@@ -132,10 +111,9 @@ export function LeftPane({
             <button
               className="btn btn-sm btn-outline-secondary"
               onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
               title="Upload file"
             >
-              {uploading ? "..." : "Upload"}
+              Upload
             </button>
             <input
               ref={fileInputRef}
@@ -163,11 +141,6 @@ export function LeftPane({
           <div className="p-2 text-muted small">No unlinked files</div>
         )}
       </div>
-    </FileDropZone>
+    </div>
   );
-}
-
-function formatAmount(amount: string): string {
-  const num = parseFloat(amount);
-  return isNaN(num) ? amount : num.toLocaleString();
 }

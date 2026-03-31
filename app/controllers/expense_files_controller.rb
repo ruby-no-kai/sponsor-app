@@ -19,6 +19,7 @@ class ExpenseFilesController < ApplicationController
 
   def update
     @asset_file.assign_attributes(params.permit(:filename, :content_type))
+    @asset_file.status = 'uploaded'
     super
   end
 

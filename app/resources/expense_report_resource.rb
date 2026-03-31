@@ -8,7 +8,7 @@ class ExpenseReportResource
   has_many :line_items, resource: ExpenseLineItemResource, key: 'line_items'
 
   attribute :files do |report|
-    report.sponsorship.expense_files.map do |file|
+    report.sponsorship.expense_files.uploaded.map do |file|
       ExpenseFileResource.new(file).to_h
     end
   end

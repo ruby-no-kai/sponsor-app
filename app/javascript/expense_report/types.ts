@@ -27,6 +27,7 @@ export type ExpenseFile = {
   id: number;
   filename: string;
   content_type: string;
+  status: "pending" | "uploaded";
   created_at: string;
 };
 
