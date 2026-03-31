@@ -23,12 +23,20 @@ Rails.application.routes.draw do
       resources :form_descriptions, param: :locale, except: %i(index)
       resources :plans, except: %i(show)
 
+      resources :expense_reports, only: %i(index)
+
       resources :sponsorships, except: %i(index new create) do
         resources :sponsorship_editing_histories, as: :editing_histories, path: 'editing_history', only: %i(index)
         resources :sponsorship_staff_notes, as: :staff_notes, path: 'staff_notes', only: %i(index create edit update destroy)
         resource :impersonation, only: %i(create), controller: 'sponsorship_impersonations'
         member do
           get :download_asset
+        end
+        resource :expense_report, only: %i(show update), controller: 'expense_reports' do
+          member do
+            get :calculate
+          end
+          resources :reviews, controller: 'expense_report_reviews', only: %i(create)
         end
       end
 

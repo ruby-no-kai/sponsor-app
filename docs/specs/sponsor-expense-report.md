@@ -315,11 +315,12 @@ Each group corresponds to a reasonably-sized commit.
 - [x] Request specs (15 examples, all passing; 449 total, 0 failures)
 
 **6. Admin expense report API and views**
-- [ ] Routes: admin expense report list, show/update, reviews, calculate
-- [ ] Controller: `Admin::ExpenseReportsController` (index, show, update, calculate)
-- [ ] Controller: `Admin::ExpenseReportReviewsController` (create)
-- [ ] View: admin expense report list page (HAML)
-- [ ] View: admin sponsorship show — expense report link
+- [x] Routes: admin expense report list, show/update, reviews, calculate
+- [x] Controller: `Admin::ExpenseReportsController` (index, show, update, calculate)
+- [x] Controller: `Admin::ExpenseReportReviewsController` (create)
+- [x] View: admin expense report list page (HAML)
+- [x] View: admin sponsorship show — expense report card
+- [x] Admin request specs (7 examples, all passing; 456 total, 0 failures)
 
 **7. Sponsor portal entry point and React mount**
 - [ ] View: sponsor sponsorship show — expense report entry point section
@@ -358,3 +359,4 @@ Implementors MUST keep this section updated as they work.
 - **2026-03-31 Phase 3**: Models and migrations — created 6 tables, 6 models, AssetFileUploadable S3 cleanup callbacks (before_destroy captures key, after_destroy deletes from S3), Sponsorship associations. Fixed 2 pre-existing tests broken by the new destroy callback (need S3 client stub). 41 new model specs + full suite (434 examples, 0 failures).
 - **2026-03-31 Phase 4**: Alba resources — created 4 resource classes in `app/resources/` for JSON serialization.
 - **2026-03-31 Phase 5**: User-facing API — 4 controllers (expense_reports, expense_line_items, expense_report_submissions, expense_files) with routes nested under sponsorship. 15 request specs passing.
+- **2026-03-31 Phase 6**: Admin API and views — Admin::ExpenseReportsController (index, show, update, calculate), Admin::ExpenseReportReviewsController (create with validation error handling), index HAML view, sponsorship show card for custom sponsorships. 7 admin request specs passing.
