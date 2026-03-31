@@ -25,6 +25,21 @@ RSpec.describe "Expense Line Items", type: :request do
       expect(json['total_amount'].to_d).to eq(5000)
       expect(json['total_tax_amount'].to_d).to eq(500)
     end
+
+    it "creates a line item with pre-linked files" do
+      file = ExpenseFile.prepare(conference:, sponsorship:)
+      file.status = 'uploaded'
+      file.save!
+
+      post user_conference_sponsorship_expense_report_line_items_path(conference), params: {
+        expense_line_item: {title: 'Receipt', amount: 100, tax_amount: 0, file_ids: [file.id]},
+      }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      created_item = json['line_items'].last
+      expect(created_item['file_ids']).to eq([file.id])
+    end
   end
 
   describe "PATCH update" do

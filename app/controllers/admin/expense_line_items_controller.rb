@@ -13,6 +13,7 @@ module Admin
 
       ActiveRecord::Base.transaction do
         @line_item.save!
+        sync_file_ids if params[:expense_line_item]&.key?(:file_ids)
         after_line_item_change
       end
 
@@ -67,7 +68,7 @@ module Admin
 
       (new_ids - current_ids).each do |file_id|
         file = @sponsorship.expense_files.find(file_id)
-        @line_item.expense_line_item_files.build(expense_file: file)
+        @line_item.expense_line_item_files.create!(expense_file: file)
       end
 
       (current_ids - new_ids).each do |file_id|
