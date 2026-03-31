@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
-import type {
-  ExpenseLineItem,
-  ExpenseReport,
-  CalculateResponse,
-  TaxMode,
-} from "./types";
+import type { ExpenseLineItem, ExpenseReport, CalculateResponse, TaxMode } from "./types";
 import { updateLineItem, deleteLineItem } from "./api";
 
 type CenterPaneProps = {
   item: ExpenseLineItem | null;
+  selectedFile: ExpenseReport["files"][number] | null;
   report: ExpenseReport;
   calcData: CalculateResponse | null;
   isReadOnly: boolean;
@@ -18,6 +14,7 @@ type CenterPaneProps = {
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
   onPreviewFile: (id: number | null) => void;
+  onSelectItem: (id: number) => void;
 };
 
 function deriveTaxMode(item: ExpenseLineItem): TaxMode {
@@ -28,6 +25,7 @@ function deriveTaxMode(item: ExpenseLineItem): TaxMode {
 
 export function CenterPane({
   item,
+  selectedFile,
   report,
   calcData,
   isReadOnly,
@@ -37,6 +35,7 @@ export function CenterPane({
   onUpdate,
   onError,
   onPreviewFile,
+  onSelectItem,
 }: CenterPaneProps) {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
@@ -65,13 +64,53 @@ export function CenterPane({
     setEnteredAmount(item.amount);
   }, [item?.id]);
 
+  const [creatingFromFile, setCreatingFromFile] = useState(false);
+
+  const handleCreateFromFile = async () => {
+    if (!selectedFile) return;
+    setCreatingFromFile(true);
+    try {
+      const { createLineItem } = await import("./api");
+      const result = await createLineItem(
+        lineItemsUrl,
+        {
+          title: selectedFile.filename || "New expense",
+          amount: "0",
+          tax_amount: "0",
+          file_ids: [selectedFile.id],
+        },
+        opts,
+      );
+      onUpdate(result);
+      const newItem = result.line_items[result.line_items.length - 1];
+      if (newItem) onSelectItem(newItem.id);
+    } catch (e) {
+      onError(e instanceof Error ? e.message : "Failed to create");
+    } finally {
+      setCreatingFromFile(false);
+    }
+  };
+
   if (!item) {
     return (
       <div
-        className="flex-grow-1 d-flex align-items-center justify-content-center text-muted"
+        className="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-muted"
         style={{ overflow: "auto" }}
       >
-        Select a line item
+        {selectedFile && !isReadOnly ? (
+          <div className="text-center">
+            <p className="mb-2 small">{selectedFile.filename}</p>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={handleCreateFromFile}
+              disabled={creatingFromFile}
+            >
+              {creatingFromFile ? "Creating..." : "Create line item from this file"}
+            </button>
+          </div>
+        ) : (
+          "Select a line item"
+        )}
       </div>
     );
   }
@@ -171,10 +210,7 @@ export function CenterPane({
   const attachedFiles = report.files.filter((f) => fileIds.includes(f.id));
 
   return (
-    <div
-      className="flex-grow-1 p-3"
-      style={{ overflow: "auto", minWidth: 0 }}
-    >
+    <div className="flex-grow-1 p-3" style={{ overflow: "auto", minWidth: 0 }}>
       <div className="form-group">
         <label className="small font-weight-bold">Title</label>
         <input
@@ -270,10 +306,7 @@ export function CenterPane({
           onChange={(e) => setPreliminal(e.target.checked)}
           disabled={isReadOnly}
         />
-        <label
-          className="form-check-label small"
-          htmlFor={`preliminal-${item.id}`}
-        >
+        <label className="form-check-label small" htmlFor={`preliminal-${item.id}`}>
           Preliminal (planned budget, not finalized)
         </label>
       </div>
@@ -329,11 +362,7 @@ export function CenterPane({
 
       {!isReadOnly && (
         <div className="d-flex justify-content-between mt-3">
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={handleSave}
-            disabled={saving}
-          >
+          <button className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving}>
             {saving ? "Saving..." : "Save"}
           </button>
           <button

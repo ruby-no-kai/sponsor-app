@@ -152,7 +152,10 @@ export function ExpenseReportEditor(props: EditorProps) {
             report={report}
             selectedItemId={selectedItemId}
             onSelectItem={setSelectedItemId}
-            onSelectFile={setPreviewFileId}
+            onSelectFile={(id) => {
+              setPreviewFileId(id);
+              setSelectedItemId(null);
+            }}
             isReadOnly={isReadOnly}
             lineItemsUrl={props.lineItemsUrl}
             opts={opts}
@@ -162,6 +165,11 @@ export function ExpenseReportEditor(props: EditorProps) {
           />
           <CenterPane
             item={selectedItem || null}
+            selectedFile={
+              !selectedItem && previewFileId
+                ? report.files.find((f) => f.id === previewFileId) || null
+                : null
+            }
             report={report}
             calcData={calcData}
             isReadOnly={isReadOnly}
@@ -171,6 +179,10 @@ export function ExpenseReportEditor(props: EditorProps) {
             onUpdate={handleReportUpdate}
             onError={setError}
             onPreviewFile={setPreviewFileId}
+            onSelectItem={(id) => {
+              setSelectedItemId(id);
+              setPreviewFileId(null);
+            }}
           />
           <RightPane file={previewFile || null} filesUrl={props.filesUrl} />
         </div>
