@@ -31,12 +31,19 @@ module AssetFileUploadable
   end
 
   def download_url(disposition: :attachment)
+    encoded_filename = ERB::Util.url_encode(filename)
+    content_disposition = if filename.ascii_only?
+      "#{disposition}; filename=\"#{filename}\""
+    else
+      "#{disposition}; filename=\"#{encoded_filename}\"; filename*=UTF-8''#{encoded_filename}"
+    end
+
     presigner.presigned_url(
       :get_object,
       bucket: self.class.asset_file_bucket,
       key: object_key,
       expires_in: 3600,
-      response_content_disposition: "#{disposition}; filename=\"#{filename}\"",
+      response_content_disposition: content_disposition,
     )
   end
 

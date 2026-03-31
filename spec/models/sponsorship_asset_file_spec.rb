@@ -45,6 +45,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
   describe '#download_url' do
     it 'generates presigned URL' do
       file = FactoryBot.create(:sponsorship_asset_file, sponsorship:, extension: 'png')
+      response_content_disposition = "attachment; filename=\"#{file.filename}\""
 
       client_double = instance_double(Aws::S3::Client)
       presigner_double = instance_double(Aws::S3::Presigner)
@@ -56,7 +57,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
         bucket: described_class.asset_file_bucket,
         key: file.object_key,
         expires_in: 3600,
-        response_content_disposition: "attachment; filename=\"#{file.filename}\"",
+        response_content_disposition:,
       ).and_return('https://s3.example.com/signed-url')
 
       url = file.download_url
@@ -66,7 +67,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
         bucket: described_class.asset_file_bucket,
         key: file.object_key,
         expires_in: 3600,
-        response_content_disposition: "attachment; filename=\"#{file.filename}\"",
+        response_content_disposition:,
       )
     end
   end
