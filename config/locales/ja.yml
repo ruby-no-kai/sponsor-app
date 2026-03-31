@@ -263,9 +263,12 @@ ja:
           unique: '本 URL についてはスポンサーごと固有のものとなり、スポンサーチケット利用にあたり認証や身元確認はありません。URL の取り扱いには気をつけていただくようお願い致します。'
         view_redemptions: '利用状況を確認する'
       expense_report:
-        title: '経費報告'
+        title: 'カスタムスポンサー向け経費報告'
         create: '経費報告を作成する'
         view: '経費報告を表示・編集する'
+        fee: '協賛費'
+        total_expense: '経費合計'
+        remaining: '残額'
       broadcasts:
         title: 'メール配信履歴'
         description: 'その他、メールにて配信された過去のアナウンスを確認できます。'

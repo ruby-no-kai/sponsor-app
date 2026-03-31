@@ -262,9 +262,12 @@ en:
           unique: 'This URL is unique and bound to your sponsorship. Note that there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
         view_redemptions: 'Review registrations'
       expense_report:
-        title: 'Expense Report'
+        title: 'Custom package expense report'
         create: 'Create Expense Report'
         view: 'View or Edit Expense Report'
+        fee: 'Sponsorship fee'
+        total_expense: 'Total expense'
+        remaining: 'Remaining'
       broadcasts:
         title: 'Email based Announcements'
         description: 'You can review past announcements sent to you via email, in addition to the latest informations shown above.'
