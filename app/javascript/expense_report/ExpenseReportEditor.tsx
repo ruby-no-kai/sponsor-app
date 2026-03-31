@@ -10,6 +10,8 @@ import { useFileUpload } from "./useFileUpload";
 import { UploadDialog } from "./UploadDialog";
 import { useIsMobile } from "./useIsMobile";
 import { I18nProvider, useI18n } from "./I18nContext";
+import { SubmitReviewDialog } from "./SubmitReviewDialog";
+import { formatAmount } from "./format";
 
 export function ExpenseReportEditor(props: EditorProps) {
   return (
@@ -205,6 +207,8 @@ function ExpenseReportEditorInner(props: EditorProps) {
               <SubmitButton
                 submissionUrl={props.submissionUrl}
                 opts={opts}
+                report={report}
+                calcData={calcData!}
                 onUpdate={handleReportUpdate}
                 onError={setError}
               />
@@ -361,36 +365,30 @@ function StatusBadge({ status, label }: { status: ExpenseReport["status"]; label
   return <span className={`badge ${badges[status] || "badge-light"}`}>{label}</span>;
 }
 
-function formatAmount(amount: string, decimal?: number): string {
-  const num = parseFloat(amount);
-  if (isNaN(num)) return amount;
-  return decimal !== undefined
-    ? num.toLocaleString(undefined, {
-        minimumFractionDigits: decimal,
-        maximumFractionDigits: decimal,
-      })
-    : num.toLocaleString();
-}
-
 function SubmitButton({
   submissionUrl,
   opts,
+  report,
+  calcData,
   onUpdate,
   onError,
 }: {
   submissionUrl: string;
   opts: { csrfToken: string };
+  report: ExpenseReport;
+  calcData: CalculateResponse;
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
 }) {
   const i18n = useI18n();
+  const [showDialog, setShowDialog] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!confirm(i18n.confirm_submit)) return;
+  const handleConfirm = async () => {
     setSubmitting(true);
     try {
       const result = await submitReport(submissionUrl, opts);
+      setShowDialog(false);
       onUpdate(result);
     } catch (e) {
       onError(e instanceof Error ? e.message : i18n.error_submit);
@@ -400,9 +398,19 @@ function SubmitButton({
   };
 
   return (
-    <button className="btn btn-primary btn-sm" onClick={handleSubmit} disabled={submitting}>
-      {submitting ? i18n.submitting : i18n.submit}
-    </button>
+    <>
+      <button className="btn btn-primary btn-sm" onClick={() => setShowDialog(true)}>
+        {i18n.submit}
+      </button>
+      <SubmitReviewDialog
+        open={showDialog}
+        report={report}
+        calcData={calcData}
+        onConfirm={handleConfirm}
+        onCancel={() => setShowDialog(false)}
+        submitting={submitting}
+      />
+    </>
   );
 }
 

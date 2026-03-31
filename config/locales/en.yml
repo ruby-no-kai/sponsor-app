@@ -348,6 +348,14 @@ en:
         upload_failed: "Upload failed"
         retry: "Retry"
         discard: "Discard"
+        review_dialog_title: "Review before submission"
+        review_dialog_no_files: "No files"
+        review_dialog_unlinked_files: "Unlinked files"
+        review_dialog_base_fee: "Base sponsorship fee"
+        review_dialog_total_expense: "Total expense (excl. tax)"
+        review_dialog_remaining: "Remaining"
+        review_dialog_overage_warning: "RubyKaigi does not reimburse the amount exceeding the base fee."
+        review_dialog_cancel: "Cancel"
   exhibitions:
     new:
       title: Booth Details

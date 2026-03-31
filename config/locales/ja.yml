@@ -349,6 +349,14 @@ ja:
         upload_failed: "アップロード失敗"
         retry: "再試行"
         discard: "破棄"
+        review_dialog_title: "提出前の確認"
+        review_dialog_no_files: "ファイルなし"
+        review_dialog_unlinked_files: "未リンクファイル"
+        review_dialog_base_fee: "スポンサー費"
+        review_dialog_total_expense: "経費合計（税抜）"
+        review_dialog_remaining: "残額"
+        review_dialog_overage_warning: "スポンサー費を超過した金額についての払い戻しはありません。"
+        review_dialog_cancel: "キャンセル"
   exhibitions:
     new:
       title: ブース詳細

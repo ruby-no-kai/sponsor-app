@@ -124,6 +124,14 @@ export type EditorI18n = {
   upload_failed: string;
   retry: string;
   discard: string;
+  review_dialog_title: string;
+  review_dialog_no_files: string;
+  review_dialog_unlinked_files: string;
+  review_dialog_base_fee: string;
+  review_dialog_total_expense: string;
+  review_dialog_remaining: string;
+  review_dialog_overage_warning: string;
+  review_dialog_cancel: string;
 };
 
 export type EditorProps = {
