@@ -18,7 +18,7 @@ module CommandRunner
     raise "invalid argument" unless cmd[1..].all? { |e| e.is_a?(String) }
 
     $stdout.sync = true
-    buf = ''
+    buf = +''
     status = Open3.popen2e(*cmd) do |stdin, stdouterr, waiter|
       stdin.close
       while (line = stdouterr.gets)
