@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { EditorProps, ExpenseReport, ExpenseFile, CalculateResponse } from "./types";
 import { fetchReport, fetchCalculate } from "./api";
 import { LeftPane } from "./LeftPane";
@@ -19,6 +19,14 @@ export function ExpenseReportEditor(props: EditorProps) {
   const [loading, setLoading] = useState(true);
 
   const opts = { csrfToken: props.csrfToken };
+  const centerPaneDirtyRef = useRef(false);
+
+  const guardDirty = useCallback((): boolean => {
+    if (centerPaneDirtyRef.current) {
+      return confirm("You have unsaved changes. Discard them?");
+    }
+    return true;
+  }, []);
 
   const isReadOnly =
     report?.status === "approved" || (props.role === "sponsor" && report?.status === "submitted");
@@ -151,8 +159,14 @@ export function ExpenseReportEditor(props: EditorProps) {
           <LeftPane
             report={report}
             selectedItemId={selectedItemId}
-            onSelectItem={setSelectedItemId}
+            onSelectItem={(id) => {
+              if (!guardDirty()) return;
+              setSelectedItemId(id);
+              const item = report.line_items.find((i) => i.id === id);
+              setPreviewFileId(item?.file_ids[0] ?? null);
+            }}
             onSelectFile={(id) => {
+              if (!guardDirty()) return;
               setPreviewFileId(id);
               setSelectedItemId(null);
             }}
@@ -183,6 +197,8 @@ export function ExpenseReportEditor(props: EditorProps) {
               setSelectedItemId(id);
               setPreviewFileId(null);
             }}
+            onRefresh={refreshReport}
+            isDirtyRef={centerPaneDirtyRef}
           />
           <RightPane file={previewFile || null} filesUrl={props.filesUrl} />
         </div>

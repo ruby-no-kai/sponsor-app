@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, type RefObject } from "react";
 import type { ExpenseLineItem, ExpenseReport, CalculateResponse, TaxMode } from "./types";
 import { updateLineItem, deleteLineItem } from "./api";
 
@@ -15,6 +15,8 @@ type CenterPaneProps = {
   onError: (e: string) => void;
   onPreviewFile: (id: number | null) => void;
   onSelectItem: (id: number) => void;
+  onRefresh: () => void;
+  isDirtyRef: RefObject<boolean>;
 };
 
 function deriveTaxMode(item: ExpenseLineItem): TaxMode {
@@ -36,6 +38,8 @@ export function CenterPane({
   onError,
   onPreviewFile,
   onSelectItem,
+  onRefresh,
+  isDirtyRef,
 }: CenterPaneProps) {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
@@ -48,6 +52,22 @@ export function CenterPane({
   const [fileIds, setFileIds] = useState<number[]>([]);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const isDirty = item
+    ? title !== item.title ||
+      (notes || "") !== (item.notes || "") ||
+      enteredAmount !== item.amount ||
+      preliminal !== item.preliminal ||
+      fileIds.join() !== item.file_ids.join() ||
+      taxMode !== deriveTaxMode(item) ||
+      (taxMode !== "manual" && taxMode !== "exempt" && taxRate !== item.tax_rate) ||
+      (taxMode === "manual" && taxAmount !== item.tax_amount)
+    : false;
+
+  // Expose isDirty to parent via ref
+  useEffect(() => {
+    if (isDirtyRef) isDirtyRef.current = isDirty;
+  }, [isDirty]);
 
   useEffect(() => {
     if (!item) return;
@@ -62,9 +82,25 @@ export function CenterPane({
     const mode = deriveTaxMode(item);
     setTaxMode(mode);
     setEnteredAmount(item.amount);
-  }, [item?.id]);
+  }, [item?.id, item?.file_ids.join()]);
 
   const [creatingFromFile, setCreatingFromFile] = useState(false);
+  const [deletingFile, setDeletingFile] = useState(false);
+
+  const handleDeleteFile = async () => {
+    if (!selectedFile || !confirm("Delete this file?")) return;
+    setDeletingFile(true);
+    try {
+      const { deleteFile } = await import("./api");
+      await deleteFile(filesUrl, selectedFile.id, opts);
+      onPreviewFile(null);
+      onRefresh();
+    } catch (e) {
+      onError(e instanceof Error ? e.message : "Failed to delete");
+    } finally {
+      setDeletingFile(false);
+    }
+  };
 
   const handleCreateFromFile = async () => {
     if (!selectedFile) return;
@@ -101,11 +137,19 @@ export function CenterPane({
           <div className="text-center">
             <p className="mb-2 small">{selectedFile.filename}</p>
             <button
-              className="btn btn-primary btn-sm"
+              className="btn btn-primary btn-sm mb-2"
               onClick={handleCreateFromFile}
               disabled={creatingFromFile}
             >
               {creatingFromFile ? "Creating..." : "Create line item from this file"}
+            </button>
+            <br />
+            <button
+              className="btn btn-outline-danger btn-sm"
+              onClick={handleDeleteFile}
+              disabled={deletingFile}
+            >
+              {deletingFile ? "Deleting..." : "Delete this file"}
             </button>
           </div>
         ) : (
@@ -362,7 +406,11 @@ export function CenterPane({
 
       {!isReadOnly && (
         <div className="d-flex justify-content-between mt-3">
-          <button className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving}>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={handleSave}
+            disabled={saving || !isDirty}
+          >
             {saving ? "Saving..." : "Save"}
           </button>
           <button
