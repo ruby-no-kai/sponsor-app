@@ -23,6 +23,7 @@ type CenterPaneProps = {
   isDropTarget: boolean;
   linkedEnabled: boolean;
   selectedItemTitle: string | null;
+  isMobile: boolean;
 };
 
 function deriveTaxMode(item: ExpenseLineItem): TaxMode {
@@ -51,6 +52,7 @@ export function CenterPane({
   isDropTarget,
   linkedEnabled,
   selectedItemTitle,
+  isMobile,
 }: CenterPaneProps) {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
@@ -152,11 +154,25 @@ export function CenterPane({
     return (
       <div
         className="d-flex flex-column align-items-center justify-content-center text-muted"
-        style={{ flex: "4 0 0", minWidth: "250px", overflow: "auto", position: "relative" }}
+        style={{
+          flex: isMobile ? "1 1 auto" : "4 0 0",
+          minWidth: isMobile ? undefined : "250px",
+          overflow: "auto",
+          position: "relative",
+        }}
       >
         {selectedFile && !isReadOnly ? (
           <div className="text-center">
             <p className="mb-2 small">{selectedFile.filename}</p>
+            {isMobile && (
+              <button
+                className="btn btn-outline-secondary btn-sm mb-2"
+                onClick={() => window.open(`${filesUrl}/${selectedFile.id}`, "_blank")}
+              >
+                Preview file
+              </button>
+            )}
+            <br />
             <button
               className="btn btn-primary btn-sm mb-2"
               onClick={handleCreateFromFile}
@@ -310,7 +326,12 @@ export function CenterPane({
   return (
     <form
       className="p-3"
-      style={{ flex: "4 0 0", minWidth: "250px", overflow: "auto", position: "relative" }}
+      style={{
+        flex: isMobile ? "1 1 auto" : "4 0 0",
+        minWidth: isMobile ? undefined : "250px",
+        overflow: "auto",
+        position: "relative",
+      }}
       onSubmit={(e) => {
         e.preventDefault();
         if (isDirty && !saving) handleSave();
@@ -444,7 +465,13 @@ export function CenterPane({
               >
                 <span
                   style={{ cursor: "pointer" }}
-                  onClick={() => onPreviewFile(f.id)}
+                  onClick={() => {
+                    if (isMobile) {
+                      window.open(`${filesUrl}/${f.id}`, "_blank");
+                    } else {
+                      onPreviewFile(f.id);
+                    }
+                  }}
                   className="text-primary"
                 >
                   {f.filename || `File #${f.id}`}

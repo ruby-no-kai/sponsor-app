@@ -18,6 +18,7 @@ type LeftPaneProps = {
   onUploadFiles: (files: File[]) => void;
   isDragging: boolean;
   isDropTarget: boolean;
+  isMobile: boolean;
 };
 
 export function LeftPane({
@@ -34,6 +35,7 @@ export function LeftPane({
   onUploadFiles,
   isDragging,
   isDropTarget,
+  isMobile,
 }: LeftPaneProps) {
   const [adding, setAdding] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -82,8 +84,13 @@ export function LeftPane({
 
   return (
     <div
-      className="border-right d-flex flex-column"
-      style={{ flex: "3 0 0", minWidth: "200px", overflow: "auto", position: "relative" }}
+      className={`${isMobile ? "" : "border-right "}d-flex flex-column`}
+      style={{
+        flex: isMobile ? "1 1 auto" : "3 0 0",
+        minWidth: isMobile ? undefined : "200px",
+        overflow: "auto",
+        position: "relative",
+      }}
     >
       <div className="p-2 bg-light border-bottom d-flex justify-content-between align-items-center">
         <strong className="small">Line Items</strong>
@@ -105,6 +112,7 @@ export function LeftPane({
           onSelectItem={onSelectItem}
           onReorder={handleReorder}
           disabled={isReadOnly}
+          isMobile={isMobile}
         />
         {report.line_items.length === 0 && (
           <div className="p-2 text-muted small">No line items yet</div>

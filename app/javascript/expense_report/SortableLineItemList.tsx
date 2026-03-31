@@ -23,6 +23,7 @@ type SortableLineItemListProps = {
   onSelectItem: (id: number) => void;
   onReorder: (activeId: number, overId: number) => void;
   disabled: boolean;
+  isMobile: boolean;
 };
 
 export function SortableLineItemList({
@@ -31,6 +32,7 @@ export function SortableLineItemList({
   onSelectItem,
   onReorder,
   disabled,
+  isMobile,
 }: SortableLineItemListProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -46,7 +48,7 @@ export function SortableLineItemList({
     }
   };
 
-  if (disabled) {
+  if (disabled || isMobile) {
     return (
       <>
         {items.map((item) => (

@@ -9,6 +9,7 @@ import { FileDropOverlay } from "./FileDropOverlay";
 import { useFileUpload } from "./useFileUpload";
 import { UploadDialog } from "./UploadDialog";
 import { updateLineItem } from "./api";
+import { useIsMobile } from "./useIsMobile";
 
 export function ExpenseReportEditor(props: EditorProps) {
   const [report, setReport] = useState<ExpenseReport | null>(null);
@@ -24,11 +25,15 @@ export function ExpenseReportEditor(props: EditorProps) {
     };
   };
 
+  const isMobile = useIsMobile();
   const initialFragment = useRef(parseFragment());
   const [selectedItemId, setSelectedItemId] = useState<number | null>(
     initialFragment.current.itemId,
   );
   const [previewFileId, setPreviewFileId] = useState<number | null>(initialFragment.current.fileId);
+  const [mobileView, setMobileView] = useState<"list" | "detail">(() =>
+    initialFragment.current.itemId || initialFragment.current.fileId ? "detail" : "list",
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -126,10 +131,12 @@ export function ExpenseReportEditor(props: EditorProps) {
 
   if (!report) return null;
 
-  const breakoutStyle = {
-    width: "calc(100vw - 180px)",
-    marginLeft: "calc(-1 * (100vw - 180px - 100%) / 2)",
-  };
+  const breakoutStyle: React.CSSProperties = isMobile
+    ? { width: "100%" }
+    : {
+        width: "calc(100vw - 180px)",
+        marginLeft: "calc(-1 * (100vw - 180px - 100%) / 2)",
+      };
 
   return (
     <div>
@@ -142,8 +149,13 @@ export function ExpenseReportEditor(props: EditorProps) {
         </div>
       )}
 
-      <div className="d-flex mb-2 justify-content-between align-items-center">
-        <div className="d-flex align-items-center flex-wrap">
+      <div
+        className={`d-flex mb-2 ${isMobile ? "flex-column" : "justify-content-between align-items-center"}`}
+      >
+        <div
+          className="d-flex align-items-center flex-wrap"
+          style={isMobile ? { fontSize: "0.85rem", overflowX: "auto" } : undefined}
+        >
           <StatusBadge status={report.status} />
           {calcData &&
             (() => {
@@ -202,76 +214,106 @@ export function ExpenseReportEditor(props: EditorProps) {
           disabled={isReadOnly}
           onDropUnlinked={handleDropUnlinked}
           onDropLinked={handleDropLinked}
+          isMobile={isMobile}
+          mobileView={mobileView}
         >
           {({ isDragging, hoverZone }) => (
             <div
-              className="d-flex border rounded"
+              className={`${isMobile ? "d-flex flex-column" : "d-flex"} border rounded`}
               style={{
-                height: "80vh",
+                height: isMobile ? "auto" : "80vh",
+                minHeight: isMobile ? "60vh" : undefined,
                 overflow: "hidden",
                 backgroundColor: "white",
                 color: "#212529",
               }}
             >
-              <LeftPane
-                report={report}
-                selectedItemId={selectedItemId}
-                selectedFileId={!selectedItemId ? previewFileId : null}
-                onSelectItem={(id) => {
-                  if (!guardDirty()) return;
-                  setSelectedItemId(id);
-                  const item = report.line_items.find((i) => i.id === id);
-                  setPreviewFileId(item?.file_ids[0] ?? null);
-                }}
-                onSelectFile={(id) => {
-                  if (!guardDirty()) return;
-                  setPreviewFileId(id);
-                  setSelectedItemId(null);
-                }}
-                isReadOnly={isReadOnly}
-                lineItemsUrl={props.lineItemsUrl}
-                opts={opts}
-                onUpdate={handleReportUpdate}
-                onError={setError}
-                onUploadFiles={handleDropUnlinked}
-                isDragging={isDragging}
-                isDropTarget={isDragging && hoverZone === "unlinked"}
-              />
-              <CenterPane
-                item={selectedItem || null}
-                selectedFile={
-                  !selectedItem && previewFileId
-                    ? report.files.find((f) => f.id === previewFileId) || null
-                    : null
-                }
-                report={report}
-                calcData={calcData}
-                isReadOnly={isReadOnly}
-                lineItemsUrl={props.lineItemsUrl}
-                filesUrl={props.filesUrl}
-                opts={opts}
-                onUpdate={handleReportUpdate}
-                onError={setError}
-                onPreviewFile={setPreviewFileId}
-                onSelectItem={(id) => {
-                  setSelectedItemId(id);
-                  setPreviewFileId(null);
-                }}
-                onRefresh={refreshReport}
-                isDirtyRef={centerPaneDirtyRef}
-                onUploadLinked={handleDropLinked}
-                isDragging={isDragging}
-                isDropTarget={isDragging && hoverZone === "linked"}
-                linkedEnabled
-                selectedItemTitle={selectedItem?.title || null}
-              />
-              <RightPane
-                file={previewFile || null}
-                filesUrl={props.filesUrl}
-                isDragging={isDragging}
-                isDropTarget={isDragging && hoverZone === "linked"}
-                linkedEnabled
-              />
+              {(!isMobile || mobileView === "list") && (
+                <LeftPane
+                  report={report}
+                  selectedItemId={selectedItemId}
+                  selectedFileId={!selectedItemId ? previewFileId : null}
+                  onSelectItem={(id) => {
+                    if (!guardDirty()) return;
+                    setSelectedItemId(id);
+                    const item = report.line_items.find((i) => i.id === id);
+                    setPreviewFileId(item?.file_ids[0] ?? null);
+                    if (isMobile) setMobileView("detail");
+                  }}
+                  onSelectFile={(id) => {
+                    if (!guardDirty()) return;
+                    setPreviewFileId(id);
+                    setSelectedItemId(null);
+                    if (isMobile) setMobileView("detail");
+                  }}
+                  isReadOnly={isReadOnly}
+                  lineItemsUrl={props.lineItemsUrl}
+                  opts={opts}
+                  onUpdate={handleReportUpdate}
+                  onError={setError}
+                  onUploadFiles={handleDropUnlinked}
+                  isDragging={isDragging}
+                  isDropTarget={isDragging && hoverZone === "unlinked"}
+                  isMobile={isMobile}
+                />
+              )}
+              {(!isMobile || mobileView === "detail") && (
+                <>
+                  {isMobile && (
+                    <div className="p-2 bg-light border-bottom">
+                      <button
+                        className="btn btn-sm btn-outline-secondary"
+                        onClick={() => {
+                          if (!guardDirty()) return;
+                          setMobileView("list");
+                          setSelectedItemId(null);
+                          setPreviewFileId(null);
+                        }}
+                      >
+                        &larr; Back
+                      </button>
+                    </div>
+                  )}
+                  <CenterPane
+                    item={selectedItem || null}
+                    selectedFile={
+                      !selectedItem && previewFileId
+                        ? report.files.find((f) => f.id === previewFileId) || null
+                        : null
+                    }
+                    report={report}
+                    calcData={calcData}
+                    isReadOnly={isReadOnly}
+                    lineItemsUrl={props.lineItemsUrl}
+                    filesUrl={props.filesUrl}
+                    opts={opts}
+                    onUpdate={handleReportUpdate}
+                    onError={setError}
+                    onPreviewFile={setPreviewFileId}
+                    onSelectItem={(id) => {
+                      setSelectedItemId(id);
+                      setPreviewFileId(null);
+                    }}
+                    onRefresh={refreshReport}
+                    isDirtyRef={centerPaneDirtyRef}
+                    onUploadLinked={handleDropLinked}
+                    isDragging={isDragging}
+                    isDropTarget={isDragging && hoverZone === "linked"}
+                    linkedEnabled
+                    selectedItemTitle={selectedItem?.title || null}
+                    isMobile={isMobile}
+                  />
+                </>
+              )}
+              {!isMobile && (
+                <RightPane
+                  file={previewFile || null}
+                  filesUrl={props.filesUrl}
+                  isDragging={isDragging}
+                  isDropTarget={isDragging && hoverZone === "linked"}
+                  linkedEnabled
+                />
+              )}
             </div>
           )}
         </FileDropOverlay>

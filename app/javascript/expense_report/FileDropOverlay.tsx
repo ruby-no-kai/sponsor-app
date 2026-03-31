@@ -9,6 +9,8 @@ type FileDropOverlayProps = {
   onDropUnlinked: (files: File[]) => void;
   onDropLinked: (files: File[]) => void;
   children: (dragState: { isDragging: boolean; hoverZone: HoverZone }) => React.ReactNode;
+  isMobile: boolean;
+  mobileView: "list" | "detail";
 };
 
 const STALE_MS = 200;
@@ -19,6 +21,8 @@ export function FileDropOverlay({
   onDropUnlinked,
   onDropLinked,
   children,
+  isMobile,
+  mobileView,
 }: FileDropOverlayProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [hoverZone, setHoverZone] = useState<HoverZone>(null);
@@ -40,13 +44,19 @@ export function FileDropOverlay({
     return () => clearInterval(interval);
   }, [isDragging]);
 
-  const zoneFromEvent = useCallback((e: React.DragEvent): HoverZone => {
-    const el = overlayRef.current;
-    if (!el) return "unlinked";
-    const rect = el.getBoundingClientRect();
-    const relX = e.clientX - rect.left;
-    return relX < rect.width / 3 ? "unlinked" : "linked";
-  }, []);
+  const zoneFromEvent = useCallback(
+    (e: React.DragEvent): HoverZone => {
+      if (isMobile) {
+        return mobileView === "list" ? "unlinked" : "linked";
+      }
+      const el = overlayRef.current;
+      if (!el) return "unlinked";
+      const rect = el.getBoundingClientRect();
+      const relX = e.clientX - rect.left;
+      return relX < rect.width / 3 ? "unlinked" : "linked";
+    },
+    [isMobile, mobileView],
+  );
 
   const handleDragOver = useCallback(
     (e: React.DragEvent) => {
