@@ -402,6 +402,14 @@ export function CenterPane({
             ))}
           </select>
         )}
+        {!isReadOnly && (
+          <div
+            className="text-muted small text-center mt-1"
+            style={{ border: "1px dashed #ccc", borderRadius: "4px", padding: "4px" }}
+          >
+            Drop files here to attach
+          </div>
+        )}
       </div>
 
       {!isReadOnly && (

@@ -159,6 +159,7 @@ export function ExpenseReportEditor(props: EditorProps) {
           <LeftPane
             report={report}
             selectedItemId={selectedItemId}
+            selectedFileId={!selectedItemId ? previewFileId : null}
             onSelectItem={(id) => {
               if (!guardDirty()) return;
               setSelectedItemId(id);

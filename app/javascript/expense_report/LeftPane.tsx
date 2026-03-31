@@ -6,6 +6,7 @@ import { SortableLineItemList } from "./SortableLineItemList";
 type LeftPaneProps = {
   report: ExpenseReport;
   selectedItemId: number | null;
+  selectedFileId: number | null;
   onSelectItem: (id: number | null) => void;
   onSelectFile: (id: number | null) => void;
   isReadOnly: boolean;
@@ -19,6 +20,7 @@ type LeftPaneProps = {
 export function LeftPane({
   report,
   selectedItemId,
+  selectedFileId,
   onSelectItem,
   onSelectFile,
   isReadOnly,
@@ -91,7 +93,7 @@ export function LeftPane({
           </button>
         )}
       </div>
-      <div className="flex-grow-1" style={{ overflow: "auto" }}>
+      <div style={{ flex: "1 1 0", overflow: "auto", minHeight: "80px" }}>
         <SortableLineItemList
           items={report.line_items}
           selectedItemId={selectedItemId}
@@ -104,17 +106,35 @@ export function LeftPane({
         )}
       </div>
 
-      <div className="p-2 bg-light border-top border-bottom d-flex justify-content-between align-items-center">
+      <div className="p-2 bg-light border-top border-bottom">
         <strong className="small">Files</strong>
+      </div>
+      <div style={{ flex: "1 1 0", overflow: "auto", minHeight: "60px" }}>
+        {unlinkedFiles.map((file) => (
+          <div
+            key={file.id}
+            className={`p-2 border-bottom small ${selectedFileId === file.id ? "bg-primary text-white" : ""}`}
+            style={{ cursor: "pointer" }}
+            onClick={() => onSelectFile(file.id)}
+          >
+            {file.filename || `File #${file.id}`}
+          </div>
+        ))}
         {!isReadOnly && (
-          <>
-            <button
-              className="btn btn-sm btn-outline-secondary"
-              onClick={() => fileInputRef.current?.click()}
-              title="Upload file"
+          <div
+            className="p-2 text-muted small text-center"
+            style={{ border: "1px dashed #ccc", borderRadius: "4px", margin: "4px" }}
+          >
+            Drop files to add or{" "}
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                fileInputRef.current?.click();
+              }}
             >
-              Upload
-            </button>
+              upload
+            </a>
             <input
               ref={fileInputRef}
               type="file"
@@ -123,22 +143,7 @@ export function LeftPane({
               className="d-none"
               onChange={handleFileInputChange}
             />
-          </>
-        )}
-      </div>
-      <div style={{ overflow: "auto", maxHeight: "150px" }}>
-        {unlinkedFiles.map((file) => (
-          <div
-            key={file.id}
-            className="p-2 border-bottom small"
-            style={{ cursor: "pointer" }}
-            onClick={() => onSelectFile(file.id)}
-          >
-            {file.filename || `File #${file.id}`}
           </div>
-        ))}
-        {unlinkedFiles.length === 0 && (
-          <div className="p-2 text-muted small">No unlinked files</div>
         )}
       </div>
     </div>
