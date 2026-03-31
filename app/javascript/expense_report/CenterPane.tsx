@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, type RefObject } from "react";
 import type { ExpenseLineItem, ExpenseReport, CalculateResponse, TaxMode } from "./types";
-import { updateLineItem, deleteLineItem } from "./api";
+import { updateLineItem, deleteLineItem, deleteFile, createLineItem } from "./api";
 import { DropZoneIndicator } from "./FileDropOverlay";
 
 type CenterPaneProps = {
@@ -74,7 +74,7 @@ export function CenterPane({
       (notes || "") !== (item.notes || "") ||
       !numeq(enteredAmount, item.amount) ||
       preliminal !== item.preliminal ||
-      fileIds.join() !== item.file_ids.join() ||
+      fileIds.join(",") !== item.file_ids.join(",") ||
       taxMode !== deriveTaxMode(item) ||
       (taxMode !== "manual" && taxMode !== "exempt" && taxRate !== item.tax_rate) ||
       (taxMode === "manual" && !numeq(taxAmount, item.tax_amount))
@@ -105,7 +105,7 @@ export function CenterPane({
     const mode = deriveTaxMode(item);
     setTaxMode(mode);
     setEnteredAmount(formatForInput(item.amount));
-  }, [item?.id, item?.file_ids.join()]);
+  }, [item?.id, item?.file_ids.join(",")]);
 
   const [creatingFromFile, setCreatingFromFile] = useState(false);
   const [deletingFile, setDeletingFile] = useState(false);
@@ -114,7 +114,6 @@ export function CenterPane({
     if (!selectedFile || !confirm("Delete this file?")) return;
     setDeletingFile(true);
     try {
-      const { deleteFile } = await import("./api");
       await deleteFile(filesUrl, selectedFile.id, opts);
       onPreviewFile(null);
       onRefresh();
@@ -129,7 +128,6 @@ export function CenterPane({
     if (!selectedFile) return;
     setCreatingFromFile(true);
     try {
-      const { createLineItem } = await import("./api");
       const result = await createLineItem(
         lineItemsUrl,
         {
@@ -294,7 +292,6 @@ export function CenterPane({
   const handleAddMore = async () => {
     setAddingMore(true);
     try {
-      const { createLineItem } = await import("./api");
       const result = await createLineItem(
         lineItemsUrl,
         { title: "New expense", amount: "0", tax_amount: "0", file_ids: fileIds },

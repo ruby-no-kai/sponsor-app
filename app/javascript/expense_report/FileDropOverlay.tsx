@@ -1,10 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import type { ExpenseLineItem } from "./types";
-
 export type HoverZone = "unlinked" | "linked" | null;
 
 type FileDropOverlayProps = {
-  selectedItem: ExpenseLineItem | null;
   disabled: boolean;
   onDropUnlinked: (files: File[]) => void;
   onDropLinked: (files: File[]) => void;
@@ -16,7 +13,6 @@ type FileDropOverlayProps = {
 const STALE_MS = 200;
 
 export function FileDropOverlay({
-  selectedItem,
   disabled,
   onDropUnlinked,
   onDropLinked,
@@ -100,7 +96,7 @@ export function FileDropOverlay({
         onDropUnlinked(files);
       }
     },
-    [zoneFromEvent, selectedItem, onDropLinked, onDropUnlinked],
+    [zoneFromEvent, onDropLinked, onDropUnlinked],
   );
 
   return (

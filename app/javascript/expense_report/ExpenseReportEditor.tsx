@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import type { EditorProps, ExpenseReport, ExpenseFile, CalculateResponse } from "./types";
-import { fetchReport, fetchCalculate } from "./api";
+import type { EditorProps, ExpenseReport, CalculateResponse } from "./types";
+import { fetchReport, fetchCalculate, submitReport, withdrawSubmission } from "./api";
 import { LeftPane } from "./LeftPane";
 import { CenterPane } from "./CenterPane";
 import { RightPane } from "./RightPane";
@@ -8,7 +8,6 @@ import { AdminReviewForm } from "./AdminReviewForm";
 import { FileDropOverlay } from "./FileDropOverlay";
 import { useFileUpload } from "./useFileUpload";
 import { UploadDialog } from "./UploadDialog";
-import { updateLineItem } from "./api";
 import { useIsMobile } from "./useIsMobile";
 
 export function ExpenseReportEditor(props: EditorProps) {
@@ -210,7 +209,6 @@ export function ExpenseReportEditor(props: EditorProps) {
 
       <div style={breakoutStyle}>
         <FileDropOverlay
-          selectedItem={selectedItem || null}
           disabled={isReadOnly}
           onDropUnlinked={handleDropUnlinked}
           onDropLinked={handleDropLinked}
@@ -372,7 +370,6 @@ function SubmitButton({
     if (!confirm("Submit this expense report for review?")) return;
     setSubmitting(true);
     try {
-      const { submitReport } = await import("./api");
       const result = await submitReport(submissionUrl, opts);
       onUpdate(result);
     } catch (e) {
@@ -406,7 +403,6 @@ function WithdrawButton({
     if (!confirm("Withdraw this submission? You can re-submit later.")) return;
     setWithdrawing(true);
     try {
-      const { withdrawSubmission } = await import("./api");
       const result = await withdrawSubmission(submissionUrl, opts);
       onUpdate(result);
     } catch (e) {

@@ -1,8 +1,4 @@
-import type {
-  ExpenseReport,
-  CalculateResponse,
-  ExpenseLineItem,
-} from "./types";
+import type { ExpenseReport, CalculateResponse, ExpenseLineItem } from "./types";
 
 type RequestOptions = {
   csrfToken: string;
@@ -14,14 +10,16 @@ async function request<T>(
   opts: RequestOptions,
   body?: Record<string, unknown>,
 ): Promise<T> {
+  const headers: Record<string, string> = {
+    "X-CSRF-Token": opts.csrfToken,
+    Accept: "application/json",
+  };
+  if (body) headers["Content-Type"] = "application/json";
+
   const resp = await fetch(url, {
     method,
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-Token": opts.csrfToken,
-      Accept: "application/json",
-    },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
   });
   if (!resp.ok) {
@@ -31,24 +29,15 @@ async function request<T>(
   return resp.json();
 }
 
-export function fetchReport(
-  url: string,
-  opts: RequestOptions,
-): Promise<ExpenseReport> {
+export function fetchReport(url: string, opts: RequestOptions): Promise<ExpenseReport> {
   return request<ExpenseReport>(url, "GET", opts);
 }
 
-export function fetchCalculate(
-  url: string,
-  opts: RequestOptions,
-): Promise<CalculateResponse> {
+export function fetchCalculate(url: string, opts: RequestOptions): Promise<CalculateResponse> {
   return request<CalculateResponse>(url, "GET", opts);
 }
 
-export function updateReport(
-  url: string,
-  opts: RequestOptions,
-): Promise<ExpenseReport> {
+export function updateReport(url: string, opts: RequestOptions): Promise<ExpenseReport> {
   return request<ExpenseReport>(url, "PATCH", opts);
 }
 
@@ -81,17 +70,11 @@ export function deleteLineItem(
   return request<ExpenseReport>(`${url}/${id}`, "DELETE", opts);
 }
 
-export function submitReport(
-  url: string,
-  opts: RequestOptions,
-): Promise<ExpenseReport> {
+export function submitReport(url: string, opts: RequestOptions): Promise<ExpenseReport> {
   return request<ExpenseReport>(url, "POST", opts);
 }
 
-export function withdrawSubmission(
-  url: string,
-  opts: RequestOptions,
-): Promise<ExpenseReport> {
+export function withdrawSubmission(url: string, opts: RequestOptions): Promise<ExpenseReport> {
   return request<ExpenseReport>(url, "DELETE", opts);
 }
 
@@ -103,10 +86,6 @@ export function createReview(
   return request<ExpenseReport>(url, "POST", opts, data);
 }
 
-export function deleteFile(
-  url: string,
-  id: number,
-  opts: RequestOptions,
-): Promise<void> {
+export function deleteFile(url: string, id: number, opts: RequestOptions): Promise<void> {
   return request<void>(`${url}/${id}`, "DELETE", opts);
 }

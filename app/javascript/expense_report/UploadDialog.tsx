@@ -26,10 +26,10 @@ type UploadDialogProps = {
 };
 
 const STATUS_EMOJI: Record<FileUploadStatus, string> = {
-  waiting: "\u23F3",
-  uploading: "\uD83D\uDD04",
-  done: "\u2705",
-  error: "\u274C",
+  waiting: "⏳",
+  uploading: "🔄",
+  done: "✅",
+  error: "❌",
 };
 
 export function UploadDialog({ state, onRetry, onDiscard }: UploadDialogProps) {
