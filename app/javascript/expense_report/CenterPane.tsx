@@ -308,9 +308,13 @@ export function CenterPane({
   const attachedFiles = report.files.filter((f) => fileIds.includes(f.id));
 
   return (
-    <div
+    <form
       className="p-3"
       style={{ flex: "4 0 0", minWidth: "250px", overflow: "auto", position: "relative" }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (isDirty && !saving) handleSave();
+      }}
     >
       <div className="form-group">
         <label className="small font-weight-bold" htmlFor={`eli-title-${item.id}`}>
@@ -483,7 +487,7 @@ export function CenterPane({
               onClick={handleAddMore}
               disabled={addingMore || isDirty}
             >
-              {addingMore ? "Adding..." : "Add more lines"}
+              {addingMore ? "Adding..." : "Add line with the same files"}
             </button>
           </div>
           <button
@@ -501,7 +505,7 @@ export function CenterPane({
         label={selectedItemTitle ? `Link to "${selectedItemTitle}"` : "Create new line item"}
         enabled={linkedEnabled}
       />
-    </div>
+    </form>
   );
 }
 
