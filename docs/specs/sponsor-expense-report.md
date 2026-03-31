@@ -24,19 +24,21 @@ Only custom sponsorships (`sponsorship.customization == true`) can create expens
 - Sponsor can upload files for each line item.
 - Sponsor can upload files to a specific line item.
 - Sponsor can upload files in bulk by dropping files onto the page:
-  - Dropping files on the left pane uploads them as unlinked files (added to the file pool).
-  - Dropping files on the center pane uploads and links them to the currently selected line item.
+  - Dropping files on the left third of the editor viewport uploads them as unlinked files (added to the file pool).
+  - Dropping files on the right two-thirds uploads and links them to the currently selected line item.
 - Sponsor can upload image (jpeg, png, webp) and PDF files.
 - Sponsor can list files, and can see which files are not attached to any line items.
   - List pane includes a section for unused files.
 - Sponsor can reuse the same file across multiple line items if needed.
 - Sponsor can attach files to a line item via a picker that lists available files from the uploaded pool.
+- Sponsor can create a new line item from an unlinked file (pre-links the file, uses filename as title).
+- Sponsor can duplicate a line item's file attachments into a new line item ("Add line with the same files").
 - Sponsor can reorder line items by drag and drop (stored as `position` integer).
-- Each line item has `amount` (net, without tax), `tax_rate` (decimal, nullable), and `tax_amount` (decimal). When `tax_rate` is present, the server calculates `tax_amount = amount * tax_rate`. When `tax_rate` is nil, the sponsor enters `tax_amount` manually.
+- Each line item has `amount` (net, without tax), `tax_rate` (decimal, nullable), and `tax_amount` (decimal). When `tax_rate` is present, the server calculates `tax_amount = floor(amount * tax_rate, decimal)` where `decimal` is the configured precision (default 0 for integer yen). When `tax_rate` is nil, the sponsor enters `tax_amount` manually.
 - Multiple JCT tax rates are supported (configured as `[1/10r, 8/100r, 0/1r]` — 10%, 8%, 0%).
 - Frontend provides a tax input mode selector per line item:
   - "Entered amount excludes tax, calculate with N%" — sends amount directly as net, with tax_rate.
-  - "Entered amount includes tax of N%" — frontend back-calculates net amount before sending, with tax_rate.
+  - "Entered amount includes tax of N%" — frontend back-calculates: `net = floor(entered / (1 + rate))`, `tax = floor(entered - net)`. Both are floored to configured decimal precision, so `net + tax` may not exactly equal the entered amount.
   - "Tax does not apply" — sends tax_rate = 0.
   - "I'll enter amount manually" — tax_rate = nil, sponsor enters both amount and tax_amount directly.
   - The mode is a frontend-only concern; the database always stores amounts as exclusive (net + separate tax).
@@ -49,16 +51,17 @@ Only custom sponsorships (`sponsorship.customization == true`) can create expens
 - Sponsor cannot edit a submitted expense report. To make changes, the sponsor can withdraw the submission (returning to draft), or the organizer can reject it.
 - Organizer can see the list of reports across sponsors from the admin page. Table shows: sponsor name, plan name, total amount (without tax), and the difference between the sponsorship fee and the report total.
   - Sponsorship fee = `plan.price + plan.price_booth` (if `booth_assigned`). Uses actual booth allocation, not just the request.
-- System sends Slack notification to organizer feed channel on report submission. Uses `:receipt:` emoji via `SlackWebhookJob` with `:feed` hook_name, includes sponsor name, total amount, and link to admin expense report view.
+- System sends Slack notification to organizer feed channel on report submission. Uses `:receipt:` emoji via `SlackWebhookJob` with `:feed` hook_name, includes sponsor name, total amount, and a link to the admin expense report view.
 
 ### Status Transitions
 
 - `draft` → `submitted`: Sponsor creates a submission (`ExpenseReportSubmissionsController#create`).
 - `submitted` → `approved`: Organizer creates a review with `action: approve`.
 - `submitted` → `rejected`: Organizer creates a review with `action: reject` (with comment).
+- Re-review (no status guard): Organizer can create a new review on the current submission at any time, replacing the previous review. This allows changing a decision after the fact (e.g., rejecting an already-approved report).
 - `rejected` → `draft`: Automatic when the sponsor makes any edit to the report. No separate API call required.
 
-Organizer edits (minor corrections) do not change the report's status. Review comments are stored on `ExpenseReportReview` records (not on ExpenseReport), providing a full history of review actions.
+Organizer edits (minor corrections) do not change the report's status. Review comments are stored on `ExpenseReportReview` records (not on ExpenseReport).
 
 ### UI Layout
 
@@ -66,10 +69,14 @@ Organizer edits (minor corrections) do not change the report's status. Review co
   - **Left pane** (iOS tableview-style):
     - Line items section: each item shows title + amount, with a "preliminal" tag/label for preliminal items.
     - Unlinked files section (below line items): small section header, each file shows filename only. Clicking selects for preview.
-  - **Center pane**: details of the selected line item, including file attachments (picker to attach from uploaded pool). Tax input mode selector per line item.
+  - **Center pane**: details of the selected line item, including file attachments (picker to attach from uploaded pool). Tax input mode selector per line item. The pane is a native `<form>` element — pressing Enter in any text field triggers save. Additional actions:
+    - "Add line with the same files" button: creates a new line item pre-linked to the same file attachments (enabled only when the current form is saved).
+    - When no line item is selected and an unlinked file is selected, shows a "Create line item from this file" button that creates a new item using the file's name as the title, pre-linked to that file. Also shows a "Delete this file" button.
   - **Right pane**: file preview — images inline via `<img>`, PDFs via `<iframe>`. Clicking an attached file in the center pane switches the preview.
-- Drop zones: dropping files on the left pane adds them as unlinked files; dropping on the center pane uploads and links to the selected line item. Visual drop zone indicators appear when a file is being dragged.
-- Report editor/viewer has 80vh height by default.
+- Drop zones: dropping files on the left third of the editor uploads them as unlinked files; dropping on the right two-thirds uploads and links to the selected line item. Visual overlay indicators appear when a file is being dragged.
+- Unsaved-changes guard: switching line items while the center pane has unsaved edits triggers a browser `confirm()` dialog.
+- Deep linking: the editor uses URL hash fragments (`#item-{id}`, `#file-{id}`) to preserve the selected item or file across page reloads.
+- Report editor/viewer has 80vh height by default. The 3-pane editor uses a breakout layout (`width: calc(100vw - 180px)` with negative margin) to span wider than the main content container.
 - Single React component for both sponsor and admin views, with admin-specific controls rendered conditionally via a `role` prop passed as a data attribute.
 - Admin review form (approve/reject buttons + review comment field) renders below the 3-pane editor.
 - Sponsor view shows the latest review comment (read-only) when the report is rejected, so the sponsor can reference feedback while editing.
@@ -87,6 +94,7 @@ None.
 - Expense reports and files are strictly isolated per sponsorship. Each sponsor can only access their own report and files. Admin staff can access all.
 - File uploads use the existing AssetFileUploadable STS-based presigned URL pattern. Content-type validation is browser-side only (via `accept` attribute on file input).
 - File downloads require authentication: sponsor session (owning sponsorship) or admin staff. Served via presigned S3 URLs generated on demand.
+- Admin file access uses a dedicated `Admin::ExpenseFilesController` with staff authentication, nested under the sponsorship route. The admin view passes admin file URLs so file preview, upload, and delete work with admin sessions.
 
 ## Mission Scope
 
@@ -118,7 +126,7 @@ Key areas to test (RSpec, following existing patterns):
 
 **Request specs:**
 - Sponsor authorization: only custom sponsorships can create reports; isolated per sponsorship
-- Status transition guards: submit only from draft, approve/reject only from submitted, withdraw only from submitted, auto-draft on editing rejected
+- Status transition guards: submit only from draft, withdraw only from submitted, auto-draft on editing rejected, review creation (no status guard — re-review allowed)
 - Admin authorization: staff access, review creation, admin edits don't change status
 - File access control: owner + staff only
 - Calculate endpoint: returns correct tax rates and fee breakdown
@@ -130,7 +138,7 @@ Key areas to test (RSpec, following existing patterns):
 - **`ExpenseReport`**: belongs to `Sponsorship` (one-to-one). Columns: `total_amount` decimal (without tax, auto-calculated), `total_tax_amount` decimal (auto-calculated), `status` (draft/submitted/approved/rejected), `revision` integer (default 0, incremented on each submission). No `tax_rate` column (rates are per line item). No `review_comment` column (review history lives in `ExpenseReportReview`).
 - **`ExpenseReportSubmission`**: belongs to `ExpenseReport`. Created on each submission. Columns: `revision` integer (matching ExpenseReport.revision at creation), `data` jsonb (full snapshot of the report matching API response format). The snapshot is kept updated while the report is submitted (e.g., organizer minor edits) until a review is created and linked. After review, the snapshot is frozen. Purely for backend audit — not exposed in UI.
 - **`ExpenseReportReview`**: belongs to `ExpenseReportSubmission`. Columns: `action` enum (approve/reject), `comment` text (nullable), `staff_id` FK (references Staff, optional). Provides an audit trail of all review actions. The latest review's comment is displayed to the sponsor. The UI reads from the live ExpenseReport, not from the submission snapshot.
-- **`ExpenseFile`**: uses `AssetFileUploadable` concern, belongs to `Sponsorship`. Stores uploaded receipt files (images and PDFs). Max file size: 20MB. Accepted content types: image/jpeg, image/png, image/webp, application/pdf. S3 prefix: `c-{conference_id}/expenses/s-{sponsorship_id}/`. Additional columns: `filename` string (original upload filename from browser), `content_type` string. Hard-deletes from both DB and S3 (with cascade delete of `ExpenseLineItemFile` join records).
+- **`ExpenseFile`**: uses `AssetFileUploadable` concern, belongs to `Sponsorship`. Stores uploaded receipt files (images and PDFs). Max file size: 20MB. Accepted content types: image/jpeg, image/png, image/webp, application/pdf. S3 prefix: `c-{conference_id}/expenses/s-{sponsorship_id}/` (stored in `prefix` column, set by `prepare` method). Columns: `prefix` string (S3 key prefix), `filename` string (original upload filename from browser), `content_type` string, `status` string (default `pending`; transitions to `uploaded` via `mark_uploaded!` after the browser confirms a successful S3 upload). Plus standard `AssetFileUploadable` columns (`handle`, `extension`, `version_id`, `checksum_sha256`, `last_modified_at`). Hard-deletes from both DB and S3 (with cascade delete of `ExpenseLineItemFile` join records).
 - **`ExpenseLineItem`**: belongs to `ExpenseReport`. Columns: `title` string (required, short label), `notes` text (optional, longer details), `amount` decimal (>= 0, net without tax), `tax_rate` decimal (nullable; nil = manual entry, otherwise from configured rates), `tax_amount` decimal (>= 0; server-calculated when tax_rate present, user-provided when nil), `preliminal` boolean (default false), `position` integer.
   - References `ExpenseFile`s as receipts via **`ExpenseLineItemFile`** join table (many-to-many).
 - **`ExpenseLineItemFile`**: join table. Columns: `expense_line_item_id` FK, `expense_file_id` FK. Unique index on `(expense_line_item_id, expense_file_id)`.
@@ -174,7 +182,13 @@ resources :sponsorships do
     member do
       get :calculate
     end
+    resources :line_items, controller: 'expense_line_items', only: [:create, :update, :destroy]
     resources :reviews, controller: 'expense_report_reviews', only: [:create]
+  end
+  resources :expense_files, only: [:create, :update, :show, :destroy] do
+    member do
+      post :initiate_update
+    end
   end
 end
 ```
@@ -194,8 +208,10 @@ end
 **Response format:**
 - `expense_report#show` responds to HTML (renders page with React mount point) and JSON (full report with all line items, files, and `latest_review: { action, comment, created_at }`). React fetches data via JSON after mounting.
 - `expense_report#create` creates an empty draft report. Sponsor adds line items through the editor.
-- `expense_report#calculate` returns available `tax_rates` and the sponsorship fee breakdown (`plan.price`, `plan.price_booth`, `booth_assigned`, total fee). Separate endpoint to handle frequent requests from the frontend.
+- `expense_report#update` accepts no params — it recalculates totals from line items, refreshes the submission snapshot if submitted, and reopens if rejected (sponsor only; admin update skips reopen). Serves as a recalculation trigger, not a traditional attribute update.
+- `expense_report#calculate` returns available `tax_rates`, `decimal` (precision config), and the sponsorship fee breakdown (`plan.price`, `plan.price_booth`, `booth_assigned`, total fee). Separate endpoint to handle frequent requests from the frontend.
 - All mutation endpoints (`expense_report#create`, `#update`, `expense_line_items#create/#update/#destroy`, submission, review) return the full report JSON so the React component can refresh its entire state.
+- Decimal serialization: all decimal values (amounts, tax rates) are serialized as JSON strings in both API responses (BigDecimal default via Alba) and submission snapshots (explicit `to_s`). The frontend parses these with `parseFloat` as needed.
 
 **File routes:**
 - Expense files are parallel to sponsorship (like existing asset files), not nested under expense_report, because files belong to the sponsorship and can be uploaded independently.
@@ -205,13 +221,15 @@ end
 
 - Use TypeScript + React, embedded in a Rails HAML view via `createRoot`.
   - i18n strings passed via data attributes on the container element (following existing codebase pattern, e.g. `user_sponsorships_form.ts`).
-- Bulk file upload: frontend handles drop zone via native HTML5 File API (`dragover`/`drop` events + `DataTransfer`), creates `ExpenseFile` records and uploads to S3 sequentially via the existing `AssetFileUploadable`/`AssetFileUploader` pattern.
+- **File upload lifecycle**: Files start as `pending` (DB record created, presigned URL returned), transition to `uploaded` after the browser confirms a successful S3 upload (calls `expense_files#update` with `version_id`, `extension`, `filename`, `content_type`). Only `uploaded` files appear in the report JSON and file lists.
+- **Upload dialog**: A modal (`UploadDialog`) appears during file uploads showing per-file progress, status indicators, and retry/discard buttons on error. The dialog remains open until all uploads complete or the user dismisses it.
+- **Drop zones**: Implemented via a `FileDropOverlay` component that detects spatial position during drag — dropping on the left third of the viewport adds files as unlinked; dropping on the right two-thirds uploads and links them to the currently selected line item. Visual overlay indicators appear when dragging files over the editor.
+- **Bulk file upload**: Frontend handles drop zone via native HTML5 File API (`dragover`/`drop` events + `DataTransfer`), creates `ExpenseFile` records and uploads to S3 sequentially via the existing `AssetFileUploadable`/`AssetFileUploader` pattern.
 - Line item reordering: use `@dnd-kit/core` + `@dnd-kit/sortable` for drag-and-drop.
 - File preview (right pane): images rendered inline via `<img>`, PDFs via `<iframe>`. Presigned URLs fetched on demand via `expense_files#show` redirect (not included in report JSON to avoid expiry). Clicking an attached file in the center pane switches the right pane preview.
 - No feature flag — expense report feature is always available for custom sponsorships.
 
 **JavaScript libraries to add:**
-- `@tanstack/react-form` — TypeScript-first headless form library for per-line-item field state and validation
 - `@dnd-kit/core` — core drag-and-drop engine for React
 - `@dnd-kit/sortable` — sortable list preset for line item reordering
 - `@dnd-kit/utilities` — CSS transform utilities for smooth drag animations
@@ -223,9 +241,9 @@ end
 
 **Callbacks (3 total, all invariants):**
 
-1. `ExpenseLineItem before_save` — calculate `tax_amount = amount * tax_rate` when `tax_rate` is present. Skipped when `tax_rate` is nil (manual entry).
+1. `ExpenseLineItem before_save` — calculate `tax_amount = floor(amount * tax_rate, decimal)` when `tax_rate` is present, where `decimal` is the configured precision. Skipped when `tax_rate` is nil (manual entry).
 2. `AssetFileUploadable before_validation` — generate `handle` if blank (existing concern behavior).
-3. `AssetFileUploadable after_destroy` — hard-delete S3 object (new addition to the concern, benefits all AssetFileUploadable models).
+3. `AssetFileUploadable before_destroy` + `after_destroy` — two-phase S3 cleanup: `before_destroy` captures the S3 object key (since the record's attributes are still available), `after_destroy` deletes the object from S3 using the captured key. This two-phase approach is necessary because the object key depends on record attributes that may not be available after destruction.
 
 No other callbacks are expected. Specifically, the following are handled by explicit model method calls, not callbacks:
 - Total recalculation (not a line item after_save/after_destroy callback)
@@ -244,8 +262,11 @@ No other callbacks are expected. Specifically, the following are handled by expl
 | `ExpenseReport` | `reopen_if_rejected` | No | Set status to draft if rejected, no-op otherwise |
 | `ExpenseReport` | `build_snapshot_data` | No | Return report as JSON hash for submission snapshot |
 | `ExpenseReport` | `refresh_submission_snapshot` | No | Update current submission's `data` jsonb if submitted |
-| `ExpenseReportReview` | `.create_for!(submission, ...)` | Yes (transaction) | Create review, freeze snapshot, update report status, save all |
+| `ExpenseReportReview` | `.create_for!(submission, ...)` | Yes (transaction) | Destroy existing review if any, create new review, update report status, save all. Snapshot is implicitly frozen (no longer refreshed once status changes from submitted) |
 | `ExpenseLineItem` | `assign_next_position` | No | Set position to `report.line_items.maximum(:position).to_i + 1` |
+| `ExpenseFile` | `prepare(conference:, sponsorship:)` | No | Set `prefix` to S3 key prefix pattern for the given conference/sponsorship |
+| `ExpenseFile` | `mark_uploaded!` | Yes | Set `status` to `uploaded` and save |
+| `ExpenseReportSubmission` | `reviewed?` | No | Returns `true` if a review record exists for this submission |
 
 **Controller patterns:**
 
@@ -270,11 +291,13 @@ Non-saving methods are batched with a single `save!` in the controller. Methods 
 
 ### Configuration
 
-- `config/initializers/expense_report.rb`: add `Rails.configuration.x.expense_report.tax_rates` as an array of available tax rates. Default: `[1/10r, 8/100r, 0/1r]` (10%, 8%, 0% JCT rates). Stored as Rationals in config, converted to decimals for DB storage and JSON serialization.
+- `config/initializers/expense_report.rb`:
+  - `Rails.configuration.x.expense_report.tax_rates`: array of available tax rates. Default: `[1/10r, 8/100r, 0/1r]` (10%, 8%, 0% JCT rates). Stored as Rationals in config, converted to decimals for DB storage and JSON serialization.
+  - `Rails.configuration.x.expense_report.decimal`: number of decimal places for tax calculation rounding (floor). Default: `0` (integer yen — no fractional amounts).
 
 ## Current Status
 
-Implementation complete.
+Implementation complete. Post-implementation spec review conducted 2026-03-31; spec updated to match actual implementation, documenting previously undocumented behaviors and flagging known issues (see Known Issues section).
 
 ### Implementation Checklist
 
@@ -288,7 +311,7 @@ Each group corresponds to a reasonably-sized commit.
 
 **2. Dependencies and configuration**
 - [x] Gemfile: add `alba` gem
-- [x] package.json: add `@tanstack/react-form`, `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
+- [x] package.json: add `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` (note: `@tanstack/react-form` was installed but unused — useState-based form used instead)
 - [x] Config: `config/initializers/expense_report.rb` with tax_rates
 
 **3. Expense report models and migrations**
@@ -317,6 +340,7 @@ Each group corresponds to a reasonably-sized commit.
 **6. Admin expense report API and views**
 - [x] Routes: admin expense report list, show/update, reviews, calculate
 - [x] Controller: `Admin::ExpenseReportsController` (index, show, update, calculate)
+- [x] Controller: `Admin::ExpenseLineItemsController` (create, update, destroy)
 - [x] Controller: `Admin::ExpenseReportReviewsController` (create)
 - [x] View: admin expense report list page (HAML)
 - [x] View: admin sponsorship show — expense report card
