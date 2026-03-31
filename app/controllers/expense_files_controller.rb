@@ -30,6 +30,7 @@ class ExpenseFilesController < ApplicationController
   end
 
   def initiate_update
+    @asset_file.content_type = params[:content_type] if params[:content_type].present?
     render json: make_session
   end
 

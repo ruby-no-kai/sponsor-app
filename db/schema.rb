@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_31_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -278,6 +278,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_000003) do
 
   create_table "sponsor_event_asset_files", force: :cascade do |t|
     t.string "checksum_sha256", default: "", null: false
+    t.string "content_type"
     t.datetime "created_at", null: false
     t.string "extension"
     t.string "handle", null: false
@@ -331,6 +332,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_000003) do
 
   create_table "sponsorship_asset_files", force: :cascade do |t|
     t.string "checksum_sha256", default: "", null: false
+    t.string "content_type"
     t.datetime "created_at", null: false
     t.string "extension"
     t.string "handle", null: false

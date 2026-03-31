@@ -16,11 +16,13 @@ class SponsorEventAssetFilesController < ApplicationController
 
   def create
     @asset_file = SponsorEventAssetFile.prepare(conference: @conference, sponsorship: current_sponsorship)
+    @asset_file.content_type = params[:content_type]
     @asset_file.save!
     render json: make_session
   end
 
   def initiate_update
+    @asset_file.content_type = params[:content_type] if params[:content_type].present?
     render json: make_session
   end
 

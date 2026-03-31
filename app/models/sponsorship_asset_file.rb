@@ -3,7 +3,23 @@
 class SponsorshipAssetFile < ApplicationRecord
   include AssetFileUploadable
 
+  ALLOWED_CONTENT_TYPES = %w[
+    image/jpeg
+    image/png
+    image/gif
+    image/webp
+    image/svg+xml
+    application/pdf
+    application/zip
+    application/x-zip-compressed
+    application/postscript
+    application/illustrator
+    application/octet-stream
+  ].freeze
+
   belongs_to :sponsorship, optional: true
+
+  validate :content_type_allowed
 
   scope :available_for_user, ->(id, session_asset_file_ids: [], available_sponsorship_ids: []) do
     where(id:)
@@ -36,6 +52,13 @@ class SponsorshipAssetFile < ApplicationRecord
 
   def filename
     "S#{id}_#{sponsorship&.slug}.#{extension}"
+  end
+
+  private def content_type_allowed
+    return if content_type.blank?
+    return if content_type.in?(ALLOWED_CONTENT_TYPES)
+
+    errors.add(:content_type, "is not an allowed file type")
   end
 
   private def validate_ownership_not_changed

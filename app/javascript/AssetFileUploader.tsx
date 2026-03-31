@@ -58,6 +58,7 @@ export default class AssetFileUploader {
 
     const sessionPayload = new FormData();
     sessionPayload.append("extension", this.file.name.split(".").pop() || "");
+    sessionPayload.append("content_type", this.file.type);
     sessionPayload.append(Rails.csrfParam() || "", Rails.csrfToken() || "");
     const sessionResp = await fetch(this.sessionEndpoint, {
       method: this.sessionEndpointMethod,
@@ -79,7 +80,7 @@ export default class AssetFileUploader {
 
     if (session.max_size && this.file.size > session.max_size) {
       throw new Error(
-        `File size (${this.file.size} bytes) exceeds maximum allowed size (${session.max_size} bytes)`
+        `File size (${this.file.size} bytes) exceeds maximum allowed size (${session.max_size} bytes)`,
       );
     }
 
@@ -93,7 +94,9 @@ export default class AssetFileUploader {
 
     formData.append("x-amz-checksum-algorithm", "SHA256");
     formData.append("x-amz-checksum-sha256", checksum);
-    formData.append("Content-Type", this.file.type);
+    if (!("Content-Type" in session.fields)) {
+      formData.append("Content-Type", this.file.type);
+    }
     formData.append("file", this.file);
 
     const response = await axios.post(session.url, formData, {

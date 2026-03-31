@@ -57,18 +57,28 @@ module AssetFileUploadable
 
   def upload_url_and_fields
     max_file_size = self.class.const_get(:MAX_FILE_SIZE)
+
+    # Use exact Content-Type from model attribute (validated by AR before this call).
+    # This pins the presigned POST to the specific content type the client declared.
+    post_opts = {
+      key: object_key,
+      signature_expiration: Time.zone.now + 900,
+      content_length_range: 0..max_file_size,
+      use_accelerate_endpoint: true,
+      allow_any: ['x-amz-checksum-algorithm', 'x-amz-checksum-sha256'],
+    }
+    if content_type.present?
+      post_opts[:content_type] = content_type
+    else
+      post_opts[:allow_any] += ['Content-Type']
+    end
+
     # see also config/initializers/aws_s3_patches.rb to force dualstack endpoint
     sign = Aws::S3::PresignedPost.new(
       Session.new(self).credentials,
       self.class.asset_file_region,
       self.class.asset_file_bucket,
-      {
-        key: object_key,
-        signature_expiration: Time.zone.now + 900,
-        content_length_range: 0..max_file_size,
-        use_accelerate_endpoint: true,
-        allow_any: ['Content-Type', 'x-amz-checksum-algorithm', 'x-amz-checksum-sha256'],
-      },
+      post_opts,
     )
     {
       url: sign.url,
@@ -82,6 +92,7 @@ module AssetFileUploadable
     self.version_id = head.version_id if head.version_id != version_id
     self.last_modified_at = head.last_modified
     self.checksum_sha256 = head.checksum_sha256 || "-"
+    self.content_type = head.content_type
     self
   end
 
@@ -135,15 +146,14 @@ module AssetFileUploadable
     end
 
     def iam_policy
+      resource = "arn:aws:s3:::#{file.class.asset_file_bucket}/#{file.object_key}"
       {
         Version: '2012-10-17',
         Statement: [
           {
             Effect: 'Allow',
-            Action: %w(
-              s3:PutObject
-            ),
-            Resource: "arn:aws:s3:::#{file.class.asset_file_bucket}/#{file.object_key}",
+            Action: %w(s3:PutObject),
+            Resource: resource,
             Condition: {
               StringEqualsIfExists: {
                 "s3:x-amz-storage-class" => "STANDARD",
