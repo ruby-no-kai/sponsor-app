@@ -21,3 +21,4 @@ import "../admin_datetime_now";
 import "../user_sponsorships_form";
 import "../broadcast_new_recipient_fields";
 import "../booth_assignments";
+import "../expense_report_editor";
