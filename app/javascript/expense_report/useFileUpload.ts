@@ -187,7 +187,7 @@ export function useFileUpload({
       entriesRef.current = accepted.map((f) => ({ name: f.name, status: "waiting" as const }));
       updateDialog();
 
-      for (let i = 0; i < files.length; i++) {
+      for (let i = 0; i < accepted.length; i++) {
         const id = await performUploadAt(i);
         if (id !== null) {
           uploadedIdsRef.current.push(id);
