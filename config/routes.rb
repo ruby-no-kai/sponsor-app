@@ -36,6 +36,7 @@ Rails.application.routes.draw do
           member do
             get :calculate
           end
+          resources :line_items, controller: 'expense_line_items', only: %i(create update destroy)
           resources :reviews, controller: 'expense_report_reviews', only: %i(create)
         end
       end
