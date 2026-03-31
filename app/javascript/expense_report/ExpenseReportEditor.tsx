@@ -88,12 +88,20 @@ export function ExpenseReportEditor(props: EditorProps) {
     csrfToken: props.csrfToken,
     onReportUpdate: handleReportUpdate,
     onError: setError,
+    onSelectItem: (id) => {
+      setSelectedItemId(id);
+      setPreviewFileId(null);
+    },
+    onSelectFile: (id) => {
+      setPreviewFileId(id);
+      setSelectedItemId(null);
+    },
   });
 
   const handleDropUnlinked = useCallback((files: File[]) => startUpload(files), [startUpload]);
 
   const handleDropLinked = useCallback(
-    (files: File[]) => startUpload(files, selectedItemId),
+    (files: File[]) => startUpload(files, selectedItemId, !selectedItemId),
     [startUpload, selectedItemId],
   );
 
@@ -244,7 +252,7 @@ export function ExpenseReportEditor(props: EditorProps) {
               onUploadLinked={handleDropLinked}
               isDragging={isDragging}
               isDropTarget={isDragging && hoverZone === "linked"}
-              linkedEnabled={selectedItem !== null}
+              linkedEnabled
               selectedItemTitle={selectedItem?.title || null}
             />
             <RightPane
@@ -252,7 +260,7 @@ export function ExpenseReportEditor(props: EditorProps) {
               filesUrl={props.filesUrl}
               isDragging={isDragging}
               isDropTarget={isDragging && hoverZone === "linked"}
-              linkedEnabled={selectedItem !== null}
+              linkedEnabled
             />
           </div>
         )}

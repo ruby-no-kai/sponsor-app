@@ -179,7 +179,7 @@ export function CenterPane({
         <DropZoneIndicator
           visible={isDragging}
           highlighted={isDropTarget}
-          label={linkedEnabled ? `Link to "${selectedItemTitle}"` : "Select a line item first"}
+          label={selectedItemTitle ? `Link to "${selectedItemTitle}"` : "Create new line item"}
           enabled={linkedEnabled}
         />
       </div>
@@ -498,7 +498,7 @@ export function CenterPane({
       <DropZoneIndicator
         visible={isDragging}
         highlighted={isDropTarget}
-        label={linkedEnabled ? `Link to "${selectedItemTitle}"` : "Select a line item first"}
+        label={selectedItemTitle ? `Link to "${selectedItemTitle}"` : "Create new line item"}
         enabled={linkedEnabled}
       />
     </div>

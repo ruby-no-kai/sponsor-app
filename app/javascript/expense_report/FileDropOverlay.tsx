@@ -84,7 +84,7 @@ export function FileDropOverlay({
       const zone = zoneFromEvent(e);
       setHoverZone(null);
 
-      if (zone === "linked" && selectedItem) {
+      if (zone === "linked") {
         onDropLinked(files);
       } else {
         onDropUnlinked(files);

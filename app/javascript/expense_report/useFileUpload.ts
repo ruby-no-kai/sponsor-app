@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import AssetFileUploader from "../AssetFileUploader";
 import type { UploadDialogState, FileUploadEntry } from "./UploadDialog";
-import { deleteFile, updateLineItem, fetchReport } from "./api";
+import { deleteFile, updateLineItem, createLineItem, fetchReport } from "./api";
 import type { ExpenseReport } from "./types";
 import Rails from "@rails/ujs";
 
@@ -12,6 +12,8 @@ type UseFileUploadOptions = {
   csrfToken: string;
   onReportUpdate: (report: ExpenseReport) => void;
   onError: (message: string) => void;
+  onSelectItem: (id: number) => void;
+  onSelectFile: (id: number) => void;
 };
 
 export function useFileUpload({
@@ -21,6 +23,8 @@ export function useFileUpload({
   csrfToken,
   onReportUpdate,
   onError,
+  onSelectItem,
+  onSelectFile,
 }: UseFileUploadOptions) {
   const [dialogState, setDialogState] = useState<UploadDialogState>({ kind: "idle" });
   const opts = { csrfToken };
@@ -159,7 +163,7 @@ export function useFileUpload({
   }, []);
 
   const startUpload = useCallback(
-    async (files: File[], linkToItemId?: number | null) => {
+    async (files: File[], linkToItemId?: number | null, createNewItem?: boolean) => {
       linkToItemIdRef.current = linkToItemId ?? null;
       uploadedIdsRef.current = [];
       completedBytesRef.current = 0;
@@ -177,7 +181,29 @@ export function useFileUpload({
 
       setDialogState({ kind: "done" });
 
+      // Create a new line item if requested and no item was selected
       const itemId = linkToItemIdRef.current;
+      if (!itemId && createNewItem && uploadedIdsRef.current.length > 0) {
+        try {
+          const result = await createLineItem(
+            lineItemsUrl,
+            {
+              title: "New expense",
+              amount: "0",
+              tax_amount: "0",
+              file_ids: uploadedIdsRef.current,
+            },
+            opts,
+          );
+          onReportUpdate(result);
+          const newItem = result.line_items[result.line_items.length - 1];
+          if (newItem) onSelectItem(newItem.id);
+          return;
+        } catch (e) {
+          onError(e instanceof Error ? e.message : "Failed to create line item");
+        }
+      }
+
       if (itemId && uploadedIdsRef.current.length > 0) {
         try {
           const refreshed = await fetchReport(reportUrl, opts);
@@ -191,6 +217,7 @@ export function useFileUpload({
               opts,
             );
             onReportUpdate(result);
+            onSelectItem(itemId);
             return;
           }
         } catch (e) {
@@ -201,11 +228,24 @@ export function useFileUpload({
       try {
         const refreshed = await fetchReport(reportUrl, opts);
         onReportUpdate(refreshed);
+        if (uploadedIdsRef.current.length > 0) {
+          onSelectFile(uploadedIdsRef.current[0]);
+        }
       } catch (e) {
         onError(e instanceof Error ? e.message : "Failed to refresh");
       }
     },
-    [performUploadAt, updateDialog, reportUrl, lineItemsUrl, opts, onReportUpdate, onError],
+    [
+      performUploadAt,
+      updateDialog,
+      reportUrl,
+      lineItemsUrl,
+      opts,
+      onReportUpdate,
+      onError,
+      onSelectItem,
+      onSelectFile,
+    ],
   );
 
   return { dialogState, startUpload, handleRetry, handleDiscard };
