@@ -119,6 +119,7 @@ export type EditorI18n = {
   upload_failed: string;
   retry: string;
   discard: string;
+  error_unsupported_file: string;
   review_dialog_title: string;
   review_dialog_no_files: string;
   review_dialog_unlinked_files: string;

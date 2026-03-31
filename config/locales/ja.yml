@@ -346,6 +346,7 @@ ja:
         upload_failed: "アップロード失敗"
         retry: "再試行"
         discard: "破棄"
+        error_unsupported_file: "対応していないファイル形式です: %{names}"
         review_dialog_title: "提出内容の確認"
         review_dialog_no_files: "ファイルなし"
         review_dialog_unlinked_files: "その他のファイル"

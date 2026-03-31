@@ -3,7 +3,16 @@ import AssetFileUploader from "../AssetFileUploader";
 import type { UploadDialogState, FileUploadEntry } from "./UploadDialog";
 import { deleteFile, updateLineItem, createLineItem, fetchReport } from "./api";
 import type { ExpenseReport } from "./types";
+import { useI18n, t } from "./I18nContext";
 import Rails from "@rails/ujs";
+
+const ALLOWED_CONTENT_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "application/pdf",
+];
 
 type UseFileUploadOptions = {
   filesUrl: string;
@@ -26,6 +35,7 @@ export function useFileUpload({
   onSelectItem,
   onSelectFile,
 }: UseFileUploadOptions) {
+  const i18n = useI18n();
   const [dialogState, setDialogState] = useState<UploadDialogState>({ kind: "idle" });
   const opts = { csrfToken };
 
@@ -164,12 +174,20 @@ export function useFileUpload({
 
   const startUpload = useCallback(
     async (files: File[], linkToItemId?: number | null, createNewItem?: boolean) => {
+      const rejected = files.filter((f) => !ALLOWED_CONTENT_TYPES.includes(f.type));
+      const accepted = files.filter((f) => ALLOWED_CONTENT_TYPES.includes(f.type));
+      if (rejected.length > 0) {
+        const names = rejected.map((f) => f.name).join(", ");
+        onError(t(i18n.error_unsupported_file, { names }));
+      }
+      if (accepted.length === 0) return;
+
       linkToItemIdRef.current = linkToItemId ?? null;
       uploadedIdsRef.current = [];
       completedBytesRef.current = 0;
-      allFilesRef.current = files;
-      fileSizesRef.current = files.map((f) => f.size || 1);
-      entriesRef.current = files.map((f) => ({ name: f.name, status: "waiting" as const }));
+      allFilesRef.current = accepted;
+      fileSizesRef.current = accepted.map((f) => f.size || 1);
+      entriesRef.current = accepted.map((f) => ({ name: f.name, status: "waiting" as const }));
       updateDialog();
 
       for (let i = 0; i < files.length; i++) {

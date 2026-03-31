@@ -345,6 +345,7 @@ en:
         upload_failed: "Upload failed"
         retry: "Retry"
         discard: "Discard"
+        error_unsupported_file: "Unsupported file type: %{names}"
         review_dialog_title: "Review before submission"
         review_dialog_no_files: "No files"
         review_dialog_unlinked_files: "Unlinked files"
