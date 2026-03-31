@@ -22,6 +22,26 @@ RSpec.describe ExpenseFile, type: :model do
     end
   end
 
+  describe 'content_type validation' do
+    %w[image/jpeg image/png image/gif image/webp application/pdf].each do |type|
+      it "allows #{type}" do
+        file = described_class.prepare(conference:, sponsorship:)
+        file.content_type = type
+        file.valid?
+        expect(file.errors[:content_type]).to be_empty
+      end
+    end
+
+    %w[text/plain application/zip image/svg+xml application/javascript].each do |type|
+      it "rejects #{type}" do
+        file = described_class.prepare(conference:, sponsorship:)
+        file.content_type = type
+        file.valid?
+        expect(file.errors[:content_type]).to be_present
+      end
+    end
+  end
+
   describe 'AssetFileUploadable' do
     it 'generates a handle on validation' do
       file = described_class.prepare(conference:, sponsorship:)

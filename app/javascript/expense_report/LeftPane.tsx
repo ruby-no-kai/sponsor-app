@@ -165,7 +165,7 @@ export function LeftPane({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp,application/pdf"
+              accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
               multiple
               className="d-none"
               onChange={handleFileInputChange}
