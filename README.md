@@ -9,8 +9,8 @@ rails s
 bin/vite dev
 ```
 
-- https://sponsor-app.localhost:1355/
-- https://sponsor-app.localhost:1355/admin
+- http://sponsor-app.localhost:1355/
+- http://sponsor-app.localhost:1355/admin
 
 ### Environment variables
 
