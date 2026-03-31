@@ -35,11 +35,8 @@ RSpec.describe "Admin Expense Files", type: :request do
       file.save!
 
       s3_client = instance_double(Aws::S3::Client)
-      allow(file).to receive(:s3_client).and_return(s3_client)
+      allow(Aws::S3::Client).to receive(:new).and_return(s3_client)
       allow(s3_client).to receive(:delete_object)
-
-      # Use find to get the same instance Rails will load
-      allow(ExpenseFile).to receive(:find).and_return(file)
 
       expect do
         delete conference_sponsorship_expense_file_path(conference, sponsorship, file), as: :json
