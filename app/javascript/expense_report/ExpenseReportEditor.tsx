@@ -146,8 +146,8 @@ function ExpenseReportEditorInner(props: EditorProps) {
   const breakoutStyle: React.CSSProperties = isMobile
     ? { width: "100%" }
     : {
-        width: "calc(100vw - 180px)",
-        marginLeft: "calc(-1 * (100vw - 180px - 100%) / 2)",
+        width: "max(100%, calc(100vw - 180px))",
+        marginLeft: "calc(-1 * (max(100%, calc(100vw - 180px)) - 100%) / 2)",
       };
 
   return (
