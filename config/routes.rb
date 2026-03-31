@@ -39,6 +39,11 @@ Rails.application.routes.draw do
           resources :line_items, controller: 'expense_line_items', only: %i(create update destroy)
           resources :reviews, controller: 'expense_report_reviews', only: %i(create)
         end
+        resources :expense_files, only: %i(create update show destroy) do
+          member do
+            post :initiate_update
+          end
+        end
       end
 
       resources :sponsor_events, path: 'events', except: %i(new create destroy) do
