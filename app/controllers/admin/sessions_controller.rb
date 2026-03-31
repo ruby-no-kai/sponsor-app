@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Admin
-  class SessionsController < ApplicationController
+  class SessionsController < ::ApplicationController
     layout 'admin'
 
     def new
