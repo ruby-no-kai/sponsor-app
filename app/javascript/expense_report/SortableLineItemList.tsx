@@ -50,27 +50,17 @@ export function SortableLineItemList({
     return (
       <>
         {items.map((item) => (
-          <LineItemRow
-            key={item.id}
-            item={item}
-            isSelected={selectedItemId === item.id}
-            onClick={() => onSelectItem(item.id)}
-          />
+          <div key={item.id} onClick={() => onSelectItem(item.id)} style={{ cursor: "pointer" }}>
+            <LineItemRow item={item} isSelected={selectedItemId === item.id} />
+          </div>
         ))}
       </>
     );
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext
-        items={items.map((i) => i.id)}
-        strategy={verticalListSortingStrategy}
-      >
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
         {items.map((item) => (
           <SortableLineItem
             key={item.id}
@@ -93,8 +83,7 @@ function SortableLineItem({
   isSelected: boolean;
   onClick: () => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: item.id });
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -103,42 +92,23 @@ function SortableLineItem({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      onClick={onClick}
-    >
-      <LineItemRow item={item} isSelected={isSelected} onClick={onClick} />
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} onClick={onClick}>
+      <LineItemRow item={item} isSelected={isSelected} />
     </div>
   );
 }
 
-function LineItemRow({
-  item,
-  isSelected,
-  onClick,
-}: {
-  item: ExpenseLineItem;
-  isSelected: boolean;
-  onClick: () => void;
-}) {
+function LineItemRow({ item, isSelected }: { item: ExpenseLineItem; isSelected: boolean }) {
   const num = parseFloat(item.amount);
   const formatted = isNaN(num) ? item.amount : num.toLocaleString();
 
   return (
-    <div
-      className={`p-2 border-bottom ${isSelected ? "bg-primary text-white" : ""}`}
-      onClick={onClick}
-    >
+    <div className={`p-2 border-bottom ${isSelected ? "bg-primary text-white" : ""}`}>
       <div className="small font-weight-bold text-truncate">{item.title}</div>
       <div className="small">
         {formatted}
         {item.preliminal && (
-          <span
-            className={`ml-1 badge ${isSelected ? "badge-light" : "badge-warning"}`}
-          >
+          <span className={`ml-1 badge ${isSelected ? "badge-light" : "badge-warning"}`}>
             preliminal
           </span>
         )}
