@@ -30,13 +30,13 @@ module AssetFileUploadable
     )
   end
 
-  def download_url
+  def download_url(disposition: :attachment)
     presigner.presigned_url(
       :get_object,
       bucket: self.class.asset_file_bucket,
       key: object_key,
       expires_in: 3600,
-      response_content_disposition: "attachment; filename=\"#{filename}\"",
+      response_content_disposition: "#{disposition}; filename=\"#{filename}\"",
     )
   end
 

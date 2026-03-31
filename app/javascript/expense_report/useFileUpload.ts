@@ -3,6 +3,7 @@ import AssetFileUploader from "../AssetFileUploader";
 import type { UploadDialogState, FileUploadEntry } from "./UploadDialog";
 import { deleteFile, updateLineItem, fetchReport } from "./api";
 import type { ExpenseReport } from "./types";
+import Rails from "@rails/ujs";
 
 type UseFileUploadOptions = {
   filesUrl: string;
@@ -24,11 +25,9 @@ export function useFileUpload({
   const [dialogState, setDialogState] = useState<UploadDialogState>({ kind: "idle" });
   const opts = { csrfToken };
 
-  // Mutable state for the upload batch
   const entriesRef = useRef<FileUploadEntry[]>([]);
   const fileSizesRef = useRef<number[]>([]);
   const completedBytesRef = useRef(0);
-  const currentIndexRef = useRef(0);
   const currentFileIdRef = useRef<number | null>(null);
   const uploadedIdsRef = useRef<number[]>([]);
   const linkToItemIdRef = useRef<number | null>(null);
@@ -62,27 +61,28 @@ export function useFileUpload({
     [],
   );
 
-  const reportBack = useCallback(
-    async (fileId: string, file: File) => {
-      const resp = await fetch(`${filesUrl}/${fileId}`, {
-        method: "PUT",
+  // Create the ExpenseFile record (pending) with filename/content_type
+  const createFileRecord = useCallback(
+    async (file: File): Promise<{ id: number; initiateUrl: string }> => {
+      const formData = new FormData();
+      formData.append("extension", file.name.split(".").pop() || "");
+      formData.append("filename", file.name);
+      formData.append("content_type", file.type);
+      formData.append(Rails.csrfParam() || "", Rails.csrfToken() || "");
+
+      const resp = await fetch(filesUrl, {
+        method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken,
-        },
-        body: JSON.stringify({
-          filename: file.name,
-          content_type: file.type,
-          extension: file.name.split(".").pop() || "",
-          version_id: "",
-        }),
+        body: formData,
       });
       if (!resp.ok) {
-        throw new Error(`Failed to finalize upload: ${resp.status}`);
+        throw new Error(`Failed to create file record: ${resp.status}`);
       }
+      const session = await resp.json();
+      const id = parseInt(session.id, 10);
+      return { id, initiateUrl: `${filesUrl}/${id}/initiate_update` };
     },
-    [filesUrl, csrfToken],
+    [filesUrl],
   );
 
   const performUploadAt = useCallback(
@@ -91,48 +91,40 @@ export function useFileUpload({
       setEntryStatus(index, "uploading");
       updateDialog();
 
-      const uploader = new AssetFileUploader({
-        file,
-        sessionEndpoint: filesUrl,
-        sessionEndpointMethod: "POST",
-        onProgress: (p) => updateDialog(p),
-      });
-
       try {
-        await uploader.perform();
-        const fileId = parseInt(uploader.fileId!, 10);
-        currentFileIdRef.current = fileId;
+        // Step 1: create pending record with filename/content_type
+        const { id, initiateUrl } = await createFileRecord(file);
+        currentFileIdRef.current = id;
 
-        await reportBack(uploader.fileId!, file);
+        // Step 2: upload to S3 via AssetFileUploader
+        // Use initiate_update as session endpoint — it returns presigned
+        // URL for an existing record. The report_to PUT marks as uploaded.
+        const uploader = new AssetFileUploader({
+          file,
+          sessionEndpoint: initiateUrl,
+          sessionEndpointMethod: "POST",
+          onProgress: (p) => updateDialog(p),
+        });
+
+        await uploader.perform();
 
         completedBytesRef.current += file.size;
         setEntryStatus(index, "done");
         updateDialog();
-        return fileId;
+        return id;
       } catch (e) {
         const message = e instanceof Error ? e.message : "Upload failed";
-        currentFileIdRef.current = uploader.fileId ? parseInt(uploader.fileId, 10) : null;
 
         setEntryStatus(index, "error", message);
         updateDialog();
 
-        // Wait for user to retry or discard
         return new Promise<number | null>((resolve) => {
           retryHandlerRef.current = async () => {
             setEntryStatus(index, "uploading", undefined);
             updateDialog();
             try {
-              if (uploader.fileId) {
-                await uploader.perform();
-                await reportBack(uploader.fileId, file);
-                completedBytesRef.current += file.size;
-                setEntryStatus(index, "done");
-                updateDialog();
-                resolve(parseInt(uploader.fileId, 10));
-              } else {
-                const id = await performUploadAt(index);
-                resolve(id);
-              }
+              const id = await performUploadAt(index);
+              resolve(id);
             } catch (retryErr) {
               const retryMsg = retryErr instanceof Error ? retryErr.message : "Upload failed";
               setEntryStatus(index, "error", retryMsg);
@@ -155,7 +147,7 @@ export function useFileUpload({
         });
       }
     },
-    [filesUrl, reportBack, opts, setEntryStatus, updateDialog],
+    [filesUrl, createFileRecord, opts, setEntryStatus, updateDialog],
   );
 
   const handleRetry = useCallback(() => {
@@ -177,7 +169,6 @@ export function useFileUpload({
       updateDialog();
 
       for (let i = 0; i < files.length; i++) {
-        currentIndexRef.current = i;
         const id = await performUploadAt(i);
         if (id !== null) {
           uploadedIdsRef.current.push(id);
@@ -186,7 +177,6 @@ export function useFileUpload({
 
       setDialogState({ kind: "done" });
 
-      // Link uploaded files to item if requested
       const itemId = linkToItemIdRef.current;
       if (itemId && uploadedIdsRef.current.length > 0) {
         try {

@@ -9,12 +9,13 @@ class ExpenseFilesController < ApplicationController
 
   def create
     @asset_file = ExpenseFile.prepare(conference: @conference, sponsorship: current_sponsorship)
+    @asset_file.assign_attributes(params.permit(:filename, :content_type))
     @asset_file.save!
     render json: make_session
   end
 
   def show
-    redirect_to @asset_file.download_url, allow_other_host: true
+    redirect_to @asset_file.download_url(disposition: :inline), allow_other_host: true
   end
 
   def update
