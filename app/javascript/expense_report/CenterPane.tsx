@@ -142,8 +142,8 @@ export function CenterPane({
   if (!item) {
     return (
       <div
-        className="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-muted"
-        style={{ overflow: "auto" }}
+        className="d-flex flex-column align-items-center justify-content-center text-muted"
+        style={{ flex: "4 0 0", minWidth: "250px", overflow: "auto" }}
       >
         {selectedFile && !isReadOnly ? (
           <div className="text-center">
@@ -293,7 +293,7 @@ export function CenterPane({
   const attachedFiles = report.files.filter((f) => fileIds.includes(f.id));
 
   return (
-    <div className="flex-grow-1 p-3" style={{ overflow: "auto", minWidth: 0 }}>
+    <div className="p-3" style={{ flex: "4 0 0", minWidth: "250px", overflow: "auto" }}>
       <div className="form-group">
         <label className="small font-weight-bold" htmlFor={`eli-title-${item.id}`}>
           Title

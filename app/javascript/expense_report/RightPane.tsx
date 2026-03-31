@@ -11,7 +11,7 @@ export function RightPane({ file, filesUrl }: RightPaneProps) {
     return (
       <div
         className="border-left d-flex align-items-center justify-content-center text-muted"
-        style={{ width: "350px", minWidth: "350px" }}
+        style={{ flex: "5 0 0", minWidth: "300px" }}
       >
         Select a file to preview
       </div>
@@ -23,16 +23,16 @@ export function RightPane({ file, filesUrl }: RightPaneProps) {
   const isPdf = file.content_type === "application/pdf";
 
   return (
-    <div
-      className="border-left d-flex flex-column"
-      style={{ width: "350px", minWidth: "350px" }}
-    >
+    <div className="border-left d-flex flex-column" style={{ flex: "5 0 0", minWidth: "300px" }}>
       <div className="p-2 bg-light border-bottom">
         <strong className="small text-truncate d-block">
           {file.filename || `File #${file.id}`}
         </strong>
       </div>
-      <div className="flex-grow-1 d-flex align-items-center justify-content-center p-2" style={{ overflow: "auto" }}>
+      <div
+        className="flex-grow-1 d-flex align-items-center justify-content-center p-2"
+        style={{ overflow: "auto" }}
+      >
         {isImage && (
           <img
             src={previewUrl}

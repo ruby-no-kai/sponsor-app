@@ -13,8 +13,22 @@ import { updateLineItem } from "./api";
 export function ExpenseReportEditor(props: EditorProps) {
   const [report, setReport] = useState<ExpenseReport | null>(null);
   const [calcData, setCalcData] = useState<CalculateResponse | null>(null);
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-  const [previewFileId, setPreviewFileId] = useState<number | null>(null);
+
+  const parseFragment = (): { itemId: number | null; fileId: number | null } => {
+    const hash = window.location.hash;
+    const itemMatch = hash.match(/^#item-(\d+)$/);
+    const fileMatch = hash.match(/^#file-(\d+)$/);
+    return {
+      itemId: itemMatch ? parseInt(itemMatch[1], 10) : null,
+      fileId: fileMatch ? parseInt(fileMatch[1], 10) : null,
+    };
+  };
+
+  const initialFragment = useRef(parseFragment());
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(
+    initialFragment.current.itemId,
+  );
+  const [previewFileId, setPreviewFileId] = useState<number | null>(initialFragment.current.fileId);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -27,6 +41,16 @@ export function ExpenseReportEditor(props: EditorProps) {
     }
     return true;
   }, []);
+
+  useEffect(() => {
+    if (selectedItemId) {
+      history.replaceState(null, "", `#item-${selectedItemId}`);
+    } else if (previewFileId) {
+      history.replaceState(null, "", `#file-${previewFileId}`);
+    } else {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, [selectedItemId, previewFileId]);
 
   const isReadOnly =
     report?.status === "approved" || (props.role === "sponsor" && report?.status === "submitted");
@@ -95,7 +119,9 @@ export function ExpenseReportEditor(props: EditorProps) {
   if (!report) return null;
 
   return (
-    <div>
+    <div
+      style={{ width: "calc(100vw - 180px)", marginLeft: "calc(-1 * (100vw - 180px - 100%) / 2)" }}
+    >
       {error && (
         <div className="alert alert-warning alert-dismissible" role="alert">
           {error}

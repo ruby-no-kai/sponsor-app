@@ -78,7 +78,7 @@ export function LeftPane({
   return (
     <div
       className="border-right d-flex flex-column"
-      style={{ width: "250px", minWidth: "250px", overflow: "auto" }}
+      style={{ flex: "3 0 0", minWidth: "200px", overflow: "auto" }}
     >
       <div className="p-2 bg-light border-bottom d-flex justify-content-between align-items-center">
         <strong className="small">Line Items</strong>
