@@ -10,7 +10,7 @@ class ExpenseReportSubmissionsController < ApplicationController
     @expense_report.submit!
 
     SlackWebhookJob.perform_later(
-      {text: ":receipt: #{current_sponsorship.name} submitted an expense report (#{@expense_report.total_amount} + #{@expense_report.total_tax_amount} tax)"},
+      {text: ":receipt: #{current_sponsorship.name} submitted an <#{conference_sponsorship_expense_report_url(@conference, current_sponsorship)}|expense report> (#{@expense_report.total_amount} + #{@expense_report.total_tax_amount} tax)"},
       hook_name: :feed,
     )
 
