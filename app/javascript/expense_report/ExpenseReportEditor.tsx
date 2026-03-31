@@ -9,6 +9,7 @@ import { fetchReport, fetchCalculate } from "./api";
 import { LeftPane } from "./LeftPane";
 import { CenterPane } from "./CenterPane";
 import { RightPane } from "./RightPane";
+import { AdminReviewForm } from "./AdminReviewForm";
 
 export function ExpenseReportEditor(props: EditorProps) {
   const [report, setReport] = useState<ExpenseReport | null>(null);
@@ -155,6 +156,16 @@ export function ExpenseReportEditor(props: EditorProps) {
         />
         <RightPane file={previewFile || null} filesUrl={props.filesUrl} />
       </div>
+
+      {props.role === "admin" && props.reviewsUrl && (
+        <AdminReviewForm
+          report={report}
+          reviewsUrl={props.reviewsUrl}
+          opts={opts}
+          onUpdate={handleReportUpdate}
+          onError={setError}
+        />
+      )}
     </div>
   );
 }

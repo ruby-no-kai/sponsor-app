@@ -343,8 +343,8 @@ Each group corresponds to a reasonably-sized commit.
 - [x] File upload button with file input in left pane
 
 **10. Frontend: admin review and rejection feedback**
-- [ ] Admin review form below editor (approve/reject + comment)
-- [ ] Sponsor view of rejection feedback (latest review comment)
+- [x] Admin review form below editor (approve/reject + comment)
+- [x] Sponsor view of rejection feedback (latest review comment, already in Phase 8 editor)
 
 **11. Slack notification**
 - [ ] Job: Slack notification on submission (`:receipt:`, feed channel)
@@ -366,3 +366,4 @@ Implementors MUST keep this section updated as they work.
 - **2026-03-31 Phase 7**: Sponsor portal entry point — expense report card on sponsor show page (custom sponsorships only), React mount point views for user and admin, i18n keys (en/ja).
 - **2026-03-31 Phase 8**: Frontend 3-pane editor — ExpenseReportEditor root component with LeftPane, CenterPane, RightPane. API client, types, entry point. Tax mode selector with 4 modes (exclude/include/exempt/manual). File preview via img/iframe. Submit/withdraw buttons. TypeScript compiles cleanly.
 - **2026-03-31 Phase 9**: File upload and drag-and-drop — useFileUpload hook wrapping AssetFileUploader, FileDropZone component, SortableLineItemList with @dnd-kit, file upload button in left pane.
+- **2026-03-31 Phase 10**: Admin review form — AdminReviewForm component with approve/reject buttons and comment field, rendered below editor for admin when status is submitted. Rejection feedback already included in Phase 8.
