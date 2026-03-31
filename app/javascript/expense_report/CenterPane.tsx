@@ -56,15 +56,17 @@ export function CenterPane({
   const [deleting, setDeleting] = useState(false);
   const [addingMore, setAddingMore] = useState(false);
 
+  const numeq = (a: string, b: string) => (parseFloat(a) || 0) === (parseFloat(b) || 0);
+
   const isDirty = item
     ? title !== item.title ||
       (notes || "") !== (item.notes || "") ||
-      enteredAmount !== item.amount ||
+      !numeq(enteredAmount, item.amount) ||
       preliminal !== item.preliminal ||
       fileIds.join() !== item.file_ids.join() ||
       taxMode !== deriveTaxMode(item) ||
       (taxMode !== "manual" && taxMode !== "exempt" && taxRate !== item.tax_rate) ||
-      (taxMode === "manual" && taxAmount !== item.tax_amount)
+      (taxMode === "manual" && !numeq(taxAmount, item.tax_amount))
     : false;
 
   // Expose isDirty to parent via ref
@@ -72,19 +74,26 @@ export function CenterPane({
     if (isDirtyRef) isDirtyRef.current = isDirty;
   }, [isDirty]);
 
+  const formatForInput = (v: string): string => {
+    const num = parseFloat(v);
+    if (isNaN(num)) return v;
+    const d = calcData?.decimal ?? 0;
+    return num.toFixed(d);
+  };
+
   useEffect(() => {
     if (!item) return;
     setTitle(item.title);
     setNotes(item.notes || "");
     setAmount(item.amount);
     setTaxRate(item.tax_rate);
-    setTaxAmount(item.tax_amount);
+    setTaxAmount(formatForInput(item.tax_amount));
     setPreliminal(item.preliminal);
     setFileIds(item.file_ids);
 
     const mode = deriveTaxMode(item);
     setTaxMode(mode);
-    setEnteredAmount(item.amount);
+    setEnteredAmount(formatForInput(item.amount));
   }, [item?.id, item?.file_ids.join()]);
 
   const [creatingFromFile, setCreatingFromFile] = useState(false);
@@ -177,6 +186,14 @@ export function CenterPane({
     }
   };
 
+  const decimal = calcData?.decimal ?? 0;
+  const amountStep = decimal > 0 ? (10 ** -decimal).toString() : "1";
+
+  const floorToDecimal = (v: number): string => {
+    const factor = 10 ** decimal;
+    return (Math.floor(v * factor) / factor).toFixed(decimal);
+  };
+
   const computeNetAndTax = (): { netAmount: string; taxAmt: string; rate: string | null } => {
     const entered = parseFloat(enteredAmount) || 0;
     if (taxMode === "exempt") {
@@ -190,8 +207,8 @@ export function CenterPane({
       const net = entered / (1 + rate);
       const tax = entered - net;
       return {
-        netAmount: net.toFixed(2),
-        taxAmt: tax.toFixed(2),
+        netAmount: floorToDecimal(net),
+        taxAmt: floorToDecimal(tax),
         rate: rate.toString(),
       };
     }
@@ -199,7 +216,7 @@ export function CenterPane({
     const tax = entered * rate;
     return {
       netAmount: enteredAmount,
-      taxAmt: tax.toFixed(2),
+      taxAmt: floorToDecimal(tax),
       rate: rate.toString(),
     };
   };
@@ -340,7 +357,7 @@ export function CenterPane({
           <input
             type="number"
             className="form-control form-control-sm"
-            step="0.01"
+            step={amountStep}
             min="0"
             value={enteredAmount}
             onChange={(e) => setEnteredAmount(e.target.value)}
@@ -353,7 +370,7 @@ export function CenterPane({
             <input
               type="number"
               className="form-control form-control-sm"
-              step="0.01"
+              step={amountStep}
               min="0"
               value={taxAmount}
               onChange={(e) => setTaxAmount(e.target.value)}

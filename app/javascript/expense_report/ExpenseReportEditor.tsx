@@ -108,12 +108,21 @@ export function ExpenseReportEditor(props: EditorProps) {
       <div className="d-flex mb-2 justify-content-between align-items-center">
         <div>
           <StatusBadge status={report.status} />
-          {calcData && (
-            <span className="ml-3 text-muted">
-              Total: {formatAmount(report.total_amount)} + tax{" "}
-              {formatAmount(report.total_tax_amount)} / Fee: {formatAmount(calcData.total_fee)}
-            </span>
-          )}
+          {calcData &&
+            (() => {
+              const d = calcData.decimal;
+              const fee = parseFloat(calcData.total_fee) || 0;
+              const expense = parseFloat(report.total_amount) || 0;
+              const remaining = fee - expense;
+              return (
+                <span className="ml-3 text-muted small">
+                  Base sponsorship fee: {formatAmount(calcData.total_fee, d)}
+                  {" | "}Expense: {formatAmount(report.total_amount, d)} + tax{" "}
+                  {formatAmount(report.total_tax_amount, d)}
+                  {" | "}Remaining: {formatAmount(remaining.toString(), d)}
+                </span>
+              );
+            })()}
         </div>
         <div>
           {!isReadOnly &&
@@ -229,9 +238,15 @@ function StatusBadge({ status }: { status: ExpenseReport["status"] }) {
   return <span className={`badge ${badges[status] || "badge-light"}`}>{status}</span>;
 }
 
-function formatAmount(amount: string): string {
+function formatAmount(amount: string, decimal?: number): string {
   const num = parseFloat(amount);
-  return isNaN(num) ? amount : num.toLocaleString();
+  if (isNaN(num)) return amount;
+  return decimal !== undefined
+    ? num.toLocaleString(undefined, {
+        minimumFractionDigits: decimal,
+        maximumFractionDigits: decimal,
+      })
+    : num.toLocaleString();
 }
 
 function SubmitButton({

@@ -32,6 +32,7 @@ module Admin
       plan = @sponsorship.plan
       render json: {
         tax_rates: Rails.configuration.x.expense_report.tax_rates.map { |r| r.to_f.to_s },
+        decimal: Rails.configuration.x.expense_report.decimal,
         plan_price: plan&.price.to_s,
         plan_price_booth: plan&.price_booth.to_s,
         booth_assigned: @sponsorship.booth_assigned?,

@@ -16,6 +16,9 @@ class ExpenseLineItem < ApplicationRecord
   end
 
   private def calculate_tax_amount
-    self.tax_amount = amount * tax_rate if tax_rate.present?
+    return if tax_rate.blank?
+
+    decimal = Rails.configuration.x.expense_report.decimal
+    self.tax_amount = (amount * tax_rate).floor(decimal)
   end
 end
