@@ -7,8 +7,12 @@ class ExpenseReportsController < ApplicationController
   before_action :set_expense_report, only: [:show, :update, :calculate]
 
   def create
-    @expense_report = current_sponsorship.build_expense_report
-    @expense_report.save!
+    begin
+      @expense_report = current_sponsorship.build_expense_report
+      @expense_report.save!
+    rescue ActiveRecord::RecordNotUnique
+      @expense_report = current_sponsorship.expense_report
+    end
 
     respond_to do |format|
       format.html { redirect_to user_conference_sponsorship_expense_report_path(@conference) }
