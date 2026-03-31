@@ -295,8 +295,11 @@ export function CenterPane({
   return (
     <div className="flex-grow-1 p-3" style={{ overflow: "auto", minWidth: 0 }}>
       <div className="form-group">
-        <label className="small font-weight-bold">Title</label>
+        <label className="small font-weight-bold" htmlFor={`eli-title-${item.id}`}>
+          Title
+        </label>
         <input
+          id={`eli-title-${item.id}`}
           type="text"
           className="form-control form-control-sm"
           value={title}
@@ -306,8 +309,11 @@ export function CenterPane({
       </div>
 
       <div className="form-group">
-        <label className="small font-weight-bold">Notes</label>
+        <label className="small font-weight-bold" htmlFor={`eli-notes-${item.id}`}>
+          Notes
+        </label>
         <textarea
+          id={`eli-notes-${item.id}`}
           className="form-control form-control-sm"
           rows={2}
           value={notes}
@@ -318,8 +324,11 @@ export function CenterPane({
       </div>
 
       <div className="form-group">
-        <label className="small font-weight-bold">Tax mode</label>
+        <label className="small font-weight-bold" htmlFor={`eli-taxmode-${item.id}`}>
+          Tax mode
+        </label>
         <select
+          id={`eli-taxmode-${item.id}`}
           className="form-control form-control-sm"
           value={taxMode}
           onChange={(e) => handleTaxModeChange(e.target.value as TaxMode)}
@@ -334,8 +343,11 @@ export function CenterPane({
 
       {(taxMode === "exclude" || taxMode === "include") && (
         <div className="form-group">
-          <label className="small font-weight-bold">Tax rate</label>
+          <label className="small font-weight-bold" htmlFor={`eli-taxrate-${item.id}`}>
+            Tax rate
+          </label>
           <select
+            id={`eli-taxrate-${item.id}`}
             className="form-control form-control-sm"
             value={taxRate || ""}
             onChange={(e) => setTaxRate(e.target.value)}
@@ -352,10 +364,11 @@ export function CenterPane({
 
       <div className="form-row">
         <div className="form-group col">
-          <label className="small font-weight-bold">
+          <label className="small font-weight-bold" htmlFor={`eli-amount-${item.id}`}>
             Amount {taxMode === "include" ? "(incl. tax)" : "(excl. tax)"}
           </label>
           <input
+            id={`eli-amount-${item.id}`}
             type="number"
             className="form-control form-control-sm"
             step={amountStep}
@@ -367,8 +380,11 @@ export function CenterPane({
         </div>
         {taxMode === "manual" && (
           <div className="form-group col">
-            <label className="small font-weight-bold">Tax amount</label>
+            <label className="small font-weight-bold" htmlFor={`eli-taxamt-${item.id}`}>
+              Tax amount
+            </label>
             <input
+              id={`eli-taxamt-${item.id}`}
               type="number"
               className="form-control form-control-sm"
               step={amountStep}
