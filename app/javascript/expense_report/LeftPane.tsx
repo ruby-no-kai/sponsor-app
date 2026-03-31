@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import type { ExpenseReport } from "./types";
 import { createLineItem, updateLineItem } from "./api";
 import { SortableLineItemList } from "./SortableLineItemList";
+import { arrayMove } from "@dnd-kit/sortable";
 import { DropZoneIndicator } from "./FileDropOverlay";
 import { useI18n, splitAt } from "./I18nContext";
 
@@ -44,12 +45,19 @@ export function LeftPane({
   const unlinkedFiles = report.files.filter((f) => !linkedFileIds.has(f.id));
 
   const handleReorder = async (activeId: number, overId: number) => {
-    const items = [...report.line_items];
+    const items = report.line_items;
     const activeIdx = items.findIndex((i) => i.id === activeId);
     const overIdx = items.findIndex((i) => i.id === overId);
     if (activeIdx < 0 || overIdx < 0) return;
 
     const newPosition = items[overIdx].position;
+
+    // Optimistic reorder so dnd-kit doesn't animate a snap-back
+    onUpdate({
+      ...report,
+      line_items: arrayMove(items, activeIdx, overIdx),
+    });
+
     try {
       const result = await updateLineItem(lineItemsUrl, activeId, { position: newPosition });
       onUpdate(result);

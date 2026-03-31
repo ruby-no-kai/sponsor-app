@@ -25,6 +25,7 @@ module Admin
         @line_item.assign_attributes(line_item_params)
         sync_file_ids if params[:expense_line_item]&.key?(:file_ids)
         @line_item.save!
+        reindex_positions if @line_item.saved_change_to_position?
         after_line_item_change
       end
 
@@ -73,6 +74,17 @@ module Admin
 
       (current_ids - new_ids).each do |file_id|
         @line_item.expense_line_item_files.find_by!(expense_file_id: file_id).destroy!
+      end
+    end
+
+    private def reindex_positions
+      target_position = @line_item.position
+      items = @expense_report.line_items.reload.where.not(id: @line_item.id).order(:position, :id).to_a
+      insert_idx = items.index { |i| i.position >= target_position } || items.length
+      items.insert(insert_idx, @line_item)
+      items.each_with_index do |item, idx|
+        new_pos = idx + 1
+        item.update_column(:position, new_pos) if item.position != new_pos # rubocop:disable Rails/SkipsModelValidations
       end
     end
 

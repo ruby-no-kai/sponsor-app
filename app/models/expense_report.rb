@@ -2,7 +2,7 @@
 
 class ExpenseReport < ApplicationRecord
   belongs_to :sponsorship
-  has_many :line_items, class_name: 'ExpenseLineItem', dependent: :destroy
+  has_many :line_items, -> { order(:position) }, class_name: 'ExpenseLineItem', inverse_of: :expense_report, dependent: :destroy
   has_many :submissions, class_name: 'ExpenseReportSubmission', dependent: :destroy
 
   validates :sponsorship_id, uniqueness: true
