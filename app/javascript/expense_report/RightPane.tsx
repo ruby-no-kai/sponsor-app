@@ -1,6 +1,7 @@
 import React from "react";
 import type { ExpenseFile } from "./types";
 import { DropZoneIndicator } from "./FileDropOverlay";
+import { useI18n } from "./I18nContext";
 
 type RightPaneProps = {
   file: ExpenseFile | null;
@@ -17,13 +18,15 @@ export function RightPane({
   isDropTarget,
   linkedEnabled,
 }: RightPaneProps) {
+  const i18n = useI18n();
+
   if (!file) {
     return (
       <div
         className="border-left d-flex align-items-center justify-content-center text-muted"
         style={{ flex: "5 0 0", minWidth: "300px", position: "relative" }}
       >
-        Select a file to preview
+        {i18n.select_file}
         <DropZoneIndicator
           visible={isDragging}
           highlighted={isDropTarget}
@@ -68,9 +71,9 @@ export function RightPane({
         )}
         {!isImage && !isPdf && (
           <div className="text-muted small">
-            Preview not available.{" "}
+            {i18n.no_preview}{" "}
             <a href={previewUrl} target="_blank" rel="noreferrer">
-              Download
+              {i18n.download}
             </a>
           </div>
         )}

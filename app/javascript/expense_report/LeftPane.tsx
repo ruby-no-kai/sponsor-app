@@ -3,6 +3,7 @@ import type { ExpenseReport } from "./types";
 import { createLineItem, updateLineItem } from "./api";
 import { SortableLineItemList } from "./SortableLineItemList";
 import { DropZoneIndicator } from "./FileDropOverlay";
+import { useI18n, splitAt } from "./I18nContext";
 
 type LeftPaneProps = {
   report: ExpenseReport;
@@ -37,6 +38,7 @@ export function LeftPane({
   isDropTarget,
   isMobile,
 }: LeftPaneProps) {
+  const i18n = useI18n();
   const [adding, setAdding] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,7 +56,7 @@ export function LeftPane({
       const result = await updateLineItem(lineItemsUrl, activeId, { position: newPosition }, opts);
       onUpdate(result);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Failed to reorder");
+      onError(e instanceof Error ? e.message : i18n.error_save);
     }
   };
 
@@ -70,7 +72,7 @@ export function LeftPane({
       const newItem = result.line_items[result.line_items.length - 1];
       if (newItem) onSelectItem(newItem.id);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Failed to add item");
+      onError(e instanceof Error ? e.message : i18n.error_add);
     } finally {
       setAdding(false);
     }
@@ -81,6 +83,18 @@ export function LeftPane({
     if (files.length > 0) onUploadFiles(files);
     e.target.value = "";
   };
+
+  const uploadLink = (
+    <a
+      href="#"
+      onClick={(e) => {
+        e.preventDefault();
+        fileInputRef.current?.click();
+      }}
+    >
+      {i18n.upload}
+    </a>
+  );
 
   return (
     <div
@@ -93,13 +107,13 @@ export function LeftPane({
       }}
     >
       <div className="p-2 bg-light border-bottom d-flex justify-content-between align-items-center">
-        <strong className="small">Line Items</strong>
+        <strong className="small">{i18n.line_items}</strong>
         {!isReadOnly && (
           <button
             className="btn btn-sm btn-outline-primary"
             onClick={handleAddItem}
             disabled={adding}
-            title="Add line item"
+            title={i18n.add_line_item}
           >
             +
           </button>
@@ -115,12 +129,12 @@ export function LeftPane({
           isMobile={isMobile}
         />
         {report.line_items.length === 0 && (
-          <div className="p-2 text-muted small">No line items yet</div>
+          <div className="p-2 text-muted small">{i18n.no_line_items}</div>
         )}
       </div>
 
       <div className="p-2 bg-light border-top border-bottom">
-        <strong className="small">Files</strong>
+        <strong className="small">{i18n.files}</strong>
       </div>
       <div style={{ flex: "0 1 auto", overflow: "auto", maxHeight: "40%" }}>
         {unlinkedFiles.map((file) => (
@@ -138,16 +152,16 @@ export function LeftPane({
             className="p-2 text-muted small text-center"
             style={{ border: "1px dashed #ccc", borderRadius: "4px", margin: "4px" }}
           >
-            Drop files to add or{" "}
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                fileInputRef.current?.click();
-              }}
-            >
-              upload
-            </a>
+            {(() => {
+              const [before, after] = splitAt(i18n.drop_to_add, "link");
+              return (
+                <>
+                  {before}
+                  {uploadLink}
+                  {after}
+                </>
+              );
+            })()}
             <input
               ref={fileInputRef}
               type="file"
@@ -162,7 +176,7 @@ export function LeftPane({
       <DropZoneIndicator
         visible={isDragging}
         highlighted={isDropTarget}
-        label="Add as unlinked file"
+        label={i18n.drop_unlinked}
       />
     </div>
   );

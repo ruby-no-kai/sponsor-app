@@ -16,6 +16,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { ExpenseLineItem } from "./types";
+import { useI18n } from "./I18nContext";
 
 type SortableLineItemListProps = {
   items: ExpenseLineItem[];
@@ -101,6 +102,7 @@ function SortableLineItem({
 }
 
 function LineItemRow({ item, isSelected }: { item: ExpenseLineItem; isSelected: boolean }) {
+  const i18n = useI18n();
   const num = parseFloat(item.amount);
   const formatted = isNaN(num) ? item.amount : num.toLocaleString();
 
@@ -111,7 +113,7 @@ function LineItemRow({ item, isSelected }: { item: ExpenseLineItem; isSelected: 
         {formatted}
         {item.preliminal && (
           <span className={`ml-1 badge ${isSelected ? "badge-light" : "badge-warning"}`}>
-            preliminal
+            {i18n.preliminal_badge}
           </span>
         )}
       </div>

@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     calculateUrl: dataset.calculateUrl || "",
     filesUrl: dataset.filesUrl || "",
     csrfToken: dataset.csrfToken || "",
+    i18n: JSON.parse(dataset.i18n || "{}"),
   };
 
   const root = createRoot(container);

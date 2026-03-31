@@ -9,8 +9,18 @@ import { FileDropOverlay } from "./FileDropOverlay";
 import { useFileUpload } from "./useFileUpload";
 import { UploadDialog } from "./UploadDialog";
 import { useIsMobile } from "./useIsMobile";
+import { I18nProvider, useI18n } from "./I18nContext";
 
 export function ExpenseReportEditor(props: EditorProps) {
+  return (
+    <I18nProvider value={props.i18n}>
+      <ExpenseReportEditorInner {...props} />
+    </I18nProvider>
+  );
+}
+
+function ExpenseReportEditorInner(props: EditorProps) {
+  const i18n = useI18n();
   const [report, setReport] = useState<ExpenseReport | null>(null);
   const [calcData, setCalcData] = useState<CalculateResponse | null>(null);
 
@@ -41,10 +51,10 @@ export function ExpenseReportEditor(props: EditorProps) {
 
   const guardDirty = useCallback((): boolean => {
     if (centerPaneDirtyRef.current) {
-      return confirm("You have unsaved changes. Discard them?");
+      return confirm(i18n.confirm_discard);
     }
     return true;
-  }, []);
+  }, [i18n.confirm_discard]);
 
   useEffect(() => {
     if (selectedItemId) {
@@ -69,7 +79,7 @@ export function ExpenseReportEditor(props: EditorProps) {
       setCalcData(c);
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load report");
+      setError(e instanceof Error ? e.message : i18n.error_load);
     } finally {
       setLoading(false);
     }
@@ -84,7 +94,6 @@ export function ExpenseReportEditor(props: EditorProps) {
     setError(null);
   }, []);
 
-  // File upload with modal dialog
   const { dialogState, startUpload, handleRetry, handleDiscard } = useFileUpload({
     filesUrl: props.filesUrl,
     reportUrl: props.reportUrl,
@@ -115,7 +124,7 @@ export function ExpenseReportEditor(props: EditorProps) {
   if (loading) {
     return (
       <div className="text-center py-5">
-        <p>Loading expense report...</p>
+        <p>{i18n.loading}</p>
       </div>
     );
   }
@@ -129,6 +138,13 @@ export function ExpenseReportEditor(props: EditorProps) {
   }
 
   if (!report) return null;
+
+  const statusLabels: Record<string, string> = {
+    draft: i18n.status_draft,
+    submitted: i18n.status_submitted,
+    approved: i18n.status_approved,
+    rejected: i18n.status_rejected,
+  };
 
   const breakoutStyle: React.CSSProperties = isMobile
     ? { width: "100%" }
@@ -155,7 +171,10 @@ export function ExpenseReportEditor(props: EditorProps) {
           className="d-flex align-items-center flex-wrap"
           style={isMobile ? { fontSize: "0.85rem", overflowX: "auto" } : undefined}
         >
-          <StatusBadge status={report.status} />
+          <StatusBadge
+            status={report.status}
+            label={statusLabels[report.status] || report.status}
+          />
           {calcData &&
             (() => {
               const d = calcData.decimal;
@@ -164,13 +183,13 @@ export function ExpenseReportEditor(props: EditorProps) {
               const remaining = fee - expense;
               return (
                 <span className="ml-3" style={{ whiteSpace: "nowrap" }}>
-                  <span className="text-muted">Fee:</span>{" "}
+                  <span className="text-muted">{i18n.fee}</span>{" "}
                   <strong>{formatAmount(calcData.total_fee, d)}</strong>
-                  <span className="text-muted ml-2">Expense:</span>{" "}
+                  <span className="text-muted ml-2">{i18n.expense}</span>{" "}
                   <strong>{formatAmount(report.total_amount, d)}</strong>
-                  <span className="text-muted"> + tax </span>
+                  <span className="text-muted"> {i18n.plus_tax} </span>
                   <strong>{formatAmount(report.total_tax_amount, d)}</strong>
-                  <span className="text-muted ml-2">Remaining:</span>{" "}
+                  <span className="text-muted ml-2">{i18n.remaining}</span>{" "}
                   <strong style={{ color: remaining >= 0 ? "#28a745" : "#dc3545" }}>
                     {formatAmount(remaining.toString(), d)}
                   </strong>
@@ -203,7 +222,7 @@ export function ExpenseReportEditor(props: EditorProps) {
 
       {report.latest_review?.action === "reject" && report.latest_review?.comment && (
         <div className="alert alert-danger mb-2">
-          <strong>Review feedback:</strong> {report.latest_review.comment}
+          <strong>{i18n.review_feedback}</strong> {report.latest_review.comment}
         </div>
       )}
 
@@ -268,7 +287,7 @@ export function ExpenseReportEditor(props: EditorProps) {
                           setPreviewFileId(null);
                         }}
                       >
-                        &larr; Back
+                        &larr; {i18n.back}
                       </button>
                     </div>
                   )}
@@ -332,14 +351,14 @@ export function ExpenseReportEditor(props: EditorProps) {
   );
 }
 
-function StatusBadge({ status }: { status: ExpenseReport["status"] }) {
+function StatusBadge({ status, label }: { status: ExpenseReport["status"]; label: string }) {
   const badges: Record<string, string> = {
     draft: "badge-secondary",
     submitted: "badge-info",
     approved: "badge-success",
     rejected: "badge-danger",
   };
-  return <span className={`badge ${badges[status] || "badge-light"}`}>{status}</span>;
+  return <span className={`badge ${badges[status] || "badge-light"}`}>{label}</span>;
 }
 
 function formatAmount(amount: string, decimal?: number): string {
@@ -364,16 +383,17 @@ function SubmitButton({
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
 }) {
+  const i18n = useI18n();
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!confirm("Submit this expense report for review?")) return;
+    if (!confirm(i18n.confirm_submit)) return;
     setSubmitting(true);
     try {
       const result = await submitReport(submissionUrl, opts);
       onUpdate(result);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Failed to submit");
+      onError(e instanceof Error ? e.message : i18n.error_submit);
     } finally {
       setSubmitting(false);
     }
@@ -381,7 +401,7 @@ function SubmitButton({
 
   return (
     <button className="btn btn-primary btn-sm" onClick={handleSubmit} disabled={submitting}>
-      {submitting ? "Submitting..." : "Submit for Review"}
+      {submitting ? i18n.submitting : i18n.submit}
     </button>
   );
 }
@@ -397,16 +417,17 @@ function WithdrawButton({
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
 }) {
+  const i18n = useI18n();
   const [withdrawing, setWithdrawing] = useState(false);
 
   const handleWithdraw = async () => {
-    if (!confirm("Withdraw this submission? You can re-submit later.")) return;
+    if (!confirm(i18n.confirm_withdraw)) return;
     setWithdrawing(true);
     try {
       const result = await withdrawSubmission(submissionUrl, opts);
       onUpdate(result);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Failed to withdraw");
+      onError(e instanceof Error ? e.message : i18n.error_withdraw);
     } finally {
       setWithdrawing(false);
     }
@@ -414,7 +435,7 @@ function WithdrawButton({
 
   return (
     <button className="btn btn-warning btn-sm" onClick={handleWithdraw} disabled={withdrawing}>
-      {withdrawing ? "Withdrawing..." : "Withdraw Submission"}
+      {withdrawing ? i18n.withdrawing : i18n.withdraw}
     </button>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+import { useI18n } from "./I18nContext";
 
 export type FileUploadStatus = "waiting" | "uploading" | "done" | "error";
 
@@ -33,6 +34,7 @@ const STATUS_EMOJI: Record<FileUploadStatus, string> = {
 };
 
 export function UploadDialog({ state, onRetry, onDiscard }: UploadDialogProps) {
+  const i18n = useI18n();
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -78,7 +80,7 @@ export function UploadDialog({ state, onRetry, onDiscard }: UploadDialogProps) {
         maxWidth: "500px",
       }}
     >
-      <h5>{hasError ? "Upload failed" : "Uploading files"}</h5>
+      <h5>{hasError ? i18n.upload_failed : i18n.uploading}</h5>
 
       <div className="progress mb-3" style={{ height: "20px" }}>
         <div
@@ -103,10 +105,10 @@ export function UploadDialog({ state, onRetry, onDiscard }: UploadDialogProps) {
       {hasError && (
         <div className="d-flex justify-content-end" style={{ gap: "0.5rem" }}>
           <button className="btn btn-outline-danger btn-sm" onClick={onDiscard}>
-            Discard
+            {i18n.discard}
           </button>
           <button className="btn btn-primary btn-sm" onClick={onRetry}>
-            Retry
+            {i18n.retry}
           </button>
         </div>
       )}

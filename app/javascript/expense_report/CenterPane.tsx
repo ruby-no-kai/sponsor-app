@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, type RefObject } from "react";
 import type { ExpenseLineItem, ExpenseReport, CalculateResponse, TaxMode } from "./types";
 import { updateLineItem, deleteLineItem, deleteFile, createLineItem } from "./api";
 import { DropZoneIndicator } from "./FileDropOverlay";
+import { useI18n, t, splitAt } from "./I18nContext";
 
 type CenterPaneProps = {
   item: ExpenseLineItem | null;
@@ -54,6 +55,7 @@ export function CenterPane({
   selectedItemTitle,
   isMobile,
 }: CenterPaneProps) {
+  const i18n = useI18n();
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
   const [amount, setAmount] = useState("");
@@ -80,7 +82,6 @@ export function CenterPane({
       (taxMode === "manual" && !numeq(taxAmount, item.tax_amount))
     : false;
 
-  // Expose isDirty to parent via ref
   useEffect(() => {
     if (isDirtyRef) isDirtyRef.current = isDirty;
   }, [isDirty]);
@@ -111,14 +112,14 @@ export function CenterPane({
   const [deletingFile, setDeletingFile] = useState(false);
 
   const handleDeleteFile = async () => {
-    if (!selectedFile || !confirm("Delete this file?")) return;
+    if (!selectedFile || !confirm(i18n.confirm_delete_file)) return;
     setDeletingFile(true);
     try {
       await deleteFile(filesUrl, selectedFile.id, opts);
       onPreviewFile(null);
       onRefresh();
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Failed to delete");
+      onError(e instanceof Error ? e.message : i18n.error_delete);
     } finally {
       setDeletingFile(false);
     }
@@ -142,11 +143,15 @@ export function CenterPane({
       const newItem = result.line_items[result.line_items.length - 1];
       if (newItem) onSelectItem(newItem.id);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Failed to create");
+      onError(e instanceof Error ? e.message : i18n.error_create);
     } finally {
       setCreatingFromFile(false);
     }
   };
+
+  const dropLabel = selectedItemTitle
+    ? t(i18n.drop_link_to, { title: selectedItemTitle })
+    : i18n.drop_create_item;
 
   if (!item) {
     return (
@@ -167,7 +172,7 @@ export function CenterPane({
                 className="btn btn-outline-secondary btn-sm mb-2"
                 onClick={() => window.open(`${filesUrl}/${selectedFile.id}`, "_blank")}
               >
-                Preview file
+                {i18n.preview_file}
               </button>
             )}
             <br />
@@ -176,7 +181,7 @@ export function CenterPane({
               onClick={handleCreateFromFile}
               disabled={creatingFromFile}
             >
-              {creatingFromFile ? "Creating..." : "Create line item from this file"}
+              {creatingFromFile ? i18n.creating : i18n.create_from_file}
             </button>
             <br />
             <button
@@ -184,16 +189,16 @@ export function CenterPane({
               onClick={handleDeleteFile}
               disabled={deletingFile}
             >
-              {deletingFile ? "Deleting..." : "Delete this file"}
+              {deletingFile ? i18n.deleting : i18n.delete_file}
             </button>
           </div>
         ) : (
-          "Select a line item"
+          i18n.select_line_item
         )}
         <DropZoneIndicator
           visible={isDragging}
           highlighted={isDropTarget}
-          label={selectedItemTitle ? `Link to "${selectedItemTitle}"` : "Create new line item"}
+          label={dropLabel}
           enabled={linkedEnabled}
         />
       </div>
@@ -270,20 +275,20 @@ export function CenterPane({
       );
       onUpdate(result);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Failed to save");
+      onError(e instanceof Error ? e.message : i18n.error_save);
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm("Delete this line item?")) return;
+    if (!confirm(i18n.confirm_delete_item)) return;
     setDeleting(true);
     try {
       const result = await deleteLineItem(lineItemsUrl, item.id, opts);
       onUpdate(result);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Failed to delete");
+      onError(e instanceof Error ? e.message : i18n.error_delete);
     } finally {
       setDeleting(false);
     }
@@ -301,7 +306,7 @@ export function CenterPane({
       const newItem = result.line_items[result.line_items.length - 1];
       if (newItem) onSelectItem(newItem.id);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Failed to add");
+      onError(e instanceof Error ? e.message : i18n.error_add);
     } finally {
       setAddingMore(false);
     }
@@ -336,7 +341,7 @@ export function CenterPane({
     >
       <div className="form-group">
         <label className="small font-weight-bold" htmlFor={`eli-title-${item.id}`}>
-          Title
+          {i18n.title_label}
         </label>
         <input
           id={`eli-title-${item.id}`}
@@ -350,7 +355,7 @@ export function CenterPane({
 
       <div className="form-group">
         <label className="small font-weight-bold" htmlFor={`eli-notes-${item.id}`}>
-          Notes
+          {i18n.notes_label}
         </label>
         <textarea
           id={`eli-notes-${item.id}`}
@@ -359,13 +364,13 @@ export function CenterPane({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           disabled={isReadOnly}
-          placeholder="(optional)"
+          placeholder={i18n.notes_placeholder}
         />
       </div>
 
       <div className="form-group">
         <label className="small font-weight-bold" htmlFor={`eli-taxmode-${item.id}`}>
-          Tax mode
+          {i18n.tax_mode_label}
         </label>
         <select
           id={`eli-taxmode-${item.id}`}
@@ -374,17 +379,17 @@ export function CenterPane({
           onChange={(e) => handleTaxModeChange(e.target.value as TaxMode)}
           disabled={isReadOnly}
         >
-          <option value="exclude">Entered amount excludes tax</option>
-          <option value="include">Entered amount includes tax</option>
-          <option value="exempt">Tax does not apply</option>
-          <option value="manual">Enter amounts manually</option>
+          <option value="exclude">{i18n.tax_mode_exclude}</option>
+          <option value="include">{i18n.tax_mode_include}</option>
+          <option value="exempt">{i18n.tax_mode_exempt}</option>
+          <option value="manual">{i18n.tax_mode_manual}</option>
         </select>
       </div>
 
       {(taxMode === "exclude" || taxMode === "include") && (
         <div className="form-group">
           <label className="small font-weight-bold" htmlFor={`eli-taxrate-${item.id}`}>
-            Tax rate
+            {i18n.tax_rate_label}
           </label>
           <select
             id={`eli-taxrate-${item.id}`}
@@ -405,7 +410,7 @@ export function CenterPane({
       <div className="form-row">
         <div className="form-group col">
           <label className="small font-weight-bold" htmlFor={`eli-amount-${item.id}`}>
-            Amount {taxMode === "include" ? "(incl. tax)" : "(excl. tax)"}
+            {taxMode === "include" ? i18n.amount_incl : i18n.amount_excl}
           </label>
           <input
             id={`eli-amount-${item.id}`}
@@ -421,7 +426,7 @@ export function CenterPane({
         {taxMode === "manual" && (
           <div className="form-group col">
             <label className="small font-weight-bold" htmlFor={`eli-taxamt-${item.id}`}>
-              Tax amount
+              {i18n.tax_amount_label}
             </label>
             <input
               id={`eli-taxamt-${item.id}`}
@@ -447,12 +452,12 @@ export function CenterPane({
           disabled={isReadOnly}
         />
         <label className="form-check-label small" htmlFor={`preliminal-${item.id}`}>
-          Preliminal (planned budget, not finalized)
+          {i18n.preliminal_label}
         </label>
       </div>
 
       <div className="mb-2">
-        <label className="small font-weight-bold">Attached files</label>
+        <label className="small font-weight-bold">{i18n.attached_files}</label>
         {attachedFiles.length > 0 ? (
           <ul className="list-unstyled mb-1">
             {attachedFiles.map((f) => (
@@ -485,7 +490,7 @@ export function CenterPane({
             ))}
           </ul>
         ) : (
-          <div className="small text-muted">No files attached</div>
+          <div className="small text-muted">{i18n.no_files_attached}</div>
         )}
         {!isReadOnly && (
           <AttachFileBox
@@ -504,14 +509,14 @@ export function CenterPane({
               onClick={handleSave}
               disabled={saving || !isDirty}
             >
-              {saving ? "Saving..." : "Save"}
+              {saving ? i18n.saving : i18n.save}
             </button>
             <button
               className="btn btn-outline-secondary btn-sm"
               onClick={handleAddMore}
               disabled={addingMore || isDirty}
             >
-              {addingMore ? "Adding..." : "Add line with the same files"}
+              {addingMore ? i18n.adding : i18n.add_same_files}
             </button>
           </div>
           <button
@@ -519,14 +524,14 @@ export function CenterPane({
             onClick={handleDelete}
             disabled={deleting}
           >
-            {deleting ? "Deleting..." : "Delete"}
+            {deleting ? i18n.deleting : i18n.delete}
           </button>
         </div>
       )}
       <DropZoneIndicator
         visible={isDragging}
         highlighted={isDropTarget}
-        label={selectedItemTitle ? `Link to "${selectedItemTitle}"` : "Create new line item"}
+        label={dropLabel}
         enabled={linkedEnabled}
       />
     </form>
@@ -542,7 +547,20 @@ function AttachFileBox({
   onAttachFile: (id: number) => void;
   onUploadFiles: (files: File[]) => void;
 }) {
+  const i18n = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const uploadLink = (
+    <a
+      href="#"
+      onClick={(e) => {
+        e.preventDefault();
+        fileInputRef.current?.click();
+      }}
+    >
+      {i18n.upload}
+    </a>
+  );
 
   return (
     <div
@@ -550,17 +568,16 @@ function AttachFileBox({
       style={{ border: "1px dashed #ccc", borderRadius: "4px", padding: "6px 8px" }}
     >
       <div>
-        Drop files here or{" "}
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            fileInputRef.current?.click();
-          }}
-        >
-          upload
-        </a>{" "}
-        to attach
+        {(() => {
+          const [before, after] = splitAt(i18n.drop_or_upload, "link");
+          return (
+            <>
+              {before}
+              {uploadLink}
+              {after}
+            </>
+          );
+        })()}
       </div>
       <input
         ref={fileInputRef}
@@ -576,7 +593,7 @@ function AttachFileBox({
       />
       {attachableFiles.length > 0 && (
         <>
-          <div className="my-1">&mdash; or &mdash;</div>
+          <div className="my-1">{i18n.or_separator}</div>
           <select
             className="form-control form-control-sm"
             value=""
@@ -585,7 +602,7 @@ function AttachFileBox({
               if (fid) onAttachFile(fid);
             }}
           >
-            <option value="">Link existing file...</option>
+            <option value="">{i18n.link_existing}</option>
             {attachableFiles.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.filename || `File #${f.id}`}
