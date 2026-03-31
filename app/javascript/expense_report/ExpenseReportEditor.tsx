@@ -127,27 +127,22 @@ export function ExpenseReportEditor(props: EditorProps) {
                 onError={setError}
               />
             )}
-          {!isReadOnly &&
-            props.role === "sponsor" &&
-            report.status === "submitted" &&
-            props.submissionUrl && (
-              <WithdrawButton
-                submissionUrl={props.submissionUrl}
-                opts={opts}
-                onUpdate={handleReportUpdate}
-                onError={setError}
-              />
-            )}
+          {props.role === "sponsor" && report.status === "submitted" && props.submissionUrl && (
+            <WithdrawButton
+              submissionUrl={props.submissionUrl}
+              opts={opts}
+              onUpdate={handleReportUpdate}
+              onError={setError}
+            />
+          )}
         </div>
       </div>
 
-      {report.status === "rejected" &&
-        props.role === "sponsor" &&
-        report.latest_review?.comment && (
-          <div className="alert alert-danger mb-2">
-            <strong>Review feedback:</strong> {report.latest_review.comment}
-          </div>
-        )}
+      {report.latest_review?.action === "reject" && report.latest_review?.comment && (
+        <div className="alert alert-danger mb-2">
+          <strong>Review feedback:</strong> {report.latest_review.comment}
+        </div>
+      )}
 
       <FileDropOverlay
         selectedItem={selectedItem || null}

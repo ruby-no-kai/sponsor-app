@@ -20,7 +20,7 @@ export function AdminReviewForm({
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  if (report.status !== "submitted") return null;
+  if (report.status === "draft") return null;
 
   const handleReview = async (actionType: "approve" | "reject") => {
     if (actionType === "reject" && !comment.trim()) {
@@ -29,9 +29,7 @@ export function AdminReviewForm({
     }
 
     const confirmMsg =
-      actionType === "approve"
-        ? "Approve this expense report?"
-        : "Reject this expense report?";
+      actionType === "approve" ? "Approve this expense report?" : "Reject this expense report?";
     if (!confirm(confirmMsg)) return;
 
     setSubmitting(true);
@@ -60,9 +58,7 @@ export function AdminReviewForm({
       </div>
       <div className="card-body">
         <div className="form-group">
-          <label className="small font-weight-bold">
-            Comment (required for rejection)
-          </label>
+          <label className="small font-weight-bold">Comment (required for rejection)</label>
           <textarea
             className="form-control"
             rows={3}

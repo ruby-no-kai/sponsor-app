@@ -9,6 +9,7 @@ class ExpenseReportReview < ApplicationRecord
 
   def self.create_for!(submission, action:, comment:, staff:)
     transaction do
+      submission.review&.destroy!
       review = submission.create_review!(action:, comment:, staff:)
       report = submission.expense_report
       report.status = action == 'approve' ? 'approved' : 'rejected'
