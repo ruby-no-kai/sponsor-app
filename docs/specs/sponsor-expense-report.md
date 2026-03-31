@@ -292,13 +292,16 @@ Each group corresponds to a reasonably-sized commit.
 - [x] Config: `config/initializers/expense_report.rb` with tax_rates
 
 **3. Expense report models and migrations**
-- [ ] Migration: create `expense_reports`, `expense_report_submissions`, `expense_report_reviews`, `expense_files`, `expense_line_items`, `expense_line_item_files` tables
-- [ ] Model: `ExpenseReport` with validations, total recalculation, status management
-- [ ] Model: `ExpenseLineItem` with tax calculation, position ordering
-- [ ] Model: `ExpenseLineItemFile` join model
-- [ ] Model: `ExpenseFile` with `AssetFileUploadable`, hard delete + S3 cleanup
-- [ ] Model: `ExpenseReportSubmission` with snapshot creation/refresh
-- [ ] Model: `ExpenseReportReview` with status side effect
+- [x] Migration: create `expense_reports`, `expense_report_submissions`, `expense_report_reviews`, `expense_files`, `expense_line_items`, `expense_line_item_files` tables
+- [x] Model: `ExpenseReport` with validations, total recalculation, status management
+- [x] Model: `ExpenseLineItem` with tax calculation, position ordering
+- [x] Model: `ExpenseLineItemFile` join model
+- [x] Model: `ExpenseFile` with `AssetFileUploadable`, hard delete + S3 cleanup
+- [x] Model: `ExpenseReportSubmission` with snapshot creation/refresh
+- [x] Model: `ExpenseReportReview` with status side effect
+- [x] Concern: `AssetFileUploadable` S3 cleanup on destroy (before_destroy + after_destroy)
+- [x] Sponsorship: added `has_one :expense_report` and `has_many :expense_files` associations
+- [x] Factories and model specs (41 examples, all passing)
 
 **4. Alba resources**
 - [ ] `ExpenseReportResource`, `ExpenseLineItemResource`, `ExpenseFileResource`, `ExpenseReportReviewResource` in `app/resources/`
@@ -351,3 +354,4 @@ Implementors MUST keep this section updated as they work.
 
 - **2026-03-31 Phase 1**: Plan pricing — added `price` (decimal 12,2) and `price_booth` (decimal 12,2) columns to plans table. Added form fields in admin plans form and permitted params in controller. AR provides accessors so no model changes needed. Seeds not needed as defaults are 0 and values are editable via admin UI.
 - **2026-03-31 Phase 2**: Dependencies — added alba gem, @tanstack/react-form, @dnd-kit/{core,sortable,utilities}. Added expense_report initializer with JCT tax rates.
+- **2026-03-31 Phase 3**: Models and migrations — created 6 tables, 6 models, AssetFileUploadable S3 cleanup callbacks (before_destroy captures key, after_destroy deletes from S3), Sponsorship associations. Fixed 2 pre-existing tests broken by the new destroy callback (need S3 client stub). 41 new model specs + full suite (434 examples, 0 failures).

@@ -69,6 +69,8 @@ RSpec.describe ProcessSponsorEventEditJob, type: :job do
         event.reload
 
         # Destroy the asset file (simulating removal) and trigger new history
+        s3_client = instance_double(Aws::S3::Client, delete_object: nil)
+        allow(asset_file).to receive(:s3_client).and_return(s3_client)
         asset_file.destroy!
         event.reload
         event.touch # rubocop:disable Rails/SkipsModelValidations

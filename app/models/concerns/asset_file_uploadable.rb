@@ -13,6 +13,9 @@ module AssetFileUploadable
     before_validation do
       self.handle ||= SecureRandom.urlsafe_base64(32)
     end
+
+    before_destroy :capture_object_key_for_cleanup
+    after_destroy :destroy_s3_object
   end
 
   def object_key
@@ -77,6 +80,18 @@ module AssetFileUploadable
 
   def s3_client
     @s3_client ||= Aws::S3::Client.new(use_dualstack_endpoint: true, region: self.class.asset_file_region, logger: Rails.logger)
+  end
+
+  private def capture_object_key_for_cleanup
+    @object_key_for_cleanup = object_key
+  end
+
+  private def destroy_s3_object
+    return unless @object_key_for_cleanup
+
+    s3_client.delete_object(bucket: self.class.asset_file_bucket, key: @object_key_for_cleanup)
+  rescue Aws::S3::Errors::ServiceError => e
+    Rails.logger.warn("Failed to delete S3 object #{@object_key_for_cleanup}: #{e.message}")
   end
 
   private def presigner

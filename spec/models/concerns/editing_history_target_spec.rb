@@ -28,6 +28,9 @@ RSpec.describe EditingHistoryTarget do
         name: "Test",
       )
 
+      s3_client = instance_double(Aws::S3::Client, delete_object: nil)
+      allow(sponsorship.asset_file).to receive(:s3_client).and_return(s3_client)
+
       history_ids = sponsorship.editing_histories.pluck(:id)
       expect(history_ids).not_to be_empty
 
