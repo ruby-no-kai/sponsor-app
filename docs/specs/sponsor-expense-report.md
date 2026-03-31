@@ -304,7 +304,7 @@ Each group corresponds to a reasonably-sized commit.
 - [x] Factories and model specs (41 examples, all passing)
 
 **4. Alba resources**
-- [ ] `ExpenseReportResource`, `ExpenseLineItemResource`, `ExpenseFileResource`, `ExpenseReportReviewResource` in `app/resources/`
+- [x] `ExpenseReportResource`, `ExpenseLineItemResource`, `ExpenseFileResource`, `ExpenseReportReviewResource` in `app/resources/`
 
 **5. User-facing expense report API**
 - [ ] Routes: expense report, line items, submissions, files
@@ -355,3 +355,4 @@ Implementors MUST keep this section updated as they work.
 - **2026-03-31 Phase 1**: Plan pricing — added `price` (decimal 12,2) and `price_booth` (decimal 12,2) columns to plans table. Added form fields in admin plans form and permitted params in controller. AR provides accessors so no model changes needed. Seeds not needed as defaults are 0 and values are editable via admin UI.
 - **2026-03-31 Phase 2**: Dependencies — added alba gem, @tanstack/react-form, @dnd-kit/{core,sortable,utilities}. Added expense_report initializer with JCT tax rates.
 - **2026-03-31 Phase 3**: Models and migrations — created 6 tables, 6 models, AssetFileUploadable S3 cleanup callbacks (before_destroy captures key, after_destroy deletes from S3), Sponsorship associations. Fixed 2 pre-existing tests broken by the new destroy callback (need S3 client stub). 41 new model specs + full suite (434 examples, 0 failures).
+- **2026-03-31 Phase 4**: Alba resources — created 4 resource classes in `app/resources/` for JSON serialization.
