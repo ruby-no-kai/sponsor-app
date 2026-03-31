@@ -75,6 +75,13 @@ Rails.application.routes.draw do
             resource :retraction, only: %i(new create show), controller: 'pass_retractions'
           end
         end
+        resource :expense_report, only: %i(create update show) do
+          member do
+            get :calculate
+          end
+          resources :line_items, controller: 'expense_line_items', only: %i(create update destroy)
+          resource :submission, controller: 'expense_report_submissions', only: %i(create destroy)
+        end
       end
       resources :sponsorship_asset_files, only: %i(create update show) do
         member do
@@ -82,6 +89,11 @@ Rails.application.routes.draw do
         end
       end
       resources :event_asset_files, controller: 'sponsor_event_asset_files', only: %i(create update show) do
+        member do
+          post :initiate_update
+        end
+      end
+      resources :expense_files, only: %i(create update show destroy) do
         member do
           post :initiate_update
         end

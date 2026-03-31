@@ -307,11 +307,12 @@ Each group corresponds to a reasonably-sized commit.
 - [x] `ExpenseReportResource`, `ExpenseLineItemResource`, `ExpenseFileResource`, `ExpenseReportReviewResource` in `app/resources/`
 
 **5. User-facing expense report API**
-- [ ] Routes: expense report, line items, submissions, files
-- [ ] Controller: `ExpenseReportsController` (create, show, update, calculate)
-- [ ] Controller: `ExpenseLineItemsController` (create, update, destroy)
-- [ ] Controller: `ExpenseReportSubmissionsController` (create, destroy)
-- [ ] Controller: `ExpenseFilesController` (create, update, show, destroy, initiate_update)
+- [x] Routes: expense report, line items, submissions, files
+- [x] Controller: `ExpenseReportsController` (create, show, update, calculate)
+- [x] Controller: `ExpenseLineItemsController` (create, update, destroy)
+- [x] Controller: `ExpenseReportSubmissionsController` (create, destroy)
+- [x] Controller: `ExpenseFilesController` (create, update, show, destroy, initiate_update)
+- [x] Request specs (15 examples, all passing; 449 total, 0 failures)
 
 **6. Admin expense report API and views**
 - [ ] Routes: admin expense report list, show/update, reviews, calculate
@@ -356,3 +357,4 @@ Implementors MUST keep this section updated as they work.
 - **2026-03-31 Phase 2**: Dependencies — added alba gem, @tanstack/react-form, @dnd-kit/{core,sortable,utilities}. Added expense_report initializer with JCT tax rates.
 - **2026-03-31 Phase 3**: Models and migrations — created 6 tables, 6 models, AssetFileUploadable S3 cleanup callbacks (before_destroy captures key, after_destroy deletes from S3), Sponsorship associations. Fixed 2 pre-existing tests broken by the new destroy callback (need S3 client stub). 41 new model specs + full suite (434 examples, 0 failures).
 - **2026-03-31 Phase 4**: Alba resources — created 4 resource classes in `app/resources/` for JSON serialization.
+- **2026-03-31 Phase 5**: User-facing API — 4 controllers (expense_reports, expense_line_items, expense_report_submissions, expense_files) with routes nested under sponsorship. 15 request specs passing.
