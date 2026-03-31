@@ -135,9 +135,11 @@ export function ExpenseReportEditor(props: EditorProps) {
           onSelectFile={setPreviewFileId}
           isReadOnly={isReadOnly}
           lineItemsUrl={props.lineItemsUrl}
+          filesUrl={props.filesUrl}
           opts={opts}
           onUpdate={handleReportUpdate}
           onError={setError}
+          onRefresh={refreshReport}
         />
         <CenterPane
           item={selectedItem || null}

@@ -1,6 +1,9 @@
-import React, { useState } from "react";
-import type { ExpenseReport, ExpenseFile } from "./types";
-import { createLineItem } from "./api";
+import React, { useState, useRef } from "react";
+import type { ExpenseReport } from "./types";
+import { createLineItem, updateLineItem } from "./api";
+import { FileDropZone } from "./FileDropZone";
+import { useFileUpload } from "./useFileUpload";
+import { SortableLineItemList } from "./SortableLineItemList";
 
 type LeftPaneProps = {
   report: ExpenseReport;
@@ -9,9 +12,11 @@ type LeftPaneProps = {
   onSelectFile: (id: number | null) => void;
   isReadOnly: boolean;
   lineItemsUrl: string;
+  filesUrl: string;
   opts: { csrfToken: string };
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
+  onRefresh: () => void;
 };
 
 export function LeftPane({
@@ -21,16 +26,47 @@ export function LeftPane({
   onSelectFile,
   isReadOnly,
   lineItemsUrl,
+  filesUrl,
   opts,
   onUpdate,
   onError,
+  onRefresh,
 }: LeftPaneProps) {
   const [adding, setAdding] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { uploading, uploadFiles } = useFileUpload({
+    filesUrl,
+    csrfToken: opts.csrfToken,
+    onFileUploaded: () => onRefresh(),
+    onError,
+  });
 
   const linkedFileIds = new Set(
     report.line_items.flatMap((item) => item.file_ids),
   );
   const unlinkedFiles = report.files.filter((f) => !linkedFileIds.has(f.id));
+
+  const handleReorder = async (activeId: number, overId: number) => {
+    const items = [...report.line_items];
+    const activeIdx = items.findIndex((i) => i.id === activeId);
+    const overIdx = items.findIndex((i) => i.id === overId);
+    if (activeIdx < 0 || overIdx < 0) return;
+
+    // Compute new position: take the over item's position
+    const newPosition = items[overIdx].position;
+    try {
+      const result = await updateLineItem(
+        lineItemsUrl,
+        activeId,
+        { position: newPosition },
+        opts,
+      );
+      onUpdate(result);
+    } catch (e) {
+      onError(e instanceof Error ? e.message : "Failed to reorder");
+    }
+  };
 
   const handleAddItem = async () => {
     setAdding(true);
@@ -50,8 +86,16 @@ export function LeftPane({
     }
   };
 
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) uploadFiles(files);
+    e.target.value = "";
+  };
+
   return (
-    <div
+    <FileDropZone
+      onFilesDropped={uploadFiles}
+      disabled={isReadOnly || uploading}
       className="border-right d-flex flex-column"
       style={{ width: "250px", minWidth: "250px", overflow: "auto" }}
     >
@@ -69,53 +113,57 @@ export function LeftPane({
         )}
       </div>
       <div className="flex-grow-1" style={{ overflow: "auto" }}>
-        {report.line_items.map((item) => (
-          <div
-            key={item.id}
-            className={`p-2 border-bottom cursor-pointer ${selectedItemId === item.id ? "bg-primary text-white" : ""}`}
-            style={{ cursor: "pointer" }}
-            onClick={() => onSelectItem(item.id)}
-          >
-            <div className="small font-weight-bold text-truncate">
-              {item.title}
-            </div>
-            <div className="small">
-              {formatAmount(item.amount)}
-              {item.preliminal && (
-                <span
-                  className={`ml-1 badge ${selectedItemId === item.id ? "badge-light" : "badge-warning"}`}
-                >
-                  preliminal
-                </span>
-              )}
-            </div>
-          </div>
-        ))}
+        <SortableLineItemList
+          items={report.line_items}
+          selectedItemId={selectedItemId}
+          onSelectItem={onSelectItem}
+          onReorder={handleReorder}
+          disabled={isReadOnly}
+        />
         {report.line_items.length === 0 && (
           <div className="p-2 text-muted small">No line items yet</div>
         )}
       </div>
 
-      {unlinkedFiles.length > 0 && (
-        <>
-          <div className="p-2 bg-light border-top border-bottom">
-            <strong className="small">Unlinked Files</strong>
+      <div className="p-2 bg-light border-top border-bottom d-flex justify-content-between align-items-center">
+        <strong className="small">Files</strong>
+        {!isReadOnly && (
+          <>
+            <button
+              className="btn btn-sm btn-outline-secondary"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              title="Upload file"
+            >
+              {uploading ? "..." : "Upload"}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
+              multiple
+              className="d-none"
+              onChange={handleFileInputChange}
+            />
+          </>
+        )}
+      </div>
+      <div style={{ overflow: "auto", maxHeight: "150px" }}>
+        {unlinkedFiles.map((file) => (
+          <div
+            key={file.id}
+            className="p-2 border-bottom small"
+            style={{ cursor: "pointer" }}
+            onClick={() => onSelectFile(file.id)}
+          >
+            {file.filename || `File #${file.id}`}
           </div>
-          <div style={{ overflow: "auto", maxHeight: "150px" }}>
-            {unlinkedFiles.map((file) => (
-              <div
-                key={file.id}
-                className="p-2 border-bottom small"
-                style={{ cursor: "pointer" }}
-                onClick={() => onSelectFile(file.id)}
-              >
-                {file.filename || `File #${file.id}`}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+        ))}
+        {unlinkedFiles.length === 0 && (
+          <div className="p-2 text-muted small">No unlinked files</div>
+        )}
+      </div>
+    </FileDropZone>
   );
 }
 

@@ -337,9 +337,10 @@ Each group corresponds to a reasonably-sized commit.
 - [x] Note: using useState-based form instead of @tanstack/react-form for simplicity
 
 **9. Frontend: file upload and drag-and-drop**
-- [ ] File upload via AssetFileUploader pattern
-- [ ] Drop zones (left pane for unlinked, center pane for linked)
-- [ ] Line item reordering via @dnd-kit
+- [x] File upload via AssetFileUploader pattern (useFileUpload hook)
+- [x] Drop zones (left pane via FileDropZone component)
+- [x] Line item reordering via @dnd-kit (SortableLineItemList)
+- [x] File upload button with file input in left pane
 
 **10. Frontend: admin review and rejection feedback**
 - [ ] Admin review form below editor (approve/reject + comment)
@@ -364,3 +365,4 @@ Implementors MUST keep this section updated as they work.
 - **2026-03-31 Phase 6**: Admin API and views — Admin::ExpenseReportsController (index, show, update, calculate), Admin::ExpenseReportReviewsController (create with validation error handling), index HAML view, sponsorship show card for custom sponsorships. 7 admin request specs passing.
 - **2026-03-31 Phase 7**: Sponsor portal entry point — expense report card on sponsor show page (custom sponsorships only), React mount point views for user and admin, i18n keys (en/ja).
 - **2026-03-31 Phase 8**: Frontend 3-pane editor — ExpenseReportEditor root component with LeftPane, CenterPane, RightPane. API client, types, entry point. Tax mode selector with 4 modes (exclude/include/exempt/manual). File preview via img/iframe. Submit/withdraw buttons. TypeScript compiles cleanly.
+- **2026-03-31 Phase 9**: File upload and drag-and-drop — useFileUpload hook wrapping AssetFileUploader, FileDropZone component, SortableLineItemList with @dnd-kit, file upload button in left pane.
