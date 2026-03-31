@@ -23,6 +23,15 @@ RSpec.describe "Expense Report Submissions", type: :request do
       expect(json['revision']).to eq(1)
     end
 
+    it "fires Slack notification" do
+      allow(SlackWebhookJob).to receive(:perform_later).and_call_original
+      post user_conference_sponsorship_expense_report_submission_path(conference), as: :json
+      expect(SlackWebhookJob).to have_received(:perform_later).with(
+        hash_including(:text),
+        hook_name: :feed,
+      )
+    end
+
     it "rejects submission of non-draft report" do
       report.submit!
 

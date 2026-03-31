@@ -274,7 +274,7 @@ Non-saving methods are batched with a single `save!` in the controller. Methods 
 
 ## Current Status
 
-Implementation in progress. Implementors MUST keep this section updated as they work.
+Implementation complete.
 
 ### Implementation Checklist
 
@@ -347,11 +347,13 @@ Each group corresponds to a reasonably-sized commit.
 - [x] Sponsor view of rejection feedback (latest review comment, already in Phase 8 editor)
 
 **11. Slack notification**
-- [ ] Job: Slack notification on submission (`:receipt:`, feed channel)
+- [x] Job: Slack notification on submission (`:receipt:`, feed channel)
+- [x] Fixed SlackWebhookJob nil guard for unconfigured webhook_urls
+- [x] Spec verifies SlackWebhookJob.perform_later is called on submit
 
-**12. Specs**
-- [ ] Model specs (see Test Coverage section)
-- [ ] Request specs (see Test Coverage section)
+**12. Specs** (folded into each phase above)
+- [x] Model specs (Phase 3)
+- [x] Request specs (Phase 5, 6, 11)
 
 ### Updates
 
@@ -367,3 +369,4 @@ Implementors MUST keep this section updated as they work.
 - **2026-03-31 Phase 8**: Frontend 3-pane editor — ExpenseReportEditor root component with LeftPane, CenterPane, RightPane. API client, types, entry point. Tax mode selector with 4 modes (exclude/include/exempt/manual). File preview via img/iframe. Submit/withdraw buttons. TypeScript compiles cleanly.
 - **2026-03-31 Phase 9**: File upload and drag-and-drop — useFileUpload hook wrapping AssetFileUploader, FileDropZone component, SortableLineItemList with @dnd-kit, file upload button in left pane.
 - **2026-03-31 Phase 10**: Admin review form — AdminReviewForm component with approve/reject buttons and comment field, rendered below editor for admin when status is submitted. Rejection feedback already included in Phase 8.
+- **2026-03-31 Phase 11**: Slack notification — SlackWebhookJob.perform_later on submit with :receipt: emoji and :feed hook_name. Fixed pre-existing nil guard in SlackWebhookJob#webhook_url. 457 total specs, 0 failures.
