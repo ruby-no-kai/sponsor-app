@@ -32,6 +32,9 @@ class Sponsorship < ApplicationRecord
 
   has_one :exhibition, dependent: nil
 
+  has_one :expense_report, dependent: :destroy
+  has_many :expense_files, dependent: :destroy
+
   has_many :sponsor_events, dependent: :destroy
 
   has_many :broadcast_deliveries, dependent: :nullify

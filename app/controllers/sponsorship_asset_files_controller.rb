@@ -17,6 +17,7 @@ class SponsorshipAssetFilesController < ApplicationController
     return render(status: :forbidden, json: {error: 403}) if !@conference&.amendment_open? && !current_staff
 
     @asset_file = SponsorshipAssetFile.prepare(conference: @conference)
+    @asset_file.content_type = params[:content_type]
     @asset_file.save!
     (session[:asset_file_ids] ||= []) << @asset_file.id
     render json: make_session
@@ -25,6 +26,7 @@ class SponsorshipAssetFilesController < ApplicationController
   def initiate_update
     return render(status: :forbidden, json: {error: 403}) if !@conference&.amendment_open? && !current_staff
 
+    @asset_file.content_type = params[:content_type] if params[:content_type].present?
     render json: make_session
   end
 

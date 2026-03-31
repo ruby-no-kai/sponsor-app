@@ -30,6 +30,7 @@ gem 'jsonnet', require: false
 gem 'shoryuken'
 gem 'lambdakiq'
 
+gem 'alba'
 gem 'jbuilder', '~> 2.9'
 gem 'haml'
 gem 'vite_rails'

@@ -85,6 +85,35 @@
             %span.badge.badge-danger= t('.pending')
             %span= t('.pending_help')
 
+    - if @sponsorship.customized?
+      .card.mt-2.text-dark
+        .card-header= t('.expense_report.title')
+        .card-body
+          - if @sponsorship.expense_report
+            - er = @sponsorship.expense_report
+            - er_status = er.status
+            %p.card-text
+              - badge_class = { 'draft' => 'badge-secondary', 'submitted' => 'badge-info', 'approved' => 'badge-success', 'rejected' => 'badge-danger' }[er_status] || 'badge-light'
+              %span{class: "badge #{badge_class}"}= t("activerecord.attributes.expense_report/status.#{er_status}")
+            - fee = @sponsorship.plan.price + (@sponsorship.booth_assigned? ? @sponsorship.plan.price_booth : 0)
+            - remaining = fee - er.total_amount
+            - precision = Rails.configuration.x.expense_report.decimal
+            %dl.card-text.small.mb-2
+              .d-flex.justify-content-between
+                %dt.font-weight-normal.text-muted= t('.expense_report.fee')
+                %dd.mb-0= number_with_precision(fee, precision:, delimiter: ',')
+              .d-flex.justify-content-between
+                %dt.font-weight-normal.text-muted= t('.expense_report.total_expense')
+                %dd.mb-0= number_with_precision(er.total_amount, precision:, delimiter: ',')
+              .d-flex.justify-content-between
+                %dt.font-weight-normal.text-muted= t('.expense_report.remaining')
+                %dd.mb-0{style: remaining >= 0 ? 'color:#28a745' : 'color:#dc3545'}= number_with_precision(remaining, precision:, delimiter: ',')
+            %p.card-text
+              = link_to t('.expense_report.view'), user_conference_sponsorship_expense_report_path(@conference), class: 'btn btn-primary btn-sm'
+          - else
+            %p.card-text
+              = link_to t('.expense_report.create'), user_conference_sponsorship_expense_report_path(@conference), method: :post, class: 'btn btn-primary btn-sm'
+
     - if @conference.distributing_ticket? && (@sponsorship.booth_assigned? || @sponsorship.total_number_of_attendees > 0)
       .card.mt-2.text-dark
         .card-header= t('.tickets.title')
@@ -144,4 +173,3 @@
         %p.card-text= t('.contact_help')
         %p.card-text
           %a{href: "mailto:#{@conference.contact_email_address}"}= @conference.contact_email_address
-

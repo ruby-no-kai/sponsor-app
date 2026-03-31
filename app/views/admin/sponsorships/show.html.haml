@@ -177,6 +177,30 @@
                   - when 'withdrawn'
                     %span.badge.badge-secondary withdrawn
 
+        - if @sponsorship.customized? || @sponsorship.customization_planned?
+          .card.mt-2
+            %h5.card-header Expense Report
+            .card-body
+              - report = @sponsorship.expense_report
+              - if report
+                %p.card-text
+                  - case report.status
+                  - when 'draft'
+                    %span.badge.badge-secondary draft
+                  - when 'submitted'
+                    %span.badge.badge-info submitted
+                  - when 'approved'
+                    %span.badge.badge-success approved
+                  - when 'rejected'
+                    %span.badge.badge-danger rejected
+                  &mdash;
+                  = number_with_delimiter(report.total_amount)
+                  (+ #{number_with_delimiter(report.total_tax_amount)} tax)
+                %p.card-text
+                  = link_to 'View Report', conference_sponsorship_expense_report_path(@conference, @sponsorship), class: 'btn btn-sm btn-primary'
+              - else
+                %p.card-text.text-muted No report created
+
     .row
       .col-md-12
         .card.mt-2
@@ -251,4 +275,3 @@
             = link_to "Withdraw", conference_sponsorship_path(@conference, @sponsorship), method: :delete, data: {confirm: 'Are you sure?'}, class: 'btn btn-danger'
           - if Rails.configuration.x.dev.sponsor_impersonation
             = link_to "Impersonate", conference_sponsorship_impersonation_path(@conference, @sponsorship), method: :post, class: 'btn btn-warning'
-

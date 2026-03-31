@@ -50,6 +50,12 @@ en:
         policy_acknowledged_at: 'Policy Acknowledged At'
         policy_agreement: 'I agree to the event policy'
 
+      expense_report/status:
+        draft: 'Draft'
+        submitted: 'Submitted'
+        approved: 'Approved'
+        rejected: 'Rejected'
+
     errors:
       models:
         sponsorship:
@@ -255,6 +261,13 @@ en:
           requirement: 'All people who visit the conference venue must exchange their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
           unique: 'This URL is unique and bound to your sponsorship. Note that there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
         view_redemptions: 'Review registrations'
+      expense_report:
+        title: 'Custom package expense report'
+        create: 'Create Expense Report'
+        view: 'View or Edit Expense Report'
+        fee: 'Sponsorship fee'
+        total_expense: 'Total expense'
+        remaining: 'Remaining'
       broadcasts:
         title: 'Email based Announcements'
         description: 'You can review past announcements sent to you via email, in addition to the latest informations shown above.'
@@ -262,6 +275,88 @@ en:
       announcements: 'Announcements'
     edit:
       amendment_availability: "You can amend your application until %{ts}."
+  expense_reports:
+    show:
+      title: Expense Report
+      header: "%{name} Expense Report"
+      editor:
+        loading: "Loading expense report..."
+        confirm_discard: "You have unsaved changes. Discard them?"
+        error_load: "Failed to load report"
+        fee: "Fee:"
+        expense: "Expense:"
+        plus_tax: "+ tax"
+        remaining: "Remaining:"
+        submit: "Submit for Review"
+        submitting: "Submitting..."
+        error_submit: "Failed to submit"
+        withdraw: "Withdraw Submission"
+        withdrawing: "Withdrawing..."
+        confirm_withdraw: "Withdraw this submission? You can re-submit later."
+        error_withdraw: "Failed to withdraw"
+        review_feedback: "Review feedback:"
+        back: "Back"
+        line_items: "Line Items"
+        add_line_item: "Add line item"
+        no_line_items: "No line items yet"
+        files: "Other Files"
+        drop_to_add: "Drop files to add or %{link}"
+        upload: "upload"
+        drop_unlinked: "Add as a new file"
+        select_line_item: "Select a line item"
+        create_from_file: "Create line item from this file"
+        creating: "Creating..."
+        delete_file: "Delete this file"
+        confirm_delete_file: "Delete this file?"
+        preview_file: "Preview file"
+        title_label: "Title"
+        notes_label: "Notes"
+        notes_placeholder: "(optional)"
+        tax_mode_label: "Tax mode"
+        tax_mode_exclude: "Entered amount excludes tax"
+        tax_mode_include: "Entered amount includes tax"
+        tax_mode_exempt: "Tax does not apply"
+        tax_mode_manual: "Enter amounts manually"
+        tax_rate_label: "Tax rate"
+        amount_excl: "Amount (excl. tax)"
+        amount_incl: "Amount (incl. tax)"
+        tax_amount_label: "Tax amount"
+        preliminal_label: "Preliminal (planned budget, not finalized)"
+        attached_files: "Attached files"
+        no_files_attached: "No files attached"
+        drop_or_upload: "Drop files here or %{link} to attach"
+        or_separator: "— or —"
+        link_existing: "Link existing file..."
+        save: "Save"
+        saving: "Saving..."
+        error_save: "Failed to save"
+        add_same_files: "Add line with the same files"
+        adding: "Adding..."
+        error_add: "Failed to add"
+        delete: "Delete"
+        deleting: "Deleting..."
+        confirm_delete_item: "Delete this line item?"
+        error_delete: "Failed to delete"
+        error_create: "Failed to create"
+        drop_link_to: "Link to \"%{title}\""
+        drop_create_item: "Create new line item"
+        select_file: "Select a file to preview"
+        no_preview: "Preview not available."
+        download: "Download"
+        preliminal_badge: "preliminal"
+        uploading: "Uploading files"
+        upload_failed: "Upload failed"
+        retry: "Retry"
+        discard: "Discard"
+        error_unsupported_file: "Unsupported file type: %{names}"
+        review_dialog_title: "Review before submission"
+        review_dialog_no_files: "No files"
+        review_dialog_unlinked_files: "Unlinked files"
+        review_dialog_base_fee: "Base sponsorship fee"
+        review_dialog_total_expense: "Total expense (excl. tax)"
+        review_dialog_remaining: "Remaining (amount to be billed)"
+        review_dialog_overage_warning: "RubyKaigi does not reimburse the amount exceeding the base fee."
+        review_dialog_cancel: "Cancel"
   exhibitions:
     new:
       title: Booth Details

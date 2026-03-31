@@ -43,3 +43,5 @@ node_modules
 *.local
 
 .playwright-mcp/
+.playwright-cli/
+.claude/skills/playwright-cli/

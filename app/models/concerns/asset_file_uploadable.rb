@@ -13,6 +13,9 @@ module AssetFileUploadable
     before_validation do
       self.handle ||= SecureRandom.urlsafe_base64(32)
     end
+
+    before_destroy :capture_object_key_for_cleanup
+    after_destroy :destroy_s3_object
   end
 
   def object_key
@@ -27,13 +30,20 @@ module AssetFileUploadable
     )
   end
 
-  def download_url
+  def download_url(disposition: :attachment)
+    encoded_filename = ERB::Util.url_encode(filename)
+    content_disposition = if filename.ascii_only?
+      "#{disposition}; filename=\"#{filename}\""
+    else
+      "#{disposition}; filename=\"#{encoded_filename}\"; filename*=UTF-8''#{encoded_filename}"
+    end
+
     presigner.presigned_url(
       :get_object,
       bucket: self.class.asset_file_bucket,
       key: object_key,
       expires_in: 3600,
-      response_content_disposition: "attachment; filename=\"#{filename}\"",
+      response_content_disposition: content_disposition,
     )
   end
 
@@ -47,18 +57,28 @@ module AssetFileUploadable
 
   def upload_url_and_fields
     max_file_size = self.class.const_get(:MAX_FILE_SIZE)
+
+    # Use exact Content-Type from model attribute (validated by AR before this call).
+    # This pins the presigned POST to the specific content type the client declared.
+    post_opts = {
+      key: object_key,
+      signature_expiration: Time.zone.now + 900,
+      content_length_range: 0..max_file_size,
+      use_accelerate_endpoint: true,
+      allow_any: ['x-amz-checksum-algorithm', 'x-amz-checksum-sha256'],
+    }
+    if content_type.present?
+      post_opts[:content_type] = content_type
+    else
+      post_opts[:allow_any] += ['Content-Type']
+    end
+
     # see also config/initializers/aws_s3_patches.rb to force dualstack endpoint
     sign = Aws::S3::PresignedPost.new(
       Session.new(self).credentials,
       self.class.asset_file_region,
       self.class.asset_file_bucket,
-      {
-        key: object_key,
-        signature_expiration: Time.zone.now + 900,
-        content_length_range: 0..max_file_size,
-        use_accelerate_endpoint: true,
-        allow_any: ['Content-Type', 'x-amz-checksum-algorithm', 'x-amz-checksum-sha256'],
-      },
+      post_opts,
     )
     {
       url: sign.url,
@@ -72,11 +92,24 @@ module AssetFileUploadable
     self.version_id = head.version_id if head.version_id != version_id
     self.last_modified_at = head.last_modified
     self.checksum_sha256 = head.checksum_sha256 || "-"
+    self.content_type = head.content_type
     self
   end
 
   def s3_client
     @s3_client ||= Aws::S3::Client.new(use_dualstack_endpoint: true, region: self.class.asset_file_region, logger: Rails.logger)
+  end
+
+  private def capture_object_key_for_cleanup
+    @object_key_for_cleanup = object_key
+  end
+
+  private def destroy_s3_object
+    return unless @object_key_for_cleanup
+
+    s3_client.delete_object(bucket: self.class.asset_file_bucket, key: @object_key_for_cleanup)
+  rescue Aws::S3::Errors::ServiceError => e
+    Rails.logger.warn("Failed to delete S3 object #{@object_key_for_cleanup}: #{e.message}")
   end
 
   private def presigner
@@ -113,15 +146,14 @@ module AssetFileUploadable
     end
 
     def iam_policy
+      resource = "arn:aws:s3:::#{file.class.asset_file_bucket}/#{file.object_key}"
       {
         Version: '2012-10-17',
         Statement: [
           {
             Effect: 'Allow',
-            Action: %w(
-              s3:PutObject
-            ),
-            Resource: "arn:aws:s3:::#{file.class.asset_file_bucket}/#{file.object_key}",
+            Action: %w(s3:PutObject),
+            Resource: resource,
             Condition: {
               StringEqualsIfExists: {
                 "s3:x-amz-storage-class" => "STANDARD",

@@ -50,6 +50,12 @@ ja:
         policy_acknowledged_at: 'ポリシー同意日時'
         policy_agreement: '上記ポリシーに同意する'
 
+      expense_report/status:
+        draft: '下書き'
+        submitted: '提出済み'
+        approved: '承認済み'
+        rejected: '差し戻し'
+
     errors:
       models:
         sponsorship:
@@ -256,6 +262,13 @@ ja:
           requirement: 'ブーススタッフを含む全参加者について上記 URL から各々チケットを取得する必要があります。御社内の参加者へ上記 URL を忘れずに共有してください。'
           unique: '本 URL についてはスポンサーごと固有のものとなり、スポンサーチケット利用にあたり認証や身元確認はありません。URL の取り扱いには気をつけていただくようお願い致します。'
         view_redemptions: '利用状況を確認する'
+      expense_report:
+        title: 'カスタムスポンサー向け経費報告'
+        create: '経費報告を作成する'
+        view: '経費報告を表示・編集する'
+        fee: '協賛費'
+        total_expense: '経費合計'
+        remaining: '残額'
       broadcasts:
         title: 'メール配信履歴'
         description: 'その他、メールにて配信された過去のアナウンスを確認できます。'
@@ -263,6 +276,88 @@ ja:
       announcements: 'お知らせ'
     edit:
       amendment_availability: "%{ts} まで修正することができます。"
+  expense_reports:
+    show:
+      title: 経費報告
+      header: "%{name} 経費報告"
+      editor:
+        loading: "経費報告を読み込んでいます..."
+        confirm_discard: "未保存の変更があります。破棄しますか？"
+        error_load: "報告の読み込みに失敗しました"
+        fee: "スポンサー費:"
+        expense: "経費:"
+        plus_tax: "+ 税"
+        remaining: "残額:"
+        submit: "審査へ提出"
+        submitting: "提出中..."
+        error_submit: "提出に失敗しました"
+        withdraw: "提出を取り下げる"
+        withdrawing: "取り下げ中..."
+        confirm_withdraw: "提出を取り下げますか？ あとで再提出できます。"
+        error_withdraw: "取り下げに失敗しました"
+        review_feedback: "レビューコメント:"
+        back: "戻る"
+        line_items: "明細リスト"
+        add_line_item: "明細を追加"
+        no_line_items: "明細がありません"
+        files: "その他のファイル"
+        drop_to_add: "ファイルをドロップするか %{link} して追加"
+        upload: "アップロード"
+        drop_unlinked: "新規ファイルとして追加"
+        select_line_item: "明細を選択してください"
+        create_from_file: "このファイルから明細を作成"
+        creating: "作成中..."
+        delete_file: "このファイルを削除"
+        confirm_delete_file: "このファイルを削除しますか？"
+        preview_file: "プレビュー"
+        title_label: "摘要"
+        notes_label: "備考"
+        notes_placeholder: "(任意)"
+        tax_mode_label: "税の入力方法"
+        tax_mode_exclude: "税抜を入力する"
+        tax_mode_include: "税込を入力する"
+        tax_mode_exempt: "課税対象外"
+        tax_mode_manual: "税抜額と税額を手動で入力する"
+        tax_rate_label: "税率"
+        amount_excl: "金額 (税抜)"
+        amount_incl: "金額 (税込)"
+        tax_amount_label: "税額"
+        preliminal_label: "概算 (予算計画/未確定の場合)"
+        attached_files: "添付ファイル"
+        no_files_attached: "ファイルなし"
+        drop_or_upload: "ファイルをドロップするか %{link} して添付"
+        or_separator: "— または —"
+        link_existing: "アップロード済みファイルを追加..."
+        save: "保存"
+        saving: "保存中..."
+        error_save: "保存に失敗しました"
+        add_same_files: "同じファイルからさらに明細を追加"
+        adding: "追加中..."
+        error_add: "追加に失敗しました"
+        delete: "削除"
+        deleting: "削除中..."
+        confirm_delete_item: "この明細を削除しますか？"
+        error_delete: "削除に失敗しました"
+        error_create: "作成に失敗しました"
+        drop_link_to: "明細「%{title}」へアップロード"
+        drop_create_item: "新しい明細を作成してアップロード"
+        select_file: "ファイルを選択するとプレビューできます"
+        no_preview: "プレビューできません"
+        download: "ダウンロード"
+        preliminal_badge: "概算"
+        uploading: "アップロード中"
+        upload_failed: "アップロード失敗"
+        retry: "再試行"
+        discard: "破棄"
+        error_unsupported_file: "対応していないファイル形式です: %{names}"
+        review_dialog_title: "提出内容の確認"
+        review_dialog_no_files: "ファイルなし"
+        review_dialog_unlinked_files: "その他のファイル"
+        review_dialog_base_fee: "協賛費"
+        review_dialog_total_expense: "経費合計 (税抜)"
+        review_dialog_remaining: "残額 (請求される金額)"
+        review_dialog_overage_warning: "スポンサー費を超過した金額についての払い戻しはありません。"
+        review_dialog_cancel: "キャンセル"
   exhibitions:
     new:
       title: ブース詳細

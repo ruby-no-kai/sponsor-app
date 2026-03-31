@@ -18,6 +18,30 @@ RSpec.describe SponsorshipAssetFile, type: :model do
       file = FactoryBot.create(:sponsorship_asset_file, sponsorship:, extension: 'png')
       expect(file.handle).to be_present
     end
+
+    describe 'content_type' do
+      %w[image/jpeg image/png image/gif image/webp image/svg+xml application/pdf application/zip application/x-zip-compressed application/postscript application/illustrator application/octet-stream].each do |type|
+        it "allows #{type}" do
+          file = FactoryBot.build(:sponsorship_asset_file, sponsorship:, content_type: type)
+          file.valid?
+          expect(file.errors[:content_type]).to be_empty
+        end
+      end
+
+      %w[text/html text/plain application/javascript style/css].each do |type|
+        it "rejects #{type}" do
+          file = FactoryBot.build(:sponsorship_asset_file, sponsorship:, content_type: type)
+          file.valid?
+          expect(file.errors[:content_type]).to be_present
+        end
+      end
+
+      it 'allows blank content_type' do
+        file = FactoryBot.build(:sponsorship_asset_file, sponsorship:, content_type: nil)
+        file.valid?
+        expect(file.errors[:content_type]).to be_empty
+      end
+    end
   end
 
   describe '#object_key' do
@@ -45,6 +69,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
   describe '#download_url' do
     it 'generates presigned URL' do
       file = FactoryBot.create(:sponsorship_asset_file, sponsorship:, extension: 'png')
+      response_content_disposition = "attachment; filename=\"#{file.filename}\""
 
       client_double = instance_double(Aws::S3::Client)
       presigner_double = instance_double(Aws::S3::Presigner)
@@ -56,7 +81,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
         bucket: described_class.asset_file_bucket,
         key: file.object_key,
         expires_in: 3600,
-        response_content_disposition: "attachment; filename=\"#{file.filename}\"",
+        response_content_disposition:,
       ).and_return('https://s3.example.com/signed-url')
 
       url = file.download_url
@@ -66,7 +91,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
         bucket: described_class.asset_file_bucket,
         key: file.object_key,
         expires_in: 3600,
-        response_content_disposition: "attachment; filename=\"#{file.filename}\"",
+        response_content_disposition:,
       )
     end
   end
@@ -94,6 +119,7 @@ RSpec.describe SponsorshipAssetFile, type: :model do
         version_id: 'test-version-id',
         last_modified: Time.current,
         checksum_sha256: 'test-checksum-sha256',
+        content_type: 'image/png',
       )
       allow(s3_client).to receive(:head_object) do |args|
         expect(args[:bucket]).to eq(described_class.asset_file_bucket)

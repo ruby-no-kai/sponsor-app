@@ -1,0 +1,19 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item= link_to 'Expense Reports', conference_expense_reports_path(@conference)
+    %li.breadcrumb-item= link_to @sponsorship.name, conference_sponsorship_path(@conference, @sponsorship)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Expense Report
+
+#expense-report-editor{data: {
+  role: 'admin',
+  report_url: conference_sponsorship_expense_report_path(@conference, @sponsorship, format: :json),
+  line_items_url: conference_sponsorship_expense_report_line_items_path(@conference, @sponsorship),
+  reviews_url: conference_sponsorship_expense_report_reviews_path(@conference, @sponsorship),
+  calculate_url: calculate_conference_sponsorship_expense_report_path(@conference, @sponsorship),
+  files_url: conference_sponsorship_expense_files_path(@conference, @sponsorship),
+  i18n: t('expense_reports.show.editor').to_json,
+  status_labels: t('activerecord.attributes.expense_report/status').to_json,
+}}
+  .text-center.py-5
+    %p Loading...

@@ -12,7 +12,8 @@ local linters = new Mapping<String, Step> {
   ["newlines"] = Builtins.newlines
 
   ["oxfmt"] {
-    workspace_indicator = "pnpm-workspace.yaml"
+    workspace_indicator = "pnpm-lock.yaml"
+    glob = "**/*.{ts,tsx,js,jsx,css,sass,scss}"
     check = "cd {{workspace}} && npx oxfmt --check {{ workspace_files }}"
     check_list_files = "cd {{workspace}} && npx oxfmt --list-different {{ workspace_files }}"
     fix = "cd {{workspace}} && npx oxfmt --write {{ workspace_files }}"

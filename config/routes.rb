@@ -23,12 +23,26 @@ Rails.application.routes.draw do
       resources :form_descriptions, param: :locale, except: %i(index)
       resources :plans, except: %i(show)
 
+      resources :expense_reports, only: %i(index)
+
       resources :sponsorships, except: %i(index new create) do
         resources :sponsorship_editing_histories, as: :editing_histories, path: 'editing_history', only: %i(index)
         resources :sponsorship_staff_notes, as: :staff_notes, path: 'staff_notes', only: %i(index create edit update destroy)
         resource :impersonation, only: %i(create), controller: 'sponsorship_impersonations'
         member do
           get :download_asset
+        end
+        resource :expense_report, only: %i(show update), controller: 'expense_reports' do
+          member do
+            get :calculate
+          end
+          resources :line_items, controller: 'expense_line_items', only: %i(create update destroy)
+          resources :reviews, controller: 'expense_report_reviews', only: %i(create)
+        end
+        resources :expense_files, only: %i(create update show destroy) do
+          member do
+            post :initiate_update
+          end
         end
       end
 
@@ -52,6 +66,7 @@ Rails.application.routes.draw do
 
     resource :session, only: %i(new destroy) do
       get :rise, as: :rise
+      post :backdoor
     end
   end
 
@@ -74,6 +89,13 @@ Rails.application.routes.draw do
             resource :retraction, only: %i(new create show), controller: 'pass_retractions'
           end
         end
+        resource :expense_report, only: %i(create update show) do
+          member do
+            get :calculate
+          end
+          resources :line_items, controller: 'expense_line_items', only: %i(create update destroy)
+          resource :submission, controller: 'expense_report_submissions', only: %i(create destroy)
+        end
       end
       resources :sponsorship_asset_files, only: %i(create update show) do
         member do
@@ -81,6 +103,11 @@ Rails.application.routes.draw do
         end
       end
       resources :event_asset_files, controller: 'sponsor_event_asset_files', only: %i(create update show) do
+        member do
+          post :initiate_update
+        end
+      end
+      resources :expense_files, only: %i(create update show destroy) do
         member do
           post :initiate_update
         end

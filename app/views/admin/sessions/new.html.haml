@@ -1,3 +1,12 @@
 - content_for(:title) { t('.title') }
 
 %a.btn.btn-primary{href: new_session_path(back_to: params[:back_to], proceed: 1)} Log in with GitHub
+
+- if Rails.env.development?
+  %hr
+  %h4 Development Backdoor
+  = form_tag backdoor_session_path, method: :post do
+    .form-group
+      = label_tag :login, 'GitHub Login'
+      = text_field_tag :login, nil, class: 'form-control', required: true
+    = submit_tag 'Sign in (dev)', class: 'btn btn-secondary'

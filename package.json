@@ -7,6 +7,9 @@
     "format": "prettier --write app/javascript/**/*.{ts,tsx,scss}"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@rails/ujs": "^6.0.0",
     "@sentry/browser": "^10.25.0",
     "@sentry/react": "^10.25.0",
@@ -25,7 +28,7 @@
   },
   "devDependencies": {
     "@types/jquery": "^3.5.33",
-    "oxfmt": "^0.42.0",
+    "oxfmt": "^0.41.0",
     "playwright": "^1.58.2",
     "prettier": "^3.1.1",
     "vite": "^7.2.2",

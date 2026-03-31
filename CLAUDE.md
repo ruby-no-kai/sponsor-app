@@ -176,18 +176,13 @@ bundle exec shoryuken -R -C config/shoryuken.yml
 
 ### Authentication Backdoor
 
-Set `BACKDOOR_SECRET` environment variable, then visit:
-```
-http://localhost:3000/admin/session/new?backdoor=BACKDOOR_SECRET&login=YOUR_GITHUB_LOGIN
-```
-
-This bypasses GitHub OAuth for local development.
+In development, visit http://sponsor-app.localhost:1355/admin/session/new and use the "Development Backdoor" form to sign in without GitHub OAuth.
 
 ### Email Testing
 
 In development, emails are captured by Letter Opener gem. Use either method to view sent emails:
 
-- Visit http://localhost:3000/letter_opener
+- Visit http://sponsor-app.localhost:1355/letter_opener
 - Check `tmp/letter_opener` directory and its files
 
 ### Environment Variables

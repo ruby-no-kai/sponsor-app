@@ -1,0 +1,16 @@
+- content_for(:title) { t('.title') }
+
+%h2= t('.header', name: @conference.name)
+
+#expense-report-editor{data: {
+  role: 'sponsor',
+  report_url: user_conference_sponsorship_expense_report_path(@conference, format: :json),
+  line_items_url: user_conference_sponsorship_expense_report_line_items_path(@conference),
+  submission_url: user_conference_sponsorship_expense_report_submission_path(@conference),
+  calculate_url: calculate_user_conference_sponsorship_expense_report_path(@conference),
+  files_url: user_conference_expense_files_path(@conference),
+  i18n: t('expense_reports.show.editor').to_json,
+  status_labels: t('activerecord.attributes.expense_report/status').to_json,
+}}
+  .text-center.py-5
+    %p Loading...

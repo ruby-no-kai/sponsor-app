@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_14_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -135,6 +135,77 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_100000) do
     t.index ["sponsorship_id"], name: "index_exhibitions_on_sponsorship_id"
   end
 
+  create_table "expense_files", force: :cascade do |t|
+    t.string "checksum_sha256", default: "", null: false
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "extension"
+    t.string "filename"
+    t.string "handle", null: false
+    t.datetime "last_modified_at"
+    t.string "prefix", null: false
+    t.bigint "sponsorship_id", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.string "version_id", default: "", null: false
+    t.index ["handle"], name: "index_expense_files_on_handle"
+    t.index ["sponsorship_id"], name: "index_expense_files_on_sponsorship_id"
+  end
+
+  create_table "expense_line_item_files", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "expense_file_id", null: false
+    t.bigint "expense_line_item_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expense_file_id"], name: "index_expense_line_item_files_on_expense_file_id"
+    t.index ["expense_line_item_id", "expense_file_id"], name: "idx_line_item_files_unique", unique: true
+  end
+
+  create_table "expense_line_items", force: :cascade do |t|
+    t.decimal "amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.bigint "expense_report_id", null: false
+    t.text "notes"
+    t.integer "position", null: false
+    t.boolean "preliminal", default: false, null: false
+    t.decimal "tax_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "tax_rate", precision: 5, scale: 4
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expense_report_id", "position"], name: "index_expense_line_items_on_expense_report_id_and_position"
+  end
+
+  create_table "expense_report_reviews", force: :cascade do |t|
+    t.string "action", null: false
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.bigint "expense_report_submission_id", null: false
+    t.bigint "staff_id"
+    t.datetime "updated_at", null: false
+    t.index ["expense_report_submission_id"], name: "index_expense_report_reviews_on_expense_report_submission_id"
+    t.index ["staff_id"], name: "index_expense_report_reviews_on_staff_id"
+  end
+
+  create_table "expense_report_submissions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "data", default: {}, null: false
+    t.bigint "expense_report_id", null: false
+    t.integer "revision", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expense_report_id", "revision"], name: "idx_expense_report_submissions_unique", unique: true
+  end
+
+  create_table "expense_reports", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "revision", default: 0, null: false
+    t.bigint "sponsorship_id", null: false
+    t.string "status", default: "draft", null: false
+    t.decimal "total_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "total_tax_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sponsorship_id"], name: "index_expense_reports_on_sponsorship_id", unique: true
+  end
+
   create_table "form_descriptions", force: :cascade do |t|
     t.text "booth_help"
     t.text "booth_help_html"
@@ -179,6 +250,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_100000) do
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.integer "number_of_guests", default: 0, null: false
+    t.decimal "price", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "price_booth", precision: 12, scale: 2, default: "0.0", null: false
     t.string "price_text"
     t.integer "rank", default: 0, null: false
     t.string "summary"
@@ -205,6 +278,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_100000) do
 
   create_table "sponsor_event_asset_files", force: :cascade do |t|
     t.string "checksum_sha256", default: "", null: false
+    t.string "content_type"
     t.datetime "created_at", null: false
     t.string "extension"
     t.string "handle", null: false
@@ -258,6 +332,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_100000) do
 
   create_table "sponsorship_asset_files", force: :cascade do |t|
     t.string "checksum_sha256", default: "", null: false
+    t.string "content_type"
     t.datetime "created_at", null: false
     t.string "extension"
     t.string "handle", null: false
@@ -420,6 +495,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_100000) do
   add_foreign_key "exhibition_editing_histories", "exhibitions"
   add_foreign_key "exhibition_editing_histories", "staffs"
   add_foreign_key "exhibitions", "sponsorships"
+  add_foreign_key "expense_files", "sponsorships"
+  add_foreign_key "expense_line_item_files", "expense_files"
+  add_foreign_key "expense_line_item_files", "expense_line_items"
+  add_foreign_key "expense_line_items", "expense_reports"
+  add_foreign_key "expense_report_reviews", "expense_report_submissions"
+  add_foreign_key "expense_report_reviews", "staffs"
+  add_foreign_key "expense_report_submissions", "expense_reports"
+  add_foreign_key "expense_reports", "sponsorships"
   add_foreign_key "form_descriptions", "conferences"
   add_foreign_key "plans", "conferences"
   add_foreign_key "sponsor_event_asset_files", "sponsor_events"

@@ -1,0 +1,51 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Expense Reports
+
+%h3 Expense Reports
+
+- if @sponsorships.any?
+  .table-responsive
+    %table.table.table-bordered.table-striped
+      %thead
+        %tr
+          %th Sponsor
+          %th Plan
+          %th Status
+          %th Total (excl. tax)
+          %th Fee
+          %th Offset
+          %th
+      %tbody
+        - @sponsorships.each do |sponsorship|
+          - report = sponsorship.expense_report
+          - fee = (sponsorship.plan&.price || 0) + (sponsorship.booth_assigned? ? (sponsorship.plan&.price_booth || 0) : 0)
+          %tr
+            %td= link_to sponsorship.name, conference_sponsorship_path(@conference, sponsorship)
+            %td= sponsorship.plan_name
+            %td
+              - if report
+                - case report.status
+                - when 'draft'
+                  %span.badge.badge-secondary draft
+                - when 'submitted'
+                  %span.badge.badge-info submitted
+                - when 'approved'
+                  %span.badge.badge-success approved
+                - when 'rejected'
+                  %span.badge.badge-danger rejected
+              - else
+                %span.text-muted No report
+            %td
+              - if report
+                = number_with_delimiter(report.total_amount)
+            %td= number_with_delimiter(fee)
+            %td
+              - if report
+                = number_with_delimiter(fee - report.total_amount)
+            %td
+              - if report
+                = link_to 'View', conference_sponsorship_expense_report_path(@conference, sponsorship), class: 'btn btn-sm btn-secondary'
+- else
+  .alert.alert-info No custom sponsorships found.
