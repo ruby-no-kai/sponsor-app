@@ -23,6 +23,14 @@
     = form.text_field :price_text, class: 'form-control'
 
   .form-group
+    = form.label :price
+    = form.number_field :price, class: 'form-control', step: '0.01'
+
+  .form-group
+    = form.label :price_booth
+    = form.number_field :price_booth, class: 'form-control', step: '0.01'
+
+  .form-group
     = form.label :capacity
     = form.number_field :capacity, class: 'form-control'
 

@@ -274,16 +274,17 @@ Non-saving methods are batched with a single `save!` in the controller. Methods 
 
 ## Current Status
 
-Spec review complete. Ready for implementation.
+Implementation in progress. Implementors MUST keep this section updated as they work.
 
 ### Implementation Checklist
 
 Each group corresponds to a reasonably-sized commit.
 
 **1. Plan pricing**
-- [ ] Migration: add `price` and `price_booth` decimal columns to `plans` table
-- [ ] Model: update `Plan` with `price`, `price_booth` accessors
-- [ ] Seeds: update Plan seeds with numeric `price`/`price_booth` values
+- [x] Migration: add `price` and `price_booth` decimal columns to `plans` table
+- [x] Admin form: add `price` and `price_booth` fields to plans form and permit in controller
+- [ ] ~Model: update `Plan` with `price`, `price_booth` accessors~ (not needed — AR provides accessors)
+- [ ] ~Seeds: update Plan seeds with numeric `price`/`price_booth` values~ (defaults to 0, editable via admin)
 
 **2. Dependencies and configuration**
 - [ ] Gemfile: add `alba` gem
@@ -348,4 +349,4 @@ Each group corresponds to a reasonably-sized commit.
 
 Implementors MUST keep this section updated as they work.
 
-_(No updates yet.)_
+- **2026-03-31 Phase 1**: Plan pricing — added `price` (decimal 12,2) and `price_booth` (decimal 12,2) columns to plans table. Added form fields in admin plans form and permitted params in controller. AR provides accessors so no model changes needed. Seeds not needed as defaults are 0 and values are editable via admin UI.

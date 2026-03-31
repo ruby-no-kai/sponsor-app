@@ -44,6 +44,8 @@ module Admin
         :name,
         :rank,
         :price_text,
+        :price,
+        :price_booth,
         :summary,
         :capacity,
         :number_of_guests,
