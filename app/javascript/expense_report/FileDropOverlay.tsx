@@ -45,7 +45,7 @@ export function FileDropOverlay({
     if (!el) return "unlinked";
     const rect = el.getBoundingClientRect();
     const relX = e.clientX - rect.left;
-    return relX < rect.width / 2 ? "unlinked" : "linked";
+    return relX < rect.width / 3 ? "unlinked" : "linked";
   }, []);
 
   const hoverZoneRef = useRef<HoverZone>(null);
@@ -124,11 +124,17 @@ export function FileDropOverlay({
             backgroundColor: "rgba(0,0,0,0.3)",
           }}
         >
-          <ZoneIndicator label="Add as unlinked file" isHover={hoverZone === "unlinked"} enabled />
+          <ZoneIndicator
+            label="Add as unlinked file"
+            isHover={hoverZone === "unlinked"}
+            enabled
+            flex={1}
+          />
           <ZoneIndicator
             label={selectedItem ? `Link to "${selectedItem.title}"` : "Select a line item first"}
             isHover={hoverZone === "linked"}
             enabled={linkedEnabled}
+            flex={2}
           />
         </div>
       )}
@@ -140,15 +146,17 @@ function ZoneIndicator({
   label,
   isHover,
   enabled,
+  flex = 1,
 }: {
   label: string;
   isHover: boolean;
   enabled: boolean;
+  flex?: number;
 }) {
   return (
     <div
       style={{
-        flex: 1,
+        flex,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

@@ -155,7 +155,10 @@ export function ExpenseReportEditor(props: EditorProps) {
         onDropUnlinked={handleDropUnlinked}
         onDropLinked={handleDropLinked}
       >
-        <div className="d-flex border rounded" style={{ height: "80vh", overflow: "hidden" }}>
+        <div
+          className="d-flex border rounded"
+          style={{ height: "80vh", overflow: "hidden", backgroundColor: "white", color: "#212529" }}
+        >
           <LeftPane
             report={report}
             selectedItemId={selectedItemId}

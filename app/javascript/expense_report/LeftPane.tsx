@@ -93,7 +93,7 @@ export function LeftPane({
           </button>
         )}
       </div>
-      <div style={{ flex: "1 1 0", overflow: "auto", minHeight: "80px" }}>
+      <div className="flex-grow-1" style={{ overflow: "auto", minHeight: "80px" }}>
         <SortableLineItemList
           items={report.line_items}
           selectedItemId={selectedItemId}
@@ -109,7 +109,7 @@ export function LeftPane({
       <div className="p-2 bg-light border-top border-bottom">
         <strong className="small">Files</strong>
       </div>
-      <div style={{ flex: "1 1 0", overflow: "auto", minHeight: "60px" }}>
+      <div style={{ flex: "0 1 auto", overflow: "auto", maxHeight: "40%" }}>
         {unlinkedFiles.map((file) => (
           <div
             key={file.id}
