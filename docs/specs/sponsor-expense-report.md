@@ -287,9 +287,9 @@ Each group corresponds to a reasonably-sized commit.
 - [ ] ~Seeds: update Plan seeds with numeric `price`/`price_booth` values~ (defaults to 0, editable via admin)
 
 **2. Dependencies and configuration**
-- [ ] Gemfile: add `alba` gem
-- [ ] package.json: add `@tanstack/react-form`, `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
-- [ ] Config: `config/initializers/expense_report.rb` with tax_rates
+- [x] Gemfile: add `alba` gem
+- [x] package.json: add `@tanstack/react-form`, `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
+- [x] Config: `config/initializers/expense_report.rb` with tax_rates
 
 **3. Expense report models and migrations**
 - [ ] Migration: create `expense_reports`, `expense_report_submissions`, `expense_report_reviews`, `expense_files`, `expense_line_items`, `expense_line_item_files` tables
@@ -350,3 +350,4 @@ Each group corresponds to a reasonably-sized commit.
 Implementors MUST keep this section updated as they work.
 
 - **2026-03-31 Phase 1**: Plan pricing — added `price` (decimal 12,2) and `price_booth` (decimal 12,2) columns to plans table. Added form fields in admin plans form and permitted params in controller. AR provides accessors so no model changes needed. Seeds not needed as defaults are 0 and values are editable via admin UI.
+- **2026-03-31 Phase 2**: Dependencies — added alba gem, @tanstack/react-form, @dnd-kit/{core,sortable,utilities}. Added expense_report initializer with JCT tax rates.
