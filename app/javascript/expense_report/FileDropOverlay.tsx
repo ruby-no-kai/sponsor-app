@@ -1,15 +1,15 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import type { ExpenseLineItem } from "./types";
 
+export type HoverZone = "unlinked" | "linked" | null;
+
 type FileDropOverlayProps = {
   selectedItem: ExpenseLineItem | null;
   disabled: boolean;
   onDropUnlinked: (files: File[]) => void;
   onDropLinked: (files: File[]) => void;
-  children: React.ReactNode;
+  children: (dragState: { isDragging: boolean; hoverZone: HoverZone }) => React.ReactNode;
 };
-
-type HoverZone = "unlinked" | "linked" | null;
 
 const STALE_MS = 200;
 
@@ -25,6 +25,7 @@ export function FileDropOverlay({
   const lastDragOverRef = useRef(0);
   const isDraggingRef = useRef(false);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const hoverZoneRef = useRef<HoverZone>(null);
 
   useEffect(() => {
     if (!isDragging) return;
@@ -39,7 +40,6 @@ export function FileDropOverlay({
     return () => clearInterval(interval);
   }, [isDragging]);
 
-  // Determine zone from mouse X position relative to the overlay
   const zoneFromEvent = useCallback((e: React.DragEvent): HoverZone => {
     const el = overlayRef.current;
     if (!el) return "unlinked";
@@ -48,8 +48,6 @@ export function FileDropOverlay({
     return relX < rect.width / 3 ? "unlinked" : "linked";
   }, []);
 
-  const hoverZoneRef = useRef<HoverZone>(null);
-
   const handleDragOver = useCallback(
     (e: React.DragEvent) => {
       if (disabled) return;
@@ -57,17 +55,11 @@ export function FileDropOverlay({
       lastDragOverRef.current = Date.now();
 
       const zone = zoneFromEvent(e);
-
-      // Batch: only update state when something actually changed
       const needsDragging = !isDraggingRef.current;
       const needsZone = zone !== hoverZoneRef.current;
 
-      if (needsDragging) {
-        isDraggingRef.current = true;
-      }
-      if (needsZone) {
-        hoverZoneRef.current = zone;
-      }
+      if (needsDragging) isDraggingRef.current = true;
+      if (needsZone) hoverZoneRef.current = zone;
       if (needsDragging || needsZone) {
         if (needsDragging) setIsDragging(true);
         if (needsZone) setHoverZone(zone);
@@ -101,73 +93,44 @@ export function FileDropOverlay({
     [zoneFromEvent, selectedItem, onDropLinked, onDropUnlinked],
   );
 
-  const linkedEnabled = selectedItem !== null;
-
   return (
-    <div
-      ref={overlayRef}
-      style={{ position: "relative" }}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
-      {children}
-
-      {isDragging && !disabled && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 100,
-            display: "flex",
-            gap: "4px",
-            padding: "4px",
-            backgroundColor: "rgba(0,0,0,0.3)",
-          }}
-        >
-          <ZoneIndicator
-            label="Add as unlinked file"
-            isHover={hoverZone === "unlinked"}
-            enabled
-            flex={1}
-          />
-          <ZoneIndicator
-            label={selectedItem ? `Link to "${selectedItem.title}"` : "Select a line item first"}
-            isHover={hoverZone === "linked"}
-            enabled={linkedEnabled}
-            flex={2}
-          />
-        </div>
-      )}
+    <div ref={overlayRef} onDragOver={handleDragOver} onDrop={handleDrop}>
+      {children({ isDragging: isDragging && !disabled, hoverZone })}
     </div>
   );
 }
 
-function ZoneIndicator({
+export function DropZoneIndicator({
+  visible,
+  highlighted,
   label,
-  isHover,
-  enabled,
-  flex = 1,
+  enabled = true,
 }: {
+  visible: boolean;
+  highlighted: boolean;
   label: string;
-  isHover: boolean;
-  enabled: boolean;
-  flex?: number;
+  enabled?: boolean;
 }) {
+  if (!visible) return null;
+
+  const isActive = highlighted && enabled;
+
   return (
     <div
       style={{
-        flex,
+        position: "absolute",
+        inset: 0,
+        zIndex: 100,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        border: `3px dashed ${isHover && enabled ? "#007bff" : enabled ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.2)"}`,
-        borderRadius: "8px",
-        backgroundColor: isHover && enabled ? "rgba(0,123,255,0.15)" : "transparent",
-        color: enabled ? "white" : "rgba(255,255,255,0.4)",
+        border: `3px dashed ${isActive ? "#007bff" : enabled ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.15)"}`,
+        borderRadius: "4px",
+        backgroundColor: isActive ? "rgba(0,123,255,0.25)" : "rgba(0,0,0,0.08)",
+        color: isActive ? "#004085" : enabled ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.25)",
         fontSize: "1rem",
         fontWeight: "bold",
         textAlign: "center",
-        padding: "1rem",
       }}
     >
       {label}

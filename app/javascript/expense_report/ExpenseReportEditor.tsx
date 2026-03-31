@@ -185,58 +185,77 @@ export function ExpenseReportEditor(props: EditorProps) {
         onDropUnlinked={handleDropUnlinked}
         onDropLinked={handleDropLinked}
       >
-        <div
-          className="d-flex border rounded"
-          style={{ height: "80vh", overflow: "hidden", backgroundColor: "white", color: "#212529" }}
-        >
-          <LeftPane
-            report={report}
-            selectedItemId={selectedItemId}
-            selectedFileId={!selectedItemId ? previewFileId : null}
-            onSelectItem={(id) => {
-              if (!guardDirty()) return;
-              setSelectedItemId(id);
-              const item = report.line_items.find((i) => i.id === id);
-              setPreviewFileId(item?.file_ids[0] ?? null);
+        {({ isDragging, hoverZone }) => (
+          <div
+            className="d-flex border rounded"
+            style={{
+              height: "80vh",
+              overflow: "hidden",
+              backgroundColor: "white",
+              color: "#212529",
             }}
-            onSelectFile={(id) => {
-              if (!guardDirty()) return;
-              setPreviewFileId(id);
-              setSelectedItemId(null);
-            }}
-            isReadOnly={isReadOnly}
-            lineItemsUrl={props.lineItemsUrl}
-            opts={opts}
-            onUpdate={handleReportUpdate}
-            onError={setError}
-            onUploadFiles={handleDropUnlinked}
-          />
-          <CenterPane
-            item={selectedItem || null}
-            selectedFile={
-              !selectedItem && previewFileId
-                ? report.files.find((f) => f.id === previewFileId) || null
-                : null
-            }
-            report={report}
-            calcData={calcData}
-            isReadOnly={isReadOnly}
-            lineItemsUrl={props.lineItemsUrl}
-            filesUrl={props.filesUrl}
-            opts={opts}
-            onUpdate={handleReportUpdate}
-            onError={setError}
-            onPreviewFile={setPreviewFileId}
-            onSelectItem={(id) => {
-              setSelectedItemId(id);
-              setPreviewFileId(null);
-            }}
-            onRefresh={refreshReport}
-            isDirtyRef={centerPaneDirtyRef}
-            onUploadLinked={handleDropLinked}
-          />
-          <RightPane file={previewFile || null} filesUrl={props.filesUrl} />
-        </div>
+          >
+            <LeftPane
+              report={report}
+              selectedItemId={selectedItemId}
+              selectedFileId={!selectedItemId ? previewFileId : null}
+              onSelectItem={(id) => {
+                if (!guardDirty()) return;
+                setSelectedItemId(id);
+                const item = report.line_items.find((i) => i.id === id);
+                setPreviewFileId(item?.file_ids[0] ?? null);
+              }}
+              onSelectFile={(id) => {
+                if (!guardDirty()) return;
+                setPreviewFileId(id);
+                setSelectedItemId(null);
+              }}
+              isReadOnly={isReadOnly}
+              lineItemsUrl={props.lineItemsUrl}
+              opts={opts}
+              onUpdate={handleReportUpdate}
+              onError={setError}
+              onUploadFiles={handleDropUnlinked}
+              isDragging={isDragging}
+              isDropTarget={isDragging && hoverZone === "unlinked"}
+            />
+            <CenterPane
+              item={selectedItem || null}
+              selectedFile={
+                !selectedItem && previewFileId
+                  ? report.files.find((f) => f.id === previewFileId) || null
+                  : null
+              }
+              report={report}
+              calcData={calcData}
+              isReadOnly={isReadOnly}
+              lineItemsUrl={props.lineItemsUrl}
+              filesUrl={props.filesUrl}
+              opts={opts}
+              onUpdate={handleReportUpdate}
+              onError={setError}
+              onPreviewFile={setPreviewFileId}
+              onSelectItem={(id) => {
+                setSelectedItemId(id);
+                setPreviewFileId(null);
+              }}
+              onRefresh={refreshReport}
+              isDirtyRef={centerPaneDirtyRef}
+              onUploadLinked={handleDropLinked}
+              isDragging={isDragging}
+              isDropTarget={isDragging && hoverZone === "linked"}
+              linkedEnabled={selectedItem !== null}
+              selectedItemTitle={selectedItem?.title || null}
+            />
+            <RightPane
+              file={previewFile || null}
+              filesUrl={props.filesUrl}
+              isDragging={isDragging}
+              isDropTarget={isDragging && hoverZone === "linked"}
+              linkedEnabled={selectedItem !== null}
+            />
+          </div>
+        )}
       </FileDropOverlay>
 
       {props.role === "admin" && props.reviewsUrl && (

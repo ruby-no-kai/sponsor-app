@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import type { ExpenseReport } from "./types";
 import { createLineItem, updateLineItem } from "./api";
 import { SortableLineItemList } from "./SortableLineItemList";
+import { DropZoneIndicator } from "./FileDropOverlay";
 
 type LeftPaneProps = {
   report: ExpenseReport;
@@ -15,6 +16,8 @@ type LeftPaneProps = {
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
   onUploadFiles: (files: File[]) => void;
+  isDragging: boolean;
+  isDropTarget: boolean;
 };
 
 export function LeftPane({
@@ -29,6 +32,8 @@ export function LeftPane({
   onUpdate,
   onError,
   onUploadFiles,
+  isDragging,
+  isDropTarget,
 }: LeftPaneProps) {
   const [adding, setAdding] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -78,7 +83,7 @@ export function LeftPane({
   return (
     <div
       className="border-right d-flex flex-column"
-      style={{ flex: "3 0 0", minWidth: "200px", overflow: "auto" }}
+      style={{ flex: "3 0 0", minWidth: "200px", overflow: "auto", position: "relative" }}
     >
       <div className="p-2 bg-light border-bottom d-flex justify-content-between align-items-center">
         <strong className="small">Line Items</strong>
@@ -146,6 +151,11 @@ export function LeftPane({
           </div>
         )}
       </div>
+      <DropZoneIndicator
+        visible={isDragging}
+        highlighted={isDropTarget}
+        label="Add as unlinked file"
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, type RefObject } from "react";
 import type { ExpenseLineItem, ExpenseReport, CalculateResponse, TaxMode } from "./types";
 import { updateLineItem, deleteLineItem } from "./api";
+import { DropZoneIndicator } from "./FileDropOverlay";
 
 type CenterPaneProps = {
   item: ExpenseLineItem | null;
@@ -18,6 +19,10 @@ type CenterPaneProps = {
   onRefresh: () => void;
   isDirtyRef: RefObject<boolean>;
   onUploadLinked: (files: File[]) => void;
+  isDragging: boolean;
+  isDropTarget: boolean;
+  linkedEnabled: boolean;
+  selectedItemTitle: string | null;
 };
 
 function deriveTaxMode(item: ExpenseLineItem): TaxMode {
@@ -42,6 +47,10 @@ export function CenterPane({
   onRefresh,
   isDirtyRef,
   onUploadLinked,
+  isDragging,
+  isDropTarget,
+  linkedEnabled,
+  selectedItemTitle,
 }: CenterPaneProps) {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
@@ -143,7 +152,7 @@ export function CenterPane({
     return (
       <div
         className="d-flex flex-column align-items-center justify-content-center text-muted"
-        style={{ flex: "4 0 0", minWidth: "250px", overflow: "auto" }}
+        style={{ flex: "4 0 0", minWidth: "250px", overflow: "auto", position: "relative" }}
       >
         {selectedFile && !isReadOnly ? (
           <div className="text-center">
@@ -167,6 +176,12 @@ export function CenterPane({
         ) : (
           "Select a line item"
         )}
+        <DropZoneIndicator
+          visible={isDragging}
+          highlighted={isDropTarget}
+          label={linkedEnabled ? `Link to "${selectedItemTitle}"` : "Select a line item first"}
+          enabled={linkedEnabled}
+        />
       </div>
     );
   }
@@ -293,7 +308,10 @@ export function CenterPane({
   const attachedFiles = report.files.filter((f) => fileIds.includes(f.id));
 
   return (
-    <div className="p-3" style={{ flex: "4 0 0", minWidth: "250px", overflow: "auto" }}>
+    <div
+      className="p-3"
+      style={{ flex: "4 0 0", minWidth: "250px", overflow: "auto", position: "relative" }}
+    >
       <div className="form-group">
         <label className="small font-weight-bold" htmlFor={`eli-title-${item.id}`}>
           Title
@@ -477,6 +495,12 @@ export function CenterPane({
           </button>
         </div>
       )}
+      <DropZoneIndicator
+        visible={isDragging}
+        highlighted={isDropTarget}
+        label={linkedEnabled ? `Link to "${selectedItemTitle}"` : "Select a line item first"}
+        enabled={linkedEnabled}
+      />
     </div>
   );
 }

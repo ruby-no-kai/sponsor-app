@@ -1,19 +1,35 @@
 import React from "react";
 import type { ExpenseFile } from "./types";
+import { DropZoneIndicator } from "./FileDropOverlay";
 
 type RightPaneProps = {
   file: ExpenseFile | null;
   filesUrl: string;
+  isDragging: boolean;
+  isDropTarget: boolean;
+  linkedEnabled: boolean;
 };
 
-export function RightPane({ file, filesUrl }: RightPaneProps) {
+export function RightPane({
+  file,
+  filesUrl,
+  isDragging,
+  isDropTarget,
+  linkedEnabled,
+}: RightPaneProps) {
   if (!file) {
     return (
       <div
         className="border-left d-flex align-items-center justify-content-center text-muted"
-        style={{ flex: "5 0 0", minWidth: "300px" }}
+        style={{ flex: "5 0 0", minWidth: "300px", position: "relative" }}
       >
         Select a file to preview
+        <DropZoneIndicator
+          visible={isDragging}
+          highlighted={isDropTarget}
+          label=""
+          enabled={linkedEnabled}
+        />
       </div>
     );
   }
@@ -23,7 +39,10 @@ export function RightPane({ file, filesUrl }: RightPaneProps) {
   const isPdf = file.content_type === "application/pdf";
 
   return (
-    <div className="border-left d-flex flex-column" style={{ flex: "5 0 0", minWidth: "300px" }}>
+    <div
+      className="border-left d-flex flex-column"
+      style={{ flex: "5 0 0", minWidth: "300px", position: "relative" }}
+    >
       <div className="p-2 bg-light border-bottom">
         <strong className="small text-truncate d-block">
           {file.filename || `File #${file.id}`}
@@ -56,6 +75,12 @@ export function RightPane({ file, filesUrl }: RightPaneProps) {
           </div>
         )}
       </div>
+      <DropZoneIndicator
+        visible={isDragging}
+        highlighted={isDropTarget}
+        label=""
+        enabled={linkedEnabled}
+      />
     </div>
   );
 }
