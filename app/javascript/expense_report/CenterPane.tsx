@@ -250,19 +250,23 @@ export function CenterPane({
     };
   };
 
+  const saveCurrentItem = async () => {
+    const { netAmount, taxAmt, rate } = computeNetAndTax();
+    return updateLineItem(lineItemsUrl, item.id, {
+      title,
+      notes: notes || null,
+      amount: netAmount,
+      tax_rate: rate,
+      tax_amount: taxAmt,
+      preliminal,
+      file_ids: fileIds,
+    });
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { netAmount, taxAmt, rate } = computeNetAndTax();
-      const result = await updateLineItem(lineItemsUrl, item.id, {
-        title,
-        notes: notes || null,
-        amount: netAmount,
-        tax_rate: rate,
-        tax_amount: taxAmt,
-        preliminal,
-        file_ids: fileIds,
-      });
+      const result = await saveCurrentItem();
       onUpdate(result);
     } catch (e) {
       onError(e instanceof Error ? e.message : i18n.error_save);
@@ -287,6 +291,7 @@ export function CenterPane({
   const handleAddMore = async () => {
     setAddingMore(true);
     try {
+      if (isDirty) await saveCurrentItem();
       const result = await createLineItem(lineItemsUrl, {
         title: "New expense",
         amount: "0",
@@ -506,7 +511,7 @@ export function CenterPane({
             <button
               className="btn btn-outline-secondary btn-sm"
               onClick={handleAddMore}
-              disabled={addingMore || isDirty}
+              disabled={addingMore}
             >
               {addingMore ? i18n.adding : i18n.add_same_files}
             </button>

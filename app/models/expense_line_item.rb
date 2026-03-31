@@ -6,8 +6,8 @@ class ExpenseLineItem < ApplicationRecord
   has_many :expense_files, through: :expense_line_item_files
 
   validates :title, presence: true
-  validates :amount, numericality: {greater_than_or_equal_to: 0}
-  validates :tax_amount, numericality: {greater_than_or_equal_to: 0}
+  validates :amount, numericality: {greater_than_or_equal_to: 0, less_than: 10_000_000_000}
+  validates :tax_amount, numericality: {greater_than_or_equal_to: 0, less_than: 10_000_000_000}
 
   before_save :calculate_tax_amount
 

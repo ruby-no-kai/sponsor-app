@@ -6,6 +6,8 @@ class ExpenseReport < ApplicationRecord
   has_many :submissions, class_name: 'ExpenseReportSubmission', dependent: :destroy
 
   validates :sponsorship_id, uniqueness: true
+  validates :total_amount, numericality: {less_than: 10_000_000_000}, allow_nil: true
+  validates :total_tax_amount, numericality: {less_than: 10_000_000_000}, allow_nil: true
   validate :validate_custom_sponsorship
 
   def recalculate_totals
