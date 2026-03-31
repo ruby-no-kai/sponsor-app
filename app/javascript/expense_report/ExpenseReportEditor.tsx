@@ -48,7 +48,6 @@ function ExpenseReportEditorInner(props: EditorProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const opts = { csrfToken: props.csrfToken };
   const centerPaneDirtyRef = useRef(false);
 
   const guardDirty = useCallback((): boolean => {
@@ -74,8 +73,8 @@ function ExpenseReportEditorInner(props: EditorProps) {
   const refreshReport = useCallback(async () => {
     try {
       const [r, c] = await Promise.all([
-        fetchReport(props.reportUrl, opts),
-        fetchCalculate(props.calculateUrl, opts),
+        fetchReport(props.reportUrl),
+        fetchCalculate(props.calculateUrl),
       ]);
       setReport(r);
       setCalcData(c);
@@ -85,7 +84,7 @@ function ExpenseReportEditorInner(props: EditorProps) {
     } finally {
       setLoading(false);
     }
-  }, [props.reportUrl, props.calculateUrl, props.csrfToken]);
+  }, [props.reportUrl, props.calculateUrl]);
 
   useEffect(() => {
     refreshReport();
@@ -100,7 +99,6 @@ function ExpenseReportEditorInner(props: EditorProps) {
     filesUrl: props.filesUrl,
     reportUrl: props.reportUrl,
     lineItemsUrl: props.lineItemsUrl,
-    csrfToken: props.csrfToken,
     onReportUpdate: handleReportUpdate,
     onError: setError,
     onSelectItem: (id) => {
@@ -201,7 +199,6 @@ function ExpenseReportEditorInner(props: EditorProps) {
             props.submissionUrl && (
               <SubmitButton
                 submissionUrl={props.submissionUrl}
-                opts={opts}
                 report={report}
                 calcData={calcData!}
                 onUpdate={handleReportUpdate}
@@ -211,7 +208,6 @@ function ExpenseReportEditorInner(props: EditorProps) {
           {props.role === "sponsor" && report.status === "submitted" && props.submissionUrl && (
             <WithdrawButton
               submissionUrl={props.submissionUrl}
-              opts={opts}
               onUpdate={handleReportUpdate}
               onError={setError}
             />
@@ -264,7 +260,6 @@ function ExpenseReportEditorInner(props: EditorProps) {
                   }}
                   isReadOnly={isReadOnly}
                   lineItemsUrl={props.lineItemsUrl}
-                  opts={opts}
                   onUpdate={handleReportUpdate}
                   onError={setError}
                   onUploadFiles={handleDropUnlinked}
@@ -302,7 +297,6 @@ function ExpenseReportEditorInner(props: EditorProps) {
                     isReadOnly={isReadOnly}
                     lineItemsUrl={props.lineItemsUrl}
                     filesUrl={props.filesUrl}
-                    opts={opts}
                     onUpdate={handleReportUpdate}
                     onError={setError}
                     onPreviewFile={setPreviewFileId}
@@ -339,7 +333,6 @@ function ExpenseReportEditorInner(props: EditorProps) {
         <AdminReviewForm
           report={report}
           reviewsUrl={props.reviewsUrl}
-          opts={opts}
           onUpdate={handleReportUpdate}
           onError={setError}
         />
@@ -362,14 +355,12 @@ function StatusBadge({ status, label }: { status: ExpenseReport["status"]; label
 
 function SubmitButton({
   submissionUrl,
-  opts,
   report,
   calcData,
   onUpdate,
   onError,
 }: {
   submissionUrl: string;
-  opts: { csrfToken: string };
   report: ExpenseReport;
   calcData: CalculateResponse;
   onUpdate: (r: ExpenseReport) => void;
@@ -382,7 +373,7 @@ function SubmitButton({
   const handleConfirm = async () => {
     setSubmitting(true);
     try {
-      const result = await submitReport(submissionUrl, opts);
+      const result = await submitReport(submissionUrl);
       setShowDialog(false);
       onUpdate(result);
     } catch (e) {
@@ -411,12 +402,10 @@ function SubmitButton({
 
 function WithdrawButton({
   submissionUrl,
-  opts,
   onUpdate,
   onError,
 }: {
   submissionUrl: string;
-  opts: { csrfToken: string };
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
 }) {
@@ -427,7 +416,7 @@ function WithdrawButton({
     if (!confirm(i18n.confirm_withdraw)) return;
     setWithdrawing(true);
     try {
-      const result = await withdrawSubmission(submissionUrl, opts);
+      const result = await withdrawSubmission(submissionUrl);
       onUpdate(result);
     } catch (e) {
       onError(e instanceof Error ? e.message : i18n.error_withdraw);

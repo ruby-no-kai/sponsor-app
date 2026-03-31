@@ -24,7 +24,6 @@ export function FileDropOverlay({
   const [hoverZone, setHoverZone] = useState<HoverZone>(null);
   const lastDragOverRef = useRef(0);
   const isDraggingRef = useRef(false);
-  const overlayRef = useRef<HTMLDivElement>(null);
   const hoverZoneRef = useRef<HoverZone>(null);
 
   useEffect(() => {
@@ -45,11 +44,9 @@ export function FileDropOverlay({
       if (isMobile) {
         return mobileView === "list" ? "unlinked" : "linked";
       }
-      const el = overlayRef.current;
-      if (!el) return "unlinked";
-      const rect = el.getBoundingClientRect();
-      const relX = e.clientX - rect.left;
-      return relX < rect.width / 3 ? "unlinked" : "linked";
+      const target = (e.target as HTMLElement).closest?.("[data-drop-zone]");
+      const zone = target?.getAttribute("data-drop-zone");
+      return zone === "unlinked" ? "unlinked" : "linked";
     },
     [isMobile, mobileView],
   );
@@ -100,7 +97,7 @@ export function FileDropOverlay({
   );
 
   return (
-    <div ref={overlayRef} onDragOver={handleDragOver} onDrop={handleDrop}>
+    <div onDragOver={handleDragOver} onDrop={handleDrop}>
       {children({ isDragging: isDragging && !disabled, hoverZone })}
     </div>
   );

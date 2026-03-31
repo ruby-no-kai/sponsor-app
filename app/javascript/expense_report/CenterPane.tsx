@@ -12,7 +12,6 @@ type CenterPaneProps = {
   isReadOnly: boolean;
   lineItemsUrl: string;
   filesUrl: string;
-  opts: { csrfToken: string };
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
   onPreviewFile: (id: number | null) => void;
@@ -41,7 +40,6 @@ export function CenterPane({
   isReadOnly,
   lineItemsUrl,
   filesUrl,
-  opts,
   onUpdate,
   onError,
   onPreviewFile,
@@ -115,7 +113,7 @@ export function CenterPane({
     if (!selectedFile || !confirm(i18n.confirm_delete_file)) return;
     setDeletingFile(true);
     try {
-      await deleteFile(filesUrl, selectedFile.id, opts);
+      await deleteFile(filesUrl, selectedFile.id);
       onPreviewFile(null);
       onRefresh();
     } catch (e) {
@@ -129,16 +127,12 @@ export function CenterPane({
     if (!selectedFile) return;
     setCreatingFromFile(true);
     try {
-      const result = await createLineItem(
-        lineItemsUrl,
-        {
-          title: selectedFile.filename || "New expense",
-          amount: "0",
-          tax_amount: "0",
-          file_ids: [selectedFile.id],
-        },
-        opts,
-      );
+      const result = await createLineItem(lineItemsUrl, {
+        title: selectedFile.filename || "New expense",
+        amount: "0",
+        tax_amount: "0",
+        file_ids: [selectedFile.id],
+      });
       onUpdate(result);
       const newItem = result.line_items[result.line_items.length - 1];
       if (newItem) onSelectItem(newItem.id);
@@ -156,6 +150,7 @@ export function CenterPane({
   if (!item) {
     return (
       <div
+        data-drop-zone="linked"
         className="d-flex flex-column align-items-center justify-content-center text-muted"
         style={{
           flex: isMobile ? "1 1 auto" : "4 0 0",
@@ -259,20 +254,15 @@ export function CenterPane({
     setSaving(true);
     try {
       const { netAmount, taxAmt, rate } = computeNetAndTax();
-      const result = await updateLineItem(
-        lineItemsUrl,
-        item.id,
-        {
-          title,
-          notes: notes || null,
-          amount: netAmount,
-          tax_rate: rate,
-          tax_amount: taxAmt,
-          preliminal,
-          file_ids: fileIds,
-        },
-        opts,
-      );
+      const result = await updateLineItem(lineItemsUrl, item.id, {
+        title,
+        notes: notes || null,
+        amount: netAmount,
+        tax_rate: rate,
+        tax_amount: taxAmt,
+        preliminal,
+        file_ids: fileIds,
+      });
       onUpdate(result);
     } catch (e) {
       onError(e instanceof Error ? e.message : i18n.error_save);
@@ -285,7 +275,7 @@ export function CenterPane({
     if (!confirm(i18n.confirm_delete_item)) return;
     setDeleting(true);
     try {
-      const result = await deleteLineItem(lineItemsUrl, item.id, opts);
+      const result = await deleteLineItem(lineItemsUrl, item.id);
       onUpdate(result);
     } catch (e) {
       onError(e instanceof Error ? e.message : i18n.error_delete);
@@ -297,11 +287,12 @@ export function CenterPane({
   const handleAddMore = async () => {
     setAddingMore(true);
     try {
-      const result = await createLineItem(
-        lineItemsUrl,
-        { title: "New expense", amount: "0", tax_amount: "0", file_ids: fileIds },
-        opts,
-      );
+      const result = await createLineItem(lineItemsUrl, {
+        title: "New expense",
+        amount: "0",
+        tax_amount: "0",
+        file_ids: fileIds,
+      });
       onUpdate(result);
       const newItem = result.line_items[result.line_items.length - 1];
       if (newItem) onSelectItem(newItem.id);
@@ -327,6 +318,7 @@ export function CenterPane({
 
   return (
     <form
+      data-drop-zone="linked"
       className="p-3"
       style={{
         flex: isMobile ? "1 1 auto" : "4 0 0",

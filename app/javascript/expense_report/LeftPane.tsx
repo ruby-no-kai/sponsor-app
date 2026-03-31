@@ -13,7 +13,6 @@ type LeftPaneProps = {
   onSelectFile: (id: number | null) => void;
   isReadOnly: boolean;
   lineItemsUrl: string;
-  opts: { csrfToken: string };
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
   onUploadFiles: (files: File[]) => void;
@@ -30,7 +29,6 @@ export function LeftPane({
   onSelectFile,
   isReadOnly,
   lineItemsUrl,
-  opts,
   onUpdate,
   onError,
   onUploadFiles,
@@ -53,7 +51,7 @@ export function LeftPane({
 
     const newPosition = items[overIdx].position;
     try {
-      const result = await updateLineItem(lineItemsUrl, activeId, { position: newPosition }, opts);
+      const result = await updateLineItem(lineItemsUrl, activeId, { position: newPosition });
       onUpdate(result);
     } catch (e) {
       onError(e instanceof Error ? e.message : i18n.error_save);
@@ -63,11 +61,11 @@ export function LeftPane({
   const handleAddItem = async () => {
     setAdding(true);
     try {
-      const result = await createLineItem(
-        lineItemsUrl,
-        { title: "New expense", amount: "0", tax_amount: "0" },
-        opts,
-      );
+      const result = await createLineItem(lineItemsUrl, {
+        title: "New expense",
+        amount: "0",
+        tax_amount: "0",
+      });
       onUpdate(result);
       const newItem = result.line_items[result.line_items.length - 1];
       if (newItem) onSelectItem(newItem.id);
@@ -98,6 +96,7 @@ export function LeftPane({
 
   return (
     <div
+      data-drop-zone="unlinked"
       className={`${isMobile ? "" : "border-right "}d-flex flex-column`}
       style={{
         flex: isMobile ? "1 1 auto" : "3 0 0",

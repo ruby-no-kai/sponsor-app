@@ -5,18 +5,11 @@ import { createReview } from "./api";
 type AdminReviewFormProps = {
   report: ExpenseReport;
   reviewsUrl: string;
-  opts: { csrfToken: string };
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
 };
 
-export function AdminReviewForm({
-  report,
-  reviewsUrl,
-  opts,
-  onUpdate,
-  onError,
-}: AdminReviewFormProps) {
+export function AdminReviewForm({ report, reviewsUrl, onUpdate, onError }: AdminReviewFormProps) {
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -34,14 +27,10 @@ export function AdminReviewForm({
 
     setSubmitting(true);
     try {
-      const result = await createReview(
-        reviewsUrl,
-        {
-          action_type: actionType,
-          comment: comment.trim() || null,
-        },
-        opts,
-      );
+      const result = await createReview(reviewsUrl, {
+        action_type: actionType,
+        comment: comment.trim() || null,
+      });
       onUpdate(result);
       setComment("");
     } catch (e) {

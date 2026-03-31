@@ -18,7 +18,6 @@ type UseFileUploadOptions = {
   filesUrl: string;
   reportUrl: string;
   lineItemsUrl: string;
-  csrfToken: string;
   onReportUpdate: (report: ExpenseReport) => void;
   onError: (message: string) => void;
   onSelectItem: (id: number) => void;
@@ -29,7 +28,6 @@ export function useFileUpload({
   filesUrl,
   reportUrl,
   lineItemsUrl,
-  csrfToken,
   onReportUpdate,
   onError,
   onSelectItem,
@@ -37,7 +35,6 @@ export function useFileUpload({
 }: UseFileUploadOptions) {
   const i18n = useI18n();
   const [dialogState, setDialogState] = useState<UploadDialogState>({ kind: "idle" });
-  const opts = { csrfToken };
 
   const entriesRef = useRef<FileUploadEntry[]>([]);
   const fileSizesRef = useRef<number[]>([]);
@@ -149,7 +146,7 @@ export function useFileUpload({
           discardHandlerRef.current = async () => {
             if (currentFileIdRef.current) {
               try {
-                await deleteFile(filesUrl, currentFileIdRef.current, opts);
+                await deleteFile(filesUrl, currentFileIdRef.current);
               } catch {
                 // Tolerate — garbage pending records acceptable
               }
@@ -161,7 +158,7 @@ export function useFileUpload({
         });
       }
     },
-    [filesUrl, createFileRecord, opts, setEntryStatus, updateDialog],
+    [filesUrl, createFileRecord, setEntryStatus, updateDialog],
   );
 
   const handleRetry = useCallback(() => {
@@ -203,16 +200,12 @@ export function useFileUpload({
       const itemId = linkToItemIdRef.current;
       if (!itemId && createNewItem && uploadedIdsRef.current.length > 0) {
         try {
-          const result = await createLineItem(
-            lineItemsUrl,
-            {
-              title: "New expense",
-              amount: "0",
-              tax_amount: "0",
-              file_ids: uploadedIdsRef.current,
-            },
-            opts,
-          );
+          const result = await createLineItem(lineItemsUrl, {
+            title: "New expense",
+            amount: "0",
+            tax_amount: "0",
+            file_ids: uploadedIdsRef.current,
+          });
           onReportUpdate(result);
           const newItem = result.line_items[result.line_items.length - 1];
           if (newItem) onSelectItem(newItem.id);
@@ -224,16 +217,11 @@ export function useFileUpload({
 
       if (itemId && uploadedIdsRef.current.length > 0) {
         try {
-          const refreshed = await fetchReport(reportUrl, opts);
+          const refreshed = await fetchReport(reportUrl);
           const item = refreshed.line_items.find((i) => i.id === itemId);
           if (item) {
             const allFileIds = [...item.file_ids, ...uploadedIdsRef.current];
-            const result = await updateLineItem(
-              lineItemsUrl,
-              itemId,
-              { file_ids: allFileIds },
-              opts,
-            );
+            const result = await updateLineItem(lineItemsUrl, itemId, { file_ids: allFileIds });
             onReportUpdate(result);
             onSelectItem(itemId);
             return;
@@ -244,7 +232,7 @@ export function useFileUpload({
       }
 
       try {
-        const refreshed = await fetchReport(reportUrl, opts);
+        const refreshed = await fetchReport(reportUrl);
         onReportUpdate(refreshed);
         if (uploadedIdsRef.current.length > 0) {
           onSelectFile(uploadedIdsRef.current[0]);
@@ -258,7 +246,6 @@ export function useFileUpload({
       updateDialog,
       reportUrl,
       lineItemsUrl,
-      opts,
       onReportUpdate,
       onError,
       onSelectItem,

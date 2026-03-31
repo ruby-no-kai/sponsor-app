@@ -138,7 +138,6 @@ export type EditorProps = {
   reviewsUrl?: string;
   calculateUrl: string;
   filesUrl: string;
-  csrfToken: string;
   i18n: EditorI18n;
   statusLabels: Record<string, string>;
 };

@@ -23,6 +23,7 @@ export function RightPane({
   if (!file) {
     return (
       <div
+        data-drop-zone="linked"
         className="border-left d-flex align-items-center justify-content-center text-muted"
         style={{ flex: "5 0 0", minWidth: "300px", position: "relative" }}
       >
@@ -43,6 +44,7 @@ export function RightPane({
 
   return (
     <div
+      data-drop-zone="linked"
       className="border-left d-flex flex-column"
       style={{ flex: "5 0 0", minWidth: "300px", position: "relative" }}
     >
