@@ -255,6 +255,14 @@ en:
           requirement: 'All people who visit the conference venue must exchange their ticket from the above URL to entry. So distribute the above URL to all attendees, including booth staff, in your organization.'
           unique: 'This URL is unique and bound to your sponsorship. Note that there is no user verification to consume your sponsor tickets. Be careful on sharing this URL.'
         view_redemptions: 'Review registrations'
+      expense_report:
+        title: 'Expense Report'
+        create: 'Create Expense Report'
+        view: 'View Expense Report'
+        status_draft: 'Draft'
+        status_submitted: 'Submitted'
+        status_approved: 'Approved'
+        status_rejected: 'Rejected'
       broadcasts:
         title: 'Email based Announcements'
         description: 'You can review past announcements sent to you via email, in addition to the latest informations shown above.'
@@ -262,6 +270,10 @@ en:
       announcements: 'Announcements'
     edit:
       amendment_availability: "You can amend your application until %{ts}."
+  expense_reports:
+    show:
+      title: Expense Report
+      header: "%{name} Expense Report"
   exhibitions:
     new:
       title: Booth Details

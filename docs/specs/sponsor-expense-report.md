@@ -323,8 +323,9 @@ Each group corresponds to a reasonably-sized commit.
 - [x] Admin request specs (7 examples, all passing; 456 total, 0 failures)
 
 **7. Sponsor portal entry point and React mount**
-- [ ] View: sponsor sponsorship show — expense report entry point section
-- [ ] View: expense report show (HAML mount point for React, i18n data attributes)
+- [x] View: sponsor sponsorship show — expense report entry point section
+- [x] View: expense report show (HAML mount point for React, user + admin)
+- [x] i18n keys (en.yml + ja.yml)
 
 **8. Frontend: 3-pane editor and API integration**
 - [ ] React 3-pane expense report editor component (state management, API client)
@@ -360,3 +361,4 @@ Implementors MUST keep this section updated as they work.
 - **2026-03-31 Phase 4**: Alba resources — created 4 resource classes in `app/resources/` for JSON serialization.
 - **2026-03-31 Phase 5**: User-facing API — 4 controllers (expense_reports, expense_line_items, expense_report_submissions, expense_files) with routes nested under sponsorship. 15 request specs passing.
 - **2026-03-31 Phase 6**: Admin API and views — Admin::ExpenseReportsController (index, show, update, calculate), Admin::ExpenseReportReviewsController (create with validation error handling), index HAML view, sponsorship show card for custom sponsorships. 7 admin request specs passing.
+- **2026-03-31 Phase 7**: Sponsor portal entry point — expense report card on sponsor show page (custom sponsorships only), React mount point views for user and admin, i18n keys (en/ja).

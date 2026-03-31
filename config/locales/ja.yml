@@ -256,6 +256,14 @@ ja:
           requirement: 'ブーススタッフを含む全参加者について上記 URL から各々チケットを取得する必要があります。御社内の参加者へ上記 URL を忘れずに共有してください。'
           unique: '本 URL についてはスポンサーごと固有のものとなり、スポンサーチケット利用にあたり認証や身元確認はありません。URL の取り扱いには気をつけていただくようお願い致します。'
         view_redemptions: '利用状況を確認する'
+      expense_report:
+        title: '経費報告'
+        create: '経費報告を作成する'
+        view: '経費報告を表示する'
+        status_draft: '下書き'
+        status_submitted: '提出済み'
+        status_approved: '承認済み'
+        status_rejected: '差し戻し'
       broadcasts:
         title: 'メール配信履歴'
         description: 'その他、メールにて配信された過去のアナウンスを確認できます。'
@@ -263,6 +271,10 @@ ja:
       announcements: 'お知らせ'
     edit:
       amendment_availability: "%{ts} まで修正することができます。"
+  expense_reports:
+    show:
+      title: 経費報告
+      header: "%{name} 経費報告"
   exhibitions:
     new:
       title: ブース詳細
