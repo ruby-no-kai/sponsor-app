@@ -313,6 +313,7 @@ export function CenterPane({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           disabled={isReadOnly}
+          placeholder="(optional)"
         />
       </div>
 
