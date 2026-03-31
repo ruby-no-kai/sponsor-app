@@ -200,6 +200,7 @@ export function ExpenseReportEditor(props: EditorProps) {
             }}
             onRefresh={refreshReport}
             isDirtyRef={centerPaneDirtyRef}
+            onUploadLinked={handleDropLinked}
           />
           <RightPane file={previewFile || null} filesUrl={props.filesUrl} />
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, type RefObject } from "react";
+import React, { useState, useEffect, useRef, type RefObject } from "react";
 import type { ExpenseLineItem, ExpenseReport, CalculateResponse, TaxMode } from "./types";
 import { updateLineItem, deleteLineItem } from "./api";
 
@@ -17,6 +17,7 @@ type CenterPaneProps = {
   onSelectItem: (id: number) => void;
   onRefresh: () => void;
   isDirtyRef: RefObject<boolean>;
+  onUploadLinked: (files: File[]) => void;
 };
 
 function deriveTaxMode(item: ExpenseLineItem): TaxMode {
@@ -40,6 +41,7 @@ export function CenterPane({
   onSelectItem,
   onRefresh,
   isDirtyRef,
+  onUploadLinked,
 }: CenterPaneProps) {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
@@ -52,6 +54,7 @@ export function CenterPane({
   const [fileIds, setFileIds] = useState<number[]>([]);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [addingMore, setAddingMore] = useState(false);
 
   const isDirty = item
     ? title !== item.title ||
@@ -240,6 +243,25 @@ export function CenterPane({
     }
   };
 
+  const handleAddMore = async () => {
+    setAddingMore(true);
+    try {
+      const { createLineItem } = await import("./api");
+      const result = await createLineItem(
+        lineItemsUrl,
+        { title: "New expense", amount: "0", tax_amount: "0", file_ids: fileIds },
+        opts,
+      );
+      onUpdate(result);
+      const newItem = result.line_items[result.line_items.length - 1];
+      if (newItem) onSelectItem(newItem.id);
+    } catch (e) {
+      onError(e instanceof Error ? e.message : "Failed to add");
+    } finally {
+      setAddingMore(false);
+    }
+  };
+
   const handleRemoveFile = (fid: number) => {
     setFileIds(fileIds.filter((id) => id !== fid));
   };
@@ -385,42 +407,33 @@ export function CenterPane({
         ) : (
           <div className="small text-muted">No files attached</div>
         )}
-        {!isReadOnly && attachableFiles.length > 0 && (
-          <select
-            className="form-control form-control-sm mt-1"
-            value=""
-            onChange={(e) => {
-              const fid = parseInt(e.target.value, 10);
-              if (fid) handleAttachFile(fid);
-            }}
-          >
-            <option value="">Attach a file...</option>
-            {attachableFiles.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.filename || `File #${f.id}`}
-              </option>
-            ))}
-          </select>
-        )}
         {!isReadOnly && (
-          <div
-            className="text-muted small text-center mt-1"
-            style={{ border: "1px dashed #ccc", borderRadius: "4px", padding: "4px" }}
-          >
-            Drop files here to attach
-          </div>
+          <AttachFileBox
+            attachableFiles={attachableFiles}
+            onAttachFile={handleAttachFile}
+            onUploadFiles={onUploadLinked}
+          />
         )}
       </div>
 
       {!isReadOnly && (
         <div className="d-flex justify-content-between mt-3">
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={handleSave}
-            disabled={saving || !isDirty}
-          >
-            {saving ? "Saving..." : "Save"}
-          </button>
+          <div>
+            <button
+              className="btn btn-primary btn-sm mr-1"
+              onClick={handleSave}
+              disabled={saving || !isDirty}
+            >
+              {saving ? "Saving..." : "Save"}
+            </button>
+            <button
+              className="btn btn-outline-secondary btn-sm"
+              onClick={handleAddMore}
+              disabled={addingMore || isDirty}
+            >
+              {addingMore ? "Adding..." : "Add more lines"}
+            </button>
+          </div>
           <button
             className="btn btn-outline-danger btn-sm"
             onClick={handleDelete}
@@ -429,6 +442,71 @@ export function CenterPane({
             {deleting ? "Deleting..." : "Delete"}
           </button>
         </div>
+      )}
+    </div>
+  );
+}
+
+function AttachFileBox({
+  attachableFiles,
+  onAttachFile,
+  onUploadFiles,
+}: {
+  attachableFiles: { id: number; filename: string }[];
+  onAttachFile: (id: number) => void;
+  onUploadFiles: (files: File[]) => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <div
+      className="text-muted small text-center mt-1"
+      style={{ border: "1px dashed #ccc", borderRadius: "4px", padding: "6px 8px" }}
+    >
+      <div>
+        Drop files here or{" "}
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            fileInputRef.current?.click();
+          }}
+        >
+          upload
+        </a>{" "}
+        to attach
+      </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,application/pdf"
+        multiple
+        className="d-none"
+        onChange={(e) => {
+          const files = Array.from(e.target.files || []);
+          if (files.length > 0) onUploadFiles(files);
+          e.target.value = "";
+        }}
+      />
+      {attachableFiles.length > 0 && (
+        <>
+          <div className="my-1">&mdash; or &mdash;</div>
+          <select
+            className="form-control form-control-sm"
+            value=""
+            onChange={(e) => {
+              const fid = parseInt(e.target.value, 10);
+              if (fid) onAttachFile(fid);
+            }}
+          >
+            <option value="">Link existing file...</option>
+            {attachableFiles.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.filename || `File #${f.id}`}
+              </option>
+            ))}
+          </select>
+        </>
       )}
     </div>
   );
