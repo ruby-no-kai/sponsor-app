@@ -54,17 +54,12 @@ export type EditorI18n = {
   loading: string;
   confirm_discard: string;
   error_load: string;
-  status_draft: string;
-  status_submitted: string;
-  status_approved: string;
-  status_rejected: string;
   fee: string;
   expense: string;
   plus_tax: string;
   remaining: string;
   submit: string;
   submitting: string;
-  confirm_submit: string;
   error_submit: string;
   withdraw: string;
   withdrawing: string;
@@ -144,4 +139,5 @@ export type EditorProps = {
   filesUrl: string;
   csrfToken: string;
   i18n: EditorI18n;
+  statusLabels: Record<string, string>;
 };

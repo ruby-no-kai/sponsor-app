@@ -50,6 +50,12 @@ en:
         policy_acknowledged_at: 'Policy Acknowledged At'
         policy_agreement: 'I agree to the event policy'
 
+      expense_report/status:
+        draft: 'Draft'
+        submitted: 'Submitted'
+        approved: 'Approved'
+        rejected: 'Rejected'
+
     errors:
       models:
         sponsorship:
@@ -258,11 +264,7 @@ en:
       expense_report:
         title: 'Expense Report'
         create: 'Create Expense Report'
-        view: 'View Expense Report'
-        status_draft: 'Draft'
-        status_submitted: 'Submitted'
-        status_approved: 'Approved'
-        status_rejected: 'Rejected'
+        view: 'View or Edit Expense Report'
       broadcasts:
         title: 'Email based Announcements'
         description: 'You can review past announcements sent to you via email, in addition to the latest informations shown above.'
@@ -278,17 +280,12 @@ en:
         loading: "Loading expense report..."
         confirm_discard: "You have unsaved changes. Discard them?"
         error_load: "Failed to load report"
-        status_draft: "Draft"
-        status_submitted: "Submitted"
-        status_approved: "Approved"
-        status_rejected: "Rejected"
         fee: "Fee:"
         expense: "Expense:"
         plus_tax: "+ tax"
         remaining: "Remaining:"
         submit: "Submit for Review"
         submitting: "Submitting..."
-        confirm_submit: "Submit this expense report for review?"
         error_submit: "Failed to submit"
         withdraw: "Withdraw Submission"
         withdrawing: "Withdrawing..."
@@ -299,10 +296,10 @@ en:
         line_items: "Line Items"
         add_line_item: "Add line item"
         no_line_items: "No line items yet"
-        files: "Files"
+        files: "Other Files"
         drop_to_add: "Drop files to add or %{link}"
         upload: "upload"
-        drop_unlinked: "Add as unlinked file"
+        drop_unlinked: "Add as a new file"
         select_line_item: "Select a line item"
         create_from_file: "Create line item from this file"
         creating: "Creating..."
@@ -353,7 +350,7 @@ en:
         review_dialog_unlinked_files: "Unlinked files"
         review_dialog_base_fee: "Base sponsorship fee"
         review_dialog_total_expense: "Total expense (excl. tax)"
-        review_dialog_remaining: "Remaining"
+        review_dialog_remaining: "Remaining (amount to be billed)"
         review_dialog_overage_warning: "RubyKaigi does not reimburse the amount exceeding the base fee."
         review_dialog_cancel: "Cancel"
   exhibitions:

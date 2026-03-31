@@ -141,12 +141,7 @@ function ExpenseReportEditorInner(props: EditorProps) {
 
   if (!report) return null;
 
-  const statusLabels: Record<string, string> = {
-    draft: i18n.status_draft,
-    submitted: i18n.status_submitted,
-    approved: i18n.status_approved,
-    rejected: i18n.status_rejected,
-  };
+  const statusLabels = props.statusLabels;
 
   const breakoutStyle: React.CSSProperties = isMobile
     ? { width: "100%" }

@@ -14,6 +14,7 @@
   files_url: conference_sponsorship_expense_files_path(@conference, @sponsorship),
   csrf_token: form_authenticity_token,
   i18n: t('expense_reports.show.editor').to_json,
+  status_labels: t('activerecord.attributes.expense_report/status').to_json,
 }}
   .text-center.py-5
     %p Loading...

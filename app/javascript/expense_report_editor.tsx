@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     filesUrl: dataset.filesUrl || "",
     csrfToken: dataset.csrfToken || "",
     i18n: JSON.parse(dataset.i18n || "{}"),
+    statusLabels: JSON.parse(dataset.statusLabels || "{}"),
   };
 
   const root = createRoot(container);

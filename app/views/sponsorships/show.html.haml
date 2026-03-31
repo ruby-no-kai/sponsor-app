@@ -62,16 +62,10 @@
         .card-header= t('.expense_report.title')
         .card-body
           - if @sponsorship.expense_report
+            - er_status = @sponsorship.expense_report.status
             %p.card-text
-              - case @sponsorship.expense_report.status
-              - when 'draft'
-                %span.badge.badge-secondary= t('.expense_report.status_draft')
-              - when 'submitted'
-                %span.badge.badge-info= t('.expense_report.status_submitted')
-              - when 'approved'
-                %span.badge.badge-success= t('.expense_report.status_approved')
-              - when 'rejected'
-                %span.badge.badge-danger= t('.expense_report.status_rejected')
+              - badge_class = { 'draft' => 'badge-secondary', 'submitted' => 'badge-info', 'approved' => 'badge-success', 'rejected' => 'badge-danger' }[er_status] || 'badge-light'
+              %span{class: "badge #{badge_class}"}= t("activerecord.attributes.expense_report/status.#{er_status}")
             %p.card-text
               = link_to t('.expense_report.view'), user_conference_sponsorship_expense_report_path(@conference), class: 'btn btn-primary btn-sm'
           - else
