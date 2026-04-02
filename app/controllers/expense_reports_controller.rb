@@ -7,11 +7,13 @@ class ExpenseReportsController < ApplicationController
   before_action :set_expense_report, only: [:show, :update, :calculate]
 
   def create
-    begin
-      @expense_report = current_sponsorship.build_expense_report
-      @expense_report.save!
-    rescue ActiveRecord::RecordNotUnique
-      @expense_report = current_sponsorship.expense_report
+    @expense_report = current_sponsorship.expense_report
+    unless @expense_report
+      begin
+        @expense_report = ExpenseReport.create!(sponsorship: current_sponsorship)
+      rescue ActiveRecord::RecordNotUnique
+        @expense_report = current_sponsorship.reload_expense_report
+      end
     end
 
     respond_to do |format|

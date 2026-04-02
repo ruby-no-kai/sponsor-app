@@ -21,6 +21,21 @@ RSpec.describe "Expense Reports", type: :request do
       expect(sponsorship.expense_report.status).to eq('draft')
     end
 
+    context "when expense report already exists with line items" do
+      let!(:existing_report) { ExpenseReport.create!(sponsorship:) }
+      let!(:line_item) { FactoryBot.create(:expense_line_item, expense_report: existing_report, position: 1) }
+
+      it "preserves the existing report and its line items" do
+        original_id = existing_report.id
+
+        post user_conference_sponsorship_expense_report_path(conference)
+
+        expect(response).to redirect_to(user_conference_sponsorship_expense_report_path(conference))
+        expect(sponsorship.reload.expense_report.id).to eq(original_id)
+        expect(existing_report.reload.line_items).to eq([line_item])
+      end
+    end
+
     it "rejects non-custom sponsorships" do
       sponsorship.update_column(:customization, false) # rubocop:disable Rails/SkipsModelValidations
       post user_conference_sponsorship_expense_report_path(conference), as: :json
