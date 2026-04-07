@@ -115,6 +115,8 @@ export type EditorI18n = {
   no_preview: string;
   download: string;
   preliminal_badge: string;
+  no_file_badge: string;
+  no_file_alert: string;
   uploading: string;
   upload_failed: string;
   retry: string;

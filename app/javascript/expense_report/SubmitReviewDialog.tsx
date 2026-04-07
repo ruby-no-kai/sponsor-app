@@ -125,6 +125,9 @@ export function SubmitReviewDialog({
                 {item.preliminal && (
                   <span className="ml-1 badge badge-warning">{i18n.preliminal_badge}</span>
                 )}
+                {item.file_ids.length === 0 && (
+                  <span className="ml-1 badge badge-danger">{i18n.no_file_badge}</span>
+                )}
               </span>
               <span className="small font-weight-bold" style={{ whiteSpace: "nowrap" }}>
                 {formatAmount(item.amount, d)}
@@ -175,6 +178,10 @@ export function SubmitReviewDialog({
         <div className="alert alert-warning small py-2 mb-3">
           {i18n.review_dialog_overage_warning}
         </div>
+      )}
+
+      {report.line_items.some((i) => i.file_ids.length === 0) && (
+        <div className="alert alert-warning small py-2 mb-3">{i18n.no_file_alert}</div>
       )}
 
       <div className="d-flex justify-content-end" style={{ gap: "0.5rem" }}>

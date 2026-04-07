@@ -344,6 +344,8 @@ en:
         no_preview: "Preview not available."
         download: "Download"
         preliminal_badge: "preliminal"
+        no_file_badge: "no file"
+        no_file_alert: "Some line items have no files attached. Attaching files is not mandatory, but please attach receipts or invoices where available."
         uploading: "Uploading files"
         upload_failed: "Upload failed"
         retry: "Retry"

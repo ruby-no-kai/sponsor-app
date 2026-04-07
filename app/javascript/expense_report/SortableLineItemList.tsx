@@ -116,6 +116,11 @@ function LineItemRow({ item, isSelected }: { item: ExpenseLineItem; isSelected: 
             {i18n.preliminal_badge}
           </span>
         )}
+        {item.file_ids.length === 0 && (
+          <span className={`ml-1 badge ${isSelected ? "badge-light" : "badge-danger"}`}>
+            {i18n.no_file_badge}
+          </span>
+        )}
       </div>
     </div>
   );
