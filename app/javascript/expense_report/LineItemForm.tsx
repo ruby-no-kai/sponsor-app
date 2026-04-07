@@ -65,13 +65,46 @@ export function LineItemForm({
 
   const numeq = (a: string, b: string) => (parseFloat(a) || 0) === (parseFloat(b) || 0);
 
+  const decimal = calcData?.decimal ?? 0;
+  const floorToDecimal = (v: number): string => {
+    const factor = 10 ** decimal;
+    return (Math.floor(v * factor) / factor).toFixed(decimal);
+  };
+
+  const amountDirty = (() => {
+    if (taxMode === "include" && taxRate !== null) {
+      // enteredAmount is tax-inclusive; item.amount is net — derive net
+      // with the same rounding as computeNetAndTax to compare
+      const entered = parseFloat(enteredAmount) || 0;
+      const rate = parseFloat(taxRate) || 0;
+      const net = floorToDecimal(entered / (1 + rate));
+      return !numeq(net, item.amount);
+    }
+    return !numeq(enteredAmount, item.amount);
+  })();
+
+  // "include" and "exclude" are UI-only input modes — the server stores
+  // the same data (net amount + tax_rate + tax_amount) for both. Treat
+  // them as equivalent when checking for unsaved changes.
+  const taxModeDirty = (() => {
+    const saved = deriveTaxMode(item);
+    if (taxMode === saved) return false;
+    // "include" ↔ "exclude" is not a real change
+    if (
+      (taxMode === "include" || taxMode === "exclude") &&
+      (saved === "include" || saved === "exclude")
+    )
+      return false;
+    return true;
+  })();
+
   const isDirty =
     title !== item.title ||
     (notes || "") !== (item.notes || "") ||
-    !numeq(enteredAmount, item.amount) ||
+    amountDirty ||
     preliminal !== item.preliminal ||
     fileIds.join(",") !== item.file_ids.join(",") ||
-    taxMode !== deriveTaxMode(item) ||
+    taxModeDirty ||
     (taxMode !== "manual" && taxMode !== "exempt" && taxRate !== item.tax_rate) ||
     (taxMode === "manual" && !numeq(taxAmount, item.tax_amount));
 
@@ -115,13 +148,7 @@ export function LineItemForm({
     }
   };
 
-  const decimal = calcData?.decimal ?? 0;
   const amountStep = decimal > 0 ? (10 ** -decimal).toString() : "1";
-
-  const floorToDecimal = (v: number): string => {
-    const factor = 10 ** decimal;
-    return (Math.floor(v * factor) / factor).toFixed(decimal);
-  };
 
   const computeNetAndTax = (): { netAmount: string; taxAmt: string; rate: string | null } => {
     const entered = parseFloat(enteredAmount) || 0;
