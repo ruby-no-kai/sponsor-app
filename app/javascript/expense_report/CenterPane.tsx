@@ -92,6 +92,7 @@ export function CenterPane({
       {selectedFile && !isReadOnly ? (
         <FileView
           file={selectedFile}
+          report={report}
           filesUrl={filesUrl}
           lineItemsUrl={lineItemsUrl}
           onUpdate={onUpdate}
