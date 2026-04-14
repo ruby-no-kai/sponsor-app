@@ -30,15 +30,11 @@ class ExhibitionsController < ApplicationController
   end
 
   def edit
-    raise ActiveRecord::RecordNotFound if !current_sponsorship.conference.amendment_open? && !current_staff
-
     @exhibition = current_sponsorship.exhibition
     raise ActiveRecord::RecordNotFound unless @exhibition
   end
 
   def update
-    raise ActiveRecord::RecordNotFound if !current_sponsorship.conference.amendment_open? && !current_staff
-
     @exhibition = current_sponsorship.exhibition
     raise ActiveRecord::RecordNotFound unless @exhibition
 
