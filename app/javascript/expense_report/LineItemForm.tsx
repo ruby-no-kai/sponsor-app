@@ -52,7 +52,6 @@ export function LineItemForm({
   const i18n = useI18n();
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
-  const [amount, setAmount] = useState("");
   const [taxRate, setTaxRate] = useState<string | null>(null);
   const [taxAmount, setTaxAmount] = useState("");
   const [preliminal, setPreliminal] = useState(false);
@@ -66,22 +65,34 @@ export function LineItemForm({
   const numeq = (a: string, b: string) => (parseFloat(a) || 0) === (parseFloat(b) || 0);
 
   const decimal = calcData?.decimal ?? 0;
-  const floorToDecimal = (v: number): string => {
-    const factor = 10 ** decimal;
-    return (Math.floor(v * factor) / factor).toFixed(decimal);
+  const factor = 10 ** decimal;
+  const floorToDecimal = (v: number): string => (Math.floor(v * factor) / factor).toFixed(decimal);
+  const ceilToDecimal = (v: number): string => (Math.ceil(v * factor) / factor).toFixed(decimal);
+
+  const deriveAmounts = (): { netAmount: string; taxAmt: string; rate: string | null } => {
+    const entered = parseFloat(enteredAmount) || 0;
+    if (taxMode === "exempt") {
+      return { netAmount: enteredAmount, taxAmt: "0", rate: "0" };
+    }
+    if (taxMode === "manual") {
+      return { netAmount: enteredAmount, taxAmt: taxAmount, rate: null };
+    }
+    const rate = parseFloat(taxRate || "0.1");
+    if (taxMode === "include") {
+      // Japanese receipts compute 税額 = floor(税抜 × rate), so reverse with
+      // ceil on net and derive tax as the remainder so net + tax === entered.
+      const net = ceilToDecimal(entered / (1 + rate));
+      const tax = (entered - parseFloat(net)).toFixed(decimal);
+      return { netAmount: net, taxAmt: tax, rate: rate.toString() };
+    }
+    return {
+      netAmount: enteredAmount,
+      taxAmt: floorToDecimal(entered * rate),
+      rate: rate.toString(),
+    };
   };
 
-  const amountDirty = (() => {
-    if (taxMode === "include" && taxRate !== null) {
-      // enteredAmount is tax-inclusive; item.amount is net — derive net
-      // with the same rounding as computeNetAndTax to compare
-      const entered = parseFloat(enteredAmount) || 0;
-      const rate = parseFloat(taxRate) || 0;
-      const net = floorToDecimal(entered / (1 + rate));
-      return !numeq(net, item.amount);
-    }
-    return !numeq(enteredAmount, item.amount);
-  })();
+  const amountDirty = !numeq(deriveAmounts().netAmount, item.amount);
 
   // "include" and "exclude" are UI-only input modes — the server stores
   // the same data (net amount + tax_rate + tax_amount) for both. Treat
@@ -122,7 +133,6 @@ export function LineItemForm({
   useEffect(() => {
     setTitle(item.title);
     setNotes(item.notes || "");
-    setAmount(item.amount);
     setTaxRate(item.tax_rate);
     setTaxAmount(formatForInput(item.tax_amount));
     setPreliminal(item.preliminal);
@@ -150,35 +160,8 @@ export function LineItemForm({
 
   const amountStep = decimal > 0 ? (10 ** -decimal).toString() : "1";
 
-  const computeNetAndTax = (): { netAmount: string; taxAmt: string; rate: string | null } => {
-    const entered = parseFloat(enteredAmount) || 0;
-    if (taxMode === "exempt") {
-      return { netAmount: enteredAmount, taxAmt: "0", rate: "0" };
-    }
-    if (taxMode === "manual") {
-      return { netAmount: enteredAmount, taxAmt: taxAmount, rate: null };
-    }
-    const rate = parseFloat(taxRate || "0.1");
-    if (taxMode === "include") {
-      const net = entered / (1 + rate);
-      const tax = entered - net;
-      return {
-        netAmount: floorToDecimal(net),
-        taxAmt: floorToDecimal(tax),
-        rate: rate.toString(),
-      };
-    }
-    // exclude
-    const tax = entered * rate;
-    return {
-      netAmount: enteredAmount,
-      taxAmt: floorToDecimal(tax),
-      rate: rate.toString(),
-    };
-  };
-
   const saveCurrentItem = async () => {
-    const { netAmount, taxAmt, rate } = computeNetAndTax();
+    const { netAmount, taxAmt, rate } = deriveAmounts();
     return updateLineItem(lineItemsUrl, item.id, {
       title,
       notes: notes || null,
