@@ -3,7 +3,7 @@ WORKDIR /app
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-COPY package.json pnpm-lock.yaml /app/
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
 RUN pnpm install --frozen-lockfile
 
 COPY package.json pnpm-lock.yaml tsconfig.json vite.config.mts /app
