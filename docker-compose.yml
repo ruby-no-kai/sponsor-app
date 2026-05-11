@@ -1,6 +1,6 @@
 services:
   db:
-    image: public.ecr.aws/docker/library/postgres:17-trixie
+    image: mirror.gcr.io/postgres:17-trixie
     restart: always
     environment:
       POSTGRES_USER: sponsorapp
