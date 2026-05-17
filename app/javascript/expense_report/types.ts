@@ -92,6 +92,7 @@ export type EditorI18n = {
   amount_excl: string;
   amount_incl: string;
   tax_amount_label: string;
+  total_incl_label: string;
   preliminal_label: string;
   attached_files: string;
   no_files_attached: string;

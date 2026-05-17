@@ -321,6 +321,7 @@ en:
         amount_excl: "Amount (excl. tax)"
         amount_incl: "Amount (incl. tax)"
         tax_amount_label: "Tax amount"
+        total_incl_label: "Total (incl. tax)"
         preliminal_label: "Preliminal (planned budget, not finalized)"
         attached_files: "Attached files"
         no_files_attached: "No files attached"

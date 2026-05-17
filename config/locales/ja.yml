@@ -322,6 +322,7 @@ ja:
         amount_excl: "金額 (税抜)"
         amount_incl: "金額 (税込)"
         tax_amount_label: "税額"
+        total_incl_label: "合計 (税込)"
         preliminal_label: "概算 (予算計画/未確定の場合)"
         attached_files: "添付ファイル"
         no_files_attached: "ファイルなし"
