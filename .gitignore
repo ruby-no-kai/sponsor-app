@@ -47,3 +47,4 @@ node_modules
 .claude/skills/playwright-cli/
 
 mise.local.toml
+.mise.local.lock
