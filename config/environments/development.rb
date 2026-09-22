@@ -121,4 +121,6 @@ Rails.application.configure do
   config.x.tito.token = ENV['TITO_API_TOKEN']
 
   config.x.dev.sponsor_impersonation = true
+
+  config.hosts.concat ENV["SPONSOR_APP_HOST"]&.split(",") if ENV["SPONSOR_APP_HOST"].present?
 end
