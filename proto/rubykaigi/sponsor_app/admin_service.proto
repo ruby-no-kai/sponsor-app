@@ -131,6 +131,11 @@ service AdminService {
   // Deletes a staff note, whoever wrote it.
   rpc DeleteSponsorshipStaffNote(AdminServiceDeleteSponsorshipStaffNoteRequest) returns (AdminServiceDeleteSponsorshipStaffNoteResponse);
 
+  // Issues a one-minute sign-in for the sponsorship's contact, to see the sponsor pages as they
+  // do. Development only: elsewhere it is answered `not_found`, and GetSponsorship's
+  // impersonation_enabled is false.
+  rpc ImpersonateSponsorship(AdminServiceImpersonateSponsorshipRequest) returns (AdminServiceImpersonateSponsorshipResponse);
+
   // Organizations
 
   // Booth assignments

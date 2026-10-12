@@ -161,6 +161,9 @@ message AdminServiceGetSponsorshipResponse {
   // The fallback options the conference's application form offers in the sponsorship's locale, or
   // in English when the form is not described in that locale. Empty when it offers none.
   repeated FallbackOption fallback_option_choices = 5;
+
+  // Whether ImpersonateSponsorship is available on this server, which it is in development only.
+  bool impersonation_enabled = 6;
 }
 
 // Request for AdminService.UpdateSponsorship.
@@ -302,3 +305,22 @@ message AdminServiceDeleteSponsorshipStaffNoteRequest {
 
 // Response for AdminService.DeleteSponsorshipStaffNote.
 message AdminServiceDeleteSponsorshipStaffNoteResponse {}
+
+// Request for AdminService.ImpersonateSponsorship.
+message AdminServiceImpersonateSponsorshipRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.ImpersonateSponsorship.
+message AdminServiceImpersonateSponsorshipResponse {
+  // Path of this site to open, in a full page load, within a minute. It signs the browser in as
+  // the sponsorship's contact, keeping the staff session.
+  string claim_path = 1;
+}

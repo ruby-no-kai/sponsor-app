@@ -151,6 +151,7 @@ Rails.application.routes.draw do
       rpc 'CreateSponsorshipStaffNote' => 'api/admin/sponsorship_staff_notes'
       rpc 'UpdateSponsorshipStaffNote' => 'api/admin/sponsorship_staff_notes'
       rpc 'DeleteSponsorshipStaffNote' => 'api/admin/sponsorship_staff_notes'
+      rpc 'ImpersonateSponsorship' => 'api/admin/sponsorship_impersonations'
 
       # Organizations
 

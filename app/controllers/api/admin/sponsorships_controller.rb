@@ -13,6 +13,7 @@ module Api
       def get_sponsorship
         sponsorship = find_sponsorship
         staff_notes = sponsorship.staff_notes.includes(:staff).order(stickiness: :desc, created_at: :desc)
+        impersonation_enabled = Rails.configuration.x.dev.sponsor_impersonation #: bool?
 
         Rk::SponsorApp::AdminServiceGetSponsorshipResponse.new(
           sponsorship: admin_sponsorship_message(sponsorship),
@@ -20,6 +21,7 @@ module Api
           recent_staff_notes: staff_notes.where(stickiness: 0).limit(RECENT_STAFF_NOTE_COUNT).map { staff_note_message(it) },
           plan_choices: conference.plans.order(:rank, :id).map { Api::AdminSponsorshipPlanResource.new(it).as_protobuf },
           fallback_option_choices: fallback_option_choices(sponsorship),
+          impersonation_enabled: !!impersonation_enabled,
         )
       end
 

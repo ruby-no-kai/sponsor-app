@@ -161,6 +161,7 @@ RSpec.describe 'AdminService sponsorships', type: :request do
         expect(en.plan_choices.map(&:id)).to eq([gold.id, platinum.id])
         expect(en.fallback_option_choices.map(&:value)).to eq(['withdraw'])
         expect(ja.fallback_option_choices.map(&:name)).to eq(['ゴールドに変更'])
+        expect(en.impersonation_enabled).to be(false)
       end
 
       it 'offers plans of the same rank oldest first' do
