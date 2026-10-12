@@ -15,6 +15,13 @@ describe("isSpaPathname", () => {
     assert.ok(!isSpaPathname("/admin/session/new"));
     assert.ok(!isSpaPathname("/"));
   });
+
+  it("matches the form description pages HAML has at the same paths", () => {
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/form_descriptions/new"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/form_descriptions/ja"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/form_descriptions/ja/edit"));
+    assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/form_descriptions"));
+  });
 });
 
 describe("matchSpaPath", () => {

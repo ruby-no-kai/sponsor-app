@@ -1,7 +1,7 @@
 import { Badge, Empty, LayerCard, Link, LinkButton, Loader, Text } from "@cloudflare/kumo";
 import { ArrowSquareOutIcon, HandshakeIcon, PencilSimpleIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
-import { useParams } from "react-router";
+import { generatePath, useParams } from "react-router";
 import { AdminService } from "../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
 import { SponsorshipState } from "../../gen/rubykaigi/sponsor_app/sponsorship_summary_pb.ts";
 import type { SponsorshipSummary } from "../../gen/rubykaigi/sponsor_app/sponsorship_summary_pb.ts";
@@ -10,6 +10,7 @@ import { formatTimestamp } from "../../lib/forms.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
 import { useRpc } from "../../lib/rpc.ts";
 import { useDocumentTitle } from "../../lib/title.ts";
+import { paths } from "../paths.ts";
 import { groupCounts, groupSponsorships } from "./sponsorshipGroups.ts";
 
 export default function ConferenceOverview() {
@@ -140,13 +141,17 @@ export default function ConferenceOverview() {
             <Rows>
               {data.formDescriptionLocales.map((locale) => (
                 <Row key={locale}>
-                  <Link href={`${base}/form_descriptions/${encodeURIComponent(locale)}`}>
+                  <Link
+                    href={generatePath(paths.formDescription, { slug: conference.slug, locale })}
+                  >
                     {locale}
                   </Link>
                 </Row>
               ))}
               <Row>
-                <Link href={`${base}/form_descriptions/new`}>Add locale</Link>
+                <Link href={generatePath(paths.formDescriptionNew, { slug: conference.slug })}>
+                  Add locale
+                </Link>
               </Row>
             </Rows>
           </Card>

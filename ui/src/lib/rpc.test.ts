@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { Code, ConnectError } from "@connectrpc/connect";
 import { AdminService } from "../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
-import { isRetryable, rpcKey, signInUrl } from "./rpc.ts";
+import { isRetryable, isRpcKeyOf, rpcKey, signInUrl } from "./rpc.ts";
 
 describe("signInUrl", () => {
   it("sends staff pages to the staff sign-in, coming back to the same page", () => {
@@ -35,6 +35,16 @@ describe("rpcKey", () => {
       "GetConference",
       '{"conferenceSlug":"rk26"}',
     ]);
+  });
+});
+
+describe("isRpcKeyOf", () => {
+  it("matches the keys of one method, whatever the input", () => {
+    const key = rpcKey(AdminService.method.getConference, { conferenceSlug: "rk26" });
+
+    assert.ok(isRpcKeyOf(key, AdminService.method.getConference));
+    assert.ok(!isRpcKeyOf(key, AdminService.method.getFormDescription));
+    assert.ok(!isRpcKeyOf("GetConference", AdminService.method.getConference));
   });
 });
 
