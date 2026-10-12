@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 class Conference < ApplicationRecord
-  GithubRepo = Struct.new(:raw, :name, :path, :branch, keyword_init: true) do
+  GithubRepo = Data.define(:raw, :name, :path, :branch) do
     def to_s
       raw
     end

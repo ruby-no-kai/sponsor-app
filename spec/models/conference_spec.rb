@@ -442,6 +442,11 @@ RSpec.describe Conference, type: :model do
       conference = FactoryBot.build_stubbed(:conference, github_repo: 'owner/repo@main:path')
       expect(conference.github_repo.to_s).to eq('owner/repo@main:path')
     end
+
+    it 'returns an immutable value' do
+      conference = FactoryBot.build_stubbed(:conference, github_repo: 'owner/repo@main:path')
+      expect(conference.github_repo).to be_frozen
+    end
   end
 
   describe '#verify_invite_code' do
