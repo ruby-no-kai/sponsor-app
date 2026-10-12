@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ProcessSponsorEventEditJob < ApplicationJob
-  include Rails.application.routes.url_helpers
-
   def perform(edit)
     @sponsor_event = edit.sponsor_event
     @sponsorship = @sponsor_event.sponsorship
