@@ -6,6 +6,7 @@
   %hr
   %h4 Development Backdoor
   = form_tag backdoor_session_path, method: :post do
+    = hidden_field_tag :back_to, params[:back_to] if params[:back_to].present?
     .form-group
       = label_tag :login, 'GitHub Login'
       = text_field_tag :login, nil, class: 'form-control', required: true

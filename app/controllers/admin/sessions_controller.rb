@@ -9,12 +9,8 @@ module Admin
     def new
       if params[:proceed]
         session.delete(:back_to)
-        if params[:back_to]
-          uri = Addressable::URI.parse(params[:back_to])
-          if uri && uri.host.nil? && uri.scheme.nil? && uri.path.start_with?('/')
-            session[:back_to] = params[:back_to]
-          end
-        end
+        back_to = safe_back_to(params[:back_to])
+        session[:back_to] = back_to if back_to
         redirect_to '/auth/github'
       end
     end
@@ -33,7 +29,7 @@ module Admin
         login: params[:login],
       )
       session[:staff_id] = staff.id
-      redirect_to '/'
+      redirect_to(safe_back_to(params[:back_to]) || '/')
     end
 
     #: () -> void
@@ -72,6 +68,18 @@ module Admin
     def destroy
       session.delete(:staff_id)
       redirect_to '/'
+    end
+
+    # A path on this site to return to after signing in, or nil when the value could lead off-site,
+    # as a leading "//" or "///" does in a browser.
+    #: (untyped) -> String?
+    private def safe_back_to(value)
+      return unless value.is_a?(String) && value.start_with?('/') && !value.start_with?('//')
+
+      uri = Addressable::URI.parse(value)
+      value if uri && uri.host.nil? && uri.scheme.nil?
+    rescue Addressable::URI::InvalidURIError
+      nil
     end
 
     #: (String) -> bool

@@ -113,6 +113,11 @@ Uses Shoryuken (AWS SQS) for background processing:
 ### Dev Server
 
 - Assume the dev server (Rails and Vite) is already up and running. Do not attempt to start them.
+- The `Procfile` runs, under overmind and [trustless](https://github.com/sorah/trustless):
+  - `web`: Rails on port 3000, at http://sponsor-app-rails.localhost:1355. Restarts when `gen/proto/ruby/` or `Gemfile.lock` changes.
+  - `vite`: `bin/vite dev`, the assets of the HAML pages.
+  - `ui`: the `ui/` Vite dev server, at http://sponsor-app.localhost:1355. It renders SPA paths and proxies every other request to Rails.
+  - `proto`: regenerates `gen/` and `ui/src/gen` when a `.proto` changes, which restarts Rails and hot-reloads the SPA.
 - If you encounter a connection error when accessing the dev server, halt and ask the human to check their server.
 - If you modify files under `config/` that are not auto-reloaded (e.g., `config/initializers/`, `config/boot.rb`, `config/environment.rb`, `config/environments/`, `config/application.rb`), remind the human to restart the Rails server for changes to take effect.
 
@@ -245,9 +250,13 @@ curl -b jar 'http://sponsor-app.localhost:1355/rubykaigi.sponsor_app.AdminServic
 
 An error is a JSON body `{"code", "message", "details"}`, each detail a protobuf message named by `type` and encoded in unpadded base64 under `value`.
 
+These recipes work on both hosts. A session cookie belongs to the host that set it, so http://sponsor-app.localhost:1355 and http://sponsor-app-rails.localhost:1355 each need their own sign-in.
+
 ### SPA (ui/)
 
 `ui/` is a standalone pnpm project, not part of the root `package.json`: React, React Router (data mode), SWR, TanStack Form, [Kumo](https://github.com/cloudflare/kumo) on Tailwind CSS 4, and Connect-ES on the code generated into `ui/src/gen/`. It is development only. Production serves the HAML pages, and the Docker image leaves `ui/` out.
+
+The `ui` Vite dev server is the SPA's origin, http://sponsor-app.localhost:1355. Its own files live under `/_ui/`. A page load (`Sec-Fetch-Dest: document`) of a path listed in `ui/src/routes/paths.ts` gets the SPA. Every other request goes to Rails (`SPONSOR_APP_RAILS_URL`, default http://127.0.0.1:3000) with its `Host` untouched: RPCs, sign-in, `/vite-dev/`, downloads and each HAML page the SPA does not implement yet. http://sponsor-app-rails.localhost:1355 keeps serving every page as HAML.
 
 ```bash
 mise run ui:install     # pnpm install --frozen-lockfile in ui/
@@ -263,7 +272,7 @@ cd ui && pnpm run format  # oxfmt
 
 ### Authentication Backdoor
 
-In development, visit http://sponsor-app.localhost:1355/admin/session/new and use the "Development Backdoor" form to sign in without GitHub OAuth.
+In development, visit http://sponsor-app.localhost:1355/admin/session/new and use the "Development Backdoor" form to sign in without GitHub OAuth. It returns to the `back_to` path when there is one, as the SPA's sign-in redirect sets. Sign in on http://sponsor-app-rails.localhost:1355 separately to use the HAML pages there.
 
 ### Email Testing
 

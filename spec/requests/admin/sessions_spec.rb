@@ -137,4 +137,58 @@ RSpec.describe "GET /auth/github/callback", type: :request do
       expect(Staff.find_by(uid: '12345')).to be_nil
     end
   end
+
+  describe "GET /admin/session/new" do
+    it "remembers a path on this site to return to after GitHub sign-in" do
+      get '/admin/session/new', params: {proceed: 1, back_to: '/admin/conferences/rk26'}
+
+      expect(response).to redirect_to('/auth/github')
+      expect(session[:back_to]).to eq('/admin/conferences/rk26')
+    end
+
+    it "forgets a back_to that leads off-site" do
+      get '/admin/session/new', params: {proceed: 1, back_to: '//evil.invalid/'}
+
+      expect(session[:back_to]).to be_nil
+    end
+  end
+
+  describe "the development backdoor" do
+    before { allow(Rails).to receive(:env).and_return(ActiveSupport::EnvironmentInquirer.new('development')) }
+
+    it "carries back_to into its form" do
+      get '/admin/session/new', params: {back_to: '/admin/conferences/rk26'}
+
+      expect(response.body).to include('<input type="hidden" name="back_to" id="back_to" value="/admin/conferences/rk26"')
+    end
+
+    it "signs in and returns to a path on this site" do
+      post '/admin/session/backdoor', params: {login: 'dev', back_to: '/admin/conferences/rk26?tab=plans'}
+
+      expect(response).to redirect_to('/admin/conferences/rk26?tab=plans')
+      expect(session[:staff_id]).to eq(Staff.find_by!(login: 'dev').id)
+    end
+
+    it "signs in without back_to" do
+      post '/admin/session/backdoor', params: {login: 'dev'}
+
+      expect(response).to redirect_to('/')
+    end
+
+    ['//evil.invalid/', '///evil.invalid/', 'https://evil.invalid/', 'javascript:alert(1)', 'admin', ''].each do |back_to|
+      it "returns to the top page for back_to #{back_to.inspect}" do
+        post '/admin/session/backdoor', params: {login: 'dev', back_to:}
+
+        expect(response).to redirect_to('/')
+      end
+    end
+
+    it "is not found outside development" do
+      allow(Rails).to receive(:env).and_return(ActiveSupport::EnvironmentInquirer.new('test'))
+
+      post '/admin/session/backdoor', params: {login: 'dev', back_to: '/admin'}
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end
