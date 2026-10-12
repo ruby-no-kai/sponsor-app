@@ -18,6 +18,9 @@ export const paths = {
   formDescriptionEdit: "/admin/conferences/:slug/form_descriptions/:locale/edit",
 
   // Plans
+  plans: "/admin/conferences/:slug/plans",
+  planNew: "/admin/conferences/:slug/plans/new",
+  planEdit: "/admin/conferences/:slug/plans/:id/edit",
 
   // Sponsorships
 

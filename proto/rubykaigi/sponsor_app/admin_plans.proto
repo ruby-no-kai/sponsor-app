@@ -1,0 +1,236 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// A sponsorship plan of a conference with every setting organizers manage, and how much of its
+// capacity is taken.
+//
+// Staff-only. SponsorService never returns it.
+message AdminPlan {
+  // Plan ID.
+  int64 id = 1;
+
+  // Display name, such as "Ruby" or "Platinum". Fallback option conditions name plans by it.
+  string name = 2;
+
+  // Position among the conference's plans, which are listed lowest rank first.
+  int32 rank = 3;
+
+  // One line describing the plan. Absent when the plan has none.
+  optional string summary = 4;
+
+  // Price as the application form shows it, such as "3,000,000 JPY".
+  string price_text = 5;
+
+  // Fee for the plan as a decimal number with at most two decimal places, such as "3000000.0".
+  // A customized sponsorship's expense report is offset against it.
+  string price = 6;
+
+  // Fee added to `price` when a booth is assigned, in the same form.
+  string price_booth = 7;
+
+  // How many active sponsorships the plan admits. A full plan takes no more applications.
+  int32 capacity = 8;
+
+  // Conference tickets each sponsorship on the plan includes.
+  int32 number_of_guests = 9;
+
+  // Size of the booth the plan includes. The plan is eligible for a booth only when it is above
+  // zero. Absent counts as zero.
+  optional int32 booth_size = 10;
+
+  // About how many words a sponsor's profile may have. The application form allows 10% more.
+  int32 words_limit = 11;
+
+  // Whether an application for the plan is accepted as soon as it is submitted. Otherwise
+  // organizers accept applications after the application form closes.
+  bool auto_acceptance = 12;
+
+  // Whether the plan includes a sponsor session.
+  bool talkable = 13;
+
+  // When the plan stops taking applications. Absent means it takes them as long as the
+  // application form is open.
+  optional google.protobuf.Timestamp closes_at = 14;
+
+  // Accepted sponsorships on the plan that have not withdrawn, which is what the capacity is
+  // checked against. Applications awaiting acceptance are not counted.
+  int32 active_sponsorship_count = 15;
+
+  // Whether active_sponsorship_count has reached the capacity.
+  bool sold_out = 16;
+
+  // Whether closes_at has passed, as of the response.
+  bool closed = 17;
+
+  // Whether the application form offers the plan, being neither sold out nor closed.
+  bool available = 18;
+}
+
+// The writable fields of a plan, taken by AdminService.CreatePlan and UpdatePlan.
+message PlanInput {
+  // Display name, such as "Platinum". At most 100 characters, the most a fallback option
+  // condition can name.
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 100,
+    (buf.validate.field).cel = {
+      id: "plan_input.name.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Position among the conference's plans, which are listed lowest rank first.
+  optional int32 rank = 2 [(buf.validate.field).required = true];
+
+  // One line describing the plan. Leave it unset rather than blank for none.
+  optional string summary = 3 [
+    (buf.validate.field).string.max_len = 1000,
+    (buf.validate.field).cel = {
+      id: "plan_input.summary.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Price as the application form shows it, such as "3,000,000 JPY".
+  string price_text = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 200,
+    (buf.validate.field).cel = {
+      id: "plan_input.price_text.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Fee for the plan as a non-negative decimal number with at most ten digits before the point
+  // and two after it, such as "3000000" or "3000000.50".
+  string price = 5 [(buf.validate.field).cel = {
+    id: "plan_input.price.format"
+    message: "must be an amount such as 1000 or 1000.50"
+    expression: "this.matches('^[0-9]{1,10}([.][0-9]{1,2})?$')"
+  }];
+
+  // Fee added to `price` when a booth is assigned, in the same form.
+  string price_booth = 6 [(buf.validate.field).cel = {
+    id: "plan_input.price_booth.format"
+    message: "must be an amount such as 1000 or 1000.50"
+    expression: "this.matches('^[0-9]{1,10}([.][0-9]{1,2})?$')"
+  }];
+
+  // How many active sponsorships the plan admits.
+  optional int32 capacity = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gte = 0
+  ];
+
+  // Conference tickets each sponsorship on the plan includes.
+  optional int32 number_of_guests = 8 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gte = 0
+  ];
+
+  // Size of the booth the plan includes. Unset or zero makes the plan ineligible for a booth.
+  optional int32 booth_size = 9 [(buf.validate.field).int32.gte = 0];
+
+  // About how many words a sponsor's profile may have.
+  optional int32 words_limit = 10 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gt = 0
+  ];
+
+  // Whether an application for the plan is accepted as soon as it is submitted.
+  bool auto_acceptance = 11;
+
+  // Whether the plan includes a sponsor session.
+  bool talkable = 12;
+
+  // When the plan stops taking applications, within years 1 to 9999 as ProtoJSON spells them.
+  // Unset keeps it open as long as the application form is.
+  optional google.protobuf.Timestamp closes_at = 13 [(buf.validate.field).timestamp = {
+    gte: {seconds: -62135596800}
+    lte: {
+      seconds: 253402300799
+      nanos: 999999999
+    }
+  }];
+}
+
+// Request for AdminService.ListPlans.
+message AdminServiceListPlansRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for AdminService.ListPlans.
+message AdminServiceListPlansResponse {
+  // Every plan of the conference, lowest rank first. Not paginated, as a conference has a handful.
+  repeated AdminPlan plans = 1;
+}
+
+// Request for AdminService.GetPlan.
+message AdminServiceGetPlanRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a plan of the conference.
+  int64 plan_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.GetPlan.
+message AdminServiceGetPlanResponse {
+  // The plan the request names.
+  AdminPlan plan = 1;
+}
+
+// Request for AdminService.CreatePlan.
+message AdminServiceCreatePlanRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // The plan to add.
+  PlanInput input = 2 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.CreatePlan.
+message AdminServiceCreatePlanResponse {
+  // The plan created.
+  AdminPlan plan = 1;
+}
+
+// Request for AdminService.UpdatePlan.
+message AdminServiceUpdatePlanRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a plan of the conference.
+  int64 plan_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // Every writable field, replacing what is stored.
+  PlanInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.UpdatePlan.
+message AdminServiceUpdatePlanResponse {
+  // The plan as updated.
+  AdminPlan plan = 1;
+}

@@ -4,6 +4,7 @@ package rubykaigi.sponsor_app;
 
 import "rubykaigi/sponsor_app/admin_conferences.proto";
 import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
+import "rubykaigi/sponsor_app/admin_plans.proto";
 import "rubykaigi/sponsor_app/admin_viewer.proto";
 
 option ruby_package = "Rk::SponsorApp";
@@ -72,6 +73,23 @@ service AdminService {
   rpc UpdateFormDescription(AdminServiceUpdateFormDescriptionRequest) returns (AdminServiceUpdateFormDescriptionResponse);
 
   // Plans
+
+  // Lists a conference's plans, lowest rank first, with how much of each one's capacity is taken.
+  rpc ListPlans(AdminServiceListPlansRequest) returns (AdminServiceListPlansResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one plan of a conference. A plan of another conference is answered `not_found`.
+  rpc GetPlan(AdminServiceGetPlanRequest) returns (AdminServiceGetPlanResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Adds a plan to a conference.
+  rpc CreatePlan(AdminServiceCreatePlanRequest) returns (AdminServiceCreatePlanResponse);
+
+  // Replaces every writable field of a plan. A plan of another conference is answered
+  // `not_found`.
+  rpc UpdatePlan(AdminServiceUpdatePlanRequest) returns (AdminServiceUpdatePlanResponse);
 
   // Sponsorships
 

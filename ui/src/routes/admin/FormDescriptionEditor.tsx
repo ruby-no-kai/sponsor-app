@@ -5,7 +5,6 @@ import {
   Empty,
   Input,
   InputArea,
-  LayerCard,
   Loader,
   Select,
   TagInput,
@@ -36,7 +35,14 @@ import { useDocumentTitle } from "../../lib/title.ts";
 import { toastManager } from "../../lib/toast.ts";
 import { paths } from "../paths.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
-import { SaveBar, SaveErrorBanner, useFieldReveal } from "./FormParts.tsx";
+import {
+  ErrorList,
+  joined,
+  SaveBar,
+  SaveErrorBanner,
+  Section,
+  useFieldReveal,
+} from "./FormParts.tsx";
 import { SandboxedHtml } from "./SandboxedHtml.tsx";
 import {
   BOOTH_REQUEST_LABELS,
@@ -523,31 +529,6 @@ function saveErrors(error: unknown): FormErrors {
 const LOCALE_ITEMS = Object.fromEntries(FORM_LOCALES.map((locale) => [locale, locale]));
 
 const PLANS_HELP = `Any of these. Leave all unchecked to match any plan, with ${FIELD_LABELS.boothRequest} set to ${BOOTH_REQUEST_LABELS.requested} or ${BOOTH_REQUEST_LABELS.not_requested}.`;
-
-function joined(errors: readonly unknown[]): string | undefined {
-  const messages = errors.filter((error): error is string => typeof error === "string");
-  return messages.length === 0 ? undefined : messages.join("; ");
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <LayerCard>
-      <LayerCard.Secondary>{title}</LayerCard.Secondary>
-      <LayerCard.Primary className="flex flex-col gap-4">{children}</LayerCard.Primary>
-    </LayerCard>
-  );
-}
-
-function ErrorList({ field, errors }: { field: string; errors: readonly string[] }) {
-  if (errors.length === 0) return null;
-  return (
-    <ul className="list-inside list-disc text-kumo-danger" data-field={field}>
-      {errors.map((error) => (
-        <li key={error}>{error}</li>
-      ))}
-    </ul>
-  );
-}
 
 // One fallback option: a line of its value and name that opens to edit. A row with an error stays
 // open, so the field to reveal exists.

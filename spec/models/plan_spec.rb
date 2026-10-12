@@ -67,6 +67,13 @@ RSpec.describe Plan, type: :model do
 
       expect(plan.sold_out?).to be false
     end
+
+    it 'reads the count with_active_sponsorship_count loaded, querying nothing' do
+      3.times { FactoryBot.create(:sponsorship, plan:, conference: plan.conference, accepted_at: Time.current) }
+      loaded = described_class.with_active_sponsorship_count.find(plan.id)
+
+      expect(query_count { expect(loaded.sold_out?).to be true }).to eq(0)
+    end
   end
 
   describe '#closed?' do

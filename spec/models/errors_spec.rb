@@ -100,6 +100,13 @@ RSpec.describe Errors do
       expect(violations(error).map(&:first)).to eq(['input.fallback_options', 'input.locale', '', ''])
     end
 
+    it "names a plan attribute's PlanInput field" do
+      plan = Plan.new.tap { it.errors.add(:price_text, :invalid) }
+      error = described_class.new(record: plan, input_class: Rk::SponsorApp::PlanInput, field_prefix: 'input', json_names: true)
+
+      expect(violations(error)).to eq([['input.priceText', 'INVALID', 'is invalid']])
+    end
+
     it 'names no field without an Input' do
       expect(violations(described_class.new(record:)).map(&:first)).to all(eq(''))
     end

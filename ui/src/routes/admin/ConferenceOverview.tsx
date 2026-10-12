@@ -167,15 +167,24 @@ export default function ConferenceOverview() {
             <Rows>
               {data.plans.map((plan) => (
                 <Row key={plan.id.toString()}>
-                  <Link href={`${base}/plans/${plan.id}/edit`}>{plan.name}</Link>
+                  <Link
+                    href={generatePath(paths.planEdit, {
+                      slug: conference.slug,
+                      id: plan.id.toString(),
+                    })}
+                  >
+                    {plan.name}
+                  </Link>
                   <Text variant="secondary" as="span">
                     {plan.activeSponsorshipCount}/{plan.capacity} active
                   </Text>
                 </Row>
               ))}
               <Row>
-                <Link href={`${base}/plans`}>View all plans</Link>
-                <Link href={`${base}/plans/new`}>Add plan</Link>
+                <Link href={generatePath(paths.plans, { slug: conference.slug })}>
+                  View all plans
+                </Link>
+                <Link href={generatePath(paths.planNew, { slug: conference.slug })}>Add plan</Link>
               </Row>
             </Rows>
           </Card>

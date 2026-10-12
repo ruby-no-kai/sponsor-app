@@ -35,7 +35,7 @@ class Plan < ApplicationRecord
 
   #: () -> bool
   def sold_out?
-    !capacity || sponsorships.active.count >= capacity
+    !capacity || active_sponsorship_count >= capacity
   end
 
   #: (?ActiveSupport::TimeWithZone t) -> bool
