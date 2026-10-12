@@ -1,0 +1,29 @@
+gem:
+  outdir: "third_party/sorbet/rbi/gems"
+  dsl_dir: "third_party/sorbet/rbi/dsl"
+  # Gem YARD docs are not needed for type checking, and their examples include
+  # sample credentials that trip GitHub push protection.
+  doc: false
+  # Tooling and documentation gems the app never calls; their RBIs are large.
+  exclude:
+    - prism
+    - rbi
+    - rbs
+    - rdoc
+    - rubocop
+    - rubocop-ast
+    - rubocop-factory_bot
+    - rubocop-rails
+    - rubocop-rspec
+    - rubocop-rspec_rails
+    - rubocop-shopify
+    - rubydex
+    - spoom
+    - tapioca
+dsl:
+  outdir: "third_party/sorbet/rbi/dsl"
+annotations:
+  # The upstream activesupport annotations declare String#as_json and
+  # Array#to_xml with no arguments, contradicting the gem RBIs (Sorbet 4010).
+  typed_overrides:
+    activesupport: "false"

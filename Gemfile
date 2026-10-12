@@ -68,6 +68,9 @@ group :development, :test do
   gem "rubocop-rspec_rails", require: false
   gem "rubocop-rails", require: false
   gem "rubocop-factory_bot", require: false
+
+  gem "sorbet", require: false
+  gem "tapioca", require: false
 end
 
 group :development do

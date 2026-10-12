@@ -1,2 +1,21 @@
 [tools]
 hk = "latest"
+
+[env]
+# sorbet-static ships only precompiled platform gems, which a `ruby` lockfile
+# platform cannot resolve.
+BUNDLE_FORCE_RUBY_PLATFORM = "false"
+
+[tasks.typecheck]
+description = "Sorbet type check"
+run = "bundle exec srb tc"
+
+# Regenerating every gem RBI takes minutes and `tapioca dsl` boots Rails, so
+# this runs on demand after a Gemfile.lock or model change.
+[tasks.tapioca]
+description = "Regenerate Sorbet RBI files under third_party/"
+run = [
+  "bundle exec tapioca gem --all",
+  "bundle exec tapioca annotations",
+  "bundle exec tapioca dsl",
+]

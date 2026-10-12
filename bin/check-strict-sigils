@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Usage: bin/check-strict-sigils BASE
+#
+# Fails when a Ruby file under app/, lib/ or config/ added since BASE does not
+# declare `# typed: strict` (or `strong`).
+
+base = ARGV.fetch(0) { abort "usage: #{$PROGRAM_NAME} BASE" }
+
+added = IO.popen(["git", "diff", "--name-only", "--diff-filter=A", "-z", base, "HEAD", "--"], &:read)
+abort "git diff #{base} HEAD failed" unless $?.success?
+
+offenders = added.split("\0").grep(%r{\A(?:app|lib|config)/.+\.rb\z}).reject do |path|
+  # Sorbet reads the sigil only from the leading comment block.
+  File.foreach(path)
+    .take_while { |line| line.start_with?("#") || line.strip.empty? }
+    .any? { |line| line.match?(/\A#\s*typed:\s*(?:strict|strong)\s*\z/) }
+end
+
+exit if offenders.empty?
+
+warn "New Ruby files must start at `# typed: strict` (see docs/type-checking.md):"
+offenders.each { |path| warn "  #{path}" }
+exit 1
