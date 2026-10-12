@@ -9,11 +9,11 @@ class ExpenseLineItemsController < ApplicationController
   before_action :set_line_item, only: [:update, :destroy]
 
   def create
-    @line_item = @expense_report.line_items.build(line_item_params)
-    @line_item.assign_next_position
+    @line_item = expense_report.line_items.build(line_item_params)
+    line_item.assign_next_position
 
     ActiveRecord::Base.transaction do
-      @line_item.save!
+      line_item.save!
       sync_file_ids if params[:expense_line_item]&.key?(:file_ids)
       after_line_item_change
     end
@@ -23,10 +23,10 @@ class ExpenseLineItemsController < ApplicationController
 
   def update
     ActiveRecord::Base.transaction do
-      @line_item.assign_attributes(line_item_params)
+      line_item.assign_attributes(line_item_params)
       sync_file_ids if params[:expense_line_item]&.key?(:file_ids)
-      @line_item.save!
-      reindex_positions if @line_item.saved_change_to_position?
+      line_item.save!
+      reindex_positions if line_item.saved_change_to_position?
       after_line_item_change
     end
 
@@ -35,7 +35,7 @@ class ExpenseLineItemsController < ApplicationController
 
   def destroy
     ActiveRecord::Base.transaction do
-      @line_item.destroy!
+      line_item.destroy!
       after_line_item_change
     end
 
@@ -56,7 +56,7 @@ class ExpenseLineItemsController < ApplicationController
   end
 
   private def set_line_item
-    @line_item = @expense_report.line_items.find(params[:id])
+    @line_item = expense_report.line_items.find(params[:id])
   end
 
   private def line_item_params
@@ -65,23 +65,23 @@ class ExpenseLineItemsController < ApplicationController
 
   private def sync_file_ids
     new_ids = Array(params[:expense_line_item][:file_ids]).map(&:to_i)
-    current_ids = @line_item.expense_file_ids
+    current_ids = line_item.expense_file_ids
 
     (new_ids - current_ids).each do |file_id|
       file = current_sponsorship.expense_files.find(file_id)
-      @line_item.expense_line_item_files.create!(expense_file: file)
+      line_item.expense_line_item_files.create!(expense_file: file)
     end
 
     (current_ids - new_ids).each do |file_id|
-      @line_item.expense_line_item_files.find_by!(expense_file_id: file_id).destroy!
+      line_item.expense_line_item_files.find_by!(expense_file_id: file_id).destroy!
     end
   end
 
   private def reindex_positions
-    target_position = @line_item.position
-    items = @expense_report.line_items.reload.where.not(id: @line_item.id).order(:position, :id).to_a
+    target_position = line_item.position
+    items = expense_report.line_items.reload.where.not(id: line_item.id).order(:position, :id).to_a
     insert_idx = items.index { |i| i.position >= target_position } || items.length
-    items.insert(insert_idx, @line_item)
+    items.insert(insert_idx, line_item)
     items.each_with_index do |item, idx|
       new_pos = idx + 1
       item.update_column(:position, new_pos) if item.position != new_pos # rubocop:disable Rails/SkipsModelValidations
@@ -89,14 +89,18 @@ class ExpenseLineItemsController < ApplicationController
   end
 
   private def after_line_item_change
-    @expense_report.reload
-    @expense_report.reopen_if_rejected
-    @expense_report.recalculate_totals
-    @expense_report.refresh_submission_snapshot
-    @expense_report.save!
+    expense_report.reload
+    expense_report.reopen_if_rejected
+    expense_report.recalculate_totals
+    expense_report.refresh_submission_snapshot
+    expense_report.save!
   end
 
   private def report_json
-    ExpenseReportResource.new(@expense_report.reload).to_h
+    ExpenseReportResource.new(expense_report.reload).to_h
   end
+
+  private def expense_report = Must.because(@expense_report) { "set_expense_report runs before every action" }
+
+  private def line_item = Must.because(@line_item) { "set_line_item or create assigns @line_item" }
 end

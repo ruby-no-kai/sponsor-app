@@ -13,12 +13,12 @@ class SponsorEventsController < ApplicationController
 
   def create
     @sponsor_event = current_sponsorship.sponsor_events.build(sponsor_event_params)
-    @sponsor_event.policy_acknowledged_at = Time.zone.now if params[:sponsor_event][:policy_agreement] == '1'
+    sponsor_event.policy_acknowledged_at = Time.zone.now if params[:sponsor_event][:policy_agreement] == '1'
     assign_new_asset_file
 
-    if @sponsor_event.save
-      ProcessSponsorEventEditJob.perform_later(@sponsor_event.last_editing_history)
-      redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), notice: t('.notice')
+    if sponsor_event.save
+      ProcessSponsorEventEditJob.perform_later(sponsor_event.last_editing_history)
+      redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: sponsor_event), notice: t('.notice')
     else
       render :new, status: :unprocessable_entity
     end
@@ -28,20 +28,20 @@ class SponsorEventsController < ApplicationController
   end
 
   def edit
-    unless @sponsor_event.editable_by_sponsor?
-      redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), alert: t('.withdrawn_not_editable')
+    unless sponsor_event.editable_by_sponsor?
+      redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: sponsor_event), alert: t('.withdrawn_not_editable')
     end
   end
 
   def update
-    unless @sponsor_event.editable_by_sponsor?
-      redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), alert: t('.withdrawn_not_editable')
+    unless sponsor_event.editable_by_sponsor?
+      redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: sponsor_event), alert: t('.withdrawn_not_editable')
       return
     end
 
     success = ActiveRecord::Base.transaction do
       handle_asset_file_update
-      unless @sponsor_event.update(sponsor_event_params)
+      unless sponsor_event.update(sponsor_event_params)
         raise ActiveRecord::Rollback
       end
 
@@ -49,22 +49,22 @@ class SponsorEventsController < ApplicationController
     end
 
     if success
-      ProcessSponsorEventEditJob.perform_later(@sponsor_event.last_editing_history)
-      redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), notice: t('.notice')
+      ProcessSponsorEventEditJob.perform_later(sponsor_event.last_editing_history)
+      redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: sponsor_event), notice: t('.notice')
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    unless @sponsor_event.editable_by_sponsor?
-      redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), alert: t('.withdrawn_not_editable')
+    unless sponsor_event.editable_by_sponsor?
+      redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: sponsor_event), alert: t('.withdrawn_not_editable')
       return
     end
 
-    @sponsor_event.status = :withdrawn
-    @sponsor_event.save!
-    ProcessSponsorEventEditJob.perform_later(@sponsor_event.last_editing_history)
+    sponsor_event.status = :withdrawn
+    sponsor_event.save!
+    ProcessSponsorEventEditJob.perform_later(sponsor_event.last_editing_history)
     redirect_to user_conference_sponsorship_path(conference: current_conference), notice: t('.notice')
   end
 
@@ -91,21 +91,21 @@ class SponsorEventsController < ApplicationController
     asset_file = SponsorEventAssetFile
       .where(id: asset_file_id, sponsor_event: nil, sponsorship: current_sponsorship)
       .first!
-    @sponsor_event.asset_file = asset_file
+    sponsor_event.asset_file = asset_file
   end
 
   private def handle_asset_file_update
     asset_file_id = params[:sponsor_event][:asset_file_id]
 
     if asset_file_id == ""
-      @sponsor_event.asset_file&.destroy!
-      @sponsor_event.reload_asset_file
-    elsif asset_file_id.present? && asset_file_id.to_i != @sponsor_event.asset_file&.id
+      sponsor_event.asset_file&.destroy!
+      sponsor_event.reload_asset_file
+    elsif asset_file_id.present? && asset_file_id.to_i != sponsor_event.asset_file&.id
       new_file = SponsorEventAssetFile
         .where(id: asset_file_id, sponsor_event: nil, sponsorship: current_sponsorship)
         .first!
-      @sponsor_event.asset_file&.destroy!
-      @sponsor_event.asset_file = new_file
+      sponsor_event.asset_file&.destroy!
+      sponsor_event.asset_file = new_file
     end
   end
 
@@ -120,4 +120,6 @@ class SponsorEventsController < ApplicationController
       :location_local,
     )
   end
+
+  private def sponsor_event = Must.because(@sponsor_event) { "set_sponsor_event, new or create assigns @sponsor_event" }
 end

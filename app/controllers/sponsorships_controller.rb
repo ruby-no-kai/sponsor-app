@@ -11,7 +11,7 @@ class SponsorshipsController < ApplicationController
     @conference = current_sponsorship&.conference
     raise ActiveRecord::RecordNotFound unless @conference
 
-    @announcements = @sponsorship.conference.announcements
+    @announcements = @conference.announcements
       .where(locale: I18n.locale)
       .where('published_at IS NOT NULL')
       .order('stickiness DESC, id DESC')

@@ -8,8 +8,8 @@ class PassRetractionsController < ApplicationController
 
   def new
     @retraction = find_or_prepare_retraction
-    @pass_retraction_disabled = !@conference.pass_retraction_enabled?
-    redirect_to user_conference_sponsorship_retraction_path(@conference, params[:id]) if @retraction.completed?
+    @pass_retraction_disabled = !conference.pass_retraction_enabled?
+    redirect_to user_conference_sponsorship_retraction_path(conference, params[:id]) if @retraction.completed?
   rescue HTTPX::HTTPError => e
     raise unless e.status == 404
 
@@ -22,7 +22,7 @@ class PassRetractionsController < ApplicationController
 
     if @retraction.save
       RetractTitoTicketJob.perform_now(@retraction)
-      redirect_to user_conference_sponsorship_retraction_path(@conference, params[:id])
+      redirect_to user_conference_sponsorship_retraction_path(conference, params[:id])
     else
       render :new, status: :unprocessable_entity
     end
@@ -34,22 +34,22 @@ class PassRetractionsController < ApplicationController
 
   def show
     @retraction = TitoTicketRetraction.find_by!(
-      sponsorship: @sponsorship,
+      sponsorship:,
       tito_registration_id: params[:id],
     )
   end
 
   private def set_conference_and_sponsorship
     @sponsorship = current_sponsorship
-    @conference = @sponsorship.conference
-    raise ActiveRecord::RecordNotFound if @conference.tito_slug.blank?
+    @conference = Must.expect(sponsorship.conference)
+    raise ActiveRecord::RecordNotFound if conference.tito_slug.blank?
   end
 
   private def find_or_prepare_retraction
     TitoTicketRetraction.find_by(
-      sponsorship: @sponsorship,
+      sponsorship:,
       tito_registration_id: params[:id],
-    ) || TitoTicketRetraction.prepare(@sponsorship, params[:id])
+    ) || TitoTicketRetraction.prepare(sponsorship, params[:id])
   end
 
   private def retraction_params
@@ -57,6 +57,10 @@ class PassRetractionsController < ApplicationController
   end
 
   private def require_pass_retraction_enabled
-    raise ActiveRecord::RecordNotFound unless @conference.pass_retraction_enabled?
+    raise ActiveRecord::RecordNotFound unless conference.pass_retraction_enabled?
   end
+
+  private def sponsorship = Must.because(@sponsorship) { "set_conference_and_sponsorship runs before every action" }
+
+  private def conference = Must.because(@conference) { "set_conference_and_sponsorship runs before every action" }
 end

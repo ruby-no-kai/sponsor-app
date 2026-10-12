@@ -10,29 +10,29 @@ class ExpenseFilesController < ApplicationController
   before_action :set_asset_file, only: [:show, :update, :destroy, :initiate_update]
 
   def create
-    @asset_file = ExpenseFile.prepare(conference: @conference, sponsorship: current_sponsorship)
-    @asset_file.assign_attributes(params.permit(:filename, :content_type))
-    @asset_file.save!
+    @asset_file = ExpenseFile.prepare(conference:, sponsorship: current_sponsorship)
+    asset_file.assign_attributes(params.permit(:filename, :content_type))
+    asset_file.save!
     render json: make_session
   end
 
   def show
-    redirect_to @asset_file.download_url(disposition: :inline), allow_other_host: true
+    redirect_to asset_file.download_url(disposition: :inline), allow_other_host: true
   end
 
   def update
-    @asset_file.assign_attributes(params.permit(:filename, :content_type))
-    @asset_file.status = 'uploaded'
+    asset_file.assign_attributes(params.permit(:filename, :content_type))
+    asset_file.status = 'uploaded'
     super
   end
 
   def destroy
-    @asset_file.destroy!
+    asset_file.destroy!
     render json: {ok: true}
   end
 
   def initiate_update
-    @asset_file.content_type = params[:content_type] if params[:content_type].present?
+    asset_file.content_type = params[:content_type] if params[:content_type].present?
     render json: make_session
   end
 
@@ -49,6 +49,10 @@ class ExpenseFilesController < ApplicationController
   end
 
   private def asset_file_report_to_url(asset_file)
-    user_conference_expense_file_path(@conference, asset_file)
+    user_conference_expense_file_path(conference, asset_file)
   end
+
+  private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+  private def asset_file = Must.because(@asset_file) { "set_asset_file or create assigns @asset_file" }
 end

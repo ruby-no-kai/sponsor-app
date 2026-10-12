@@ -18,7 +18,7 @@ class ExpenseReportsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to user_conference_sponsorship_expense_report_path(@conference) }
+      format.html { redirect_to user_conference_sponsorship_expense_report_path(conference) }
       format.json { render json: report_json }
     end
   end
@@ -31,10 +31,10 @@ class ExpenseReportsController < ApplicationController
   end
 
   def update
-    @expense_report.reopen_if_rejected
-    @expense_report.recalculate_totals
-    @expense_report.refresh_submission_snapshot
-    @expense_report.save!
+    expense_report.reopen_if_rejected
+    expense_report.recalculate_totals
+    expense_report.refresh_submission_snapshot
+    expense_report.save!
 
     render json: report_json
   end
@@ -65,7 +65,7 @@ class ExpenseReportsController < ApplicationController
   end
 
   private def report_json
-    ExpenseReportResource.new(@expense_report.reload).to_h
+    ExpenseReportResource.new(expense_report.reload).to_h
   end
 
   private def calculate_total_fee
@@ -76,4 +76,8 @@ class ExpenseReportsController < ApplicationController
     fee += plan.price_booth if current_sponsorship.booth_assigned?
     fee
   end
+
+  private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+  private def expense_report = Must.because(@expense_report) { "set_expense_report or create assigns @expense_report" }
 end

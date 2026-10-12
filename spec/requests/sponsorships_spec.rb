@@ -36,6 +36,26 @@ RSpec.describe "Sponsorships", type: :request do
     end
   end
 
+  describe "GET show" do
+    let(:sponsorship) { FactoryBot.create(:sponsorship, conference:, plan:) }
+
+    it "lists the conference's published announcements" do
+      FactoryBot.create(:announcement, :published, conference:, title: 'Venue map')
+      FactoryBot.create(:announcement, :published, :exhibitors_only, conference:, title: 'Booth setup')
+      get claim_user_session_path(FactoryBot.create(:session_token, email: sponsorship.contact.email).handle)
+
+      get user_conference_sponsorship_path(conference)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Venue map')
+      expect(response.body).not_to include('Booth setup')
+    end
+
+    it "redirects to the application form without a sponsorship session" do
+      get user_conference_sponsorship_path(conference)
+      expect(URI(response.location).path).to eq(new_user_conference_sponsorship_path(conference))
+    end
+  end
+
   describe "PATCH update" do
     let(:sponsorship) { FactoryBot.create(:sponsorship, conference:, plan:) }
     let(:session_token) { FactoryBot.create(:session_token, email: sponsorship.contact.email) }

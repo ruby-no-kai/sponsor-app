@@ -10,20 +10,20 @@ class SponsorEventAssetFilesController < ApplicationController
   before_action :set_asset_file, only: %i(show update initiate_update)
 
   def show
-    redirect_to @asset_file.download_url, allow_other_host: true
+    redirect_to asset_file.download_url, allow_other_host: true
   end
 
   def update = super
 
   def create
-    @asset_file = SponsorEventAssetFile.prepare(conference: @conference, sponsorship: current_sponsorship)
-    @asset_file.content_type = params[:content_type]
-    @asset_file.save!
+    @asset_file = SponsorEventAssetFile.prepare(conference:, sponsorship: current_sponsorship)
+    asset_file.content_type = params[:content_type]
+    asset_file.save!
     render json: make_session
   end
 
   def initiate_update
-    @asset_file.content_type = params[:content_type] if params[:content_type].present?
+    asset_file.content_type = params[:content_type] if params[:content_type].present?
     render json: make_session
   end
 
@@ -42,6 +42,10 @@ class SponsorEventAssetFilesController < ApplicationController
   end
 
   private def asset_file_report_to_url(asset_file)
-    user_conference_event_asset_file_path(@conference, asset_file)
+    user_conference_event_asset_file_path(conference, asset_file)
   end
+
+  private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+  private def asset_file = Must.because(@asset_file) { "set_asset_file or create assigns @asset_file" }
 end

@@ -16,7 +16,7 @@ class BroadcastsController < ApplicationController
   private
 
   helper_method def replace_template_variables(html)
-    sponsorship_url = user_conference_sponsorship_url(@conference)
+    sponsorship_url = user_conference_sponsorship_url(current_conference)
     link = "<a href=\"#{sponsorship_url}\">#{sponsorship_url}</a>"
     html.gsub(/@LOGIN@|@FORM@/, link).html_safe # rubocop:disable Rails/OutputSafety
   end

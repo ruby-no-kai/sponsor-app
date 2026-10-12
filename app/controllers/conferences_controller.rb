@@ -3,12 +3,13 @@
 
 class ConferencesController < ApplicationController
   def index
-    @conferences = Conference.application_open.publicly_visible.order(id: :asc)
+    conferences = Conference.application_open.publicly_visible.order(id: :asc)
+    @conferences = conferences
 
-    if @conferences.one?
-      redirect_to user_conference_sponsorship_path(@conferences.first)
-    elsif @conferences.empty? && current_available_sponsorships&.exists?
-      redirect_to user_conference_sponsorship_path(current_available_sponsorships.first.conference)
+    if conferences.one?
+      redirect_to user_conference_sponsorship_path(conferences.first)
+    elsif conferences.empty? && (sponsorship = current_available_sponsorships&.first)
+      redirect_to user_conference_sponsorship_path(sponsorship.conference)
     end
   end
 end
