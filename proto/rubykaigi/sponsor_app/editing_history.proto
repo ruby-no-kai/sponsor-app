@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// One save of a record whose edits are kept, such as a sponsorship, with what the save changed.
+//
+// Each save keeps a snapshot of the record's fields, and an entry's changes are what differs from
+// the snapshot before it. The first entry adds every field.
+message EditingHistoryEntry {
+  // A difference between two snapshots.
+  message Change {
+    // What happened to the value at the path.
+    enum Operation {
+      // The zero value proto3 requires. Never returned.
+      OPERATION_UNSPECIFIED = 0;
+
+      // The path appeared, holding new_value.
+      OPERATION_ADDED = 1;
+
+      // The path disappeared, having held old_value.
+      OPERATION_REMOVED = 2;
+
+      // The value at the path went from old_value to new_value.
+      OPERATION_CHANGED = 3;
+    }
+
+    // What happened to the value.
+    Operation operation = 1;
+
+    // Where the value sits in the snapshot: a field name such as "plan_name", a nested field such
+    // as "contact.email", or a list element such as "tags[2]".
+    string path = 2;
+
+    // The value before the save. Absent for an added path.
+    //
+    // A snapshot records whatever its record chooses to, and changes with the record, so values
+    // are JSON of any type rather than a fixed schema: a string, a number, a boolean, null, a
+    // list or an object.
+    optional google.protobuf.Value old_value = 3;
+
+    // The value after the save, of any JSON type as old_value is. Absent for a removed path.
+    optional google.protobuf.Value new_value = 4;
+  }
+
+  // Entry ID.
+  int64 id = 1;
+
+  // When the save happened.
+  google.protobuf.Timestamp created_at = 2;
+
+  // GitHub login of the staff member who saved. Absent when the sponsor saved.
+  optional string staff_login = 3;
+
+  // What the save changed, in snapshot order. Empty when it changed nothing the snapshot records.
+  repeated Change changes = 4;
+}

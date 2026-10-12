@@ -524,6 +524,61 @@ module Rk
       def []=:
           ("sponsorship" name, ::Rk::SponsorApp::AdminSponsorship? value) -> void
     end
+
+    # Request for AdminService.ListSponsorshipEditingHistory.
+    class AdminServiceListSponsorshipEditingHistoryRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceListSponsorshipEditingHistoryRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+    end
+
+    # Response for AdminService.ListSponsorshipEditingHistory.
+    class AdminServiceListSponsorshipEditingHistoryResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceListSponsorshipEditingHistoryResponse]
+
+      # Every save of the sponsorship, by its sponsor or by staff, most recent first. Not paginated,
+      # as a sponsorship is saved a few dozen times at most.
+      attr_accessor entries(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::EditingHistoryEntry, ::Rk::SponsorApp::EditingHistoryEntry]
+      def clear_entries: () -> void
+
+      type init_map = {
+        entries: ::Array[::Rk::SponsorApp::EditingHistoryEntry]?,
+        "entries" => ::Array[::Rk::SponsorApp::EditingHistoryEntry]?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("entries" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::EditingHistoryEntry, ::Rk::SponsorApp::EditingHistoryEntry]
+
+      def []=:
+          ("entries" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::EditingHistoryEntry, ::Rk::SponsorApp::EditingHistoryEntry] value) -> void
+    end
   end
 end
 
@@ -540,6 +595,8 @@ module Google
         | ("rubykaigi.sponsor_app.AdminServiceUpdateSponsorshipResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceUpdateSponsorshipResponse)])
         | ("rubykaigi.sponsor_app.AdminServiceWithdrawSponsorshipRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceWithdrawSponsorshipRequest)])
         | ("rubykaigi.sponsor_app.AdminServiceWithdrawSponsorshipResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceWithdrawSponsorshipResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceListSponsorshipEditingHistoryRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceListSponsorshipEditingHistoryRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceListSponsorshipEditingHistoryResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceListSponsorshipEditingHistoryResponse)])
         | ...
     end
   end

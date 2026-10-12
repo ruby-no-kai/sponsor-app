@@ -330,6 +330,7 @@ Models including `EditingHistoryTarget` concern automatically track all changes:
 - Exhibition changes create ExhibitionEditingHistory records
 - `staff` attribute should be set before save to track who made changes
 - History includes full snapshot via `to_h_for_history` method
+- `AdminService.ListSponsorshipEditingHistory` publishes each history as an `EditingHistoryEntry`, and each of its Hashdiff rows (read through `EditingHistoryChange`) as an `EditingHistoryEntry.Change` holding `google.protobuf.Value`s, as a snapshot has no fixed schema
 
 ## Deployment
 

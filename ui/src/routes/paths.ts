@@ -25,6 +25,7 @@ export const paths = {
   // Sponsorships
   sponsorship: "/admin/conferences/:slug/sponsorships/:id",
   sponsorshipEdit: "/admin/conferences/:slug/sponsorships/:id/edit",
+  sponsorshipEditingHistory: "/admin/conferences/:slug/sponsorships/:id/editing_history",
 
   // Organizations
 

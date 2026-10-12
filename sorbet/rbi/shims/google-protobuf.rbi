@@ -14,3 +14,10 @@ class Google::Protobuf::Timestamp
   sig { returns(Time) }
   def to_time; end
 end
+
+# The same file reopens Value, converting any JSON value: nil, a number, a string, a boolean, a Hash
+# or an Array.
+class Google::Protobuf::Value
+  sig { params(value: T.untyped).returns(Google::Protobuf::Value) }
+  def self.from_ruby(value); end
+end

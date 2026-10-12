@@ -1,5 +1,10 @@
 import { Badge, LayerCard, Link, LinkButton, Loader, Text } from "@cloudflare/kumo";
-import { EnvelopeSimpleIcon, PencilSimpleIcon, SignOutIcon } from "@phosphor-icons/react";
+import {
+  ClockCounterClockwiseIcon,
+  EnvelopeSimpleIcon,
+  PencilSimpleIcon,
+  SignOutIcon,
+} from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { generatePath, useParams } from "react-router";
 import { useSWRConfig } from "swr";
@@ -66,6 +71,13 @@ function Detail({ slug, id, sponsorshipId }: { slug: string; id: string; sponsor
               icon={PencilSimpleIcon}
             >
               Edit
+            </LinkButton>
+            <LinkButton
+              href={generatePath(paths.sponsorshipEditingHistory, pathParams)}
+              variant="secondary"
+              icon={ClockCounterClockwiseIcon}
+            >
+              History
             </LinkButton>
             {sponsorship.contact !== undefined && (
               <LinkButton
@@ -409,7 +421,8 @@ function DangerZone({
             await mutate(
               (key) =>
                 isRpcKeyOf(key, AdminService.method.getSponsorship) ||
-                isRpcKeyOf(key, AdminService.method.getConference),
+                isRpcKeyOf(key, AdminService.method.getConference) ||
+                isRpcKeyOf(key, AdminService.method.listSponsorshipEditingHistory),
             );
           }}
         />

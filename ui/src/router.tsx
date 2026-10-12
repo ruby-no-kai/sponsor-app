@@ -128,6 +128,13 @@ export const router = createBrowserRouter([
                     (await import("./routes/admin/SponsorshipEditor.tsx")).default,
                 },
               },
+              {
+                path: paths.sponsorshipEditingHistory,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorshipEditingHistory.tsx")).default,
+                },
+              },
 
               // Organizations
 
