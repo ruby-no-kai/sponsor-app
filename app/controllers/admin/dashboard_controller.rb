@@ -4,6 +4,8 @@ module Admin
   class DashboardController < Admin::ApplicationController
     class Boom < StandardError; end
 
+    before_action :require_unrestricted_staff, only: %i[slacktown mailtown errortown]
+
     def index
       redirect_to conferences_path
     end

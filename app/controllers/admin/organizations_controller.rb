@@ -2,6 +2,7 @@
 
 module Admin
   class OrganizationsController < Admin::ApplicationController
+    before_action :require_unrestricted_staff
     before_action :set_organization, except: %i[index new create]
 
     def index
