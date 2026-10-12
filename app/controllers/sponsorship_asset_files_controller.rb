@@ -14,8 +14,8 @@ class SponsorshipAssetFilesController < ApplicationController
   def update = super
 
   def create
-    return render(status: :forbidden, json: {error: 403}) if current_sponsorship&.asset_file
-    return render(status: :forbidden, json: {error: 403}) if !@conference&.amendment_open? && !current_staff
+    return render(status: :forbidden, json: {error: 403}) if current_sponsorship_maybe&.asset_file
+    return render(status: :forbidden, json: {error: 403}) if !@conference&.amendment_open? && !current_staff_maybe
 
     @asset_file = SponsorshipAssetFile.prepare(conference: @conference)
     @asset_file.content_type = params[:content_type]
@@ -25,14 +25,14 @@ class SponsorshipAssetFilesController < ApplicationController
   end
 
   def initiate_update
-    return render(status: :forbidden, json: {error: 403}) if !@conference&.amendment_open? && !current_staff
+    return render(status: :forbidden, json: {error: 403}) if !@conference&.amendment_open? && !current_staff_maybe
 
     @asset_file.content_type = params[:content_type] if params[:content_type].present?
     render json: make_session
   end
 
   private def set_conference
-    @conference = current_conference
+    @conference = current_conference_maybe
   end
 
   private def set_asset_file
@@ -40,7 +40,7 @@ class SponsorshipAssetFilesController < ApplicationController
       .available_for_user(
         params[:id],
         session_asset_file_ids: session[:asset_file_ids],
-        available_sponsorship_ids: [current_sponsorship&.id].compact,
+        available_sponsorship_ids: [current_sponsorship_maybe&.id].compact,
       )
       .first!
   end

@@ -34,13 +34,15 @@ class ApplicationController < ActionController::Base
     cookies[name] = opts
   end
 
-  helper_method def current_staff
+  helper_method def current_staff_maybe
     return @current_staff if defined? @current_staff
 
     @current_staff = session[:staff_id] && Staff.find_by(id: session[:staff_id])
   end
 
-  helper_method def current_sponsorship
+  helper_method def current_staff = Must.because(current_staff_maybe) { "require_staff gates this action" }
+
+  helper_method def current_sponsorship_maybe
     return @current_sponsorship if defined? @current_sponsorship
     return unless params[:conference_slug]
     return unless session[:sponsorship_ids]
@@ -52,12 +54,16 @@ class ApplicationController < ActionController::Base
       .first
   end
 
-  helper_method def current_conference
+  helper_method def current_sponsorship = Must.because(current_sponsorship_maybe) { "require_sponsorship_session gates this action" }
+
+  helper_method def current_conference_maybe
     return @current_conference if defined? @current_conference
     return unless params[:conference_slug]
 
-    @current_conference = current_sponsorship&.conference || Conference.find_by(slug: params[:conference_slug])
+    @current_conference = current_sponsorship_maybe&.conference || Conference.find_by(slug: params[:conference_slug])
   end
+
+  helper_method def current_conference = Must.because(current_conference_maybe) { "require_sponsorship_session gates this action" }
 
   helper_method def current_available_sponsorships
     return @current_available_sponsorships if defined? @current_available_sponsorships
@@ -67,55 +73,59 @@ class ApplicationController < ActionController::Base
   end
 
   private def require_staff
-    unless current_staff
+    unless current_staff_maybe
       redirect_to new_session_path(back_to: url_for(params.to_unsafe_h.merge(only_path: true)))
     end
   end
 
   private def require_sponsorship_session
-    unless current_sponsorship
+    unless current_sponsorship_maybe
       redirect_to new_user_session_path(back_to: url_for(params.to_unsafe_h.merge(only_path: true)))
     end
   end
 
   private def populate_sentry_scope
     Sentry.configure_scope do |scope|
-      if current_staff
+      staff = current_staff_maybe
+      sponsorship = current_sponsorship_maybe
+      conference = current_conference_maybe
+
+      if staff
         scope.set_context(
           'sponsor-app.staff',
           {
-            id: current_staff.id,
-            login: current_staff.login,
+            id: staff.id,
+            login: staff.login,
           },
         )
       end
 
-      if current_sponsorship
+      if sponsorship
         scope.set_context(
           'sponsor-app.sponsor',
           {
-            id: current_sponsorship.id,
-            name: current_sponsorship.name,
+            id: sponsorship.id,
+            name: sponsorship.name,
           },
         )
       end
 
-      if current_conference
+      if conference
         scope.set_context(
           'sponsor-app.conference',
           {
-            id: current_conference.id,
-            slug: current_conference.slug,
+            id: conference.id,
+            slug: conference.slug,
           },
         )
       end
 
       case
-      when current_staff
-        Sentry.set_user(id: "staff_#{current_staff.id}", username: current_staff.login)
-      when current_sponsorship
-        email = session[:email] ||= current_sponsorship.contact&.email
-        Sentry.set_user(id: current_sponsorship.id.to_s, email:)
+      when staff
+        Sentry.set_user(id: "staff_#{staff.id}", username: staff.login)
+      when sponsorship
+        email = session[:email] ||= sponsorship.contact&.email
+        Sentry.set_user(id: sponsorship.id.to_s, email:)
       end
     end
   end

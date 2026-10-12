@@ -3,7 +3,7 @@
 
 class SponsorshipsController < ApplicationController
   def show
-    unless current_sponsorship
+    unless current_sponsorship_maybe
       return redirect_to new_user_conference_sponsorship_path(conference: @conference)
     end
 
@@ -19,19 +19,21 @@ class SponsorshipsController < ApplicationController
   end
 
   def edit
-    @sponsorship = current_sponsorship
-    @conference = current_sponsorship&.conference
-    raise ActiveRecord::RecordNotFound if !@conference&.amendment_open? && !current_staff
+    @sponsorship = current_sponsorship_maybe
+    raise ActiveRecord::RecordNotFound unless @sponsorship
+
+    @conference = @sponsorship.conference
+    raise ActiveRecord::RecordNotFound if !@conference&.amendment_open? && !current_staff_maybe
 
     @sponsorship.build_nested_attributes_associations
   end
 
   def new
-    return render(status: :not_found, plain: '404') if current_sponsorship
+    return render(status: :not_found, plain: '404') if current_sponsorship_maybe
 
     @conference = Conference.find_by!(slug: params[:conference_slug])
     return render(plain: '404', status: :not_found) unless @conference.verify_invite_code(params[:invite_code])
-    return render(:closed, status: :forbidden) if !@conference.application_open? && !current_staff
+    return render(:closed, status: :forbidden) if !@conference.application_open? && !current_staff_maybe
 
     @affiliated_organization = Organization.find_by(affiliation_code: params[:affiliation])
 
@@ -41,11 +43,11 @@ class SponsorshipsController < ApplicationController
   end
 
   def create
-    return render(status: :not_found, plain: '404') if current_sponsorship
+    return render(status: :not_found, plain: '404') if current_sponsorship_maybe
 
     @conference = Conference.find_by!(slug: params[:conference_slug])
     return render(plain: '404', status: :not_found) unless @conference.verify_invite_code(params[:invite_code])
-    return render(:closed, status: :forbidden) if !@conference.application_open? && !current_staff
+    return render(:closed, status: :forbidden) if !@conference.application_open? && !current_staff_maybe
 
     @sponsorship = Sponsorship.new(sponsorship_params.except(:asset_file_id))
 
@@ -88,8 +90,10 @@ class SponsorshipsController < ApplicationController
   end
 
   def update
-    @sponsorship = current_sponsorship
-    @conference = current_sponsorship&.conference
+    @sponsorship = current_sponsorship_maybe
+    raise ActiveRecord::RecordNotFound unless @sponsorship
+
+    @conference = @sponsorship.conference
     raise ActiveRecord::RecordNotFound unless @conference&.amendment_open?
 
     sp = sponsorship_params

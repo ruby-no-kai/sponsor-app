@@ -8,7 +8,7 @@ class RootController < ApplicationController
       return
     end
 
-    unless current_staff
+    unless current_staff_maybe
       session.clear
       request.session_options[:skip] = true
       @cacheable = true
