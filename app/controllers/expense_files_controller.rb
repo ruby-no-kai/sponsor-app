@@ -1,4 +1,4 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class ExpenseFilesController < ApplicationController
@@ -9,46 +9,61 @@ class ExpenseFilesController < ApplicationController
   before_action :require_custom_sponsorship
   before_action :set_asset_file, only: [:show, :update, :destroy, :initiate_update]
 
+  #: () -> void
   def create
-    @asset_file = ExpenseFile.prepare(conference: @conference, sponsorship: current_sponsorship)
-    @asset_file.assign_attributes(params.permit(:filename, :content_type))
-    @asset_file.save!
+    @asset_file = ExpenseFile.prepare(conference:, sponsorship: current_sponsorship)
+    asset_file.assign_attributes(params.permit(:filename, :content_type))
+    asset_file.save!
     render json: make_session
   end
 
+  #: () -> void
   def show
-    redirect_to @asset_file.download_url(disposition: :inline), allow_other_host: true
+    redirect_to asset_file.download_url(disposition: :inline), allow_other_host: true
   end
 
+  #: () -> void
   def update
-    @asset_file.assign_attributes(params.permit(:filename, :content_type))
-    @asset_file.status = 'uploaded'
+    asset_file.assign_attributes(params.permit(:filename, :content_type))
+    asset_file.status = 'uploaded'
     super
   end
 
+  #: () -> void
   def destroy
-    @asset_file.destroy!
+    asset_file.destroy!
     render json: {ok: true}
   end
 
+  #: () -> void
   def initiate_update
-    @asset_file.content_type = params[:content_type] if params[:content_type].present?
+    asset_file.content_type = params[:content_type] if params[:content_type].present?
     render json: make_session
   end
 
+  #: () -> void
   private def set_conference
-    @conference = current_conference
+    @conference = current_conference #: Conference?
   end
 
+  #: () -> void
   private def require_custom_sponsorship
     render status: :forbidden, json: {error: 'Not a custom sponsorship'} unless current_sponsorship.customization
   end
 
+  #: () -> void
   private def set_asset_file
-    @asset_file = current_sponsorship.expense_files.find(params[:id])
+    @asset_file = current_sponsorship.expense_files.find(params[:id]) #: ExpenseFile?
   end
 
+  #: (AssetFileSessionable::asset_file_record) -> String
   private def asset_file_report_to_url(asset_file)
-    user_conference_expense_file_path(@conference, asset_file)
+    user_conference_expense_file_path(conference, asset_file)
   end
+
+  #: () -> Conference
+  private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+  #: () -> ExpenseFile
+  private def asset_file = Must.because(@asset_file) { "set_asset_file or create assigns @asset_file" }
 end

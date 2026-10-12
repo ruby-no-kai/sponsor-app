@@ -1,51 +1,57 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class SponsorshipsController < ApplicationController
+  #: () -> void
   def show
-    unless current_sponsorship
+    unless current_sponsorship_maybe
       return redirect_to new_user_conference_sponsorship_path(conference: @conference)
     end
 
     @sponsorship = current_sponsorship
-    @conference = current_sponsorship&.conference
+    @conference = current_sponsorship.conference
     raise ActiveRecord::RecordNotFound unless @conference
 
-    @announcements = @sponsorship.conference.announcements
+    @announcements = @conference.announcements
       .where(locale: I18n.locale)
       .where('published_at IS NOT NULL')
       .order('stickiness DESC, id DESC')
-      .merge(@sponsorship.exhibitor? ? Announcement.for_exhibitors : Announcement.for_sponsors)
+      .merge(@sponsorship.exhibitor? ? Announcement.for_exhibitors : Announcement.for_sponsors) #: Announcement::PrivateAssociationRelation?
   end
 
+  #: () -> void
   def edit
-    @sponsorship = current_sponsorship
-    @conference = current_sponsorship&.conference
-    raise ActiveRecord::RecordNotFound if !@conference&.amendment_open? && !current_staff
+    @sponsorship = current_sponsorship_maybe #: Sponsorship?
+    raise ActiveRecord::RecordNotFound unless @sponsorship
+
+    @conference = @sponsorship.conference #: Conference?
+    raise ActiveRecord::RecordNotFound if !@conference&.amendment_open? && !current_staff_maybe
 
     @sponsorship.build_nested_attributes_associations
   end
 
+  #: () -> void
   def new
-    return render(status: :not_found, plain: '404') if current_sponsorship
+    return render(status: :not_found, plain: '404') if current_sponsorship_maybe
 
     @conference = Conference.find_by!(slug: params[:conference_slug])
     return render(plain: '404', status: :not_found) unless @conference.verify_invite_code(params[:invite_code])
-    return render(:closed, status: :forbidden) if !@conference&.application_open? && !current_staff
+    return render(:closed, status: :forbidden) if !@conference.application_open? && !current_staff_maybe
 
-    @affiliated_organization = Organization.find_by(affiliation_code: params[:affiliation])
+    @affiliated_organization = Organization.find_by(affiliation_code: params[:affiliation]) #: Organization?
 
     @sponsorship = Sponsorship.new(copied_sponsorship_attributes)
     @sponsorship.conference = @conference
     @sponsorship.build_nested_attributes_associations
   end
 
+  #: () -> void
   def create
-    return render(status: :not_found, plain: '404') if current_sponsorship
+    return render(status: :not_found, plain: '404') if current_sponsorship_maybe
 
     @conference = Conference.find_by!(slug: params[:conference_slug])
     return render(plain: '404', status: :not_found) unless @conference.verify_invite_code(params[:invite_code])
-    return render(:closed, status: :forbidden) if !@conference&.application_open? && !current_staff
+    return render(:closed, status: :forbidden) if !@conference.application_open? && !current_staff_maybe
 
     @sponsorship = Sponsorship.new(sponsorship_params.except(:asset_file_id))
 
@@ -68,7 +74,7 @@ class SponsorshipsController < ApplicationController
       end
     end
 
-    @sponsorship.locale = I18n.locale
+    @sponsorship.locale = I18n.locale.to_s
     @sponsorship.conference = @conference
     affiliated_organization = Organization.find_by(affiliation_code: params[:affiliation])
     @sponsorship.assume_organization(affiliated_organization:)
@@ -77,7 +83,7 @@ class SponsorshipsController < ApplicationController
     respond_to do |format|
       if @sponsorship.save(context: :update_by_user)
         (session[:sponsorship_ids] ||= []).unshift @sponsorship.id
-        session[:asset_file_ids]&.delete(@sponsorship.asset_file.id)
+        session[:asset_file_ids]&.delete(@sponsorship.asset_file_id)
         SponsorshipWelcomeJob.perform_later(@sponsorship)
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: t('.notice') }
       else
@@ -87,15 +93,18 @@ class SponsorshipsController < ApplicationController
     end
   end
 
+  #: () -> void
   def update
-    @sponsorship = current_sponsorship
-    @conference = current_sponsorship&.conference
+    @sponsorship = current_sponsorship_maybe
+    raise ActiveRecord::RecordNotFound unless @sponsorship
+
+    @conference = @sponsorship.conference
     raise ActiveRecord::RecordNotFound unless @conference&.amendment_open?
 
     sp = sponsorship_params
     sp.delete(:asset_file_id) if @sponsorship.asset_file_id
     @sponsorship.assign_attributes(sp)
-    @sponsorship.locale = I18n.locale
+    @sponsorship.locale = I18n.locale.to_s
 
     respond_to do |format|
       if @sponsorship.save(context: :update_by_user)
@@ -107,6 +116,7 @@ class SponsorshipsController < ApplicationController
     end
   end
 
+  #: () -> ActionController::Parameters
   private def sponsorship_params
     params.require(:sponsorship).permit(
       :plan_id,
@@ -139,6 +149,7 @@ class SponsorshipsController < ApplicationController
     end
   end
 
+  #: () -> Hash[Symbol, untyped]
   private def copied_sponsorship_attributes
     return {} if params[:sponsorship_id_to_copy].blank?
     return {} unless session[:sponsorship_ids]&.include?(params[:sponsorship_id_to_copy].to_i)

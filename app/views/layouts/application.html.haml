@@ -10,7 +10,7 @@
     - page_title = yield(:title)
     - site_name = "#{Rails.application.config.x.org_name} Sponsorships Portal"
     - if page_title.present?
-      - conf = @conference || current_conference
+      - conf = @conference || current_conference_maybe
       - if conf
         %title= "#{page_title} | #{conf.name} | #{site_name}"
       - else
@@ -48,7 +48,7 @@
             .dropdown-menu{aria: {labelledby: 'navbarDropdownMenuLink'}}
               %a.dropdown-item{href: url_for(params.to_unsafe_h.except(:authenticity_token, :commit, :utf8, :_method, :script_name, :original_script_name).merge(only_path: true, hl: 'en'))} English
               %a.dropdown-item{href: url_for(params.to_unsafe_h.except(:authenticity_token, :commit, :utf8, :_method, :script_name, :original_script_name).merge(only_path: true, hl: 'ja'))} Japanese
-          - if current_staff
+          - if current_staff_maybe
             %li.nav-item
               = link_to dashboard_path() do
                 %span.badge.badge-danger STAFF MODE

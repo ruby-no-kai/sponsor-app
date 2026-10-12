@@ -1,8 +1,9 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
   module BroadcastsHelper
+    #: (Broadcast | BroadcastDelivery) -> String
     def status_badge_class(model)
       color = case model.status.to_sym
       when :created, :preparing

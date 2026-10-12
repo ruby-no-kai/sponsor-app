@@ -1,8 +1,9 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
   module SponsorshipsHelper
+    #: (String, ?from: String?, ?cc: Array[String]) -> String
     def front_mail_to_link(to, from: nil, cc: [])
       base = "mailto:#{URI.encode_www_form_component(to).gsub("%40", "@")}"
       extras = []

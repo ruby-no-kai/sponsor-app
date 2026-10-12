@@ -1,10 +1,12 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
+  #: () -> void
   def new
   end
 
+  #: () -> void
   def create
     contact = Contact.find_by(kind: :primary, email: params[:email])
 
@@ -20,31 +22,32 @@ class SessionsController < ApplicationController
     redirect_to new_user_session_path, notice: t('.email_sent')
   end
 
+  #: () -> void
   def claim
-    @session_token = SessionToken.find_by!(handle: params[:handle])
-    if @session_token.expired?
+    session_token = SessionToken.find_by!(handle: params[:handle])
+    if session_token.expired?
       flash[:alert] = t('.expired')
       return render :new, status: :forbidden
     end
 
-    session[:email] = @session_token.email
-    session[:session_token_id] = @session_token.id
-    session[:sponsorship_ids] = @session_token.sponsorship_ids
+    session[:email] = session_token.email
+    session[:session_token_id] = session_token.id
+    session[:sponsorship_ids] = session_token.sponsorship_ids
 
-    staff_id = @session_token.staff&.id
+    staff_id = session_token.staff&.id
     session[:staff_id] = staff_id if staff_id
 
     set_back_to
 
-    @sponsorships = @session_token.sponsorships.reject(&:withdrawn?)
-    @sponsorship = @sponsorships&.last
-    if @sponsorship
-      redirect_to session.delete(:back_to) || user_conference_sponsorship_path(@sponsorship.conference)
+    sponsorship = session_token.sponsorships.reject(&:withdrawn?).last
+    if sponsorship
+      redirect_to session.delete(:back_to) || user_conference_sponsorship_path(sponsorship.conference)
     else
       redirect_to session.delete(:back_to) || '/'
     end
   end
 
+  #: () -> void
   def destroy
     session.delete(:sponsorship_ids)
     session.delete(:sponsorship_id)
@@ -52,6 +55,7 @@ class SessionsController < ApplicationController
     redirect_to '/'
   end
 
+  #: () -> void
   private def set_back_to
     if params[:back_to]
       uri = Addressable::URI.parse(params[:back_to])
