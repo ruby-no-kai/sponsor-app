@@ -6,15 +6,15 @@
 
 
 class Rk::SponsorApp::AdminServiceListConferencesResponse < Google::Protobuf::AbstractMessage
-  sig { params(conferences: T.nilable(T::Array[Rk::SponsorApp::Conference])).void }
+  sig { params(conferences: T.nilable(T::Array[Rk::SponsorApp::AdminConference])).void }
   def initialize(conferences: T.unsafe(nil)); end
 
   sig { void }
   def clear_conferences; end
 
-  sig { returns(Google::Protobuf::RepeatedField[Rk::SponsorApp::Conference]) }
+  sig { returns(Google::Protobuf::RepeatedField[Rk::SponsorApp::AdminConference]) }
   def conferences; end
 
-  sig { params(value: Google::Protobuf::RepeatedField[Rk::SponsorApp::Conference]).void }
+  sig { params(value: Google::Protobuf::RepeatedField[Rk::SponsorApp::AdminConference]).void }
   def conferences=(value); end
 end

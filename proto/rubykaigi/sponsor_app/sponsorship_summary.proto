@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "rubykaigi/sponsor_app/organization_summary.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// Where a sponsorship stands. See AIP-216.
+enum SponsorshipState {
+  // The zero value proto3 requires. Never returned.
+  SPONSORSHIP_STATE_UNSPECIFIED = 0;
+
+  // Applied and awaiting the organizers' acceptance.
+  SPONSORSHIP_STATE_PENDING = 1;
+
+  // Accepted by the organizers.
+  SPONSORSHIP_STATE_ACTIVE = 2;
+
+  // Withdrawn, whether before or after acceptance. Withdrawal is final.
+  SPONSORSHIP_STATE_WITHDRAWN = 3;
+}
+
+// A sponsorship in brief, as staff lists show it.
+message SponsorshipSummary {
+  // Sponsorship ID.
+  int64 id = 1;
+
+  // Name the sponsor is listed under.
+  string name = 2;
+
+  // Name of a custom package arranged for this sponsor, shown before the sponsor's name in staff
+  // lists. Absent when none is arranged.
+  optional string customization_name = 3;
+
+  // The sponsoring company.
+  OrganizationSummary organization = 4;
+
+  // ID of the plan sponsored. Absent while the plan is undetermined.
+  optional int64 plan_id = 5;
+
+  // Where the sponsorship stands.
+  SponsorshipState state = 6;
+
+  // Whether the sponsor has been assigned a booth.
+  bool booth_assigned = 7;
+
+  // Whether the custom package is named but not yet confirmed. Until it is, the sponsor is
+  // published under its plan.
+  bool customization_planned = 8;
+
+  // Whether the sponsor is left out of the sponsor list published to the conference website,
+  // whatever its state.
+  bool suspended = 9;
+}

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+option ruby_package = "Rk::SponsorApp";
+
+// A sponsorship plan of a conference in brief, with how much of its capacity is taken.
+message PlanSummary {
+  // Plan ID.
+  int64 id = 1;
+
+  // Display name, such as "Ruby" or "Platinum".
+  string name = 2;
+
+  // Position among the conference's plans, which are listed lowest rank first.
+  int32 rank = 3;
+
+  // How many active sponsorships the plan admits. A full plan takes no more applications.
+  int32 capacity = 4;
+
+  // Accepted sponsorships on this plan that have not withdrawn, which is what the capacity is
+  // checked against. Applications awaiting acceptance are not counted.
+  int32 active_sponsorship_count = 5;
+}

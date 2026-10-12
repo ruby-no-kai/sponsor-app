@@ -22,22 +22,23 @@ module Rk
       include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceListConferencesResponse]
 
       # Every conference the signed-in staff member can manage, hidden ones included, most recently
-      # created first. Not paginated, as there is one conference a year.
-      attr_accessor conferences(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::Conference, ::Rk::SponsorApp::Conference]
+      # created first. Not paginated, as there is one conference a year. Each carries its staff-only
+      # settings, such as whether it is hidden.
+      attr_accessor conferences(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::AdminConference, ::Rk::SponsorApp::AdminConference]
       def clear_conferences: () -> void
 
       type init_map = {
-        conferences: ::Array[::Rk::SponsorApp::Conference]?,
-        "conferences" => ::Array[::Rk::SponsorApp::Conference]?,
+        conferences: ::Array[::Rk::SponsorApp::AdminConference]?,
+        "conferences" => ::Array[::Rk::SponsorApp::AdminConference]?,
       }
 
       def initialize: (?init_map initial_value) -> void
 
       def []:
-          ("conferences" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::Conference, ::Rk::SponsorApp::Conference]
+          ("conferences" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::AdminConference, ::Rk::SponsorApp::AdminConference]
 
       def []=:
-          ("conferences" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::Conference, ::Rk::SponsorApp::Conference] value) -> void
+          ("conferences" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::AdminConference, ::Rk::SponsorApp::AdminConference] value) -> void
     end
 
     # Request for AdminService.GetConference.
@@ -63,27 +64,53 @@ module Rk
           ("conference_slug" name, (::String | ::Symbol) value) -> void
     end
 
-    # Response for AdminService.GetConference.
+    # Response for AdminService.GetConference: the conference with an overview of its plans and
+    # sponsorships.
     class AdminServiceGetConferenceResponse < ::Google::Protobuf::AbstractMessage
       include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceGetConferenceResponse]
 
       # The conference the request names.
-      attr_accessor conference(): ::Rk::SponsorApp::Conference?
+      attr_accessor conference(): ::Rk::SponsorApp::AdminConference?
       def has_conference?: () -> bool
       def clear_conference: () -> void
 
+      # Locales the application form is described in, such as "en" and "ja", in the order they were
+      # added.
+      attr_accessor form_description_locales(): ::Google::Protobuf::RepeatedField[::String, ::String | ::Symbol]
+      def clear_form_description_locales: () -> void
+
+      # The conference's plans, lowest rank first.
+      attr_accessor plans(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::PlanSummary, ::Rk::SponsorApp::PlanSummary]
+      def clear_plans: () -> void
+
+      # Every sponsorship of the conference, withdrawn ones included, oldest application first.
+      attr_accessor sponsorships(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorshipSummary, ::Rk::SponsorApp::SponsorshipSummary]
+      def clear_sponsorships: () -> void
+
       type init_map = {
-        conference: (::Rk::SponsorApp::Conference | ::Rk::SponsorApp::Conference::init_map)?,
-        "conference" => (::Rk::SponsorApp::Conference | ::Rk::SponsorApp::Conference::init_map)?,
+        conference: (::Rk::SponsorApp::AdminConference | ::Rk::SponsorApp::AdminConference::init_map)?,
+        "conference" => (::Rk::SponsorApp::AdminConference | ::Rk::SponsorApp::AdminConference::init_map)?,
+        form_description_locales: ::Array[::String | ::Symbol]?,
+        "form_description_locales" => ::Array[::String | ::Symbol]?,
+        plans: ::Array[::Rk::SponsorApp::PlanSummary]?,
+        "plans" => ::Array[::Rk::SponsorApp::PlanSummary]?,
+        sponsorships: ::Array[::Rk::SponsorApp::SponsorshipSummary]?,
+        "sponsorships" => ::Array[::Rk::SponsorApp::SponsorshipSummary]?,
       }
 
       def initialize: (?init_map initial_value) -> void
 
       def []:
-          ("conference" name) -> ::Rk::SponsorApp::Conference?
+          ("conference" name) -> ::Rk::SponsorApp::AdminConference?
+        | ("form_description_locales" name) -> (::Google::Protobuf::RepeatedField[::String, ::String | ::Symbol])
+        | ("plans" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::PlanSummary, ::Rk::SponsorApp::PlanSummary]
+        | ("sponsorships" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorshipSummary, ::Rk::SponsorApp::SponsorshipSummary]
 
       def []=:
-          ("conference" name, ::Rk::SponsorApp::Conference? value) -> void
+          ("conference" name, ::Rk::SponsorApp::AdminConference? value) -> void
+        | ("form_description_locales" name, (::Google::Protobuf::RepeatedField[::String, ::String | ::Symbol]) value) -> void
+        | ("plans" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::PlanSummary, ::Rk::SponsorApp::PlanSummary] value) -> void
+        | ("sponsorships" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorshipSummary, ::Rk::SponsorApp::SponsorshipSummary] value) -> void
     end
   end
 end
