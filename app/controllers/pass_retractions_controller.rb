@@ -9,7 +9,9 @@ class PassRetractionsController < ApplicationController
     @retraction = find_or_prepare_retraction
     @pass_retraction_disabled = !@conference.pass_retraction_enabled?
     redirect_to user_conference_sponsorship_retraction_path(@conference, params[:id]) if @retraction.completed?
-  rescue Faraday::ResourceNotFound
+  rescue HTTPX::HTTPError => e
+    raise unless e.status == 404
+
     raise ActiveRecord::RecordNotFound
   end
 
@@ -23,7 +25,9 @@ class PassRetractionsController < ApplicationController
     else
       render :new, status: :unprocessable_entity
     end
-  rescue Faraday::ResourceNotFound
+  rescue HTTPX::HTTPError => e
+    raise unless e.status == 404
+
     raise ActiveRecord::RecordNotFound
   end
 
