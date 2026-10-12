@@ -107,3 +107,14 @@ class FormDescription::FallbackOption
   sig { returns(T.untyped) }
   def priority_human; end
 end
+
+class CreateBroadcastDeliveriesJob::Recipient
+  sig { returns(T.nilable(Sponsorship)) }
+  def sponsorship; end
+
+  sig { returns(String) }
+  def email; end
+
+  sig { returns(T::Array[String]) }
+  def email_ccs; end
+end

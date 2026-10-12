@@ -1,10 +1,10 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class RetractTitoTicketJob < ApplicationJob
   class Unable < StandardError; end
 
-  # @param retraction [TitoTicketRetraction]
+  #: (TitoTicketRetraction) -> void
   def perform(retraction)
     logger.tagged(retraction_id: retraction.id, sponsorship_id: retraction.sponsorship_id, tito_registration_id: retraction.tito_registration_id, tito_registration_reference: retraction.order_reference) do |_log|
       if retraction.completed?
@@ -26,13 +26,14 @@ class RetractTitoTicketJob < ApplicationJob
       end
 
       logger.info("RetractTitoTicketJob: proceeding with cancellation")
+      tito_slug = Must.because(Must.expect(retraction.conference).tito_slug) { "retractions are only made on conferences with a tito_slug" }
       api.create_registration_note(
-        retraction.conference.tito_slug,
+        tito_slug,
         retraction.tito_registration_id,
         content: "sponsor-app cancelled this order due to sponsor's request; TitoTicketRetraction id=#{retraction.id}, reason: #{retraction.reason.truncate(240)}",
       )
       cancellation = api.cancel_registration(
-        retraction.conference.tito_slug,
+        tito_slug,
         retraction.tito_registration_id,
       )
       retraction.update!(
@@ -42,10 +43,11 @@ class RetractTitoTicketJob < ApplicationJob
       logger.info("RetractTitoTicketJob: cancelled successfully")
 
       conference = retraction.conference
-      sponsorship = retraction.sponsorship
+      sponsorship = Must.expect(retraction.sponsorship)
+      release_slugs = Must.because(retraction.ticket_release_slugs) { "refresh_tito_registration has loaded the registration" }
       SlackWebhookJob.perform_later(
         {
-          text: ":rewind: <#{conference_sponsorship_url(conference, sponsorship)}|#{sponsorship.name}> retracted their Tito order <#{retraction.tito_admin_url}|#{retraction.order_reference}> (#{retraction.ticket_release_slugs.join(",")}).\n\n>>> *Reason:* #{retraction.reason.truncate(500)}",
+          text: ":rewind: <#{conference_sponsorship_url(conference, sponsorship)}|#{sponsorship.name}> retracted their Tito order <#{retraction.tito_admin_url}|#{retraction.order_reference}> (#{release_slugs.join(",")}).\n\n>>> *Reason:* #{retraction.reason.truncate(500)}",
         },
         hook_name: :feed,
       )
@@ -54,7 +56,8 @@ class RetractTitoTicketJob < ApplicationJob
     end
   end
 
+  #: () -> SemanticLogger::Logger
   def logger
-    @logger ||= SemanticLogger[self.class.name]
+    @logger ||= SemanticLogger[self.class.name] #: SemanticLogger::Logger?
   end
 end

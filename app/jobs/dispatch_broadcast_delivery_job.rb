@@ -1,15 +1,18 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class DispatchBroadcastDeliveryJob < ApplicationJob
+  #: (BroadcastDelivery, ?force: bool) -> void
   def perform(delivery, force: false)
-    Rails.logger.info "Delivering (#{delivery.id}): #{delivery.broadcast.description} (broadcast=#{delivery.broadcast.id}))"
+    broadcast = Must.expect(delivery.broadcast)
+    Rails.logger.info "Delivering (#{delivery.id}): #{broadcast.description} (broadcast=#{broadcast.id}))"
     Sentry.with_scope do |scope|
-      scope.set_tags(delivery_id: delivery.id, broadcast_id: delivery.broadcast.id)
+      scope.set_tags(delivery_id: delivery.id, broadcast_id: broadcast.id)
       perform_real(delivery, force: force)
     end
   end
 
+  #: (BroadcastDelivery, ?force: bool) -> void
   def perform_real(delivery, force: false)
     ApplicationRecord.transaction do
       if !force && !(delivery.created? || delivery.pending?)
@@ -39,8 +42,9 @@ class DispatchBroadcastDeliveryJob < ApplicationJob
     end
   ensure
     begin
-      Rails.logger.debug { delivery.broadcast.deliveries.distinct.order(status: :asc).pluck(:status).inspect }
-      delivery.broadcast.update_status.save!
+      broadcast = Must.expect(delivery.broadcast)
+      Rails.logger.debug { broadcast.deliveries.distinct.order(status: :asc).pluck(:status).inspect }
+      broadcast.update_status.save!
     rescue => e
       raise if Rails.env.development?
 

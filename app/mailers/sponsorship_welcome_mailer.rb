@@ -1,50 +1,62 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class SponsorshipWelcomeMailer < ApplicationMailer
+  #: () -> void
   def user_email
-    @sponsorship = params[:sponsorship]
-    @session_token = params[:session_token]
-    @conference_name = @sponsorship.conference.name
+    sponsorship = params[:sponsorship] #: Sponsorship
+    session_token = params[:session_token] #: SessionToken
+    conference = Must.expect(sponsorship.conference)
+    contact = Must.because(sponsorship.contact) { "sponsorships validate the presence of their contact" }
+    @sponsorship = sponsorship
+    @session_token = session_token #: SessionToken?
+    @conference_name = conference.name #: String?
 
-    @sponsor_org_name = @sponsorship.contact.organization
-    @sponsor_contact_name = @sponsorship.contact.name
+    @sponsor_org_name = contact.organization #: String?
+    @sponsor_contact_name = contact.name #: String?
 
-    @login_link = claim_user_session_url(@session_token)
-    @login_link_expiry = @session_token.expires_at
+    @login_link = claim_user_session_url(session_token) #: String?
+    @login_link_expiry = session_token.expires_at #: ActiveSupport::TimeWithZone?
 
-    @email = @sponsorship.conference.contact_email_address
-    @team_name = @sponsorship.conference.name
+    @email = conference.contact_email_address #: String?
+    @team_name = conference.name #: String?
 
-    message_id_for "sponsorships/#{@sponsorship.id}", "admin/sponsorships/#{@sponsorship.id}"
+    message_id_for "sponsorships/#{sponsorship.id}", "admin/sponsorships/#{sponsorship.id}"
     list_name 'welcome'
     mail(
-      to: @sponsorship.contact.email,
-      cc: @sponsorship.contact.email_ccs,
+      to: contact.email,
+      cc: contact.email_ccs,
       subject: make_subject,
       reply_to: @email,
     )
   end
 
+  #: () -> void
   def admin_email
-    @sponsorship = params[:sponsorship]
+    sponsorship = params[:sponsorship] #: Sponsorship
+    contact = Must.because(sponsorship.contact) { "sponsorships validate the presence of their contact" }
+    @sponsorship = sponsorship
 
-    @sponsor_name = @sponsorship.contact.organization
-    @sponsor_org_name = @sponsorship.name
-    @sponsor_contact_name = @sponsorship.contact.name
-    @sponsor_contact_email = @sponsorship.contact.email
+    @sponsor_name = contact.organization #: String?
+    @sponsor_org_name = sponsorship.name
+    @sponsor_contact_name = contact.name
+    @sponsor_contact_email = contact.email #: String?
 
-    @link = conference_sponsorship_url(@sponsorship.conference, @sponsorship)
+    @link = conference_sponsorship_url(sponsorship.conference, sponsorship) #: String?
 
-    message_id_for "admin/sponsorships/#{@sponsorship.id}"
+    message_id_for "admin/sponsorships/#{sponsorship.id}"
     mail(
-      to: @sponsorship.conference.contact_email_address,
+      to: Must.expect(sponsorship.conference).contact_email_address,
       subject: make_subject(name: @sponsor_name),
       reply_to: @sponsor_contact_email,
     )
   end
 
+  #: () -> String
   private def subject_prefix
-    "[#{@sponsorship.conference.name}] "
+    "[#{Must.expect(sponsorship.conference).name}] "
   end
+
+  #: () -> Sponsorship
+  private def sponsorship = Must.because(@sponsorship) { "user_email and admin_email set the sponsorship" }
 end
