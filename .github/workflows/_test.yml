@@ -81,3 +81,4 @@ jobs:
       - run: mise run ui:install
       - run: mise run ui:test
       - run: mise run ui:typecheck
+      - run: mise run ui:build
