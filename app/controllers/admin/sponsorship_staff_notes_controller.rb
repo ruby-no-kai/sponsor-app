@@ -1,4 +1,4 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -7,24 +7,25 @@ module Admin
     before_action :set_sponsorship
     before_action :set_staff_note, only: [:edit, :update, :destroy]
 
+    #: () -> void
     def index
-      @new_staff_note = SponsorshipStaffNote.new
-      @new_staff_note.sponsorship = @sponsorship
-      @staff_notes = @sponsorship.staff_notes.order(stickiness: :desc, created_at: :desc).includes(:staff)
+      @new_staff_note = SponsorshipStaffNote.new(sponsorship:) #: SponsorshipStaffNote?
+      @staff_notes = sponsorship.staff_notes.order(stickiness: :desc, created_at: :desc).includes(:staff) #: SponsorshipStaffNote::PrivateAssociationRelation?
     end
 
+    #: () -> void
     def create
       @staff_note = SponsorshipStaffNote.new(staff_note_params)
       @staff_note.staff = current_staff
-      @staff_note.sponsorship = @sponsorship
+      @staff_note.sponsorship = sponsorship
 
       respond_to do |format|
         if @staff_note.save
           format.html do
             if params[:back_to] == 'sponsorship'
-              redirect_to conference_sponsorship_path(@conference, @sponsorship)
+              redirect_to conference_sponsorship_path(conference, sponsorship)
             else
-              redirect_to conference_sponsorship_staff_notes_path(@conference, @sponsorship)
+              redirect_to conference_sponsorship_staff_notes_path(conference, sponsorship)
             end
           end
         else
@@ -37,55 +38,71 @@ module Admin
       end
     end
 
+    #: () -> void
     def edit
     end
 
+    #: () -> void
     def update
       respond_to do |format|
-        if @staff_note.update(staff_note_params)
+        if staff_note.update(staff_note_params)
           format.html do
             if params[:back_to] == 'sponsorship'
-              redirect_to conference_sponsorship_path(@conference, @sponsorship)
+              redirect_to conference_sponsorship_path(conference, sponsorship)
             else
-              redirect_to conference_sponsorship_staff_notes_path(@conference, @sponsorship)
+              redirect_to conference_sponsorship_staff_notes_path(conference, sponsorship)
             end
           end
         else
           format.html do
             index
-            @new_staff_note = @staff_note
+            @new_staff_note = staff_note
             render :index
           end
         end
       end
     end
 
+    #: () -> void
     def destroy
-      @staff_note.destroy
+      staff_note.destroy
       respond_to do |format|
         format.html do
           if params[:back_to] == 'sponsorship'
-            redirect_to conference_sponsorship_path(@conference, @sponsorship)
+            redirect_to conference_sponsorship_path(conference, sponsorship)
           else
-            redirect_to conference_sponsorship_staff_notes_path(@conference, @sponsorship)
+            redirect_to conference_sponsorship_staff_notes_path(conference, sponsorship)
           end
         end
       end
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
-      check_staff_conference_authorization!(@conference)
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
+      check_staff_conference_authorization!(conference)
     end
 
+    #: () -> void
     private def set_sponsorship
-      @sponsorship = Sponsorship.where(conference: @conference).find(params[:sponsorship_id])
+      @sponsorship = Sponsorship.where(conference:).find(params[:sponsorship_id]) #: Sponsorship?
     end
 
+    #: () -> void
     private def set_staff_note
-      @staff_note = @sponsorship.staff_notes.find(params[:id])
+      @staff_note = sponsorship.staff_notes.find(params[:id]) #: SponsorshipStaffNote?
     end
 
+    #: () -> Conference
+    private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+    #: () -> Sponsorship
+    private def sponsorship = Must.because(@sponsorship) { "set_sponsorship runs before every action" }
+
+    #: () -> SponsorshipStaffNote
+    private def staff_note = Must.because(@staff_note) { "set_staff_note runs before edit, update and destroy" }
+
+    #: () -> ActionController::Parameters
     private def staff_note_params
       params.require(:sponsorship_staff_note).permit(
         :body,

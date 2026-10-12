@@ -1,10 +1,11 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
   class SessionsController < ::ApplicationController
     layout 'admin'
 
+    #: () -> void
     def new
       if params[:proceed]
         session.delete(:back_to)
@@ -18,6 +19,7 @@ module Admin
       end
     end
 
+    #: () -> void
     def backdoor
       unless Rails.env.development?
         return render(status: :not_found, plain: 'Not Found')
@@ -34,6 +36,7 @@ module Admin
       redirect_to '/'
     end
 
+    #: () -> void
     def create
       auth = request.env['omniauth.auth']
       case auth[:provider]
@@ -65,11 +68,13 @@ module Admin
       redirect_to(session.delete(:back_to) || '/')
     end
 
+    #: () -> void
     def destroy
       session.delete(:staff_id)
       redirect_to '/'
     end
 
+    #: (String) -> bool
     private def staff_member?(access_token)
       octo = Octokit::Client.new(
         access_token: access_token,
@@ -78,6 +83,7 @@ module Admin
       github_repo_writable?(octo, Rails.application.config.x.github.repo)
     end
 
+    #: (String, Array[String]) -> Array[String]
     private def github_find_accessible_repos(access_token, repos)
       octo = Octokit::Client.new(
         access_token: access_token,
@@ -89,6 +95,7 @@ module Admin
     end
 
     # Readable alone is not enough, as any GitHub user can read a public repo.
+    #: (Octokit::Client, String) -> bool
     private def github_repo_writable?(octo, repo)
       permissions = octo.repository(repo)[:permissions]
       return false unless permissions

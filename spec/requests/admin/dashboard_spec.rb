@@ -52,4 +52,14 @@ RSpec.describe "Admin Dashboard", type: :request do
       expect(ErrorTownJob).not_to have_received(:perform_later)
     end
   end
+
+  context "without a staff session" do
+    before { reset! }
+
+    it "redirects slacktown to sign in" do
+      get slacktown_path
+      expect(response).to redirect_to(new_session_path(back_to: slacktown_path))
+      expect(SlackWebhookJob).not_to have_received(:perform_later)
+    end
+  end
 end

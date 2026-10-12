@@ -11,6 +11,51 @@ RSpec.describe "Admin Broadcasts", type: :request do
     get claim_user_session_path(session_token.handle)
   end
 
+  describe "GET index" do
+    it "lists broadcasts of the conference" do
+      broadcast = FactoryBot.create(:broadcast, conference:)
+      get conference_broadcasts_path(conference)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(broadcast.campaign)
+    end
+  end
+
+  describe "GET new" do
+    it "renders the form" do
+      get new_conference_broadcast_path(conference)
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe "POST create" do
+    it "creates a broadcast by the current staff and queues its deliveries" do
+      allow(CreateBroadcastDeliveriesJob).to receive(:perform_later)
+
+      expect do
+        post conference_broadcasts_path(conference), params: {
+          broadcast: {campaign: 'c', description: 'd', title: 't', body: 'b'},
+          recipient_filter: {kind: 'raw', emails: 'someone@example.com'},
+        }
+      end.to change(conference.broadcasts, :count).by(1)
+
+      broadcast = conference.broadcasts.last
+      expect(broadcast).to have_attributes(staff:, status: 'created')
+      expect(response).to redirect_to(conference_broadcast_path(conference, broadcast))
+      expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(broadcast, [instance_of(ActionController::Parameters)])
+    end
+  end
+
+  describe "POST dispatch_delivery" do
+    it "dispatches the broadcast as the current staff" do
+      broadcast = FactoryBot.create(:broadcast, conference:, status: :ready)
+
+      post dispatch_delivery_conference_broadcast_path(conference, broadcast)
+
+      expect(response).to redirect_to(conference_broadcast_path(conference, broadcast))
+      expect(broadcast.reload).to have_attributes(staff:, status: 'pending')
+    end
+  end
+
   describe "PATCH update" do
     let(:broadcast) { FactoryBot.create(:broadcast, conference:, status:) }
     let(:new_params) { {campaign: 'New campaign', description: 'New description', title: 'New title', body: 'New body'} }
@@ -29,9 +74,9 @@ RSpec.describe "Admin Broadcasts", type: :request do
       let(:status) { :sent }
 
       it "rejects changes to title and body" do
-        expect {
+        expect do
           patch conference_broadcast_path(conference, broadcast), params: {broadcast: new_params}
-        }.not_to change { broadcast.reload.attributes }
+        end.not_to change { broadcast.reload.attributes }
       end
 
       it "updates campaign and description" do

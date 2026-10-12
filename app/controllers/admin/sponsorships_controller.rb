@@ -1,4 +1,4 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -6,51 +6,57 @@ module Admin
     before_action :set_conference
     before_action :set_sponsorship
 
+    #: () -> void
     def show
-      @pinned_staff_notes = @sponsorship.staff_notes.where('stickiness > 0').order(stickiness: :desc, created_at: :desc).includes(:staff)
-      @staff_notes = @sponsorship.staff_notes.where('stickiness = 0').order(stickiness: :desc, created_at: :desc).includes(:staff).limit(5)
-      @new_staff_note = SponsorshipStaffNote.new(sponsorship: @sponsorship)
+      @pinned_staff_notes = sponsorship.staff_notes.where('stickiness > 0').order(stickiness: :desc, created_at: :desc).includes(:staff) #: SponsorshipStaffNote::PrivateAssociationRelation?
+      @staff_notes = sponsorship.staff_notes.where('stickiness = 0').order(stickiness: :desc, created_at: :desc).includes(:staff).limit(5) #: SponsorshipStaffNote::PrivateAssociationRelation?
+      @new_staff_note = SponsorshipStaffNote.new(sponsorship:) #: SponsorshipStaffNote?
     end
 
+    #: () -> void
     def download_asset
-      asset = @sponsorship.asset_file
+      asset = sponsorship.asset_file
       raise ActiveRecord::RecordNotFound unless asset
 
       redirect_to(asset.download_url, allow_other_host: true)
     end
 
+    #: () -> void
     def edit
-      @sponsorship.build_alternate_billing_contact unless @sponsorship.alternate_billing_contact
-      @sponsorship.build_billing_request unless @sponsorship.billing_request
-      @sponsorship.build_customization_request unless @sponsorship.customization_request
-      @sponsorship.build_note unless @sponsorship.note
+      sponsorship.build_alternate_billing_contact unless sponsorship.alternate_billing_contact
+      sponsorship.build_billing_request unless sponsorship.billing_request
+      sponsorship.build_customization_request unless sponsorship.customization_request
+      sponsorship.build_note unless sponsorship.note
     end
 
+    #: () -> void
     def update
-      @sponsorship.assign_attributes(sponsorship_params)
-      @sponsorship.staff = current_staff
+      sponsorship.assign_attributes(sponsorship_params)
+      sponsorship.staff = current_staff
       respond_to do |format|
-        if @sponsorship.save
-          ProcessSponsorshipEditJob.perform_later(@sponsorship.last_editing_history)
-          format.html { redirect_to conference_sponsorship_path(@conference, @sponsorship), notice: 'Sponsorship was successfully updated.' }
+        if sponsorship.save
+          ProcessSponsorshipEditJob.perform_later(sponsorship.last_editing_history)
+          format.html { redirect_to conference_sponsorship_path(conference, sponsorship), notice: 'Sponsorship was successfully updated.' }
         else
           format.html { render :edit }
         end
       end
     end
 
+    #: () -> void
     def destroy
-      return render(status: :not_found, plain: '') if @sponsorship.withdrawn?
+      return render(status: :not_found, plain: '') if sponsorship.withdrawn?
 
-      @sponsorship.staff = current_staff
+      sponsorship.staff = current_staff
       respond_to do |format|
-        @sponsorship.withdraw
-        @sponsorship.save!
-        ProcessSponsorshipEditJob.perform_later(@sponsorship.last_editing_history)
-        format.html { redirect_to conference_sponsorship_path(@conference, @sponsorship), notice: 'Sponsorship was successfully withdrawn.' }
+        sponsorship.withdraw
+        sponsorship.save!
+        ProcessSponsorshipEditJob.perform_later(sponsorship.last_editing_history)
+        format.html { redirect_to conference_sponsorship_path(conference, sponsorship), notice: 'Sponsorship was successfully withdrawn.' }
       end
     end
 
+    #: () -> ActionController::Parameters
     private def sponsorship_params
       params.require(:sponsorship).permit(
         :plan_id,
@@ -88,13 +94,21 @@ module Admin
       end
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
-      check_staff_conference_authorization!(@conference)
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
+      check_staff_conference_authorization!(conference)
     end
 
+    #: () -> void
     private def set_sponsorship
-      @sponsorship = Sponsorship.where(conference: @conference).find(params[:id])
+      @sponsorship = Sponsorship.where(conference:).find(params[:id]) #: Sponsorship?
     end
+
+    #: () -> Conference
+    private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+    #: () -> Sponsorship
+    private def sponsorship = Must.because(@sponsorship) { "set_sponsorship runs before every action" }
   end
 end
