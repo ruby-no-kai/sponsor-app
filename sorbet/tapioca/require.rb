@@ -8,3 +8,4 @@
 
 require "protobufable/alba_binding"
 require "protobufable/protovalidate"
+require "protobufable/connect"

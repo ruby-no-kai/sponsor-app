@@ -41,6 +41,7 @@ RSpec.describe 'Connect forgery protection', type: :request do
       error = connect_call(rpc, request_message, headers: {'Sec-Fetch-Site' => site})
 
       expect(error).to have_attributes(status: 403, code: 'permission_denied')
+      expect(error.detail(Google::Rpc::RequestInfo)).to be_present
     end
 
     it "rejects a GET with Sec-Fetch-Site: #{site}" do

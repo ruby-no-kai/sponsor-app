@@ -507,3 +507,13 @@ ja:
       registration_reference: '登録'
       back: '利用状況へ戻る'
 
+  # Keyed by the identifier each ProblemType value publishes, with dashes as underscores.
+  problem_details:
+    titles:
+      unauthenticated: 'ログインが必要です'
+      permission_denied: '権限がありません'
+      not_found: '見つかりません'
+      conflict: '競合が発生しました'
+      failed_precondition: '現在の状態では実行できません'
+      invalid_record: '入力内容に誤りがあります'
+      internal: 'サーバーエラー'

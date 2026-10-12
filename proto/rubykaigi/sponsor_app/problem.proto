@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "google/protobuf/descriptor.proto";
+import "protobufable/problem.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+extend google.protobuf.EnumValueOptions {
+  // The identifier and HTTP status a ProblemType value publishes. The number comes from the range
+  // reserved for internal use, as protobufable holds no registered extension number yet.
+  optional protobufable.ProblemTypeOptions problem_type = 50001;
+}
+
+// Every problem this API answers with, as an RFC 9457 problem document.
+//
+// A problem carries a packed protobufable.ProblemDetails. Its `type` is the value's `uri`
+// appended to https://sponsorships.rubykaigi.org/problems/, and its `status` is the value's
+// `http_status`. Dispatch on `type`: the enum value names themselves never go on the wire.
+//
+// Over Connect, the status selects the error code: 401 is `unauthenticated`, 403
+// `permission_denied`, 404 `not_found`, 409 `aborted`, 412 `failed_precondition`, 422
+// `invalid_argument` and 500 `internal`. The HTTP response then carries the code's status, so a
+// 422 problem arrives as HTTP 400 while its document still reads 422.
+//
+// Values and identifiers are never renamed or reused.
+enum ProblemType {
+  // The zero value proto3 requires. Never published.
+  PROBLEM_TYPE_UNSPECIFIED = 0;
+
+  // The request carries no valid session. Sign in and retry.
+  PROBLEM_TYPE_UNAUTHENTICATED = 1 [(problem_type) = {
+    uri: "unauthenticated"
+    http_status: 401
+  }];
+
+  // The session is valid but may not act on this resource, such as a conference outside a
+  // restricted staff member's repositories.
+  PROBLEM_TYPE_PERMISSION_DENIED = 2 [(problem_type) = {
+    uri: "permission-denied"
+    http_status: 403
+  }];
+
+  // The resource the request names does not exist.
+  PROBLEM_TYPE_NOT_FOUND = 3 [(problem_type) = {
+    uri: "not-found"
+    http_status: 404
+  }];
+
+  // The request conflicts with the current state of the resource, such as a concurrent edit.
+  PROBLEM_TYPE_CONFLICT = 4 [(problem_type) = {
+    uri: "conflict"
+    http_status: 409
+  }];
+
+  // The resource is not in a state that allows the request, such as an application window that
+  // has closed.
+  PROBLEM_TYPE_FAILED_PRECONDITION = 5 [(problem_type) = {
+    uri: "failed-precondition"
+    http_status: 412
+  }];
+
+  // The record the request would save fails validation.
+  PROBLEM_TYPE_INVALID_RECORD = 6 [(problem_type) = {
+    uri: "invalid-record"
+    http_status: 422
+  }];
+
+  // The server failed to answer the request. Report the request ID that comes with the error.
+  PROBLEM_TYPE_INTERNAL = 7 [(problem_type) = {
+    uri: "internal"
+    http_status: 500
+  }];
+}

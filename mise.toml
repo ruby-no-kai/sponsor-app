@@ -63,11 +63,12 @@ run = [
   "bundle exec tapioca dsl --only=Protobuf",
 ]
 
+# proto/protobufable is copied byte-for-byte from the protobufable gem, so it keeps the gem's formatting.
 [tasks."lint:proto"]
 description = "Lint proto/ and check its formatting"
 run = [
   "buf lint",
-  "buf format --diff --exit-code",
+  "buf format --diff --exit-code --exclude-path proto/protobufable",
 ]
 
 # mise skips this while node_modules/.pnpm/lock.yaml is newer than the sources. A no-op install

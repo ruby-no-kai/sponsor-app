@@ -26,7 +26,11 @@ local linters = new Mapping<String, Step> {
     depends = "gen"
   }
   ["actionlint"] = Builtins.actionlint
-  ["buf-format"] = Builtins.buf_format
+  // proto/protobufable is copied byte-for-byte from the protobufable gem, so it keeps the gem's formatting.
+  ["buf-format"] = (Builtins.buf_format) {
+    check_diff = "buf format {{workspace}} --diff --exit-code --exclude-path proto/protobufable"
+    fix = "buf format {{workspace}} --write --exclude-path proto/protobufable"
+  }
   ["buf-lint"] = Builtins.buf_lint
   // The sponsors_yaml goldens hold the job's output byte for byte, trailing blank line included.
   ["newlines"] = (Builtins.newlines) {

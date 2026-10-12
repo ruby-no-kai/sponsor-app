@@ -6,3 +6,8 @@ plugins:
   # Needs protoc 34 or later.
   - protoc_builtin: rbs
     out: gen/proto/ruby/sig
+inputs:
+  - directory: proto
+    # The protobufable gem ships the Ruby for its protos, and loading a second copy raises.
+    exclude_paths:
+      - proto/protobufable
