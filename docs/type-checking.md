@@ -33,7 +33,7 @@ Run `bundle` under the mise environment (`mise x -- bundle ...`, or a shell with
 
 `tapioca dsl` boots Rails against the development database. Bring it up with `docker compose up -d db` first. `mise run gen` needs no database.
 
-Nothing detects stale RBIs. Regenerate them in the same change that moves `Gemfile.lock`, the database schema or a `.proto` file.
+Regenerate RBIs in the same change that moves `Gemfile.lock`, the database schema or a `.proto` file. CI detects stale protobuf message RBIs only.
 
 ## Writing types
 

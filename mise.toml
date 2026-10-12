@@ -24,6 +24,8 @@ run = [
   "bundle exec tapioca dsl",
 ]
 
+# hk's gen step and CI's gen job both run this, so registering a generator here
+# covers both.
 [tasks.gen]
 description = "Run every generator whose output is checked into git"
 depends = ["gen:proto", "gen:rbi"]
