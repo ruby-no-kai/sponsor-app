@@ -20,7 +20,8 @@ class SponsorshipsController < ApplicationController
   def edit
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
-    raise ActiveRecord::RecordNotFound if !@conference&.amendment_open? && !current_staff
+    raise ActiveRecord::RecordNotFound unless @conference
+    raise ActiveRecord::RecordNotFound if !@conference.amendment_open? && !current_staff
 
     @sponsorship.build_nested_attributes_associations
   end
@@ -89,7 +90,8 @@ class SponsorshipsController < ApplicationController
   def update
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
-    raise ActiveRecord::RecordNotFound unless @conference&.amendment_open?
+    raise ActiveRecord::RecordNotFound unless @conference
+    raise ActiveRecord::RecordNotFound if !@conference.amendment_open? && !current_staff
 
     sp = sponsorship_params
     sp.delete(:asset_file_id) if @sponsorship.asset_file_id

@@ -68,4 +68,45 @@ RSpec.describe "Sponsorships", type: :request do
       expect(sponsorship.reload.name).to eq('Renamed')
     end
   end
+
+  context "when amendment is closed" do
+    let(:conference) { FactoryBot.create(:conference, :full, application_opens_at: 2.days.ago, amendment_closes_at: 1.day.ago) }
+    let(:sponsorship) { FactoryBot.create(:sponsorship, conference:, plan:) }
+
+    before do
+      get claim_user_session_path(FactoryBot.create(:session_token, email: sponsorship.contact.email).handle)
+    end
+
+    it "responds with 404 on edit" do
+      get edit_user_conference_sponsorship_path(conference)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "responds with 404 on update and keeps the name" do
+      patch user_conference_sponsorship_path(conference), params: {sponsorship: {name: 'Renamed'}}
+      expect(response).to have_http_status(:not_found)
+      expect(sponsorship.reload.name).not_to eq('Renamed')
+    end
+  end
+
+  context "when amendment is closed with staff" do
+    let(:conference) { FactoryBot.create(:conference, :full, application_opens_at: 2.days.ago, amendment_closes_at: 1.day.ago) }
+    let(:sponsorship) { FactoryBot.create(:sponsorship, conference:, plan:) }
+
+    before do
+      get claim_user_session_path(FactoryBot.create(:session_token, :with_staff).handle)
+      get claim_user_session_path(FactoryBot.create(:session_token, email: sponsorship.contact.email).handle)
+    end
+
+    it "renders edit" do
+      get edit_user_conference_sponsorship_path(conference)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "renames on update" do
+      patch user_conference_sponsorship_path(conference), params: {sponsorship: {name: 'Renamed'}}
+      expect(response).to have_http_status(:found)
+      expect(sponsorship.reload.name).to eq('Renamed')
+    end
+  end
 end
