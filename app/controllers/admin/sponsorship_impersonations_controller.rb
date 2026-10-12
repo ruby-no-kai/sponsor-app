@@ -11,7 +11,7 @@ module Admin
       @sponsorship = Sponsorship.where(conference: @conference).find(params[:sponsorship_id])
 
       token = SessionToken.create!(
-        email: @sponsorship.contact.email,
+        email: Must.because(@sponsorship.contact) { "a saved sponsorship validates the presence of its contact" }.email,
         expires_at: 1.minute.from_now,
       )
 
