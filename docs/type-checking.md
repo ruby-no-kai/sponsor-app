@@ -91,7 +91,7 @@ To raise an older file, `bundle exec spoom srb bump --from false --to true` find
 ## Known gaps
 
 - `Struct` members have untyped readers, so value objects use `Data.define`. Its readers have no inline form. Declare them in `sorbet/rbi/shims/data_define.rbi`.
-- Sorbet checks only the argument count of a `Data.define` constructor, so nothing checks the stored values against the reader types in the shim.
+- Sorbet checks only the argument count of a `Data.define` constructor. Its shim block also declares `def self.new(id:, ...)` with `sig { params(id: Integer, ...).returns(T.attached_class) }`, which makes Sorbet check the keys and value types. A sig on `initialize` is rejected (4010) instead. `Data#with` stays unchecked.
 - `belongs_to` readers are nilable in the DSL RBIs, even when the association is required. Read them with `Must.expect`.
 - `NOT NULL` columns are typed non-nil, although an unsaved record can still hold nil.
 - `Rails.application.config.x` and a parameterized mailer's `params` return untyped. Declare the value where it is read when a type is needed: `delivery = params[:delivery] #: BroadcastDelivery`.

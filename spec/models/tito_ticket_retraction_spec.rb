@@ -202,6 +202,49 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
   end
 
+  describe '#registration_maybe' do
+    %i(with_tito_registration paid cancelled multiple_releases invalid_discount_code).each do |trait|
+      it "decodes the #{trait} trait" do
+        retraction = FactoryBot.build(:tito_ticket_retraction, trait, sponsorship:)
+        raw = retraction.tito_registration
+
+        expect(retraction.registration_maybe).to have_attributes(
+          reference: raw.fetch('reference'),
+          slug: raw.fetch('slug'),
+          free: raw.fetch('free'),
+          paid: raw.fetch('paid'),
+          refunded: raw.fetch('refunded'),
+          partially_refunded: raw.fetch('partially_refunded'),
+          cancelled: raw.fetch('cancelled'),
+        )
+        expect(retraction.registration_maybe.tickets.map { |t| [t.release_id, t.discount_code] }).to eq(
+          raw.fetch('tickets').map { |t| [t.fetch('release_id'), t.fetch('discount_code_used')] },
+        )
+      end
+    end
+
+    it 'resolves release slugs from the conference cached releases' do
+      FactoryBot.create(:tito_cached_release, conference:, tito_release_id: 'rel_1', tito_release_slug: 'sponsor')
+      retraction = FactoryBot.build(:tito_ticket_retraction, :with_tito_registration, sponsorship:)
+
+      expect(retraction.registration_maybe.tickets.sole.release_slug).to eq('sponsor')
+    end
+
+    it 'is nil without tito_registration' do
+      retraction = FactoryBot.build(:tito_ticket_retraction, sponsorship:, tito_registration: nil)
+
+      expect(retraction.registration_maybe).to be_nil
+    end
+  end
+
+  describe '#registration' do
+    it 'raises without tito_registration' do
+      retraction = FactoryBot.build(:tito_ticket_retraction, sponsorship:, tito_registration: nil)
+
+      expect { retraction.registration }.to raise_error(Must::Violation)
+    end
+  end
+
   describe '#preconditions' do
     context 'when tito_registration is nil' do
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, sponsorship:, tito_registration: nil) }
@@ -215,7 +258,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :with_tito_registration, sponsorship: nil, conference:) }
 
       it 'reports no valid discount codes instead of raising' do
-        expect(retraction.preconditions).to include(valid_discount_code_used: false)
+        expect(retraction.preconditions).to have_attributes(valid_discount_code_used: false)
         expect(retraction).not_to be_retractable
       end
 
@@ -228,20 +271,24 @@ RSpec.describe TitoTicketRetraction, type: :model do
       let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :with_tito_registration, sponsorship:) }
 
-      it 'returns preconditions hash' do
-        preconditions = retraction.preconditions
+      it 'returns the preconditions' do
+        expect(retraction.preconditions).to be_a(described_class::Preconditions).and have_attributes(
+          free: true,
+          paid: false,
+          refunded: false,
+          partially_refunded: false,
+          cancelled: false,
+          ticket_release_count: 1,
+          ticket_discount_code_count: 1,
+          discount_codes_used: ['SPONSOR2025'],
+          invalid_discount_codes: [],
+          valid_discount_code_used: true,
+        )
+        expect(retraction.preconditions).to be_satisfied
+      end
 
-        expect(preconditions).to be_a(Hash)
-        expect(preconditions[:free]).to be true
-        expect(preconditions[:paid]).to be false
-        expect(preconditions[:refunded]).to be false
-        expect(preconditions[:partially_refunded]).to be false
-        expect(preconditions[:cancelled]).to be false
-        expect(preconditions[:ticket_release_count]).to eq(1)
-        expect(preconditions[:ticket_discount_code_count]).to eq(1)
-        expect(preconditions[:discount_codes_used]).to eq(['SPONSOR2025'])
-        expect(preconditions[:invalid_discount_codes]).to eq([])
-        expect(preconditions[:valid_discount_code_used]).to be true
+      it 'prints every member when inspected' do
+        expect(retraction.preconditions.inspect).to include('free=true', 'ticket_release_count=1', 'discount_codes_used=["SPONSOR2025"]', 'valid_discount_code_used=true')
       end
     end
 
@@ -250,10 +297,7 @@ RSpec.describe TitoTicketRetraction, type: :model do
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :multiple_releases, sponsorship:) }
 
       it 'counts multiple releases' do
-        preconditions = retraction.preconditions
-
-        expect(preconditions[:ticket_release_count]).to eq(2)
-        expect(preconditions[:ticket_discount_code_count]).to eq(1)
+        expect(retraction.preconditions).to have_attributes(ticket_release_count: 2, ticket_discount_code_count: 1)
       end
     end
 
@@ -262,11 +306,11 @@ RSpec.describe TitoTicketRetraction, type: :model do
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :invalid_discount_code, sponsorship:) }
 
       it 'identifies invalid discount codes' do
-        preconditions = retraction.preconditions
-
-        expect(preconditions[:discount_codes_used]).to eq(['INVALID_CODE'])
-        expect(preconditions[:invalid_discount_codes]).to eq(['INVALID_CODE'])
-        expect(preconditions[:valid_discount_code_used]).to be false
+        expect(retraction.preconditions).to have_attributes(
+          discount_codes_used: ['INVALID_CODE'],
+          invalid_discount_codes: ['INVALID_CODE'],
+          valid_discount_code_used: false,
+        )
       end
     end
   end
@@ -292,6 +336,19 @@ RSpec.describe TitoTicketRetraction, type: :model do
     context 'when ticket is paid' do
       let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :paid, sponsorship:) }
+
+      it 'returns false' do
+        expect(retraction.retractable?).to be false
+      end
+    end
+
+    context 'when the paid flag is missing' do
+      let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
+      let(:retraction) do
+        FactoryBot.build(:tito_ticket_retraction, :with_tito_registration, sponsorship:).tap do |r|
+          r.tito_registration = r.tito_registration.except('paid')
+        end
+      end
 
       it 'returns false' do
         expect(retraction.retractable?).to be false

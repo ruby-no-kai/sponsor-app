@@ -6,35 +6,58 @@ class PassRedemption
   class PaginationNotSupported < StandardError; end
 
   Registration = Data.define(
-    :id, :reference,
+    :id, :slug, :reference,
     :discount_code, :source,
     :email,
     :state,
     :free, :paid, :cancelled, :refunded, :partially_refunded,
     :tickets
   ) do
-    #: () -> bool
-    def retractable? # XXX: dupe with TitoTicketRetraction
-      free && !cancelled && !paid && !refunded && !partially_refunded && tickets.group_by(&:release_id).size == 1 && tickets.group_by(&:discount_code).size == 1
-    end
-
-    #: (?untyped) -> Hash[Symbol, untyped]
-    def as_json(_options = nil)
-      to_h.merge(
-        tickets: tickets.map(&:as_json),
-        retractable: retractable?,
+    # Reads Tito's API response (Symbol keys) or a copy stored in a json column (String keys).
+    # Absent keys read as nil, since Tito owns the shape.
+    #: (Hash[untyped, untyped], releases: Hash[String, TitoCachedRelease]) -> Registration
+    def self.from_tito(tito_registration, releases:)
+      tito = tito_registration.deep_symbolize_keys #: Hash[Symbol, untyped]
+      new(
+        id: tito[:id],
+        slug: tito[:slug],
+        reference: tito[:reference],
+        discount_code: tito[:discount_code],
+        source: tito[:source],
+        email: tito[:email],
+        state: tito[:state],
+        free: tito[:free],
+        paid: tito[:paid],
+        cancelled: tito[:cancelled],
+        refunded: tito[:refunded],
+        partially_refunded: tito[:partially_refunded],
+        tickets: tito.fetch(:tickets, []).map { |t| Ticket.from_tito(t, releases:) },
       )
     end
   end
+
   Ticket = Data.define(
     :id, :reference,
-    :discount_code, :release, :release_id,
+    :discount_code, :release_id, :release_slug,
     :email,
     :state,
     :void, :assigned
   ) do
-    #: (?untyped) -> Hash[Symbol, untyped]
-    def as_json(_options = nil) = to_h
+    #: (Hash[Symbol, untyped], releases: Hash[String, TitoCachedRelease]) -> Ticket
+    def self.from_tito(tito_ticket, releases:)
+      release_id = tito_ticket[:release_id].to_s
+      new(
+        id: tito_ticket[:id],
+        reference: tito_ticket[:reference],
+        discount_code: tito_ticket[:discount_code_used],
+        release_id:,
+        release_slug: releases[release_id]&.tito_release_slug,
+        email: tito_ticket[:email],
+        state: tito_ticket[:state],
+        void: tito_ticket[:void],
+        assigned: tito_ticket[:assigned],
+      )
+    end
   end
 
   class Collection
@@ -45,53 +68,45 @@ class PassRedemption
       end
 
       releases = conference ? TitoCachedRelease.where(conference:).index_by(&:tito_release_id) : {}
+      valid_discount_codes = sponsorship&.tito_discount_codes&.pluck(:code) #: Array[String]?
 
-      valid_discount_code = sponsorship&.tito_discount_codes&.pluck(:code)
       registrations = tito_registration_list.fetch(:registrations).map do |tito_registration|
-        tickets = tito_registration.fetch(:tickets, []).map do |tito_ticket|
-          Ticket.new(
-            id: tito_ticket[:id],
-            reference: tito_ticket[:reference],
-            discount_code: tito_ticket[:discount_code_used],
-            release: releases[tito_ticket[:release_id].to_s],
-            release_id: tito_ticket[:release_id].to_s,
-            email: tito_ticket[:email],
-            state: tito_ticket[:state],
-            void: tito_ticket[:void],
-            assigned: tito_ticket[:assigned],
-          )
-        end.select do |ticket|
-          !valid_discount_code || valid_discount_code.include?(ticket.discount_code)
-        end
-
-        Registration.new(
-          id: tito_registration[:id],
-          reference: tito_registration[:reference],
-          source: tito_registration[:source],
-          discount_code: tito_registration[:discount_code],
-          email: tito_registration[:email],
-          state: tito_registration[:state],
-          free: tito_registration[:free],
-          paid: tito_registration[:paid],
-          cancelled: tito_registration[:cancelled],
-          refunded: tito_registration[:refunded],
-          partially_refunded: tito_registration[:partially_refunded],
-          tickets: tickets,
-        )
-      end.select do |reg|
-        !valid_discount_code || valid_discount_code.include?(reg.discount_code)
+        Registration.from_tito(tito_registration, releases:)
+      end
+      if valid_discount_codes
+        registrations = registrations.select { |reg| valid_discount_codes.include?(reg.discount_code) }
       end
 
-      new(registrations:)
+      new(registrations:, valid_discount_codes:)
     end
 
-    #: (registrations: Array[Registration]) -> void
-    def initialize(registrations:)
+    # A nil valid_discount_codes shows every ticket.
+    #: (registrations: Array[Registration], valid_discount_codes: Array[String]?) -> void
+    def initialize(registrations:, valid_discount_codes:)
       @registrations = registrations
+      @valid_discount_codes = valid_discount_codes
     end
 
     #: Array[Registration]
     attr_reader :registrations
+
+    #: Array[String]?
+    attr_reader :valid_discount_codes
+
+    #: (Registration) -> Array[Ticket]
+    def tickets_for(registration)
+      codes = valid_discount_codes or return registration.tickets
+      registration.tickets.select { |ticket| codes.include?(ticket.discount_code) }
+    end
+
+    # Judges the shown tickets only. TitoTicketRetraction checks every ticket.
+    #: (Registration) -> bool
+    def retractable?(registration)
+      TitoTicketRetraction::Preconditions.from_registration(
+        registration.with(tickets: tickets_for(registration)),
+        valid_discount_codes: valid_discount_codes || [],
+      ).satisfied?
+    end
   end
 
   #: (Sponsorship) -> Collection
