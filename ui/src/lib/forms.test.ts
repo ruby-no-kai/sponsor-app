@@ -4,9 +4,11 @@ import { timestampFromDate } from "@bufbuild/protobuf/wkt";
 import {
   formatTimestamp,
   idFromInput,
+  idFromParam,
   idToInput,
   int32FromInput,
   int32ToInput,
+  nowInput,
   optionalFromInput,
   optionalInt32FromInput,
   optionalInt32ToInput,
@@ -27,6 +29,11 @@ describe("IDs", () => {
   it("rejects what is not an ID", () => {
     assert.throws(() => idFromInput(""), RangeError);
     assert.throws(() => idFromInput("1e3"), RangeError);
+  });
+
+  it("reads a route parameter that names no ID as none", () => {
+    assert.equal(idFromParam("42"), 42n);
+    assert.equal(idFromParam("abc"), undefined);
   });
 });
 
@@ -87,5 +94,11 @@ describe("formatTimestamp", () => {
   it("shows the zone along with the time", () => {
     assert.match(formatTimestamp(timestampFromDate(new Date("2026-04-01T00:30:00Z"))), /2026.*30/);
     assert.equal(formatTimestamp(undefined, "not scheduled"), "not scheduled");
+  });
+});
+
+describe("nowInput", () => {
+  it("is the local time to the minute", () => {
+    assert.equal(nowInput(new Date("2026-04-01T00:30:15.250Z")), "2026-04-01T09:30");
   });
 });

@@ -39,15 +39,6 @@ RSpec.describe 'AdminService form descriptions', type: :request do
     )
   end
 
-  def bad_request_of(error)
-    error.detail(Google::Rpc::BadRequest) ||
-      error.detail(Protobufable::ProblemDetails).information.map { it.unpack(Google::Rpc::BadRequest) }.compact.sole
-  end
-
-  def violations_of(error)
-    bad_request_of(error).field_violations.map { [it.field, it.reason] }
-  end
-
   describe 'GetFormDescription' do
     let(:rpc) { connect_method('AdminService', 'GetFormDescription') }
 

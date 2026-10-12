@@ -1,5 +1,4 @@
 import type { MessageInitShape } from "@bufbuild/protobuf";
-import { timestampFromDate } from "@bufbuild/protobuf/wkt";
 import type { AdminConference } from "../../gen/rubykaigi/sponsor_app/admin_conference_pb.ts";
 import type { ConferenceInputSchema } from "../../gen/rubykaigi/sponsor_app/admin_conferences_pb.ts";
 import {
@@ -145,9 +144,4 @@ export function inputFrom(values: ConferenceValues): ConferenceInputResult {
       titoSlug: optionalFromInput(values.titoSlug),
     },
   };
-}
-
-// The value a "Now" button puts into a datetime-local input, in the browser's time zone.
-export function nowInput(now: Date = new Date()): string {
-  return timestampToInput(timestampFromDate(now));
 }

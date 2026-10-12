@@ -1,18 +1,7 @@
-import {
-  Banner,
-  Button,
-  Checkbox,
-  Input,
-  InputGroup,
-  LayerCard,
-  Link,
-  Loader,
-  Text,
-} from "@cloudflare/kumo";
+import { Banner, Button, Checkbox, Input, Link, Loader, Text } from "@cloudflare/kumo";
 import { WarningIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
-import type { ReactNode } from "react";
 import { generatePath, useNavigate, useParams } from "react-router";
 import { useSWRConfig } from "swr";
 import type { AdminConference } from "../../gen/rubykaigi/sponsor_app/admin_conference_pb.ts";
@@ -26,14 +15,20 @@ import { useDocumentTitle } from "../../lib/title.ts";
 import { toastManager } from "../../lib/toast.ts";
 import { paths } from "../paths.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
-import { SaveBar, SaveErrorBanner, useFieldReveal } from "./FormParts.tsx";
+import {
+  DateTimeInput,
+  joined,
+  SaveBar,
+  SaveErrorBanner,
+  Section,
+  useFieldReveal,
+} from "./FormParts.tsx";
 import {
   CONFERENCE_LAYOUT,
   DATE_TIME_FIELDS,
   FIELD_LABELS,
   formValuesFrom,
   inputFrom,
-  nowInput,
 } from "./conferenceForm.ts";
 import type { ConferenceValues } from "./conferenceForm.ts";
 
@@ -244,33 +239,7 @@ function Editor({
           {DATE_TIME_FIELDS.map(({ name, description }) => (
             <form.Field key={name} name={name}>
               {(field) => (
-                <InputGroup
-                  label={FIELD_LABELS[name]}
-                  description={description}
-                  error={fieldError(field.state.meta.errors)}
-                >
-                  <InputGroup.Input
-                    type="datetime-local"
-                    // Kumo reads the input's own name rather than the group's label.
-                    aria-label={FIELD_LABELS[name]}
-                    data-field={field.name}
-                    step={1}
-                    value={field.state.value}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    onBlur={field.handleBlur}
-                  />
-                  <InputGroup.Addon align="end">
-                    <InputGroup.Button onClick={() => field.handleChange(nowInput())}>
-                      Now
-                    </InputGroup.Button>
-                    <InputGroup.Button
-                      disabled={field.state.value === ""}
-                      onClick={() => field.handleChange("")}
-                    >
-                      Clear
-                    </InputGroup.Button>
-                  </InputGroup.Addon>
-                </InputGroup>
+                <DateTimeInput field={field} label={FIELD_LABELS[name]} description={description} />
               )}
             </form.Field>
           ))}
@@ -415,17 +384,6 @@ function Editor({
   );
 }
 
-function joined(errors: readonly unknown[]): string | undefined {
-  const messages = errors.filter((error): error is string => typeof error === "string");
-  return messages.length === 0 ? undefined : messages.join("; ");
-}
-
-// InputGroup takes only the object form, whose match: true shows it whatever the input's validity.
-function fieldError(errors: readonly unknown[]): { message: string; match: true } | undefined {
-  const message = joined(errors);
-  return message === undefined ? undefined : { message, match: true };
-}
-
 function FieldError({ errors }: { errors: readonly unknown[] }) {
   const message = joined(errors);
   if (message === undefined) return null;
@@ -433,14 +391,5 @@ function FieldError({ errors }: { errors: readonly unknown[] }) {
     <Text variant="error" size="sm">
       {message}
     </Text>
-  );
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <LayerCard>
-      <LayerCard.Secondary>{title}</LayerCard.Secondary>
-      <LayerCard.Primary className="flex flex-col gap-4">{children}</LayerCard.Primary>
-    </LayerCard>
   );
 }

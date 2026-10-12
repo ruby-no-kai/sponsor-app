@@ -4,7 +4,7 @@ import { create, toJson } from "@bufbuild/protobuf";
 import { timestampFromDate } from "@bufbuild/protobuf/wkt";
 import { AdminConferenceSchema } from "../../gen/rubykaigi/sponsor_app/admin_conference_pb.ts";
 import { ConferenceInputSchema } from "../../gen/rubykaigi/sponsor_app/admin_conferences_pb.ts";
-import { DATE_TIME_FIELDS, formValuesFrom, inputFrom, nowInput } from "./conferenceForm.ts";
+import { DATE_TIME_FIELDS, formValuesFrom, inputFrom } from "./conferenceForm.ts";
 import type { ConferenceValues } from "./conferenceForm.ts";
 
 // Date reads TZ on every call, so the local-time conversions below run in a fixed zone.
@@ -101,11 +101,5 @@ describe("inputFrom", () => {
       kind: "invalid",
       fields: { boothCapacity: "Enter a whole number" },
     });
-  });
-});
-
-describe("nowInput", () => {
-  it("is the local time to the second", () => {
-    assert.equal(nowInput(new Date("2026-04-01T00:30:15.250Z")), "2026-04-01T09:30:15");
   });
 });

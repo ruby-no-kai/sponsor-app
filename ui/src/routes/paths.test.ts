@@ -9,7 +9,6 @@ describe("isSpaPathname", () => {
     assert.ok(isSpaPathname("/admin"));
     assert.ok(isSpaPathname("/admin/conferences"));
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048"));
-    assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/plans"));
     assert.ok(!isSpaPathname("/admin/session/new"));
     assert.ok(!isSpaPathname("/"));
   });
@@ -33,6 +32,13 @@ describe("isSpaPathname", () => {
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/form_descriptions/ja/edit"));
     assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/form_descriptions"));
   });
+
+  it("matches the plan pages HAML has at the same paths", () => {
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/plans"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/plans/new"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/plans/12/edit"));
+    assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/plans/12"));
+  });
 });
 
 describe("matchSpaPath", () => {
@@ -44,7 +50,7 @@ describe("matchSpaPath", () => {
   it("leaves other origins and other paths to the browser", () => {
     assert.ok(!matchSpaPath("http://sponsor-app-rails.localhost:1355/admin", BASE));
     assert.ok(!matchSpaPath("//example.invalid/admin", BASE));
-    assert.ok(!matchSpaPath("/admin/conferences/rubykaigi2048/plans", BASE));
+    assert.ok(!matchSpaPath("/admin/conferences/rubykaigi2048/sponsors_yml", BASE));
     assert.ok(!matchSpaPath("mailto:info@example.invalid", BASE));
   });
 });
