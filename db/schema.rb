@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_12_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -228,6 +228,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
     t.datetime "updated_at", null: false
     t.index ["conference_id", "locale"], name: "index_form_descriptions_on_conference_id_and_locale", unique: true
     t.index ["conference_id"], name: "index_form_descriptions_on_conference_id"
+  end
+
+  create_table "mailgun_webhook_tokens", force: :cascade do |t|
+    t.string "token", null: false
+    t.datetime "signed_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["signed_at"], name: "index_mailgun_webhook_tokens_on_signed_at"
+    t.index ["token"], name: "index_mailgun_webhook_tokens_on_token", unique: true
   end
 
   create_table "organizations", force: :cascade do |t|
