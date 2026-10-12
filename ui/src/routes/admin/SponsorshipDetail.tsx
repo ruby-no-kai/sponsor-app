@@ -1,7 +1,8 @@
-import { Badge, LayerCard, Link, LinkButton, Loader, Text } from "@cloudflare/kumo";
+import { Badge, Button, LayerCard, Link, LinkButton, Loader, Text } from "@cloudflare/kumo";
 import {
   ClockCounterClockwiseIcon,
   EnvelopeSimpleIcon,
+  MaskHappyIcon,
   PencilSimpleIcon,
   SignOutIcon,
 } from "@phosphor-icons/react";
@@ -17,7 +18,7 @@ import { SponsorshipState } from "../../gen/rubykaigi/sponsor_app/sponsorship_su
 import { idFromParam } from "../../lib/forms.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
 import { isRpcKeyOf, useRpc, useRpcMutation } from "../../lib/rpc.ts";
-import { toastManager } from "../../lib/toast.ts";
+import { notifyError, toastManager } from "../../lib/toast.ts";
 import { NotFound } from "../RouteError.tsx";
 import { paths } from "../paths.ts";
 import { ConfirmButton } from "./ConfirmButton.tsx";
@@ -204,7 +205,11 @@ function Detail({ slug, id, sponsorshipId }: { slug: string; id: string; sponsor
         </Card>
       </div>
 
-      <DangerZone sponsorship={sponsorship} target={target} />
+      <DangerZone
+        sponsorship={sponsorship}
+        target={target}
+        impersonationEnabled={data.impersonationEnabled}
+      />
     </div>
   );
 }
@@ -418,37 +423,64 @@ function ContactDetails({ contact }: { contact: AdminSponsorship_Contact }) {
 function DangerZone({
   sponsorship,
   target,
+  impersonationEnabled,
 }: {
   sponsorship: AdminSponsorship;
   target: { conferenceSlug: string; sponsorshipId: bigint };
+  impersonationEnabled: boolean;
 }) {
   const { mutate } = useSWRConfig();
   const withdraw = useRpcMutation(AdminService.method.withdrawSponsorship);
+  const impersonate = useRpcMutation(AdminService.method.impersonateSponsorship);
   const withdrawn = sponsorship.state === SponsorshipState.WITHDRAWN;
 
-  if (withdrawn) return null;
+  async function handleImpersonate() {
+    let claimPath: string;
+    try {
+      claimPath = (await impersonate.trigger(target)).claimPath;
+    } catch (error) {
+      notifyError(error);
+      return;
+    }
+    // The claim path is a Rails page, which signs this browser in as the sponsor.
+    window.location.assign(claimPath);
+  }
+
+  if (withdrawn && !impersonationEnabled) return null;
 
   return (
     <LayerCard className="ring-kumo-danger">
       <LayerCard.Secondary className="text-kumo-danger">Danger zone</LayerCard.Secondary>
       <LayerCard.Primary className="flex flex-row flex-wrap gap-2">
-        <ConfirmButton
-          label="Withdraw"
-          icon={SignOutIcon}
-          title={`Withdraw ${sponsorship.name}?`}
-          description="The sponsorship loses its plan and booth, and the sponsor list, chat and ticketing service are updated. Withdrawal cannot be undone."
-          confirmLabel="Withdraw"
-          onConfirm={async () => {
-            await withdraw.trigger(target);
-            toastManager.add({ variant: "success", title: `Withdrew ${sponsorship.name}` });
-            await mutate(
-              (key) =>
-                isRpcKeyOf(key, AdminService.method.getSponsorship) ||
-                isRpcKeyOf(key, AdminService.method.getConference) ||
-                isRpcKeyOf(key, AdminService.method.listSponsorshipEditingHistory),
-            );
-          }}
-        />
+        {!withdrawn && (
+          <ConfirmButton
+            label="Withdraw"
+            icon={SignOutIcon}
+            title={`Withdraw ${sponsorship.name}?`}
+            description="The sponsorship loses its plan and booth, and the sponsor list, chat and ticketing service are updated. Withdrawal cannot be undone."
+            confirmLabel="Withdraw"
+            onConfirm={async () => {
+              await withdraw.trigger(target);
+              toastManager.add({ variant: "success", title: `Withdrew ${sponsorship.name}` });
+              await mutate(
+                (key) =>
+                  isRpcKeyOf(key, AdminService.method.getSponsorship) ||
+                  isRpcKeyOf(key, AdminService.method.getConference) ||
+                  isRpcKeyOf(key, AdminService.method.listSponsorshipEditingHistory),
+              );
+            }}
+          />
+        )}
+        {impersonationEnabled && (
+          <Button
+            variant="secondary"
+            icon={MaskHappyIcon}
+            loading={impersonate.isMutating}
+            onClick={() => void handleImpersonate()}
+          >
+            Impersonate
+          </Button>
+        )}
       </LayerCard.Primary>
     </LayerCard>
   );

@@ -9,16 +9,20 @@ class Rk::SponsorApp::AdminServiceGetSponsorshipResponse < Google::Protobuf::Abs
   sig do
     params(
       fallback_option_choices: T.nilable(T::Array[Rk::SponsorApp::FallbackOption]),
+      impersonation_enabled: T.nilable(T::Boolean),
       pinned_staff_notes: T.nilable(T::Array[Rk::SponsorApp::SponsorshipStaffNote]),
       plan_choices: T.nilable(T::Array[Rk::SponsorApp::AdminSponsorship::Plan]),
       recent_staff_notes: T.nilable(T::Array[Rk::SponsorApp::SponsorshipStaffNote]),
       sponsorship: T.nilable(Rk::SponsorApp::AdminSponsorship)
     ).void
   end
-  def initialize(fallback_option_choices: T.unsafe(nil), pinned_staff_notes: T.unsafe(nil), plan_choices: T.unsafe(nil), recent_staff_notes: T.unsafe(nil), sponsorship: nil); end
+  def initialize(fallback_option_choices: T.unsafe(nil), impersonation_enabled: nil, pinned_staff_notes: T.unsafe(nil), plan_choices: T.unsafe(nil), recent_staff_notes: T.unsafe(nil), sponsorship: nil); end
 
   sig { void }
   def clear_fallback_option_choices; end
+
+  sig { void }
+  def clear_impersonation_enabled; end
 
   sig { void }
   def clear_pinned_staff_notes; end
@@ -40,6 +44,12 @@ class Rk::SponsorApp::AdminServiceGetSponsorshipResponse < Google::Protobuf::Abs
 
   sig { returns(Object) }
   def has_sponsorship?; end
+
+  sig { returns(T::Boolean) }
+  def impersonation_enabled; end
+
+  sig { params(value: T::Boolean).void }
+  def impersonation_enabled=(value); end
 
   sig { returns(Google::Protobuf::RepeatedField[Rk::SponsorApp::SponsorshipStaffNote]) }
   def pinned_staff_notes; end
