@@ -365,12 +365,10 @@ class Sponsorship < ApplicationRecord
     form_desc = conference&.form_description_for_locale
     return unless form_desc
 
-    fallback_options = form_desc.fallback_options
-    if fallback_options.present? && fallback_options.any?
-      if fallback_option.present? && !fallback_options.any? { |opt| opt.value == fallback_option }
-        errors.add :fallback_option, :invalid
-      end
-    end
+    options = form_desc.fallback_options.options
+    return if options.empty? || fallback_option.blank?
+
+    errors.add :fallback_option, :invalid if options.none? { |opt| opt.value == fallback_option }
   end
 
   #: () -> void

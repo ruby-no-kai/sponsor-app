@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app.internal;
+
+import "buf/validate/validate.proto";
+
+option ruby_package = "Rk::SponsorApp::Internal";
+
+// The alternative plans an application form offers, stored in form_descriptions.fallback_options.
+//
+// Storage only: the API publishes rubykaigi.sponsor_app.FallbackOption, which carries the
+// same fields and rules.
+message FallbackOptions {
+  // The options in the order the form lists them.
+  repeated FallbackOption options = 1 [
+    (buf.validate.field).repeated.max_items = 50,
+    (buf.validate.field).cel = {
+      id: "fallback_options.distinct"
+      message: "options sharing a value must differ in their conditions"
+      // Past max_items the quadratic check would exceed protovalidate's iteration budget and raise.
+      expression: "this.size() > 50 || this.all(a, this.filter(b, b.value == a.value && b.conditions == a.conditions).size() == 1)"
+    }
+  ];
+}
+
+// An alternative a sponsor picks in case the plan they applied for cannot be granted, such as
+// "change to Gold if Platinum is unavailable".
+message FallbackOption {
+  // When the form offers the option. It is offered when any condition matches, and always when
+  // there are none.
+  message Condition {
+    option (buf.validate.message).cel = {
+      id: "fallback_option.condition.not_empty"
+      message: "a condition must name plans or a booth request"
+      expression: "size(this.plans) > 0 || has(this.booth_request)"
+    };
+
+    // Names of the plans the applicant picked, any of which matches. Empty matches any plan.
+    repeated string plans = 1 [(buf.validate.field).repeated = {
+      unique: true
+      items: {
+        string: {
+          min_len: 1
+          max_len: 100
+        }
+      }
+    }];
+
+    // Whether the applicant requested a booth. Unset matches either.
+    optional bool booth_request = 2;
+  }
+
+  // What the sponsorship records as its fallback option, such as "platinum+booth,gold".
+  string value = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 100,
+    (buf.validate.field).cel = {
+      id: "fallback_option.value.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Label the form shows, in the form description's locale.
+  string name = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 200,
+    (buf.validate.field).cel = {
+      id: "fallback_option.name.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // When the form offers the option.
+  repeated Condition conditions = 3 [(buf.validate.field).repeated.max_items = 10];
+
+  // The plans the sponsor ends up with, in order of preference, which the form lists after the
+  // plan applied for. Each is a plan name or "{plan}" for the plan applied for, optionally
+  // followed by "!booth" or "!no_booth", or "!withdraw" alone.
+  repeated string priority_human = 4 [(buf.validate.field).repeated = {
+    max_items: 10
+    items: {
+      string: {
+        min_len: 1
+        max_len: 100
+      }
+    }
+  }];
+}

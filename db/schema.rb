@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_12_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -213,7 +213,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_000004) do
     t.datetime "created_at", null: false
     t.text "event_policy", default: "", null: false
     t.text "event_policy_html", default: "", null: false
-    t.jsonb "fallback_options", default: {}, null: false
+    t.jsonb "fallback_options", default: {"options" => []}, null: false
     t.text "head"
     t.text "head_html"
     t.string "locale", null: false

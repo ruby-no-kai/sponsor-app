@@ -147,7 +147,9 @@ ApplicationRecord.transaction do
 
           Some exceptions may be granted at #{conference.name}'s discretion.
         MARKDOWN
-        fallback_options: JSON.generate(Jsonnet.load(Rails.root.join("misc", "fallback_options_en.jsonnet"))),
+        fallback_options: Rk::SponsorApp::Internal::FallbackOptions.decode_json(
+          Jsonnet::VM.evaluate_file(Rails.root.join("misc", "fallback_options_en.jsonnet").to_s),
+        ),
       },
       {
         locale: "ja",
@@ -176,7 +178,9 @@ ApplicationRecord.transaction do
 
           以上の条件は #{conference.name} 側の裁量において、一部例外が認められる場合があります。
         MARKDOWN
-        fallback_options: JSON.generate(Jsonnet.load(Rails.root.join("misc", "fallback_options_ja.jsonnet"))),
+        fallback_options: Rk::SponsorApp::Internal::FallbackOptions.decode_json(
+          Jsonnet::VM.evaluate_file(Rails.root.join("misc", "fallback_options_ja.jsonnet").to_s),
+        ),
       },
     ].each do |form_desc_params|
       conference.form_descriptions.find_or_create_by!(locale: form_desc_params.fetch(:locale)).update!(form_desc_params)

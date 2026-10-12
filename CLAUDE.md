@@ -213,6 +213,21 @@ mise run lint:proto     # buf lint and buf format check
 - Sorbet ignores the generated `.rbs`. Message types come from tapioca's Protobuf DSL compiler.
 - `proto/protobufable/` is copied from the protobufable gem for buf. Do not edit it; refresh it when bumping the gem (`spec/proto/vendored_protobufable_spec.rb` checks it).
 
+#### Messages in columns
+
+A `jsonb` column can hold a message rather than a Hash: `form_descriptions.fallback_options` is an `Rk::SponsorApp::Internal::FallbackOptions`. Such messages live in `proto/rubykaigi/sponsor_app/internal/` (package `rubykaigi.sponsor_app.internal`, Ruby `Rk::SponsorApp::Internal`). They are storage, never part of a service: `spec/proto/services_spec.rb` fails on any `.internal.` type an RPC reaches, and `buf.gen.es.yaml` leaves them out of `ui/src/gen`. The API publishes a message of its own, and controllers and resources copy between the two field by field.
+
+- In `rails c`, `FormDescription.first.fallback_options` is the message. A Hash or a ProtoJSON string assigned to the attribute is cast to it.
+- The column stores ProtoJSON with every field present, in the `.proto` field names (`priority_human`). Reads accept the lowerCamelCase JSON names too and ignore unknown fields.
+- `ApplicationRecord` includes `Protobufable::ColumnValidatable`, so the message's `buf.validate` rules run before save, one error on the attribute per violation. Ruby validations remain only for what needs a query.
+
+To add one:
+
+1. Define the message under `proto/rubykaigi/sponsor_app/internal/` and run `mise run gen`.
+2. Declare `attribute :name, Protobufable::JsonType.new(Rk::SponsorApp::Internal::Foo, preserve_proto_fieldnames: true), default: -> { Rk::SponsorApp::Internal::Foo.new }` on the model.
+3. Migrate the stored documents to the message's shape in SQL, without loading models or messages.
+4. Declare the reader's type in `sorbet/rbi/shims/<model>.rbi`, as tapioca types the attribute untyped.
+
 ### Connect RPC API
 
 Rails serves the services in `proto/` over the [Connect protocol](https://connectrpc.com/docs/protocol/) with connect_rpc_rails: `AdminService` for staff and `SponsorService` for sponsors, at `/rubykaigi.sponsor_app.<Service>/<Rpc>`. Unary only, by POST with JSON or binary protobuf, and by GET for RPCs marked `idempotency_level = NO_SIDE_EFFECTS`.

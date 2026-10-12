@@ -13,6 +13,9 @@ plugins:
       - erasable_syntax=true
 inputs:
   - directory: proto
+    # Messages stored in columns never reach a client.
+    exclude_paths:
+      - proto/rubykaigi/sponsor_app/internal
   # The SPA decodes google.rpc.BadRequest and RequestInfo from Connect error details.
   - module: buf.build/googleapis/googleapis:c17df5b2beca46928cc87d5656bd5343
     paths:

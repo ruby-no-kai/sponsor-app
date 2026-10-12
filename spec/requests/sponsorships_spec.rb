@@ -36,6 +36,33 @@ RSpec.describe "Sponsorships", type: :request do
     end
   end
 
+  describe "GET new" do
+    it "lists each fallback option with the conditions and priorities the form script reads" do
+      plan.update!(name: 'Platinum')
+      conference.form_description_for_locale.update!(fallback_options: Rk::SponsorApp::Internal::FallbackOptions.new(options: [
+        Rk::SponsorApp::Internal::FallbackOption.new(
+          value: 'platinum,gold',
+          name: 'Change to Gold',
+          conditions: [
+            Rk::SponsorApp::Internal::FallbackOption::Condition.new(plans: ['Platinum'], booth_request: false),
+            Rk::SponsorApp::Internal::FallbackOption::Condition.new(booth_request: true),
+          ],
+          priority_human: ['Gold', '!withdraw'],
+        ),
+        Rk::SponsorApp::Internal::FallbackOption.new(value: 'withdraw', name: 'Withdraw'),
+      ]))
+
+      get new_user_conference_sponsorship_path(conference)
+
+      options = Nokogiri::HTML(response.body).css('select[name="sponsorship[fallback_option]"] option')
+      expect(options.map { [it['value'], it['data-conditions'], it['data-priority-human']] }).to eq([
+        ['', nil, nil],
+        ['platinum,gold', '[{"plans":["Platinum"],"booth_request":false},{"booth_request":true}]', '["Gold","!withdraw"]'],
+        ['withdraw', nil, nil],
+      ])
+    end
+  end
+
   describe "GET show" do
     let(:sponsorship) { FactoryBot.create(:sponsorship, conference:, plan:) }
 

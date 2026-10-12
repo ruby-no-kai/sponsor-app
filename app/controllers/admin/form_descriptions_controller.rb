@@ -21,12 +21,11 @@ module Admin
 
     #: () -> void
     def create
-      @form_description = FormDescription.new(form_description_params)
-      @form_description.conference = conference
+      @form_description = FormDescription.new(conference:)
 
       respond_to do |format|
-        if @form_description.save
-          format.html { redirect_to [conference, @form_description], notice: 'Form description was successfully created.' }
+        if assign_form_description_params && form_description.save
+          format.html { redirect_to [conference, form_description], notice: 'Form description was successfully created.' }
         else
           format.html { render :new }
         end
@@ -36,12 +35,33 @@ module Admin
     #: () -> void
     def update
       respond_to do |format|
-        if form_description.update(form_description_params)
+        if assign_form_description_params && form_description.save
           format.html { redirect_to [conference, form_description], notice: 'Form description was successfully updated.' }
         else
           format.html { render :new }
         end
       end
+    end
+
+    # The fallback_options textarea holds an Internal::FallbackOptions message as JSON. Malformed
+    # JSON, or a key the message lacks, is reported on the form rather than raised.
+    #: () -> bool
+    private def assign_form_description_params
+      attributes = form_description_params
+      json = attributes.delete(:fallback_options) #: String?
+      form_description.assign_attributes(attributes)
+      return true if json.nil?
+
+      form_description.fallback_options = if json.blank?
+        Rk::SponsorApp::Internal::FallbackOptions.new
+      else
+        Rk::SponsorApp::Internal::FallbackOptions.decode_json(json)
+      end
+      true
+    rescue Google::Protobuf::ParseError => e
+      @fallback_options_json = json #: String?
+      form_description.errors.add(:fallback_options, "is not a FallbackOptions message: #{e.message}")
+      false
     end
 
     #: () -> ActionController::Parameters
@@ -74,6 +94,6 @@ module Admin
     private def conference = Must.because(@conference) { "set_conference runs before every action" }
 
     #: () -> FormDescription
-    private def form_description = Must.because(@form_description) { "set_form_description runs before show, edit and update" }
+    private def form_description = Must.because(@form_description) { "set_form_description or the action sets it" }
   end
 end

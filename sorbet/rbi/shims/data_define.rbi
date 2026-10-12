@@ -121,30 +121,6 @@ class Conference::GithubRepo
   def branch; end
 end
 
-# Members hold admin-supplied JSON, which #valid? checks.
-class FormDescription::FallbackOptionCondition
-  sig { returns(T.untyped) }
-  def plans; end
-
-  sig { returns(T.untyped) }
-  def booth_request; end
-end
-
-# Members other than conditions hold admin-supplied JSON, which #valid? checks.
-class FormDescription::FallbackOption
-  sig { returns(T.untyped) }
-  def value; end
-
-  sig { returns(T.untyped) }
-  def name; end
-
-  sig { returns(T.nilable(T::Array[FormDescription::FallbackOptionCondition])) }
-  def conditions; end
-
-  sig { returns(T.untyped) }
-  def priority_human; end
-end
-
 class CreateBroadcastDeliveriesJob::Recipient
   sig { returns(T.nilable(Sponsorship)) }
   def sponsorship; end

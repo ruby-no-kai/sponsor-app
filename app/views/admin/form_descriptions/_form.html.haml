@@ -10,15 +10,17 @@
     = form.label :locale
     = form.text_field :locale, class: 'form-control'
 
-  - %i(head plan_help booth_help policy_help ticket_help sponsor_event_help event_policy).each do |field|
+  - FormDescription::MARKDOWN_FIELDS.each do |field|
     .form-group
       = form.label field
       = form.text_area field, class: 'form-control'
 
   .form-group
     = form.label :fallback_options
-    = form.text_area :fallback_options, class: 'form-control', value: JSON.pretty_generate(form_description.fallback_options.map(&:as_json)), rows: 10
-    %small.form-text JSON format: [{"value": "key1", "name": "Display Value 1"}, {"value": "key2", "name": "Display Value 2"}]
+    = form.text_area :fallback_options, class: 'form-control', value: @fallback_options_json || fallback_options_json(form_description.fallback_options), rows: 10
+    %small.form-text
+      An rubykaigi.sponsor_app.internal.FallbackOptions message as JSON:
+      %code {"options": [{"value": "gold", "name": "Change to Gold", "conditions": [{"plans": ["Platinum"], "booth_request": true}], "priority_human": ["Gold"]}]}
 
   .form-group
     = form.submit class: 'btn btn-primary'

@@ -27,6 +27,15 @@ RSpec.describe "Admin Form Descriptions", type: :request do
       form_description = conference.form_descriptions.last
       expect(response).to redirect_to(conference_form_description_path(conference, form_description))
     end
+
+    it "reports malformed fallback_options JSON on the form" do
+      expect do
+        post conference_form_descriptions_path(conference), params: {form_description: {locale: 'ja', fallback_options: '['}}
+      end.not_to change(conference.form_descriptions, :count)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('is not a FallbackOptions message')
+    end
   end
 
   describe "existing form description" do
@@ -45,13 +54,82 @@ RSpec.describe "Admin Form Descriptions", type: :request do
     end
 
     it "renders fallback_options as JSON" do
-      form_description.update!(fallback_options: [{'value' => 'opt1', 'name' => 'Option 1', 'conditions' => [{'plans' => ['Ruby']}]}])
+      FactoryBot.create(:plan, conference:, name: 'Ruby')
+      form_description.update!(fallback_options: {options: [{value: 'opt1', name: 'Option 1', conditions: [{plans: ['Ruby']}]}]})
 
       get conference_form_description_path(conference, form_description)
       expect(response).to have_http_status(:ok)
 
       json = Nokogiri::HTML(response.body).css('pre').map(&:text).join
-      expect(JSON.parse(json)).to eq([{'value' => 'opt1', 'name' => 'Option 1', 'conditions' => [{'plans' => ['Ruby']}]}])
+      expect(JSON.parse(json)).to eq('options' => [{'value' => 'opt1', 'name' => 'Option 1', 'conditions' => [{'plans' => ['Ruby']}]}])
+    end
+
+    describe "fallback_options" do
+      before { FactoryBot.create(:plan, conference:, name: 'Platinum') }
+
+      def submit(fallback_options)
+        patch conference_form_description_path(conference, form_description), params: {form_description: {head: '- Changed', fallback_options:}}
+      end
+
+      it "stores the message the JSON describes, in either field name spelling" do
+        submit('{"options": [{"value": "gold", "name": "Gold", "conditions": [{"plans": ["Platinum"], "booth_request": true}], "priorityHuman": ["Gold"]}]}')
+
+        expect(response).to redirect_to(conference_form_description_path(conference, form_description))
+        expect(form_description.reload.fallback_options).to eq(Rk::SponsorApp::Internal::FallbackOptions.new(options: [
+          Rk::SponsorApp::Internal::FallbackOption.new(
+            value: 'gold',
+            name: 'Gold',
+            conditions: [Rk::SponsorApp::Internal::FallbackOption::Condition.new(plans: ['Platinum'], booth_request: true)],
+            priority_human: ['Gold'],
+          ),
+        ]))
+      end
+
+      it "clears the options when left blank" do
+        form_description.update!(fallback_options: {options: [{value: 'gold', name: 'Gold'}]})
+
+        submit('')
+
+        expect(form_description.reload.fallback_options.options).to be_empty
+      end
+
+      it "shows the stored options in the .proto field names" do
+        form_description.update!(fallback_options: {options: [{value: 'gold', name: 'Gold', priority_human: ['Gold']}]})
+
+        get edit_conference_form_description_path(conference, form_description)
+
+        textarea = Nokogiri::HTML(response.body).at_css('textarea[name="form_description[fallback_options]"]')
+        expect(JSON.parse(textarea.text)).to eq('options' => [{'value' => 'gold', 'name' => 'Gold', 'priority_human' => ['Gold']}])
+      end
+
+      [
+        ['malformed JSON', '{"options": ['],
+        ['a key the message does not declare', '{"options": [{"value": "gold", "name": "Gold", "label": "x"}]}'],
+        ['a value of the wrong type', '{"options": [{"value": "gold", "name": "Gold", "conditions": "Platinum"}]}'],
+        ['a null option', '{"options": [null]}'],
+        ['an option that is not an object', '{"options": [1]}'],
+        ['an option that is a list', '{"options": [["a"]]}'],
+        ['conditions given as one object', '{"options": [{"value": "a", "name": "A", "conditions": {"plans": ["Platinum"]}}]}'],
+        ['a condition that is not an object', '{"options": [{"value": "a", "name": "A", "conditions": [1]}]}'],
+        ['a condition given as a string', '{"options": [{"value": "a", "name": "A", "conditions": ["x"]}]}'],
+      ].each do |description, json|
+        it "reports #{description} on the form, keeping what was typed" do
+          submit(json)
+
+          expect(response).to have_http_status(:ok)
+          page = Nokogiri::HTML(response.body)
+          expect(page.at_css('.alert-danger').text).to include('Fallback Options is not a FallbackOptions message')
+          expect(page.at_css('textarea[name="form_description[fallback_options]"]').text.strip).to eq(json)
+          expect(form_description.reload.head).not_to eq('- Changed')
+        end
+      end
+
+      it "reports a broken rule on the form" do
+        submit('{"options": [{"value": "", "name": "Gold"}]}')
+
+        expect(response).to have_http_status(:ok)
+        expect(Nokogiri::HTML(response.body).at_css('.alert-danger').text).to include('options[0].value: value is required')
+      end
     end
   end
 end
