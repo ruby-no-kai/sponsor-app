@@ -1,4 +1,4 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 require "active_support/core_ext/integer/time"
@@ -109,7 +109,7 @@ Rails.application.configure do
   config.x.github.client_id = ENV['GITHUB_CLIENT_ID']
   config.x.github.client_secret = ENV['GITHUB_CLIENT_SECRET']
   config.x.github.app_id = ENV['GITHUB_APP_ID']
-  config.x.github.private_key = ENV['GITHUB_CLIENT_PRIVATE_KEY'] && OpenSSL::PKey::RSA.new(ENV['GITHUB_CLIENT_PRIVATE_KEY'].unpack1('m*'), '')
+  config.x.github.private_key = ENV['GITHUB_CLIENT_PRIVATE_KEY']&.then { |key| OpenSSL::PKey::RSA.new(key.unpack1('m*'), '') }
 
   config.x.slack.webhook_urls = {
     default: ENV['SLACK_WEBHOOK_URL'],

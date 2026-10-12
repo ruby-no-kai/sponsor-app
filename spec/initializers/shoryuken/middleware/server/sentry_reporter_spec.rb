@@ -42,4 +42,41 @@ RSpec.describe Shoryuken::Middleware::Server::SentryReporter do
     expect(transaction).to have_received(:set_http_status).with(500)
     expect(transaction).to have_received(:finish).once
   end
+
+  describe '#generate_contexts' do
+    let(:worker) { stub_const('BatchWorker', Class.new { include Shoryuken::Worker }).new }
+
+    it 'reads the job class from the attributes of a single message' do
+      message = instance_double(
+        Shoryuken::Message,
+        message_id: 'm-1',
+        message_attributes: {
+          'shoryuken_class' => Aws::SQS::Types::MessageAttributeValue.new(
+            string_value: 'Shoryuken::ActiveJob::JobWrapper',
+            data_type: 'String',
+          ),
+        },
+      )
+      body = {'job_class' => 'SponsorshipWelcomeJob', 'job_id' => 'j-1', 'arguments' => [1]}
+
+      contexts = described_class.new.generate_contexts(worker, 'default', message, body)
+
+      expect(contexts[:Shoryuken]).to eq(
+        queue: 'default',
+        job_class: 'Shoryuken::ActiveJob::JobWrapper',
+        message_id: 'm-1',
+      )
+      expect(contexts[:'Active-Job']).to include(job_class: 'SponsorshipWelcomeJob', job_id: 'j-1', arguments: [1], queue: 'default')
+    end
+
+    it 'takes the job class from the worker for a batch' do
+      message = instance_double(Shoryuken::Message)
+
+      contexts = described_class.new.generate_contexts(worker, 'default', [message], ['payload'])
+
+      expect(contexts).to eq(
+        Shoryuken: {queue: 'default', job_class: 'BatchWorker', body: ['payload'], batched: true},
+      )
+    end
+  end
 end
