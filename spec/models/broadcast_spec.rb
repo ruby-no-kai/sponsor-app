@@ -41,7 +41,7 @@ RSpec.describe Broadcast, type: :model do
   end
 
   describe '#update_status' do
-    let(:broadcast) { FactoryBot.create(:broadcast, staff:, conference:, status: :ready) }
+    let(:broadcast) { FactoryBot.create(:broadcast, staff:, conference:, status: :pending) }
 
     it 'updates status to sent when all deliveries are sent' do
       FactoryBot.create(:broadcast_delivery, broadcast:, status: :sent)
@@ -54,6 +54,15 @@ RSpec.describe Broadcast, type: :model do
       FactoryBot.create(:broadcast_delivery, broadcast:, status: :pending)
       broadcast.update_status
       expect(broadcast.status).to eq('sending')
+    end
+
+    %i(created preparing modifying ready).each do |status|
+      it "keeps #{status} broadcast as is before dispatch" do
+        broadcast.update!(status:)
+        FactoryBot.create(:broadcast_delivery, broadcast:, status: :ready)
+        broadcast.update_status
+        expect(broadcast.status).to eq(status.to_s)
+      end
     end
   end
 end
