@@ -40,7 +40,7 @@ class ApplicationMailer < ActionMailer::Base
       Rails.application.config.x.default_email_address,
       Rails.application.config.x.default_email_reply_to,
     ]
-    prefix = possible_admin_address.include?(mail.to) ? 'admin/' : ''
+    prefix = possible_admin_address.intersect?(Array(mail.to)) ? 'admin/' : ''
 
     tag "#{prefix}sponsorship:#{@sponsorship.id}" # rubocop:disable Rails/ContentTag
     # tag "#{prefix}organization:#{@sponsorship.organization.id}"

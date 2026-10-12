@@ -25,7 +25,7 @@ class Broadcast < ApplicationRecord
   end
 
   def update_status
-    return self if preparing? || created? || preparing? || modifying?
+    return self if created? || preparing? || modifying? || ready?
 
     statuses = deliveries.distinct.order(status: :asc).pluck(:status)
     self.status = case
