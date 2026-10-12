@@ -11,12 +11,13 @@ module Admin
         .not_withdrawn
         .where(booth_requested: true)
         .order('plans.booth_size desc, sponsorships.name asc')
-      @sponsorships = conference.sponsorships
+      sponsorships = conference.sponsorships
         .includes(:plan)
         .active
         .where('(sponsorships.booth_requested = TRUE OR sponsorships.booth_assigned = TRUE)')
         .order('plans.booth_size desc, sponsorships.name asc')
-      @exhibitors = @sponsorships.select(&:booth_assigned?)
+      @sponsorships = sponsorships
+      @exhibitors = sponsorships.select(&:booth_assigned?)
     end
 
     def update
@@ -33,7 +34,7 @@ module Admin
 
     private def set_conference
       @conference = Conference.find_by!(slug: params[:conference_slug])
-      check_staff_conference_authorization!(@conference)
+      check_staff_conference_authorization!(conference)
     end
 
     #: () -> Conference

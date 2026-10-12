@@ -85,7 +85,7 @@ module Admin
 
     private def set_conference
       @conference = Conference.find_by!(slug: params[:slug])
-      check_staff_conference_authorization!(@conference)
+      check_staff_conference_authorization!(conference)
     end
 
     #: () -> Conference

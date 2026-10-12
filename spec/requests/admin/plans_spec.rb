@@ -18,6 +18,16 @@ RSpec.describe "Admin Plans", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(plan.name)
     end
+
+    context "with a staff restricted to another repository" do
+      let(:staff) { FactoryBot.create(:staff, restricted_repos: ['org/other']) }
+      let(:conference) { FactoryBot.create(:conference, allow_restricted_access: true, github_repo: 'org/repo@main:data') }
+
+      it "forbids access" do
+        get conference_plans_path(conference)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 
   describe "GET new" do

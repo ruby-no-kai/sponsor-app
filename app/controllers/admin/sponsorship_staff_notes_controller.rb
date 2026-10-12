@@ -8,8 +8,7 @@ module Admin
     before_action :set_staff_note, only: [:edit, :update, :destroy]
 
     def index
-      @new_staff_note = SponsorshipStaffNote.new
-      @new_staff_note.sponsorship = sponsorship
+      @new_staff_note = SponsorshipStaffNote.new(sponsorship:)
       @staff_notes = sponsorship.staff_notes.order(stickiness: :desc, created_at: :desc).includes(:staff)
     end
 
@@ -75,7 +74,7 @@ module Admin
 
     private def set_conference
       @conference = Conference.find_by!(slug: params[:conference_slug])
-      check_staff_conference_authorization!(@conference)
+      check_staff_conference_authorization!(conference)
     end
 
     private def set_sponsorship
