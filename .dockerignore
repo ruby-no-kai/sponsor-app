@@ -7,3 +7,6 @@ vendor/
 .terraform/
 /sorbet/
 /third_party/
+# The production image never contains the SPA, which only the ui/ dev server serves.
+/ui/
+**/node_modules
