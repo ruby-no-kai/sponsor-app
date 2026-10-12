@@ -32,9 +32,10 @@ module AssetFileUploadable
   end
 
   def download_url(disposition: :attachment)
-    encoded_filename = ERB::Util.url_encode(filename)
-    content_disposition = if filename.ascii_only?
-      "#{disposition}; filename=\"#{filename}\""
+    name = filename.to_s
+    encoded_filename = ERB::Util.url_encode(name)
+    content_disposition = if name.ascii_only?
+      "#{disposition}; filename=\"#{name}\""
     else
       "#{disposition}; filename=\"#{encoded_filename}\"; filename*=UTF-8''#{encoded_filename}"
     end
