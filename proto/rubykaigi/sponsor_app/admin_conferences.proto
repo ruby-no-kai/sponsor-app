@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package rubykaigi.sponsor_app;
 
+import "buf/validate/validate.proto";
 import "rubykaigi/sponsor_app/conference.proto";
 
 option ruby_package = "Rk::SponsorApp";
@@ -19,7 +20,10 @@ message AdminServiceListConferencesResponse {
 // Request for AdminService.GetConference.
 message AdminServiceGetConferenceRequest {
   // Slug of the conference, such as "rubykaigi2048".
-  string conference_slug = 1;
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
 }
 
 // Response for AdminService.GetConference.

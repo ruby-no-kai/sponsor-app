@@ -110,6 +110,24 @@ RSpec.describe 'AdminService conferences', type: :request do
 
         expect(error.detail(Protobufable::ProblemDetails).title).to eq('見つかりません')
       end
+
+      it 'answers invalid_argument naming the field as the JSON request spells it' do
+        error = connect_call(rpc, request_for('Not A Slug'))
+
+        expect(error).to have_attributes(status: 400, code: 'invalid_argument')
+        violations = error.detail(Google::Rpc::BadRequest).field_violations
+        expect(violations.map(&:field)).to all(eq('conferenceSlug'))
+        expect(violations.map(&:reason)).to eq(['STRING_PATTERN'])
+        expect(error.detail(Google::Rpc::RequestInfo)).to be_present
+      end
+
+      it 'names the field as a binary request spells it' do
+        error = connect_call(rpc, request_for(''), codec: :proto)
+
+        violations = error.detail(Google::Rpc::BadRequest).field_violations
+        expect(violations.map(&:field)).to all(eq('conference_slug'))
+        expect(violations.map(&:reason)).to include('STRING_MIN_LEN')
+      end
     end
 
     context 'with a restricted staff session' do
