@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "rubykaigi/sponsor_app/sponsor_viewer.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// The sponsor area: applying for a sponsorship and managing it afterwards.
+//
+// Served over the Connect protocol: by POST, which must send `Connect-Protocol-Version: 1`, and
+// by GET for an RPC without side effects. A browser may call it only from this site's own origin.
+//
+// A sponsor contact signs in through a link emailed to their address. An RPC that acts on a
+// sponsorship takes the conference's slug, and answers `unauthenticated` without a sponsor session
+// or `not_found` when the signed-in contact has no sponsorship in that conference.
+//
+// A problem the server raises carries a packed protobufable.ProblemDetails whose `type` is listed
+// in ProblemType. A request breaking a field's rules is answered `invalid_argument` with a
+// google.rpc.BadRequest naming each field. A rejected or malformed call and an unexpected failure
+// carry no ProblemDetails, only the Connect code. Each of these errors carries a
+// google.rpc.RequestInfo holding the ID to quote when reporting it. A call the transport refuses
+// outright, such as a GET of an RPC with side effects (405), an unsupported Content-Type (415) or
+// an unknown RPC (404), is answered with a plain-text body instead.
+service SponsorService {
+  // Translations
+
+  // Applications
+
+  // Exhibitions and events
+
+  // Broadcasts and passes
+
+  // Expense reports
+
+  // Viewer
+
+  // Returns who is using the sponsor area. Answers without a session too, describing a visitor
+  // who is not signed in.
+  rpc GetViewer(SponsorServiceGetViewerRequest) returns (SponsorServiceGetViewerResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}

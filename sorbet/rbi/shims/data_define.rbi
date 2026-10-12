@@ -259,3 +259,17 @@ class SponsorsFile::ApplicationResource::Group
   sig { returns(T::Array[Sponsorship]) }
   def sponsors; end
 end
+
+class SponsorViewer
+  sig { returns(T.nilable(String)) }
+  def email; end
+
+  sig { returns(T::Boolean) }
+  def staff; end
+
+  sig { returns(T::Array[Sponsorship]) }
+  def sponsorships; end
+
+  sig { returns(String) }
+  def locale; end
+end

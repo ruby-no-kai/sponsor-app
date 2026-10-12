@@ -70,7 +70,9 @@ RSpec.describe 'AdminService viewer', type: :request do
 
       expect(connect_call(rpc, Rk::SponsorApp::AdminServiceSignOutRequest.new)).to eq(Rk::SponsorApp::AdminServiceSignOutResponse.new)
       expect(connect_call(get_viewer, Rk::SponsorApp::AdminServiceGetViewerRequest.new)).to have_attributes(code: 'unauthenticated')
-      expect(session[:sponsorship_ids]).to eq([sponsorship.id])
+
+      viewer = connect_call(connect_method('SponsorService', 'GetViewer'), Rk::SponsorApp::SponsorServiceGetViewerRequest.new).viewer
+      expect(viewer.sponsorships.map(&:id)).to eq([sponsorship.id])
     end
 
     it 'answers a binary call' do

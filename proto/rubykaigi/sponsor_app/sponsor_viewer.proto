@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "rubykaigi/sponsor_app/conference.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// Request for SponsorService.GetViewer.
+message SponsorServiceGetViewerRequest {}
+
+// Response for SponsorService.GetViewer.
+message SponsorServiceGetViewerResponse {
+  // Whoever is using the sponsor area in this browser, signed in or not.
+  SponsorViewer viewer = 1;
+}
+
+// Whoever is using the sponsor area, as their session describes them.
+//
+// A sponsor contact signs in through a link emailed to them, and the session then covers every
+// sponsorship that lists that address as its primary contact.
+message SponsorViewer {
+  // A sponsorship the signed-in contact manages.
+  message Sponsorship {
+    // Sponsorship ID.
+    int64 id = 1;
+
+    // Name the sponsor is listed under.
+    string name = 2;
+
+    // The conference sponsored.
+    Conference conference = 3;
+  }
+
+  // Email address the sign-in link was sent to. Absent when no sponsor contact is signed in.
+  optional string email = 1;
+
+  // Whether this browser is also signed in to the staff area.
+  bool staff = 2;
+
+  // Sponsorships the signed-in contact manages, most recently applied first. Withdrawn
+  // sponsorships are left out. Empty when no sponsor contact is signed in.
+  repeated Sponsorship sponsorships = 3;
+
+  // Locale the sponsor area is shown in, "en" or "ja". Chosen with the `hl` query parameter,
+  // then remembered in a cookie.
+  string locale = 4;
+}

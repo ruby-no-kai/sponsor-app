@@ -78,6 +78,11 @@ module ConnectHelper
   def sign_in_staff(staff)
     get claim_user_session_path(FactoryBot.create(:session_token, staff:).handle)
   end
+
+  # Signs in as the primary contact of every sponsorship listing the email.
+  def sign_in_sponsor(email)
+    get claim_user_session_path(FactoryBot.create(:session_token, email:).handle)
+  end
 end
 
 RSpec.configure do |config|
