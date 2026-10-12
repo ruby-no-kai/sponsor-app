@@ -82,6 +82,12 @@ RSpec.describe Conference, type: :model do
         conference = FactoryBot.build(:conference, github_repo: ':data/sponsors.yml')
         expect(conference).not_to be_valid
       end
+
+      it 'rejects github_repo with a whitespace-only path' do
+        conference = FactoryBot.build(:conference, github_repo: 'owner/repo@main:  ')
+        expect(conference).not_to be_valid
+        expect(conference.errors[:github_repo]).to include('is invalid')
+      end
     end
   end
 
@@ -408,6 +414,11 @@ RSpec.describe Conference, type: :model do
 
     it 'returns nil when github_repo is blank' do
       conference = FactoryBot.build_stubbed(:conference)
+      expect(conference.github_repo).to be_nil
+    end
+
+    it 'returns nil when the path is whitespace only' do
+      conference = FactoryBot.build_stubbed(:conference, github_repo: 'owner/repo@main:  ')
       expect(conference.github_repo).to be_nil
     end
 

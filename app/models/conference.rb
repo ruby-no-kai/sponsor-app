@@ -79,11 +79,12 @@ class Conference < ApplicationRecord
     ghr = read_attribute(:github_repo)
     if @github_repo&.raw != ghr
       m = ghr&.match(/^(.+?)(?:@(.+?))?(?::(.+?))$/)
-      @github_repo = m && GithubRepo.new(
+      path = m && m[3].presence
+      @github_repo = m && path && GithubRepo.new(
         raw: ghr,
         name: m[1],
         branch: m[2].presence,
-        path: m[3].presence,
+        path:,
       )
     end
     @github_repo
@@ -92,7 +93,7 @@ class Conference < ApplicationRecord
   def validate_valid_github_repo
     return if self[:github_repo].blank?
 
-    unless github_repo && github_repo.name.present? && github_repo.path.present?
+    unless github_repo && github_repo.name.present?
       errors.add :github_repo, :invalid
     end
   end
