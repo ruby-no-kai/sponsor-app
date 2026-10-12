@@ -201,6 +201,11 @@ RSpec.describe Sponsorship, type: :model do
         sponsorship.accepted = '0'
         expect(sponsorship.accepted_at).to be_nil
       end
+
+      it 'keeps accepted_at when already accepted' do
+        sponsorship = FactoryBot.build_stubbed(:sponsorship, conference:, accepted_at: 2.days.ago)
+        expect { sponsorship.accepted = '1' }.not_to change(sponsorship, :accepted_at)
+      end
     end
 
     describe '#withdrawn?' do
@@ -346,6 +351,46 @@ RSpec.describe Sponsorship, type: :model do
     it 'returns id as string' do
       sponsorship = FactoryBot.build_stubbed(:sponsorship, conference:)
       expect(sponsorship.to_param).to eq(sponsorship.id.to_s)
+    end
+  end
+
+  describe '#policy_agreement' do
+    it 'defaults to false for a new record' do
+      sponsorship = FactoryBot.build(:sponsorship, conference:)
+      expect(sponsorship.policy_agreement).to be false
+    end
+
+    it 'defaults to true for a loaded record' do
+      sponsorship = described_class.find(FactoryBot.create(:sponsorship, conference:).id)
+      expect(sponsorship.policy_agreement).to be true
+    end
+
+    it 'keeps the value read before save' do
+      sponsorship = FactoryBot.build(:sponsorship, conference:)
+      sponsorship.policy_agreement
+      sponsorship.save!
+      expect(sponsorship.policy_agreement).to be false
+    end
+
+    it 'returns the assigned value' do
+      sponsorship = FactoryBot.build(:sponsorship, conference:)
+      sponsorship.policy_agreement = '1'
+      expect(sponsorship.policy_agreement).to be true
+    end
+  end
+
+  describe '#attributes_for_copy' do
+    it 'copies the primary contact without its id and kind' do
+      sponsorship = FactoryBot.create(:sponsorship, conference:)
+      attrs = sponsorship.attributes_for_copy
+      expect(attrs[:contact_attributes]).to include('email' => sponsorship.contact.email)
+      expect(attrs[:contact_attributes].keys).not_to include('id', 'kind')
+    end
+
+    it 'raises Must::Violation without a primary contact' do
+      sponsorship = FactoryBot.build(:sponsorship, conference:)
+      sponsorship.contact = nil
+      expect { sponsorship.attributes_for_copy }.to raise_error(Must::Violation)
     end
   end
 

@@ -57,7 +57,7 @@ class SponsorEvent < ApplicationRecord
   end
 
   def all_host_sponsorships
-    ([sponsorship] + co_host_sponsorships).reject(&:withdrawn?)
+    ([Must.expect(sponsorship)] + co_host_sponsorships).reject(&:withdrawn?)
   end
 
   private def set_conference_from_sponsorship

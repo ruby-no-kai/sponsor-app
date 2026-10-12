@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 require 'securerandom'
@@ -128,7 +128,7 @@ class Sponsorship < ApplicationRecord
     case
     when !x || x == '0'
       self.accepted_at = nil
-    when x && !accepted?
+    when !accepted?
       self.accepted_at = Time.zone.now
     else
       accepted?
@@ -161,7 +161,8 @@ class Sponsorship < ApplicationRecord
   end
 
   def policy_agreement
-    return @policy_agreement if defined? @policy_agreement
+    agreement = @policy_agreement
+    return agreement unless agreement.nil?
 
     @policy_agreement = persisted?
   end
@@ -224,7 +225,7 @@ class Sponsorship < ApplicationRecord
       url: url,
       profile: profile,
       asset_file_id: asset_file_id,
-      contact_attributes: contact.attributes.except('id', 'kind'),
+      contact_attributes: Must.because(contact) { "a saved sponsorship validates the presence of its contact" }.attributes.except('id', 'kind'),
       alternate_billing_contact_attributes: alternate_billing_contact&.attributes&.except('id', 'kind')&.merge(_keep: '1'),
       billing_request_attributes: billing_request&.attributes&.except('id', 'kind'),
     }.compact
