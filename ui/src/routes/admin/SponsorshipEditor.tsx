@@ -108,7 +108,8 @@ function Editor({
       await mutate(
         (key) =>
           isRpcKeyOf(key, AdminService.method.getSponsorship) ||
-          isRpcKeyOf(key, AdminService.method.getConference),
+          isRpcKeyOf(key, AdminService.method.getConference) ||
+          isRpcKeyOf(key, AdminService.method.listSponsorshipEditingHistory),
       );
       await navigate(sponsorshipPath);
     },

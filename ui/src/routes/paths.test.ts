@@ -43,6 +43,7 @@ describe("isSpaPathname", () => {
   it("matches the sponsorship pages but leaves downloads and note edits to Rails", () => {
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42"));
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/edit"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/editing_history"));
     assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/download_asset"));
     assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/expense_report"));
     assert.ok(

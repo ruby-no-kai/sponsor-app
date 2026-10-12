@@ -112,6 +112,11 @@ service AdminService {
   // `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
   rpc WithdrawSponsorship(AdminServiceWithdrawSponsorshipRequest) returns (AdminServiceWithdrawSponsorshipResponse);
 
+  // Lists every save of a sponsorship with what it changed.
+  rpc ListSponsorshipEditingHistory(AdminServiceListSponsorshipEditingHistoryRequest) returns (AdminServiceListSponsorshipEditingHistoryResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   // Organizations
 
   // Booth assignments

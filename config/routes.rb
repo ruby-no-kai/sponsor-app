@@ -146,6 +146,7 @@ Rails.application.routes.draw do
       rpc 'GetSponsorship' => 'api/admin/sponsorships'
       rpc 'UpdateSponsorship' => 'api/admin/sponsorships'
       rpc 'WithdrawSponsorship' => 'api/admin/sponsorships'
+      rpc 'ListSponsorshipEditingHistory' => 'api/admin/sponsorship_editing_histories'
 
       # Organizations
 

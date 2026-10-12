@@ -4,6 +4,7 @@ package rubykaigi.sponsor_app;
 
 import "buf/validate/validate.proto";
 import "rubykaigi/sponsor_app/admin_sponsorship.proto";
+import "rubykaigi/sponsor_app/editing_history.proto";
 import "rubykaigi/sponsor_app/form_description.proto";
 
 option ruby_package = "Rk::SponsorApp";
@@ -173,4 +174,23 @@ message AdminServiceWithdrawSponsorshipRequest {
 message AdminServiceWithdrawSponsorshipResponse {
   // The sponsorship as withdrawn.
   AdminSponsorship sponsorship = 1;
+}
+
+// Request for AdminService.ListSponsorshipEditingHistory.
+message AdminServiceListSponsorshipEditingHistoryRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.ListSponsorshipEditingHistory.
+message AdminServiceListSponsorshipEditingHistoryResponse {
+  // Every save of the sponsorship, by its sponsor or by staff, most recent first. Not paginated,
+  // as a sponsorship is saved a few dozen times at most.
+  repeated EditingHistoryEntry entries = 1;
 }

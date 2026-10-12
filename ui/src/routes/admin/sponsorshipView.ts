@@ -1,9 +1,13 @@
+import { toJsonString } from "@bufbuild/protobuf";
+import { ValueSchema } from "@bufbuild/protobuf/wkt";
+import type { Value } from "@bufbuild/protobuf/wkt";
 import {
   AdminSponsorship_ExpenseReport_Status,
   AdminSponsorship_SponsorEvent_Status,
   AdminSponsorship_TitoDiscountCode_Kind,
 } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 import type { AdminSponsorship } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
+import { EditingHistoryEntry_Change_Operation } from "../../gen/rubykaigi/sponsor_app/editing_history_pb.ts";
 
 // Whether a sponsor-supplied URL is safe to link to: http or https, never javascript: and the like.
 export function isWebUrl(url: string): boolean {
@@ -92,6 +96,13 @@ export const EXPENSE_REPORT_STATUS_LABELS: Readonly<
   [AdminSponsorship_ExpenseReport_Status.REJECTED]: { text: "rejected", tone: "error" },
 };
 
+export const OPERATION_LABELS: Readonly<Record<EditingHistoryEntry_Change_Operation, Label>> = {
+  [EditingHistoryEntry_Change_Operation.UNSPECIFIED]: { text: "?", tone: "outline" },
+  [EditingHistoryEntry_Change_Operation.ADDED]: { text: "+", tone: "info" },
+  [EditingHistoryEntry_Change_Operation.REMOVED]: { text: "-", tone: "error" },
+  [EditingHistoryEntry_Change_Operation.CHANGED]: { text: "~", tone: "warning" },
+};
+
 // Looks a label up for an enum value the generated code may not know yet.
 export function labelOf<K extends number>(labels: Readonly<Record<K, Label>>, value: K): Label {
   return labels[value] ?? { text: String(value), tone: "outline" };
@@ -102,4 +113,9 @@ export function formatAmount(amount: string): string {
   const [integer = "", fraction] = amount.split(".");
   const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return fraction === undefined || /^0*$/.test(fraction) ? grouped : `${grouped}.${fraction}`;
+}
+
+// A history value as JSON, or a dash when the change has none on that side.
+export function formatHistoryValue(value: Value | undefined): string {
+  return value === undefined ? "—" : toJsonString(ValueSchema, value);
 }
