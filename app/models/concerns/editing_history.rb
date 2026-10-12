@@ -13,9 +13,14 @@ module EditingHistory
     before_validation :calculate_diff
   end
 
+  #: () -> Array[EditingHistoryChange]
+  def diff_changes
+    Must.because(diff) { "diff is calculated before validation" }.map { EditingHistoryChange.new(it) }
+  end
+
   #: () -> Array[String]
   def diff_summary
-    Must.because(diff) { "diff is calculated before validation" }.map { |d| "#{d[0]}#{d[1]}" }
+    diff_changes.map { "#{it.operation}#{it.path}" }
   end
 
   #: () -> void

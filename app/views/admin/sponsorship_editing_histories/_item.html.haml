@@ -5,13 +5,10 @@
     - if history.diff.present?
       %table.table.table-responsible-sm
         %tbody
-          - history.diff.each do |row|
-            %tr{class: {'~' => 'bg-warning', '+' => 'bg-info', '-' => 'bg-danger'}[row[0]] }
-              %td= row[0]
-              %td= row[1].to_json
-              - if row[0] == '~'
-                %td= row[3].to_json
-              - else
-                %td= row[2].to_json
+          - history.diff_changes.each do |change|
+            %tr{class: {'~' => 'bg-warning', '+' => 'bg-info', '-' => 'bg-danger'}[change.operation] }
+              %td= change.operation
+              %td= change.path.to_json
+              %td= (change.new_value? ? change.new_value : change.old_value).to_json
     - else
       %span.label.label-info No diff

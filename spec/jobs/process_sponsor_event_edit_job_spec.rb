@@ -13,6 +13,26 @@ RSpec.describe ProcessSponsorEventEditJob, type: :job do
     allow(PushEventAssetFileJob).to receive(:perform_later)
   end
 
+  describe 'GenerateSponsorsYamlFileJob trigger' do
+    it 'regenerates when an accepted event is withdrawn' do
+      event = FactoryBot.create(:sponsor_event, :accepted, sponsorship:)
+      event.update!(status: :withdrawn)
+
+      described_class.perform_now(event.last_editing_history)
+
+      expect(GenerateSponsorsYamlFileJob).to have_received(:perform_now).with(conference)
+    end
+
+    it 'skips an edit of a pending event that keeps its status' do
+      event = FactoryBot.create(:sponsor_event, :pending, sponsorship:)
+      event.update!(title: 'Renamed')
+
+      described_class.perform_now(event.last_editing_history)
+
+      expect(GenerateSponsorsYamlFileJob).not_to have_received(:perform_now)
+    end
+  end
+
   describe 'PushEventAssetFileJob trigger' do
     context 'when asset_file_id changes (new file)' do
       it 'triggers PushEventAssetFileJob' do
