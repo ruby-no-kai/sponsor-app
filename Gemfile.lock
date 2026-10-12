@@ -215,6 +215,8 @@ GEM
     google-protobuf (4.36.2-x86_64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
+    googleapis-common-protos-types (1.23.0)
+      google-protobuf (~> 4.26)
     haml (7.5.1)
       prism (>= 1.1.0)
       temple (>= 0.8.2)
@@ -353,6 +355,8 @@ GEM
       premailer (~> 1.7, >= 1.7.9)
     prettyprint (0.2.1)
     prism (1.9.0)
+    problem (0.1.0)
+      actionpack (>= 7.0)
     protovalidate (0.1.0.beta3-aarch64-linux-gnu)
       google-protobuf (>= 4.31)
     protovalidate (0.1.0.beta3-arm64-darwin)
@@ -601,6 +605,7 @@ DEPENDENCIES
   factory_bot_rails
   faker
   google-protobuf
+  googleapis-common-protos-types
   haml
   hashdiff
   httpx
@@ -618,6 +623,7 @@ DEPENDENCIES
   openssl
   pg (>= 0.18, < 2.0)
   premailer-rails
+  problem (~> 0.1)
   protobufable!
   protovalidate (= 0.1.0.beta3)
   puma

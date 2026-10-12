@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package protobufable;
+
+import "google/protobuf/any.proto";
+
+// An RFC 9457 problem document as a message, for a transport whose errors carry protobuf
+// messages rather than a JSON body, such as a Connect error's details.
+//
+// Kept apart from problem.proto so an application can vendor this file to reference the
+// message from its own schema without vendoring the option message too.
+message ProblemDetails {
+  // URI reference identifying the problem type.
+  string type = 1;
+
+  // Short, human-readable summary of the problem type.
+  string title = 2;
+
+  // HTTP status of this occurrence.
+  int32 status = 3;
+
+  // Human-readable explanation specific to this occurrence.
+  string detail = 4;
+
+  // URI reference identifying this occurrence.
+  string instance = 5;
+
+  // Machine-readable data about this occurrence, such as a google.rpc.BadRequest. Named apart
+  // from `detail`, which RFC 9457 reserves for prose.
+  repeated google.protobuf.Any information = 6;
+}
