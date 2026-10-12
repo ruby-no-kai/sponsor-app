@@ -4,10 +4,11 @@
 
 require 'google/protobuf'
 
+require 'rubykaigi/sponsor_app/admin_conferences_pb'
 require 'rubykaigi/sponsor_app/admin_viewer_pb'
 
 
-descriptor_data = "\n)rubykaigi/sponsor_app/admin_service.proto\x12\x15rubykaigi.sponsor_app\x1a(rubykaigi/sponsor_app/admin_viewer.proto2\xfd\x01\n\x0c\x41\x64minService\x12{\n\tGetViewer\x12\x33.rubykaigi.sponsor_app.AdminServiceGetViewerRequest\x1a\x34.rubykaigi.sponsor_app.AdminServiceGetViewerResponse\"\x03\x90\x02\x01\x12p\n\x07SignOut\x12\x31.rubykaigi.sponsor_app.AdminServiceSignOutRequest\x1a\x32.rubykaigi.sponsor_app.AdminServiceSignOutResponseB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
+descriptor_data = "\n)rubykaigi/sponsor_app/admin_service.proto\x12\x15rubykaigi.sponsor_app\x1a-rubykaigi/sponsor_app/admin_conferences.proto\x1a(rubykaigi/sponsor_app/admin_viewer.proto2\x97\x04\n\x0c\x41\x64minService\x12\x8d\x01\n\x0fListConferences\x12\x39.rubykaigi.sponsor_app.AdminServiceListConferencesRequest\x1a:.rubykaigi.sponsor_app.AdminServiceListConferencesResponse\"\x03\x90\x02\x01\x12\x87\x01\n\rGetConference\x12\x37.rubykaigi.sponsor_app.AdminServiceGetConferenceRequest\x1a\x38.rubykaigi.sponsor_app.AdminServiceGetConferenceResponse\"\x03\x90\x02\x01\x12{\n\tGetViewer\x12\x33.rubykaigi.sponsor_app.AdminServiceGetViewerRequest\x1a\x34.rubykaigi.sponsor_app.AdminServiceGetViewerResponse\"\x03\x90\x02\x01\x12p\n\x07SignOut\x12\x31.rubykaigi.sponsor_app.AdminServiceSignOutRequest\x1a\x32.rubykaigi.sponsor_app.AdminServiceSignOutResponseB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)

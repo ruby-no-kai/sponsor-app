@@ -140,5 +140,12 @@ module Api
       end
       Sentry.set_user(id: "staff_#{staff.id}", username: staff.login)
     end
+
+    #: (Conference) -> void
+    private def set_sentry_conference(conference)
+      Sentry.configure_scope do |scope|
+        scope.set_context('sponsor-app.conference', {id: conference.id, slug: conference.slug})
+      end
+    end
   end
 end

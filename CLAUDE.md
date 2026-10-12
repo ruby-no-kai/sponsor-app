@@ -203,7 +203,7 @@ mise run lint:proto     # buf lint and buf format check
 Rails serves the services in `proto/` over the [Connect protocol](https://connectrpc.com/docs/protocol/) with connect_rpc_rails: `AdminService` for staff, at `/rubykaigi.sponsor_app.<Service>/<Rpc>`. Unary only, by POST with JSON or binary protobuf, and by GET for RPCs marked `idempotency_level = NO_SIDE_EFFECTS`.
 
 - Controllers live in `app/controllers/api/admin/`, one action per RPC. They inherit `Api::Admin::ApplicationController`, which authenticates with the HAML side's session cookie.
-- Every RPC declares its policy right above its `def`: `authorize :any_staff` or `:unrestricted_staff`. Serving an RPC without one raises.
+- Every RPC declares its policy right above its `def`: `authorize :any_staff`, `:unrestricted_staff` or `:conference`. Serving an RPC without one raises. `:conference` reads the request's `conference_slug`, which must be field 1.
 - Responses are built by Alba resources in `app/resources/api/`, bound to their message with `with_protobuf`. Controllers never build a response field by field.
 - Errors are problems: raise an `Errors::*` class from `app/models/errors.rb`, each typed by a `ProblemType` value in `proto/rubykaigi/sponsor_app/problem.proto`. Titles live under `problem_details.titles` in `config/locales/`.
 - A POST must send `Connect-Protocol-Version: 1`, and a request whose `Sec-Fetch-Site` or `Origin` names another origin is refused (`ConnectForgeryProtection`).
@@ -226,11 +226,11 @@ curl -c jar "http://sponsor-app.localhost:1355/session/claim/$handle"
 
 # POST, JSON
 curl -b jar -H 'Content-Type: application/json' -H 'Connect-Protocol-Version: 1' \
-  -d '{}' \
-  http://sponsor-app.localhost:1355/rubykaigi.sponsor_app.AdminService/GetViewer
+  -d '{"conferenceSlug": "rubykaigi2048"}' \
+  http://sponsor-app.localhost:1355/rubykaigi.sponsor_app.AdminService/GetConference
 
 # GET, for an RPC without side effects
-curl -b jar 'http://sponsor-app.localhost:1355/rubykaigi.sponsor_app.AdminService/GetViewer?connect=v1&encoding=json&message=%7B%7D'
+curl -b jar 'http://sponsor-app.localhost:1355/rubykaigi.sponsor_app.AdminService/GetConference?connect=v1&encoding=json&message=%7B%22conferenceSlug%22%3A%22rubykaigi2048%22%7D'
 ```
 
 An error is a JSON body `{"code", "message", "details"}`, each detail a protobuf message named by `type` and encoded in unpadded base64 under `value`.

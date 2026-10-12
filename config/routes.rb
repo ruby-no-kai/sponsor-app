@@ -124,6 +124,8 @@ Rails.application.routes.draw do
   if connect_rpc_enabled
     connect_service 'rubykaigi.sponsor_app.AdminService' do
       # Conferences
+      rpc 'ListConferences' => 'api/admin/conferences'
+      rpc 'GetConference' => 'api/admin/conferences'
 
       # Form descriptions
 

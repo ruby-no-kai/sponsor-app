@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package rubykaigi.sponsor_app;
 
+import "rubykaigi/sponsor_app/admin_conferences.proto";
 import "rubykaigi/sponsor_app/admin_viewer.proto";
 
 option ruby_package = "Rk::SponsorApp";
@@ -12,7 +13,8 @@ option ruby_package = "Rk::SponsorApp";
 // by GET for an RPC without side effects. A browser may call it only from this site's own origin.
 //
 // Every RPC needs the staff session that the staff area's GitHub sign-in creates, and answers
-// `unauthenticated` without one.
+// `unauthenticated` without one. A staff member restricted to some conferences is answered
+// `permission_denied` for any other.
 //
 // A problem the server raises carries a packed protobufable.ProblemDetails whose `type` is listed
 // in ProblemType. A rejected or malformed call and an unexpected failure carry no ProblemDetails,
@@ -22,6 +24,16 @@ option ruby_package = "Rk::SponsorApp";
 // a plain-text body instead.
 service AdminService {
   // Conferences
+
+  // Lists the conferences the signed-in staff member can manage.
+  rpc ListConferences(AdminServiceListConferencesRequest) returns (AdminServiceListConferencesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one conference by its slug.
+  rpc GetConference(AdminServiceGetConferenceRequest) returns (AdminServiceGetConferenceResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Form descriptions
 
