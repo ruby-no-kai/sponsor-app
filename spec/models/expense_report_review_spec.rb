@@ -59,5 +59,16 @@ RSpec.describe ExpenseReportReview, type: :model do
         described_class.create_for!(submission, action: 'invalid', comment: nil, staff:)
       end.to raise_error(ActiveRecord::RecordInvalid)
     end
+
+    it 'raises and rolls back without an expense report' do
+      submission = report.current_submission
+      allow(submission).to receive(:expense_report).and_return(nil)
+
+      expect do
+        expect do
+          described_class.create_for!(submission, action: 'approve', comment: nil, staff:)
+        end.to raise_error(Must::Violation)
+      end.not_to change(described_class, :count)
+    end
   end
 end

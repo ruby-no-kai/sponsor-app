@@ -48,6 +48,14 @@ RSpec.describe ExpenseReport, type: :model do
       report.recalculate_totals
       expect(report).to be_changed
     end
+
+    it 'sums to zero for an unsaved report' do
+      report = described_class.new(sponsorship:)
+
+      report.recalculate_totals
+      expect(report.total_amount).to eq(0)
+      expect(report.total_tax_amount).to eq(0)
+    end
   end
 
   describe '#submit!' do
