@@ -7,6 +7,8 @@ class SponsorshipStaffNote < ApplicationRecord
   belongs_to :sponsorship
   belongs_to :staff
 
+  validates :body, presence: true
+
   #: () -> bool
   def pin?
     stickiness > 0

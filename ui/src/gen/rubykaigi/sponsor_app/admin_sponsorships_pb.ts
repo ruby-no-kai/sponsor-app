@@ -11,13 +11,15 @@ import type { EditingHistoryEntry } from "./editing_history_pb.ts";
 import { file_rubykaigi_sponsor_app_editing_history } from "./editing_history_pb.ts";
 import type { FallbackOption } from "./form_description_pb.ts";
 import { file_rubykaigi_sponsor_app_form_description } from "./form_description_pb.ts";
+import type { SponsorshipStaffNote } from "./sponsorship_staff_note_pb.ts";
+import { file_rubykaigi_sponsor_app_sponsorship_staff_note } from "./sponsorship_staff_note_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file rubykaigi/sponsor_app/admin_sponsorships.proto.
  */
 export const file_rubykaigi_sponsor_app_admin_sponsorships: GenFile = /*@__PURE__*/
-  fileDesc("Ci5ydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fc3BvbnNvcnNoaXBzLnByb3RvEhVydWJ5a2FpZ2kuc3BvbnNvcl9hcHAiiQgKFUFkbWluU3BvbnNvcnNoaXBJbnB1dBIdCgdwbGFuX2lkGAEgASgDQge6SAQiAiAASACIAQESFAoEbmFtZRgCIAEoCUIGukgDyAEBEhMKA3VybBgDIAEoCUIGukgDyAEBEhcKB3Byb2ZpbGUYBCABKAlCBrpIA8gBARIXCg9ib290aF9yZXF1ZXN0ZWQYBSABKAgSFgoOYm9vdGhfYXNzaWduZWQYBiABKAgSIAoPZmFsbGJhY2tfb3B0aW9uGAcgASgJQge6SARyAhhkEhUKDWN1c3RvbWl6YXRpb24YCCABKAgSHwoSY3VzdG9taXphdGlvbl9uYW1lGAkgASgJSAGIAQESEQoJc3VzcGVuZGVkGAogASgIEhAKCGFjY2VwdGVkGAsgASgIEjQKHm51bWJlcl9vZl9hZGRpdGlvbmFsX2F0dGVuZGVlcxgMIAEoBUIHukgEGgIoAEgCiAEBEk0KB2NvbnRhY3QYDSABKAsyNC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TcG9uc29yc2hpcElucHV0LkNvbnRhY3RCBrpIA8gBARJjChlhbHRlcm5hdGVfYmlsbGluZ19jb250YWN0GA4gASgLMjsucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU3BvbnNvcnNoaXBJbnB1dC5CaWxsaW5nQ29udGFjdEgDiAEBEh0KFWN1c3RvbWl6YXRpb25fcmVxdWVzdBgPIAEoCRIXCg9iaWxsaW5nX3JlcXVlc3QYECABKAkSDAoEbm90ZRgRIAEoCRqxAQoHQ29udGFjdBIZCgVlbWFpbBgBIAEoCUIKukgHyAEBcgJgARIVCghlbWFpbF9jYxgCIAEoCUgAiAEBEhcKB2FkZHJlc3MYAyABKAlCBrpIA8gBARIcCgxvcmdhbml6YXRpb24YBCABKAlCBrpIA8gBARIRCgR1bml0GAUgASgJSAGIAQESFAoEbmFtZRgGIAEoCUIGukgDyAEBQgsKCV9lbWFpbF9jY0IHCgVfdW5pdBqUAQoOQmlsbGluZ0NvbnRhY3QSGQoFZW1haWwYASABKAlCCrpIB8gBAXICYAESFwoHYWRkcmVzcxgCIAEoCUIGukgDyAEBEhwKDG9yZ2FuaXphdGlvbhgDIAEoCUIGukgDyAEBEhEKBHVuaXQYBCABKAlIAIgBARIUCgRuYW1lGAUgASgJQga6SAPIAQFCBwoFX3VuaXRCCgoIX3BsYW5faWRCFQoTX2N1c3RvbWl6YXRpb25fbmFtZUIhCh9fbnVtYmVyX29mX2FkZGl0aW9uYWxfYXR0ZW5kZWVzQhwKGl9hbHRlcm5hdGVfYmlsbGluZ19jb250YWN0In0KIUFkbWluU2VydmljZUdldFNwb25zb3JzaGlwUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgACLuAQoiQWRtaW5TZXJ2aWNlR2V0U3BvbnNvcnNoaXBSZXNwb25zZRI8CgtzcG9uc29yc2hpcBgBIAEoCzInLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNwb25zb3JzaGlwEkIKDHBsYW5fY2hvaWNlcxgEIAMoCzIsLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNwb25zb3JzaGlwLlBsYW4SRgoXZmFsbGJhY2tfb3B0aW9uX2Nob2ljZXMYBSADKAsyJS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRmFsbGJhY2tPcHRpb24ixQEKJEFkbWluU2VydmljZVVwZGF0ZVNwb25zb3JzaGlwUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgABJDCgVpbnB1dBgDIAEoCzIsLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNwb25zb3JzaGlwSW5wdXRCBrpIA8gBASJlCiVBZG1pblNlcnZpY2VVcGRhdGVTcG9uc29yc2hpcFJlc3BvbnNlEjwKC3Nwb25zb3JzaGlwGAEgASgLMicucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU3BvbnNvcnNoaXAiggEKJkFkbWluU2VydmljZVdpdGhkcmF3U3BvbnNvcnNoaXBSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAImcKJ0FkbWluU2VydmljZVdpdGhkcmF3U3BvbnNvcnNoaXBSZXNwb25zZRI8CgtzcG9uc29yc2hpcBgBIAEoCzInLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNwb25zb3JzaGlwIowBCjBBZG1pblNlcnZpY2VMaXN0U3BvbnNvcnNoaXBFZGl0aW5nSGlzdG9yeVJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAAicAoxQWRtaW5TZXJ2aWNlTGlzdFNwb25zb3JzaGlwRWRpdGluZ0hpc3RvcnlSZXNwb25zZRI7CgdlbnRyaWVzGAEgAygLMioucnVieWthaWdpLnNwb25zb3JfYXBwLkVkaXRpbmdIaXN0b3J5RW50cnlCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_buf_validate_validate, file_rubykaigi_sponsor_app_admin_sponsorship, file_rubykaigi_sponsor_app_editing_history, file_rubykaigi_sponsor_app_form_description]);
+  fileDesc("Ci5ydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fc3BvbnNvcnNoaXBzLnByb3RvEhVydWJ5a2FpZ2kuc3BvbnNvcl9hcHAiiQgKFUFkbWluU3BvbnNvcnNoaXBJbnB1dBIdCgdwbGFuX2lkGAEgASgDQge6SAQiAiAASACIAQESFAoEbmFtZRgCIAEoCUIGukgDyAEBEhMKA3VybBgDIAEoCUIGukgDyAEBEhcKB3Byb2ZpbGUYBCABKAlCBrpIA8gBARIXCg9ib290aF9yZXF1ZXN0ZWQYBSABKAgSFgoOYm9vdGhfYXNzaWduZWQYBiABKAgSIAoPZmFsbGJhY2tfb3B0aW9uGAcgASgJQge6SARyAhhkEhUKDWN1c3RvbWl6YXRpb24YCCABKAgSHwoSY3VzdG9taXphdGlvbl9uYW1lGAkgASgJSAGIAQESEQoJc3VzcGVuZGVkGAogASgIEhAKCGFjY2VwdGVkGAsgASgIEjQKHm51bWJlcl9vZl9hZGRpdGlvbmFsX2F0dGVuZGVlcxgMIAEoBUIHukgEGgIoAEgCiAEBEk0KB2NvbnRhY3QYDSABKAsyNC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TcG9uc29yc2hpcElucHV0LkNvbnRhY3RCBrpIA8gBARJjChlhbHRlcm5hdGVfYmlsbGluZ19jb250YWN0GA4gASgLMjsucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU3BvbnNvcnNoaXBJbnB1dC5CaWxsaW5nQ29udGFjdEgDiAEBEh0KFWN1c3RvbWl6YXRpb25fcmVxdWVzdBgPIAEoCRIXCg9iaWxsaW5nX3JlcXVlc3QYECABKAkSDAoEbm90ZRgRIAEoCRqxAQoHQ29udGFjdBIZCgVlbWFpbBgBIAEoCUIKukgHyAEBcgJgARIVCghlbWFpbF9jYxgCIAEoCUgAiAEBEhcKB2FkZHJlc3MYAyABKAlCBrpIA8gBARIcCgxvcmdhbml6YXRpb24YBCABKAlCBrpIA8gBARIRCgR1bml0GAUgASgJSAGIAQESFAoEbmFtZRgGIAEoCUIGukgDyAEBQgsKCV9lbWFpbF9jY0IHCgVfdW5pdBqUAQoOQmlsbGluZ0NvbnRhY3QSGQoFZW1haWwYASABKAlCCrpIB8gBAXICYAESFwoHYWRkcmVzcxgCIAEoCUIGukgDyAEBEhwKDG9yZ2FuaXphdGlvbhgDIAEoCUIGukgDyAEBEhEKBHVuaXQYBCABKAlIAIgBARIUCgRuYW1lGAUgASgJQga6SAPIAQFCBwoFX3VuaXRCCgoIX3BsYW5faWRCFQoTX2N1c3RvbWl6YXRpb25fbmFtZUIhCh9fbnVtYmVyX29mX2FkZGl0aW9uYWxfYXR0ZW5kZWVzQhwKGl9hbHRlcm5hdGVfYmlsbGluZ19jb250YWN0Ip0BChlTcG9uc29yc2hpcFN0YWZmTm90ZUlucHV0EnAKBGJvZHkYASABKAlCYrpIX7oBWQorc3BvbnNvcnNoaXBfc3RhZmZfbm90ZV9pbnB1dC5ib2R5Lm5vdF9ibGFuaxIXdmFsdWUgbXVzdCBub3QgYmUgYmxhbmsaEXRoaXMudHJpbSgpICE9ICcnyAEBEg4KBnBpbm5lZBgCIAEoCCJ9CiFBZG1pblNlcnZpY2VHZXRTcG9uc29yc2hpcFJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAAigAMKIkFkbWluU2VydmljZUdldFNwb25zb3JzaGlwUmVzcG9uc2USPAoLc3BvbnNvcnNoaXAYASABKAsyJy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TcG9uc29yc2hpcBJHChJwaW5uZWRfc3RhZmZfbm90ZXMYAiADKAsyKy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvcnNoaXBTdGFmZk5vdGUSRwoScmVjZW50X3N0YWZmX25vdGVzGAMgAygLMisucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JzaGlwU3RhZmZOb3RlEkIKDHBsYW5fY2hvaWNlcxgEIAMoCzIsLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNwb25zb3JzaGlwLlBsYW4SRgoXZmFsbGJhY2tfb3B0aW9uX2Nob2ljZXMYBSADKAsyJS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRmFsbGJhY2tPcHRpb24ixQEKJEFkbWluU2VydmljZVVwZGF0ZVNwb25zb3JzaGlwUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgABJDCgVpbnB1dBgDIAEoCzIsLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNwb25zb3JzaGlwSW5wdXRCBrpIA8gBASJlCiVBZG1pblNlcnZpY2VVcGRhdGVTcG9uc29yc2hpcFJlc3BvbnNlEjwKC3Nwb25zb3JzaGlwGAEgASgLMicucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU3BvbnNvcnNoaXAiggEKJkFkbWluU2VydmljZVdpdGhkcmF3U3BvbnNvcnNoaXBSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAImcKJ0FkbWluU2VydmljZVdpdGhkcmF3U3BvbnNvcnNoaXBSZXNwb25zZRI8CgtzcG9uc29yc2hpcBgBIAEoCzInLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNwb25zb3JzaGlwIowBCjBBZG1pblNlcnZpY2VMaXN0U3BvbnNvcnNoaXBFZGl0aW5nSGlzdG9yeVJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAAicAoxQWRtaW5TZXJ2aWNlTGlzdFNwb25zb3JzaGlwRWRpdGluZ0hpc3RvcnlSZXNwb25zZRI7CgdlbnRyaWVzGAEgAygLMioucnVieWthaWdpLnNwb25zb3JfYXBwLkVkaXRpbmdIaXN0b3J5RW50cnkiiAEKLEFkbWluU2VydmljZUxpc3RTcG9uc29yc2hpcFN0YWZmTm90ZXNSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAInEKLUFkbWluU2VydmljZUxpc3RTcG9uc29yc2hpcFN0YWZmTm90ZXNSZXNwb25zZRJACgtzdGFmZl9ub3RlcxgBIAMoCzIrLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yc2hpcFN0YWZmTm90ZSLSAQotQWRtaW5TZXJ2aWNlQ3JlYXRlU3BvbnNvcnNoaXBTdGFmZk5vdGVSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAEkcKBWlucHV0GAMgASgLMjAucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JzaGlwU3RhZmZOb3RlSW5wdXRCBrpIA8gBASJxCi5BZG1pblNlcnZpY2VDcmVhdGVTcG9uc29yc2hpcFN0YWZmTm90ZVJlc3BvbnNlEj8KCnN0YWZmX25vdGUYASABKAsyKy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvcnNoaXBTdGFmZk5vdGUi8gEKLUFkbWluU2VydmljZVVwZGF0ZVNwb25zb3JzaGlwU3RhZmZOb3RlUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgABIeCg1zdGFmZl9ub3RlX2lkGAMgASgDQge6SAQiAiAAEkcKBWlucHV0GAQgASgLMjAucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JzaGlwU3RhZmZOb3RlSW5wdXRCBrpIA8gBASJxCi5BZG1pblNlcnZpY2VVcGRhdGVTcG9uc29yc2hpcFN0YWZmTm90ZVJlc3BvbnNlEj8KCnN0YWZmX25vdGUYASABKAsyKy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvcnNoaXBTdGFmZk5vdGUiqQEKLUFkbWluU2VydmljZURlbGV0ZVNwb25zb3JzaGlwU3RhZmZOb3RlUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgABIeCg1zdGFmZl9ub3RlX2lkGAMgASgDQge6SAQiAiAAIjAKLkFkbWluU2VydmljZURlbGV0ZVNwb25zb3JzaGlwU3RhZmZOb3RlUmVzcG9uc2VCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_buf_validate_validate, file_rubykaigi_sponsor_app_admin_sponsorship, file_rubykaigi_sponsor_app_editing_history, file_rubykaigi_sponsor_app_form_description, file_rubykaigi_sponsor_app_sponsorship_staff_note]);
 
 /**
  * The fields of a sponsorship organizers can change, taken by AdminService.UpdateSponsorship.
@@ -262,6 +264,35 @@ export const AdminSponsorshipInput_BillingContactSchema: GenMessage<AdminSponsor
   messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 0, 1);
 
 /**
+ * The writable fields of a staff note, taken by AdminService.CreateSponsorshipStaffNote and
+ * UpdateSponsorshipStaffNote.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorshipStaffNoteInput
+ */
+export type SponsorshipStaffNoteInput = Message<"rubykaigi.sponsor_app.SponsorshipStaffNoteInput"> & {
+  /**
+   * The note in Markdown.
+   *
+   * @generated from field: string body = 1;
+   */
+  body: string;
+
+  /**
+   * Whether to pin the note, which lists it ahead of the unpinned ones.
+   *
+   * @generated from field: bool pinned = 2;
+   */
+  pinned: boolean;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorshipStaffNoteInput.
+ * Use `create(SponsorshipStaffNoteInputSchema)` to create a new message.
+ */
+export const SponsorshipStaffNoteInputSchema: GenMessage<SponsorshipStaffNoteInput> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 1);
+
+/**
  * Request for AdminService.GetSponsorship.
  *
  * @generated from message rubykaigi.sponsor_app.AdminServiceGetSponsorshipRequest
@@ -287,10 +318,11 @@ export type AdminServiceGetSponsorshipRequest = Message<"rubykaigi.sponsor_app.A
  * Use `create(AdminServiceGetSponsorshipRequestSchema)` to create a new message.
  */
 export const AdminServiceGetSponsorshipRequestSchema: GenMessage<AdminServiceGetSponsorshipRequest> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 1);
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 2);
 
 /**
- * Response for AdminService.GetSponsorship: the sponsorship and what an editor of it offers.
+ * Response for AdminService.GetSponsorship: the sponsorship, the staff notes its page shows, and
+ * what an editor of it offers.
  *
  * @generated from message rubykaigi.sponsor_app.AdminServiceGetSponsorshipResponse
  */
@@ -301,6 +333,21 @@ export type AdminServiceGetSponsorshipResponse = Message<"rubykaigi.sponsor_app.
    * @generated from field: rubykaigi.sponsor_app.AdminSponsorship sponsorship = 1;
    */
   sponsorship?: AdminSponsorship | undefined;
+
+  /**
+   * Every pinned staff note, highest pinning priority first, then most recently written first.
+   *
+   * @generated from field: repeated rubykaigi.sponsor_app.SponsorshipStaffNote pinned_staff_notes = 2;
+   */
+  pinnedStaffNotes: SponsorshipStaffNote[];
+
+  /**
+   * The five unpinned staff notes written last, most recent first. ListSponsorshipStaffNotes
+   * returns all of them.
+   *
+   * @generated from field: repeated rubykaigi.sponsor_app.SponsorshipStaffNote recent_staff_notes = 3;
+   */
+  recentStaffNotes: SponsorshipStaffNote[];
 
   /**
    * The plans the sponsorship can be put on: every plan of the conference, lowest rank first.
@@ -323,7 +370,7 @@ export type AdminServiceGetSponsorshipResponse = Message<"rubykaigi.sponsor_app.
  * Use `create(AdminServiceGetSponsorshipResponseSchema)` to create a new message.
  */
 export const AdminServiceGetSponsorshipResponseSchema: GenMessage<AdminServiceGetSponsorshipResponse> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 2);
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 3);
 
 /**
  * Request for AdminService.UpdateSponsorship.
@@ -358,7 +405,7 @@ export type AdminServiceUpdateSponsorshipRequest = Message<"rubykaigi.sponsor_ap
  * Use `create(AdminServiceUpdateSponsorshipRequestSchema)` to create a new message.
  */
 export const AdminServiceUpdateSponsorshipRequestSchema: GenMessage<AdminServiceUpdateSponsorshipRequest> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 3);
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 4);
 
 /**
  * Response for AdminService.UpdateSponsorship.
@@ -379,7 +426,7 @@ export type AdminServiceUpdateSponsorshipResponse = Message<"rubykaigi.sponsor_a
  * Use `create(AdminServiceUpdateSponsorshipResponseSchema)` to create a new message.
  */
 export const AdminServiceUpdateSponsorshipResponseSchema: GenMessage<AdminServiceUpdateSponsorshipResponse> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 4);
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 5);
 
 /**
  * Request for AdminService.WithdrawSponsorship.
@@ -407,7 +454,7 @@ export type AdminServiceWithdrawSponsorshipRequest = Message<"rubykaigi.sponsor_
  * Use `create(AdminServiceWithdrawSponsorshipRequestSchema)` to create a new message.
  */
 export const AdminServiceWithdrawSponsorshipRequestSchema: GenMessage<AdminServiceWithdrawSponsorshipRequest> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 5);
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 6);
 
 /**
  * Response for AdminService.WithdrawSponsorship.
@@ -428,7 +475,7 @@ export type AdminServiceWithdrawSponsorshipResponse = Message<"rubykaigi.sponsor
  * Use `create(AdminServiceWithdrawSponsorshipResponseSchema)` to create a new message.
  */
 export const AdminServiceWithdrawSponsorshipResponseSchema: GenMessage<AdminServiceWithdrawSponsorshipResponse> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 6);
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 7);
 
 /**
  * Request for AdminService.ListSponsorshipEditingHistory.
@@ -456,7 +503,7 @@ export type AdminServiceListSponsorshipEditingHistoryRequest = Message<"rubykaig
  * Use `create(AdminServiceListSponsorshipEditingHistoryRequestSchema)` to create a new message.
  */
 export const AdminServiceListSponsorshipEditingHistoryRequestSchema: GenMessage<AdminServiceListSponsorshipEditingHistoryRequest> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 7);
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 8);
 
 /**
  * Response for AdminService.ListSponsorshipEditingHistory.
@@ -478,5 +525,224 @@ export type AdminServiceListSponsorshipEditingHistoryResponse = Message<"rubykai
  * Use `create(AdminServiceListSponsorshipEditingHistoryResponseSchema)` to create a new message.
  */
 export const AdminServiceListSponsorshipEditingHistoryResponseSchema: GenMessage<AdminServiceListSponsorshipEditingHistoryResponse> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 8);
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 9);
+
+/**
+ * Request for AdminService.ListSponsorshipStaffNotes.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceListSponsorshipStaffNotesRequest
+ */
+export type AdminServiceListSponsorshipStaffNotesRequest = Message<"rubykaigi.sponsor_app.AdminServiceListSponsorshipStaffNotesRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceListSponsorshipStaffNotesRequest.
+ * Use `create(AdminServiceListSponsorshipStaffNotesRequestSchema)` to create a new message.
+ */
+export const AdminServiceListSponsorshipStaffNotesRequestSchema: GenMessage<AdminServiceListSponsorshipStaffNotesRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 10);
+
+/**
+ * Response for AdminService.ListSponsorshipStaffNotes.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceListSponsorshipStaffNotesResponse
+ */
+export type AdminServiceListSponsorshipStaffNotesResponse = Message<"rubykaigi.sponsor_app.AdminServiceListSponsorshipStaffNotesResponse"> & {
+  /**
+   * Every staff note on the sponsorship, pinned ones first by their pinning priority, each group
+   * then most recently written first. Not paginated.
+   *
+   * @generated from field: repeated rubykaigi.sponsor_app.SponsorshipStaffNote staff_notes = 1;
+   */
+  staffNotes: SponsorshipStaffNote[];
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceListSponsorshipStaffNotesResponse.
+ * Use `create(AdminServiceListSponsorshipStaffNotesResponseSchema)` to create a new message.
+ */
+export const AdminServiceListSponsorshipStaffNotesResponseSchema: GenMessage<AdminServiceListSponsorshipStaffNotesResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 11);
+
+/**
+ * Request for AdminService.CreateSponsorshipStaffNote.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCreateSponsorshipStaffNoteRequest
+ */
+export type AdminServiceCreateSponsorshipStaffNoteRequest = Message<"rubykaigi.sponsor_app.AdminServiceCreateSponsorshipStaffNoteRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * The note to write, signed by the staff member signed in.
+   *
+   * @generated from field: rubykaigi.sponsor_app.SponsorshipStaffNoteInput input = 3;
+   */
+  input?: SponsorshipStaffNoteInput | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCreateSponsorshipStaffNoteRequest.
+ * Use `create(AdminServiceCreateSponsorshipStaffNoteRequestSchema)` to create a new message.
+ */
+export const AdminServiceCreateSponsorshipStaffNoteRequestSchema: GenMessage<AdminServiceCreateSponsorshipStaffNoteRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 12);
+
+/**
+ * Response for AdminService.CreateSponsorshipStaffNote.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCreateSponsorshipStaffNoteResponse
+ */
+export type AdminServiceCreateSponsorshipStaffNoteResponse = Message<"rubykaigi.sponsor_app.AdminServiceCreateSponsorshipStaffNoteResponse"> & {
+  /**
+   * The note written, with its body rendered.
+   *
+   * @generated from field: rubykaigi.sponsor_app.SponsorshipStaffNote staff_note = 1;
+   */
+  staffNote?: SponsorshipStaffNote | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCreateSponsorshipStaffNoteResponse.
+ * Use `create(AdminServiceCreateSponsorshipStaffNoteResponseSchema)` to create a new message.
+ */
+export const AdminServiceCreateSponsorshipStaffNoteResponseSchema: GenMessage<AdminServiceCreateSponsorshipStaffNoteResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 13);
+
+/**
+ * Request for AdminService.UpdateSponsorshipStaffNote.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceUpdateSponsorshipStaffNoteRequest
+ */
+export type AdminServiceUpdateSponsorshipStaffNoteRequest = Message<"rubykaigi.sponsor_app.AdminServiceUpdateSponsorshipStaffNoteRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * ID of a staff note on the sponsorship.
+   *
+   * @generated from field: int64 staff_note_id = 3;
+   */
+  staffNoteId: bigint;
+
+  /**
+   * Every writable field, replacing what is stored. The note keeps its author.
+   *
+   * @generated from field: rubykaigi.sponsor_app.SponsorshipStaffNoteInput input = 4;
+   */
+  input?: SponsorshipStaffNoteInput | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceUpdateSponsorshipStaffNoteRequest.
+ * Use `create(AdminServiceUpdateSponsorshipStaffNoteRequestSchema)` to create a new message.
+ */
+export const AdminServiceUpdateSponsorshipStaffNoteRequestSchema: GenMessage<AdminServiceUpdateSponsorshipStaffNoteRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 14);
+
+/**
+ * Response for AdminService.UpdateSponsorshipStaffNote.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceUpdateSponsorshipStaffNoteResponse
+ */
+export type AdminServiceUpdateSponsorshipStaffNoteResponse = Message<"rubykaigi.sponsor_app.AdminServiceUpdateSponsorshipStaffNoteResponse"> & {
+  /**
+   * The note as updated, with its body rendered.
+   *
+   * @generated from field: rubykaigi.sponsor_app.SponsorshipStaffNote staff_note = 1;
+   */
+  staffNote?: SponsorshipStaffNote | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceUpdateSponsorshipStaffNoteResponse.
+ * Use `create(AdminServiceUpdateSponsorshipStaffNoteResponseSchema)` to create a new message.
+ */
+export const AdminServiceUpdateSponsorshipStaffNoteResponseSchema: GenMessage<AdminServiceUpdateSponsorshipStaffNoteResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 15);
+
+/**
+ * Request for AdminService.DeleteSponsorshipStaffNote.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceDeleteSponsorshipStaffNoteRequest
+ */
+export type AdminServiceDeleteSponsorshipStaffNoteRequest = Message<"rubykaigi.sponsor_app.AdminServiceDeleteSponsorshipStaffNoteRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * ID of a staff note on the sponsorship.
+   *
+   * @generated from field: int64 staff_note_id = 3;
+   */
+  staffNoteId: bigint;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceDeleteSponsorshipStaffNoteRequest.
+ * Use `create(AdminServiceDeleteSponsorshipStaffNoteRequestSchema)` to create a new message.
+ */
+export const AdminServiceDeleteSponsorshipStaffNoteRequestSchema: GenMessage<AdminServiceDeleteSponsorshipStaffNoteRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 16);
+
+/**
+ * Response for AdminService.DeleteSponsorshipStaffNote.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceDeleteSponsorshipStaffNoteResponse
+ */
+export type AdminServiceDeleteSponsorshipStaffNoteResponse = Message<"rubykaigi.sponsor_app.AdminServiceDeleteSponsorshipStaffNoteResponse"> & {
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceDeleteSponsorshipStaffNoteResponse.
+ * Use `create(AdminServiceDeleteSponsorshipStaffNoteResponseSchema)` to create a new message.
+ */
+export const AdminServiceDeleteSponsorshipStaffNoteResponseSchema: GenMessage<AdminServiceDeleteSponsorshipStaffNoteResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_sponsorships, 17);
 

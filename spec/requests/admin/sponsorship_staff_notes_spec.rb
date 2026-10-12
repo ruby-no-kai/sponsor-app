@@ -32,6 +32,15 @@ RSpec.describe "Admin Sponsorship Staff Notes", type: :request do
       expect(sponsorship.staff_notes.last.staff).to eq(staff)
       expect(response).to redirect_to(conference_sponsorship_staff_notes_path(conference, sponsorship))
     end
+
+    it "shows the form again for a blank body, adding nothing" do
+      expect do
+        post conference_sponsorship_staff_notes_path(conference, sponsorship), params: {sponsorship_staff_note: {body: '  ', stickiness: 0}}
+      end.not_to change(SponsorshipStaffNote, :count)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Body can&#39;t be blank")
+    end
   end
 
   describe "existing note" do

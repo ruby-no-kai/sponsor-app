@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "google/protobuf/timestamp.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// A note organizers keep on a sponsorship, such as the outcome of a call.
+//
+// Staff-only. SponsorService never returns it.
+message SponsorshipStaffNote {
+  // Note ID.
+  int64 id = 1;
+
+  // The note in Markdown.
+  string body = 2;
+
+  // `body` rendered as HTML. Staff may embed raw HTML in the Markdown, which this holds as is.
+  string body_html = 3;
+
+  // Whether the note is pinned, which lists it ahead of the unpinned ones.
+  bool pinned = 4;
+
+  // GitHub login of the staff member who wrote the note.
+  string staff_login = 5;
+
+  // When the note was written.
+  google.protobuf.Timestamp created_at = 6;
+
+  // When the note was last changed.
+  google.protobuf.Timestamp updated_at = 7;
+}

@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "rubykaigi/sponsor_app/admin_sponsorship.proto";
 import "rubykaigi/sponsor_app/editing_history.proto";
 import "rubykaigi/sponsor_app/form_description.proto";
+import "rubykaigi/sponsor_app/sponsorship_staff_note.proto";
 
 option ruby_package = "Rk::SponsorApp";
 
@@ -112,6 +113,23 @@ message AdminSponsorshipInput {
   string note = 17;
 }
 
+// The writable fields of a staff note, taken by AdminService.CreateSponsorshipStaffNote and
+// UpdateSponsorshipStaffNote.
+message SponsorshipStaffNoteInput {
+  // The note in Markdown.
+  string body = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "sponsorship_staff_note_input.body.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Whether to pin the note, which lists it ahead of the unpinned ones.
+  bool pinned = 2;
+}
+
 // Request for AdminService.GetSponsorship.
 message AdminServiceGetSponsorshipRequest {
   // Slug of the conference, such as "rubykaigi2048".
@@ -124,10 +142,18 @@ message AdminServiceGetSponsorshipRequest {
   int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
 }
 
-// Response for AdminService.GetSponsorship: the sponsorship and what an editor of it offers.
+// Response for AdminService.GetSponsorship: the sponsorship, the staff notes its page shows, and
+// what an editor of it offers.
 message AdminServiceGetSponsorshipResponse {
   // The sponsorship the request names.
   AdminSponsorship sponsorship = 1;
+
+  // Every pinned staff note, highest pinning priority first, then most recently written first.
+  repeated SponsorshipStaffNote pinned_staff_notes = 2;
+
+  // The five unpinned staff notes written last, most recent first. ListSponsorshipStaffNotes
+  // returns all of them.
+  repeated SponsorshipStaffNote recent_staff_notes = 3;
 
   // The plans the sponsorship can be put on: every plan of the conference, lowest rank first.
   repeated AdminSponsorship.Plan plan_choices = 4;
@@ -194,3 +220,85 @@ message AdminServiceListSponsorshipEditingHistoryResponse {
   // as a sponsorship is saved a few dozen times at most.
   repeated EditingHistoryEntry entries = 1;
 }
+
+// Request for AdminService.ListSponsorshipStaffNotes.
+message AdminServiceListSponsorshipStaffNotesRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.ListSponsorshipStaffNotes.
+message AdminServiceListSponsorshipStaffNotesResponse {
+  // Every staff note on the sponsorship, pinned ones first by their pinning priority, each group
+  // then most recently written first. Not paginated.
+  repeated SponsorshipStaffNote staff_notes = 1;
+}
+
+// Request for AdminService.CreateSponsorshipStaffNote.
+message AdminServiceCreateSponsorshipStaffNoteRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // The note to write, signed by the staff member signed in.
+  SponsorshipStaffNoteInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.CreateSponsorshipStaffNote.
+message AdminServiceCreateSponsorshipStaffNoteResponse {
+  // The note written, with its body rendered.
+  SponsorshipStaffNote staff_note = 1;
+}
+
+// Request for AdminService.UpdateSponsorshipStaffNote.
+message AdminServiceUpdateSponsorshipStaffNoteRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // ID of a staff note on the sponsorship.
+  int64 staff_note_id = 3 [(buf.validate.field).int64.gt = 0];
+
+  // Every writable field, replacing what is stored. The note keeps its author.
+  SponsorshipStaffNoteInput input = 4 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.UpdateSponsorshipStaffNote.
+message AdminServiceUpdateSponsorshipStaffNoteResponse {
+  // The note as updated, with its body rendered.
+  SponsorshipStaffNote staff_note = 1;
+}
+
+// Request for AdminService.DeleteSponsorshipStaffNote.
+message AdminServiceDeleteSponsorshipStaffNoteRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // ID of a staff note on the sponsorship.
+  int64 staff_note_id = 3 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.DeleteSponsorshipStaffNote.
+message AdminServiceDeleteSponsorshipStaffNoteResponse {}
