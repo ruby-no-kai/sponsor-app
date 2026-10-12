@@ -11,6 +11,7 @@ The app typechecks with [Sorbet](https://sorbet.org/) using inline RBS comments 
 | `sorbet/tapioca/require.rb` | entrypoints tapioca loads beyond `Bundler.require` | no |
 | `sorbet/rbi/annotations/` | community annotations from `tapioca annotations` | yes |
 | `sorbet/rbi/shims/` | hand-written RBIs for what tapioca cannot see | no |
+| `sorbet/rbi/shims/<concern>.rbi` | columns and readers a concern reads from its including classes | no |
 | `third_party/sorbet/rbi/gems/` | gem RBIs from `tapioca gem` | yes |
 | `third_party/sorbet/rbi/dsl/` | Rails DSL RBIs (models, associations, routes) from `tapioca dsl` | yes |
 | `app/models/must.rb` | `Must`, the runtime counterpart of `T.must` | no |
@@ -21,7 +22,7 @@ The app typechecks with [Sorbet](https://sorbet.org/) using inline RBS comments 
 |---------|--------------|
 | `mise run typecheck` | `bundle exec srb tc` |
 | `hk check` | every linter, Sorbet included; also the pre-commit hook |
-| `mise run tapioca` | regenerates gem, annotation and DSL RBIs |
+| `mise run tapioca` | regenerates gem, annotation and DSL RBIs, skipping the gems excluded in `sorbet/tapioca/config.yml` |
 | `bundle exec tapioca gem` | gem RBIs, after `Gemfile.lock` changes |
 | `bundle exec tapioca dsl` | DSL RBIs, after adding a model, column, association or route |
 | `bundle exec tapioca annotations` | community annotations |
@@ -88,11 +89,23 @@ To raise an older file, `bundle exec spoom srb bump --from false --to true` find
 
 ## Known gaps
 
-- `Data.define` readers have no inline form. Declare them in `sorbet/rbi/shims/data_define.rbi`.
+- `Struct` members have untyped readers, so value objects use `Data.define`. Its readers have no inline form. Declare them in `sorbet/rbi/shims/data_define.rbi`.
+- Sorbet checks only the argument count of a `Data.define` constructor, so nothing checks the stored values against the reader types in the shim.
 - `belongs_to` readers are nilable in the DSL RBIs, even when the association is required. Read them with `Must.expect`.
 - `NOT NULL` columns are typed non-nil, although an unsaved record can still hold nil.
+- `Rails.application.config.x` and a parameterized mailer's `params` return untyped. Declare the value where it is read when a type is needed: `delivery = params[:delivery] #: BroadcastDelivery`.
+- `delegate` defines untyped methods and `Method#call` returns untyped. Write a typed one-line reader instead of `delegate`, and pass a lambda typed `^(A) -> R` instead of `method(:name)`.
+- `perform_later` and `perform_now` take untyped arguments, as tapioca's ActiveJob compiler reads parameter types only from runtime `sig`s. A wrong argument type is not reported.
 - Methods and `include`s inside an `included do` block are invisible to Sorbet. Include the module directly, or declare the method in a shim.
+- A concern that calls its host's methods names the host above `module` with `# @requires_ancestor: ActiveRecord::Base` (or `ApplicationController`). Columns and readers that only the including classes define go in `sorbet/rbi/shims/<concern>.rbi`.
+- Inside a concern, `self.class` reaches `ClassMethods` only through a cast: `self.class #: as singleton(ActiveRecord::Base) & ClassMethods`.
+- A concern cannot declare an instance variable that only its including classes assign, as inline RBS declares one only at an assignment. Declare a reader that each including class implements instead.
 - `include` of a module built at runtime, such as `Rails.application.routes.url_helpers`, is error 4002 at every level. `ApplicationJob` includes it inside `class_eval`; tapioca's url helpers compiler declares the helpers.
+- A block or file that a DSL evaluates with another `self`, such as `ActiveSupport.on_load`, `OmniAuth::Builder`, a mailer's `default subject: -> { }` or `config/puma.rb`, starts with `#: self as <Host>`.
+- Sorbet types the `self` of a bare lambda in a class body as the class, so a validation or callback condition takes the record: `if: ->(record) { record.persisted? }`.
+- Sorbet reads a Hash passed to an optional positional parameter as keyword arguments when the callee also takes keywords. Pass one of the keywords explicitly, as `TitoApi#get_registration` does.
+- A splat of an array whose size is not known statically is error 7019 at every level above `false`. `config/lambda_runner.rb` stays at `false` for this.
+- Tapioca emits no instance variables. One that a gem assigns and a patch reads is declared with `T.let` in an `initialize` body in the gem's shim, as in `sorbet/rbi/shims/aws-sdk-s3.rbi`.
 - Files evaluated in another tool's DSL and unable to resolve, such as `config/ci.rb`, are `typed: ignore`.
 - A spec whose anonymous class defines `initialize` or `self.name` leaks those definitions into `Object` for the whole project. Such a spec is `typed: ignore`.
 
