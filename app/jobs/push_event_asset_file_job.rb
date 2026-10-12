@@ -1,13 +1,14 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 require 'open3'
 
 class PushEventAssetFileJob < ApplicationJob
+  #: (ApplicationRecord) -> void
   def perform(record)
     resolve_record(record)
-    @sponsorship = event.sponsorship
-    @conference = event.conference
+    @sponsorship = event.sponsorship #: Sponsorship?
+    @conference = event.conference #: Conference?
 
     return if conference.github_repo_images_path.blank?
 
@@ -23,11 +24,12 @@ class PushEventAssetFileJob < ApplicationJob
     push_to_github(gi, repo, asset_file, webp_content)
   end
 
+  #: (ApplicationRecord) -> void
   private def resolve_record(record)
     case record
     when SponsorEventEditingHistory
-      @editing_history = record
-      @event = record.sponsor_event
+      @editing_history = record #: EditingHistoryTarget::history?
+      @event = record.sponsor_event #: SponsorEvent?
     when SponsorEvent
       @event = record
       @editing_history = record.last_editing_history
@@ -41,6 +43,7 @@ class PushEventAssetFileJob < ApplicationJob
     end
   end
 
+  #: (SponsorEventAssetFile) -> String
   private def convert_to_webp(asset_file)
     tmpdir = Rails.root.join('tmp', "PushEventAssetFileJob-#{job_id}-#{asset_file.id}")
     FileUtils.mkdir_p(tmpdir)
@@ -67,9 +70,10 @@ class PushEventAssetFileJob < ApplicationJob
     content
   end
 
-  THUMBNAIL_MAX_SIZE = 800
+  THUMBNAIL_MAX_SIZE = 800 #: Integer
 
   # Avoid enlarging images smaller than THUMBNAIL_MAX_SIZE
+  #: (Pathname) -> String
   private def thumbnail_size_for(input_path)
     stdout, _, status = Open3.capture3(
       {'VIPS_BLOCK_UNTRUSTED' => '1'},
@@ -84,6 +88,7 @@ class PushEventAssetFileJob < ApplicationJob
     THUMBNAIL_MAX_SIZE.to_s
   end
 
+  #: (GithubInstallation, Conference::GithubRepo, SponsorEventAssetFile, String) -> void
   private def push_to_github(gi, repo, asset_file, webp_content)
     octokit = gi.octokit
     images_path = Must.because(conference.github_repo_images_path) { "perform returns early without github_repo_images_path" }.chomp('/')
@@ -122,11 +127,15 @@ class PushEventAssetFileJob < ApplicationJob
     octokit.create_pull_request(repo.name, gi.base_branch, branch_name, pr_title, body)
   end
 
+  #: () -> SponsorEvent
   private def event = Must.because(@event) { "resolve_record sets the event" }
 
+  #: () -> EditingHistoryTarget::history
   private def editing_history = Must.because(@editing_history) { "resolve_record sets the editing history, which every saved event has" }
 
+  #: () -> Sponsorship
   private def sponsorship = Must.because(@sponsorship) { "perform sets the event's required sponsorship" }
 
+  #: () -> Conference
   private def conference = Must.because(@conference) { "perform sets the event's required conference" }
 end

@@ -1,9 +1,37 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class GenerateSponsorsYamlFileJob < ApplicationJob
+  #: type sponsor_entry = {
+  #|   id: Integer,
+  #|   asset_file_id: Integer?,
+  #|   base_plan: String,
+  #|   plan_name: String?,
+  #|   slug: String?,
+  #|   name: String,
+  #|   url: String,
+  #|   profile: String,
+  #| }
+  #: type plan_entry = { plan_name: String?, sponsors: Array[sponsor_entry] }
+  #: type base_plan_entry = { base_plan: String, plans: Hash[String, plan_entry] }
+  #: type host_entry = { slug: String?, name: String, url: String }
+  #: type event_entry = {
+  #|   id: Integer,
+  #|   slug: String,
+  #|   title: String,
+  #|   starts_at: String,
+  #|   url: String,
+  #|   price: String,
+  #|   capacity: String,
+  #|   location_en: String,
+  #|   location_local: String,
+  #|   link_name: String,
+  #|   hosts: Array[host_entry],
+  #| }
+
+  #: (Conference, ?push: bool) -> void
   def perform(conference, push: true)
-    @conference = conference
+    @conference = conference #: Conference?
 
     yaml_data # to generate
     if push
@@ -14,10 +42,12 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     end
   end
 
+  #: () -> Conference::GithubRepo?
   def repo
     conference.github_repo
   end
 
+  #: () -> Hash[String, base_plan_entry]?
   def data
     sponsorships = conference.sponsorships
       .have_presence
@@ -27,12 +57,12 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       .includes(:asset_file)
       .group_by { |s| presence_plan(s).name.downcase.gsub(/[^a-z0-9]/, '_') }
 
-    @last = SponsorshipEditingHistory.where(sponsorship_id: sponsorships.each_value.flat_map { |ss| ss.map(&:id) }).order(id: :desc).first
+    @last = SponsorshipEditingHistory.where(sponsorship_id: sponsorships.each_value.flat_map { |ss| ss.map(&:id) }).order(id: :desc).first #: SponsorshipEditingHistory?
     unless @last # this is falsy if no sponsorships have presense
       Rails.logger.warn "Conference #{conference.slug} (#{conference.id}) have no sponsorships with presense, resulting null sponsors data"
       return
     end
-    @last_id = @last.id
+    @last_id = @last.id #: Integer?
 
     sponsorships.map do |base_plan_slug, sponsorships|
       [
@@ -64,6 +94,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     end.to_h
   end
 
+  #: () -> Array[event_entry]
   def events_data
     events = conference.sponsor_events
       .accepted
@@ -72,7 +103,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
 
     @last_event_editing_history_id = SponsorEventEditingHistory
       .where(sponsor_event_id: events.map(&:id))
-      .maximum(:id)
+      .maximum(:id) #: Integer?
 
     events.map do |event|
       hosts = event.all_host_sponsorships.sort_by(&:id).map do |sponsorship|
@@ -99,13 +130,14 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     end
   end
 
+  #: () -> String?
   def yaml_data
     return @yaml_data if defined? @yaml_data
 
     data = self.data
     events = events_data
     if data.nil? && events.blank?
-      @yaml_data = nil
+      @yaml_data = nil #: String?
       return @yaml_data
     end
 
@@ -121,13 +153,15 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     ].join("\n")
   end
 
+  #: () -> String?
   def json_data
     return @json_data if defined? @json_data
 
     data = self.data
-    @json_data = data ? "#{data.to_json}\n" : nil
+    @json_data = data ? "#{data.to_json}\n" : nil #: String?
   end
 
+  #: () -> void
   def push_to_github
     github_repo = repo
     return unless github_repo
@@ -147,10 +181,11 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     ).push
   end
 
+  #: (Integer, Integer) -> String?
   private def build_edit_summary(from_last_id, from_last_event_id)
     last_id = @last_id || 0
     last_event_id = @last_event_editing_history_id || 0
-    sections = []
+    sections = [] #: Array[String]
 
     if from_last_id < last_id
       edits = SponsorshipEditingHistory
@@ -187,34 +222,44 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     sections.any? ? sections.join("\n\n") : nil
   end
 
+  #: () -> Conference
   private def conference = Must.because(@conference) { "perform sets the conference" }
 
+  #: (Sponsorship) -> Plan
   private def presence_plan(sponsorship)
     Must.because(sponsorship.plan) { "have_presence selects sponsorships with a plan" }
   end
 
   # For debugging
+  #: (String) -> Octokit::Client
   def self.get_octokit(repo)
     GithubInstallation.new(repo).octokit
   end
 
   class GitHubPusher
-    MAX_RETRIES = 3
+    MAX_RETRIES = 3 #: Integer
 
     delegate :octokit, :base_branch, to: :github_installation
 
+    #: (conference: Conference, filepath: String, content: String, last_editing_history_id: Integer?,
+    #|  last_event_editing_history_id: Integer?, push_id: Integer | String, ?build_summary: Method?) -> void
     def initialize(conference:, filepath:, content:, last_editing_history_id:, last_event_editing_history_id:, push_id:, build_summary: nil)
       @conference = conference
-      @repo = conference.github_repo
+      @repo = conference.github_repo #: Conference::GithubRepo?
       @filepath = filepath
       @content = content
-      @last_id = last_editing_history_id || 0
-      @last_event_id = last_event_editing_history_id || 0
-      @branch_name = "sponsor-app/#{conference.slug}"
-      @pr_title = "Update sponsors.yml for #{conference.slug} (#{push_id})"
+      @last_id = last_editing_history_id || 0 #: Integer
+      @last_event_id = last_event_editing_history_id || 0 #: Integer
+      @branch_name = "sponsor-app/#{conference.slug}" #: String
+      @pr_title = "Update sponsors.yml for #{conference.slug} (#{push_id})" #: String
       @build_summary = build_summary
+      @base_last_id = nil #: Integer?
+      @base_last_event_id = nil #: Integer?
+      @prev_last_id = nil #: Integer?
+      @prev_last_event_id = nil #: Integer?
     end
 
+    #: () -> void
     def push
       return unless @repo
 
@@ -229,11 +274,13 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       create_or_update_pull_request
     end
 
+    #: () -> void
     private def read_previous_ids
       @base_last_id, @base_last_event_id = read_ids_from_ref(base_branch)
       @prev_last_id, @prev_last_event_id = read_ids_from_ref(@branch_name)
     end
 
+    #: (String) -> [Integer, Integer]
     private def read_ids_from_ref(ref)
       existing = octokit.contents(repo.name, path: @filepath, ref: ref)
       content = Base64.decode64(existing[:content])
@@ -244,6 +291,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       [0, 0]
     end
 
+    #: () -> void
     private def ensure_branch
       octokit.branch(repo.name, @branch_name)
     rescue Octokit::NotFound
@@ -251,6 +299,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       octokit.create_ref(repo.name, "refs/heads/#{@branch_name}", head_sha)
     end
 
+    #: () -> void
     private def commit_content
       begin
         blob_sha = octokit.contents(repo.name, path: @filepath, ref: @branch_name)[:sha]
@@ -278,6 +327,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       end
     end
 
+    #: () -> bool
     private def branch_has_newer_data?
       existing = octokit.contents(repo.name, path: @filepath, ref: @branch_name)
       existing_content = Base64.decode64(existing[:content])
@@ -292,14 +342,15 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       false # Branch or file doesn't exist
     end
 
+    #: () -> void
     private def create_or_update_pull_request
-      full_summary = @build_summary&.call(@base_last_id, @base_last_event_id)
+      full_summary = @build_summary&.call(@base_last_id, @base_last_event_id) #: String?
       owner = repo.name.split('/')[0]
       existing_prs = octokit.pull_requests(repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
       if existing_prs.any?
         pr_number = existing_prs[0][:number]
         octokit.update_pull_request(repo.name, pr_number, title: @pr_title, body: full_summary)
-        incremental = @build_summary&.call(@prev_last_id, @prev_last_event_id)
+        incremental = @build_summary&.call(@prev_last_id, @prev_last_event_id) #: String?
         octokit.add_comment(repo.name, pr_number, incremental) if incremental
       else
         begin
@@ -310,17 +361,19 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
           if existing_prs.any?
             pr_number = existing_prs[0][:number]
             octokit.update_pull_request(repo.name, pr_number, title: @pr_title, body: full_summary)
-            incremental = @build_summary&.call(@prev_last_id, @prev_last_event_id)
+            incremental = @build_summary&.call(@prev_last_id, @prev_last_event_id) #: String?
             octokit.add_comment(repo.name, pr_number, incremental) if incremental
           end
         end
       end
     end
 
+    #: () -> GithubInstallation
     private def github_installation
-      @github_installation ||= GithubInstallation.new(repo.name, branch: repo.branch)
+      @github_installation ||= GithubInstallation.new(repo.name, branch: repo.branch) #: GithubInstallation?
     end
 
+    #: () -> Conference::GithubRepo
     private def repo = Must.because(@repo) { "push returns early without a github_repo" }
   end
 end

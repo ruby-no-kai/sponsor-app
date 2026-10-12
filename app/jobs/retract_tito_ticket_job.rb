@@ -1,10 +1,10 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class RetractTitoTicketJob < ApplicationJob
   class Unable < StandardError; end
 
-  # @param retraction [TitoTicketRetraction]
+  #: (TitoTicketRetraction) -> void
   def perform(retraction)
     logger.tagged(retraction_id: retraction.id, sponsorship_id: retraction.sponsorship_id, tito_registration_id: retraction.tito_registration_id, tito_registration_reference: retraction.order_reference) do |_log|
       if retraction.completed?
@@ -56,7 +56,8 @@ class RetractTitoTicketJob < ApplicationJob
     end
   end
 
+  #: () -> SemanticLogger::Logger
   def logger
-    @logger ||= SemanticLogger[self.class.name]
+    @logger ||= SemanticLogger[self.class.name] #: SemanticLogger::Logger?
   end
 end

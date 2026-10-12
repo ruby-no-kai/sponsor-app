@@ -1,7 +1,8 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class SponsorshipWelcomeJob < ApplicationJob
+  #: (Sponsorship) -> void
   def perform(sponsorship)
     contact = Must.because(sponsorship.contact) { "sponsorships validate the presence of their contact" }
     token = SessionToken.create!(email: contact.email, expires_at: Time.zone.now + 1.year)

@@ -1,22 +1,32 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class CreateBroadcastDeliveriesJob < ApplicationJob
+  # Permitted recipient filter form params, as ActiveJob deserializes them.
+  #: type filter_params = Hash[String | Symbol, untyped]
+
   Recipient = Data.define(:sponsorship, :email, :email_ccs)
 
   module Filters
     class Base
+      #: (broadcast: Broadcast, params: CreateBroadcastDeliveriesJob::filter_params) -> void
       def initialize(broadcast:, params:)
         @broadcast = broadcast
         @params = params
       end
 
-      attr_reader :broadcast, :params
+      #: Broadcast
+      attr_reader :broadcast
 
+      #: CreateBroadcastDeliveriesJob::filter_params
+      attr_reader :params
+
+      #: () -> Array[Recipient]
       def recipients
         raise NotImplementedError
       end
 
+      #: () -> Sponsorship::PrivateRelation
       private def status_scope
         case params[:status]
         when 'all', nil
@@ -36,6 +46,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         end
       end
 
+      #: () -> Sponsorship::PrivateRelation?
       private def plan_scope
         if params[:plan_id].present?
           plan = Must.expect(@broadcast.conference).plans.where(id: params[:plan_id]).first
@@ -46,18 +57,21 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         nil
       end
 
+      #: () -> Sponsorship::PrivateRelation?
       private def locale_scope
         if params[:locale].present?
           Sponsorship.where(locale: params[:locale])
         end
       end
 
+      #: () -> Sponsorship::PrivateRelation?
       private def exhibitor_scope
         if params[:exhibitors].present?
           Sponsorship.exhibitor
         end
       end
 
+      #: (Sponsorship::PrivateAssociationRelation) -> Sponsorship::PrivateAssociationRelation
       private def scope_sponsorships(scope)
         [
           status_scope,
@@ -69,6 +83,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         end
       end
 
+      #: (Sponsorship::PrivateRelation | Sponsorship::PrivateAssociationRelation) -> Array[Recipient]
       private def sponsorships_to_recipients(scope)
         scope.map do |sponsorship|
           contact = Must.because(sponsorship.contact) { "sponsorships validate the presence of their contact" }
@@ -82,6 +97,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
     end
 
     class All < Base
+      #: () -> Array[Recipient]
       def recipients
         scope = scope_sponsorships(Must.expect(@broadcast.conference).sponsorships.includes(:contact))
         sponsorships_to_recipients(scope)
@@ -89,6 +105,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
     end
 
     class PastSponsors < Base
+      #: () -> Array[Recipient]
       def recipients
         conference = Conference.find_by!(id: params[:id])
         scope = scope_sponsorships(conference.sponsorships.includes(:contact))
@@ -97,6 +114,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
     end
 
     class Manual < Base
+      #: () -> Array[Recipient]
       def recipients
         scope = Sponsorship.where(id: Array(params[:sponsorship_ids]))
         if params[:exclude_current_sponsors].present?
@@ -107,6 +125,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
     end
 
     class Raw < Base
+      #: () -> Array[Recipient]
       def recipients
         Array(params[:emails]).flatten.flat_map do |email_lines|
           email_lines.to_s.each_line.map do |email|
@@ -121,9 +140,10 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
     end
   end
 
+  #: (Broadcast, Array[filter_params]) -> void
   def perform(broadcast, recipient_filter_params)
     ApplicationRecord.transaction do
-      @broadcast = broadcast
+      @broadcast = broadcast #: Broadcast?
       broadcast.lock!
 
       case
@@ -152,7 +172,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
           status: :ready,
           sponsorship: recipient.sponsorship,
           recipient: recipient.email,
-          recipient_cc: recipient.email_ccs&.join(','),
+          recipient_cc: recipient.email_ccs.join(','),
         )
       end
 
@@ -163,6 +183,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
     end
   end
 
+  #: (String?, filter_params) -> Array[Recipient]
   def filter_recipients(kind, params)
     case kind.to_s
     when 'all'
@@ -180,5 +201,6 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
     end
   end
 
+  #: () -> Broadcast
   private def broadcast = Must.because(@broadcast) { "perform sets the broadcast before filtering recipients" }
 end

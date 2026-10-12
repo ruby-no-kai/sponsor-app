@@ -1,7 +1,8 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class DispatchBroadcastDeliveryJob < ApplicationJob
+  #: (BroadcastDelivery, ?force: bool) -> void
   def perform(delivery, force: false)
     broadcast = Must.expect(delivery.broadcast)
     Rails.logger.info "Delivering (#{delivery.id}): #{broadcast.description} (broadcast=#{broadcast.id}))"
@@ -11,6 +12,7 @@ class DispatchBroadcastDeliveryJob < ApplicationJob
     end
   end
 
+  #: (BroadcastDelivery, ?force: bool) -> void
   def perform_real(delivery, force: false)
     ApplicationRecord.transaction do
       if !force && !(delivery.created? || delivery.pending?)

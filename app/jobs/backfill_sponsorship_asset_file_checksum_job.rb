@@ -1,7 +1,8 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class BackfillSponsorshipAssetFileChecksumJob < ApplicationJob
+  #: (SponsorshipAssetFile) -> void
   def perform(sponsorship_asset_file)
     sponsorship = Must.because(sponsorship_asset_file.sponsorship) { "the backfill is enqueued for a sponsorship's own asset file" }
     resp = sponsorship_asset_file.get_object

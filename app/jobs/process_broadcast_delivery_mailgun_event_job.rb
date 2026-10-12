@@ -1,9 +1,13 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class ProcessBroadcastDeliveryMailgunEventJob < ApplicationJob
+  # A Mailgun webhook event-data payload.
+  #: type mailgun_event = Hash[String, untyped]
+
+  #: (mailgun_event) -> void
   def perform(event_data)
-    @event_data = event_data
+    @event_data = event_data #: mailgun_event?
     delivery_id = user_variables['delivery_id']
     ApplicationRecord.transaction do
       delivery = BroadcastDelivery.lock.find(delivery_id)
@@ -35,8 +39,10 @@ class ProcessBroadcastDeliveryMailgunEventJob < ApplicationJob
     end
   end
 
+  #: mailgun_event?
   attr_reader :event_data
 
+  #: () -> Hash[String, untyped]
   def user_variables
     Must.because(event_data) { "perform sets the event data" }['user-variables'] || {}
   end

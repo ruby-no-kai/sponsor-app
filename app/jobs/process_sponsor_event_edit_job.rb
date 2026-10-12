@@ -1,12 +1,13 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class ProcessSponsorEventEditJob < ApplicationJob
+  #: (SponsorEventEditingHistory) -> void
   def perform(edit)
     sponsor_event = Must.expect(edit.sponsor_event)
     sponsorship = Must.expect(sponsor_event.sponsorship)
     conference = Must.expect(sponsor_event.conference)
-    @sponsor_event = sponsor_event
+    @sponsor_event = sponsor_event #: SponsorEvent?
 
     is_new_submission = edit.id == sponsor_event.editing_histories.minimum(:id)
     staff = edit.staff
@@ -27,6 +28,7 @@ class ProcessSponsorEventEditJob < ApplicationJob
     end
   end
 
+  #: (SponsorEventEditingHistory) -> bool
   private def status_changed_in_edit?(edit)
     diff = edit.diff
     return false unless diff
@@ -34,6 +36,7 @@ class ProcessSponsorEventEditJob < ApplicationJob
     diff.any? { |change| change[1] == 'status' }
   end
 
+  #: (SponsorEventEditingHistory) -> bool
   private def should_push_event_asset?(edit)
     return false unless sponsor_event.accepted?
     return false unless sponsor_event.asset_file
@@ -49,6 +52,7 @@ class ProcessSponsorEventEditJob < ApplicationJob
     end
   end
 
+  #: (SponsorEventEditingHistory) -> bool
   private def status_changed_to_accepted_in_edit?(edit)
     diff = edit.diff
     return false unless diff
@@ -56,5 +60,6 @@ class ProcessSponsorEventEditJob < ApplicationJob
     diff.any? { |change| change[1] == 'status' && change.last == 'accepted' }
   end
 
+  #: () -> SponsorEvent
   private def sponsor_event = Must.because(@sponsor_event) { "perform sets the sponsor event" }
 end

@@ -1,13 +1,14 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class BroadcastMailer < ApplicationMailer
+  #: () -> void
   def announce
-    delivery = params[:delivery]
+    delivery = params[:delivery] #: BroadcastDelivery
     broadcast = Must.expect(delivery.broadcast)
     conference = Must.expect(broadcast.conference)
-    @delivery = delivery
-    @broadcast = broadcast
+    @delivery = delivery #: BroadcastDelivery?
+    @broadcast = broadcast #: Broadcast?
     @sponsorship = delivery.sponsorship
     @conference = conference
 
@@ -24,11 +25,13 @@ class BroadcastMailer < ApplicationMailer
     )
   end
 
+  #: () -> ActiveSupport::SafeBuffer
   helper_method def form_url
     path = Addressable::URI.parse(new_user_conference_sponsorship_url(@conference)).request_uri
     login_url(back_to: path)
   end
 
+  #: (**String?) -> ActiveSupport::SafeBuffer
   helper_method def login_url(**additional_params)
     sponsorship = @sponsorship
     if sponsorship
@@ -41,9 +44,11 @@ class BroadcastMailer < ApplicationMailer
     "<a href=\"#{url}\">#{url}</a>".html_safe # rubocop:disable Rails/OutputSafety
   end
 
+  #: () -> String
   private def subject_prefix
     "[#{Must.expect(broadcast.conference).name}] "
   end
 
+  #: () -> Broadcast
   private def broadcast = Must.because(@broadcast) { "announce sets the broadcast" }
 end

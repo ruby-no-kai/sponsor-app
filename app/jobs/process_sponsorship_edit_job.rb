@@ -1,7 +1,8 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class ProcessSponsorshipEditJob < ApplicationJob
+  #: (SponsorshipEditingHistory) -> void
   def perform(edit)
     sponsorship = Must.expect(edit.sponsorship)
     conference = Must.expect(sponsorship.conference)

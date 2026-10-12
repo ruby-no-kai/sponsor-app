@@ -1,14 +1,28 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
+  #: type discount_code_attributes = {
+  #|   code: String,
+  #|   type: String,
+  #|   value: String,
+  #|   only_show_attached: bool,
+  #|   reveal_secret: bool,
+  #|   block_registrations_if_not_applicable: bool,
+  #|   quantity: Integer,
+  #|   release_ids: Array[String]?,
+  #|   source_id: String,
+  #|   description_for_organizer: String,
+  #| }
+
+  #: (Sponsorship, String, ?ignore_quantity: bool) -> void
   def perform(sponsorship, kind, ignore_quantity: false)
     return unless Rails.application.config.x.tito.token
 
-    @kind = kind
-    @sponsorship = sponsorship
+    @kind = kind #: String?
+    @sponsorship = sponsorship #: Sponsorship?
     conference = Must.expect(sponsorship.conference)
-    @conference = conference
+    @conference = conference #: Conference?
     return if conference.tito_slug.blank?
 
     discount_code = sponsorship.tito_discount_codes.where(kind: kind).first
@@ -32,10 +46,12 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     end
   end
 
+  #: () -> String
   def code
     "#{code_prefix}_#{sponsorship.id}_#{sponsorship.ticket_key[0, 12]}"
   end
 
+  #: () -> discount_code_attributes
   def discount_code_attributes
     retval = {
       code: code,
@@ -58,6 +74,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     retval
   end
 
+  #: () -> Integer
   def quantity
     {
       'attendee' => sponsorship.total_number_of_attendees,
@@ -66,6 +83,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     }.fetch(kind)
   end
 
+  #: () -> String
   def code_prefix
     {
       'attendee' => 'sa',
@@ -74,6 +92,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     }.fetch(kind)
   end
 
+  #: () -> Array[String]
   def release_slugs
     {
       'attendee' => %w(sponsor),
@@ -82,6 +101,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     }.fetch(kind)
   end
 
+  #: () -> TitoSource
   def tito_source
     @tito_source ||= sponsorship.tito_source || begin
       source = tito.create_source(
@@ -95,9 +115,10 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
         sponsorship: sponsorship,
         tito_source_id: source.to_s,
       )
-    end
+    end #: TitoSource?
   end
 
+  #: () -> Array[String]
   def release_ids
     @release_ids ||= TitoCachedRelease.transaction do
       release_slugs.map do |slug|
@@ -110,18 +131,23 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
           ).tito_release_id
         end
       end
-    end
+    end #: Array[String]?
   end
 
+  #: () -> TitoApi
   def tito
-    @tito ||= TitoApi.new
+    @tito ||= TitoApi.new #: TitoApi?
   end
 
+  #: () -> String
   private def kind = Must.because(@kind) { "perform sets the kind" }
 
+  #: () -> Sponsorship
   private def sponsorship = Must.because(@sponsorship) { "perform sets the sponsorship" }
 
+  #: () -> Conference
   private def conference = Must.because(@conference) { "perform sets the conference" }
 
+  #: () -> String
   private def tito_slug = Must.because(conference.tito_slug) { "perform returns early for a conference without a tito_slug" }
 end

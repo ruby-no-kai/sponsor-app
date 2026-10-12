@@ -1,7 +1,9 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class ApplicationMailer < ActionMailer::Base
+  #: type mailgun_variables = Hash[Symbol, (String | Integer)?]
+
   default(
     from: "#{Rails.application.config.x.org_name} Sponsorships <#{Rails.application.config.x.default_email_address}>",
     reply_to: Rails.application.config.x.default_email_reply_to,
@@ -21,16 +23,18 @@ class ApplicationMailer < ActionMailer::Base
   }
 
   # Actions set @sponsorship and @conference for the Mailgun tag and List-ID callbacks.
+  #: () -> void
   def initialize
     super
-    @sponsorship = nil
-    @conference = nil
-    @mailgun_tags = nil
-    @mailgun_variables = nil
-    @list_name = nil
-    @subject_prefix = nil
+    @sponsorship = nil #: Sponsorship?
+    @conference = nil #: Conference?
+    @mailgun_tags = nil #: (Array[String] | Symbol)?
+    @mailgun_variables = nil #: (mailgun_variables | Symbol)?
+    @list_name = nil #: (Array[String?] | Symbol)?
+    @subject_prefix = nil #: String?
   end
 
+  #: (String, ?String?) -> void
   private def message_id_for(local, reference = nil)
     headers 'Message-ID' => nil
     headers 'Message-ID' => "<#{local}@#{Rails.application.config.x.default_email_host_part}>"
@@ -42,12 +46,14 @@ class ApplicationMailer < ActionMailer::Base
     end
   end
 
+  #: () -> void
   private def add_mailer_mailgun_tag
     mailer_name = Must.because(self.class.name) { "mailers are named classes" }
     tag mailer_name
     variable mailer: mailer_name
   end
 
+  #: () -> void
   private def add_sponsorship_mailgun_tag
     sponsorship = @sponsorship
     return unless sponsorship
@@ -64,6 +70,7 @@ class ApplicationMailer < ActionMailer::Base
     # tag "#{prefix}conference:#{@sponsorship.conference.id}"
   end
 
+  #: (*String) -> void
   private def tag(*tags)
     current = @mailgun_tags
     raise "BUG: used after commit" if current.is_a?(Symbol)
@@ -71,6 +78,7 @@ class ApplicationMailer < ActionMailer::Base
     @mailgun_tags = (current || []).concat(tags)
   end
 
+  #: (mailgun_variables) -> void
   private def variable(h)
     current = @mailgun_variables
     raise "BUG: used after commit" if current.is_a?(Symbol)
@@ -78,6 +86,7 @@ class ApplicationMailer < ActionMailer::Base
     @mailgun_variables = (current || {}).merge!(h)
   end
 
+  #: (String) -> void
   private def list_name(n)
     current = @list_name
     raise "BUG: used after commit" if current.is_a?(Symbol)
@@ -85,6 +94,7 @@ class ApplicationMailer < ActionMailer::Base
     @list_name = (current || []).push(n)
   end
 
+  #: () -> void
   private def commit_mailgun_tag
     tags = @mailgun_tags
     raise "BUG: used after commit" if tags.is_a?(Symbol)
@@ -95,6 +105,7 @@ class ApplicationMailer < ActionMailer::Base
     @mailgun_tags = :committed
   end
 
+  #: () -> void
   private def commit_mailgun_variables
     vars = @mailgun_variables
     raise "BUG: used after commit" if vars.is_a?(Symbol)
@@ -103,6 +114,7 @@ class ApplicationMailer < ActionMailer::Base
     @mailgun_variables = :committed
   end
 
+  #: () -> void
   private def commit_list_id
     names = @list_name
     raise "BUG: used after commit" if names.is_a?(Symbol)
@@ -121,10 +133,12 @@ class ApplicationMailer < ActionMailer::Base
     @list_name = :committed
   end
 
+  #: () -> String
   private def subject_prefix
     @subject_prefix ||= "[#{Rails.application.config.x.org_name}] "
   end
 
+  #: (**untyped) -> String
   private def make_subject(**params)
     "#{subject_prefix}#{default_i18n_subject(**params)}"
   end
