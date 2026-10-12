@@ -208,9 +208,9 @@ class Sponsorship < ApplicationRecord
   def to_h_for_history
     {
       "conference_id" => conference&.id,
-      "contact" => contact&.as_json&.slice("id", "name", "email", "email_cc", "organization", "unit", "address"),
-      "alternate_billing_contact" => alternate_billing_contact&.as_json&.slice("id", "name", "email", "email_cc", "organization", "unit", "address"),
-      "billing_request" => billing_request&.body,
+      "contact" => kept_for_history(contact)&.as_json&.slice("id", "name", "email", "email_cc", "organization", "unit", "address"),
+      "alternate_billing_contact" => kept_for_history(alternate_billing_contact)&.as_json&.slice("id", "name", "email", "email_cc", "organization", "unit", "address"),
+      "billing_request" => kept_for_history(billing_request)&.body,
       "plan_id" => plan&.id,
       "plan_name" => plan&.name,
       "plan_display_name" => plan_name,
@@ -218,7 +218,7 @@ class Sponsorship < ApplicationRecord
       "customized?" => customized?,
       "suspended?" => suspended?,
       "customization_planned?" => customization_planned?,
-      "customization_request" => customization_request&.body,
+      "customization_request" => kept_for_history(customization_request)&.body,
       "booth_requested" => booth_requested,
       "booth_assigned" => booth_assigned,
       "name" => name,
@@ -232,7 +232,7 @@ class Sponsorship < ApplicationRecord
       "asset_file.version_id" => asset_file&.version_id,
       "asset_file.checksum_sha256" => asset_file&.checksum_sha256,
       "asset_file.last_modified_at" => asset_file&.last_modified_at,
-      "note" => note&.body,
+      "note" => kept_for_history(note)&.body,
       "fallback_option" => fallback_option,
       "number_of_additional_attendees" => number_of_additional_attendees,
       "accepted_at" => accepted_at,
@@ -298,6 +298,12 @@ class Sponsorship < ApplicationRecord
     raise "Cannot generate tito source code without id" unless id
 
     "ss_#{id}"
+  end
+
+  # Autosave destroys a has_one target marked for destruction but leaves it loaded.
+  #: [R] ((R & ActiveRecord::Base)?) -> (R & ActiveRecord::Base)?
+  private def kept_for_history(record)
+    record unless record&.destroyed? || record&.marked_for_destruction?
   end
 
   #: () -> void

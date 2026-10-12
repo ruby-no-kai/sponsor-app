@@ -455,6 +455,25 @@ RSpec.describe Sponsorship, type: :model do
       hash = sponsorship.to_h_for_history
       expect(hash.key?('withdrawn_at')).to be false
     end
+
+    it 'records a contact and a request removed by the save as nil' do
+      sponsorship = FactoryBot.create(:sponsorship, conference:)
+      billing_contact = sponsorship.create_alternate_billing_contact!(
+        kind: :billing, name: 'Billing', email: 'invoices@example.invalid', address: 'Tokyo', organization: 'Contoso',
+      )
+      sponsorship.create_note!(kind: :note, body: 'Hello')
+      sponsorship.reload.save!
+
+      sponsorship.note.mark_for_destruction
+      sponsorship.update!(alternate_billing_contact_attributes: {id: billing_contact.id, _destroy: '1'})
+
+      history = sponsorship.editing_histories.reorder(:id).last
+      expect(history.raw).to include('alternate_billing_contact' => nil, 'note' => nil)
+      expect(history.diff).to include(
+        ['~', 'alternate_billing_contact', include('email' => 'invoices@example.invalid'), nil],
+        ['~', 'note', 'Hello', nil],
+      )
+    end
   end
 
   describe 'auto-acceptance with organization flag' do
