@@ -161,6 +161,48 @@ RSpec.describe CreateBroadcastDeliveriesJob, type: :job do
         end
       end
     end
+
+    describe CreateBroadcastDeliveriesJob::Filters::Raw do
+      let(:params) { {emails: "a@example.com\nb@example.com\n"} }
+
+      it 'builds one recipient without a sponsorship per line' do
+        expect(recipients.map(&:email)).to eq(%w(a@example.com b@example.com))
+        expect(recipients.map(&:sponsorship)).to eq([nil, nil])
+        expect(recipients.map(&:email_ccs)).to eq([[], []])
+      end
+    end
+  end
+
+  describe '#perform' do
+    let(:sponsorship) { FactoryBot.create(:sponsorship, conference:) }
+
+    before do
+      sponsorship.contact.update!(email_cc: 'cc@example.com')
+    end
+
+    it 'creates a ready delivery per recipient and marks the broadcast ready' do
+      filters = [
+        {kind: 'all'},
+        {kind: 'raw', emails: "raw@example.com\n"},
+      ].map(&:with_indifferent_access)
+      described_class.perform_now(broadcast, filters)
+
+      deliveries = broadcast.deliveries.order(id: :asc).map { |d| [d.recipient, d.recipient_cc, d.sponsorship] }
+      expect(deliveries).to eq([
+        [sponsorship.contact.email, 'cc@example.com', sponsorship],
+        ['raw@example.com', '', nil],
+      ])
+      expect(broadcast.reload).to be_ready
+    end
+
+    it 'skips recipients that already have a delivery' do
+      FactoryBot.create(:broadcast_delivery, broadcast:, recipient: 'raw@example.com')
+      broadcast.update!(status: :ready)
+
+      described_class.perform_now(broadcast, [{kind: 'raw', emails: "raw@example.com\n"}.with_indifferent_access])
+
+      expect(broadcast.deliveries.pluck(:recipient)).to eq(['raw@example.com'])
+    end
   end
 end
 # rubocop:enable RSpec/NestedGroups

@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 class CreateBroadcastDeliveriesJob < ApplicationJob
-  Recipient = Struct.new(:sponsorship, :email, :email_ccs, keyword_init: true)
+  Recipient = Data.define(:sponsorship, :email, :email_ccs)
 
   module Filters
     class Base
@@ -110,6 +110,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
         Array(params[:emails]).flatten.flat_map do |email_lines|
           email_lines.to_s.each_line.map do |email|
             Recipient.new(
+              sponsorship: nil,
               email: email.chomp,
               email_ccs: [],
             )
