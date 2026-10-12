@@ -8,7 +8,7 @@ module Admin
     before_action :set_expense_report, except: [:index]
 
     def index
-      @sponsorships = @conference.sponsorships
+      @sponsorships = conference.sponsorships
         .where(customization: true)
         .includes(:plan, :expense_report)
         .order(:name)
@@ -22,21 +22,23 @@ module Admin
     end
 
     def update
-      @expense_report.recalculate_totals
-      @expense_report.refresh_submission_snapshot
-      @expense_report.save!
+      expense_report.recalculate_totals
+      expense_report.refresh_submission_snapshot
+      expense_report.save!
 
       render json: report_json
     end
 
     def calculate
-      plan = @sponsorship.plan
+      plan = sponsorship.plan
+      tax_rates = Rails.configuration.x.expense_report.tax_rates #: Array[Rational]
+      decimal = Rails.configuration.x.expense_report.decimal #: Integer
       render json: {
-        tax_rates: Rails.configuration.x.expense_report.tax_rates.map { |r| r.to_f.to_s },
-        decimal: Rails.configuration.x.expense_report.decimal,
+        tax_rates: tax_rates.map { |r| r.to_f.to_s },
+        decimal:,
         plan_price: plan&.price.to_s,
         plan_price_booth: plan&.price_booth.to_s,
-        booth_assigned: @sponsorship.booth_assigned?,
+        booth_assigned: sponsorship.booth_assigned?,
         total_fee: calculate_total_fee.to_s,
       }
     end
@@ -47,24 +49,33 @@ module Admin
     end
 
     private def set_sponsorship
-      @sponsorship = Sponsorship.where(conference: @conference).find(params[:sponsorship_id])
+      @sponsorship = Sponsorship.where(conference:).find(params[:sponsorship_id])
     end
 
     private def set_expense_report
-      @expense_report = @sponsorship.expense_report
+      @expense_report = sponsorship.expense_report
       raise ActiveRecord::RecordNotFound unless @expense_report
     end
 
+    #: () -> Conference
+    private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+    #: () -> Sponsorship
+    private def sponsorship = Must.because(@sponsorship) { "set_sponsorship runs before every action but index" }
+
+    #: () -> ExpenseReport
+    private def expense_report = Must.because(@expense_report) { "set_expense_report runs before every action but index" }
+
     private def report_json
-      ExpenseReportResource.new(@expense_report.reload).to_h
+      ExpenseReportResource.new(expense_report.reload).to_h
     end
 
     private def calculate_total_fee
-      plan = @sponsorship.plan
+      plan = sponsorship.plan
       return 0 unless plan
 
       fee = plan.price
-      fee += plan.price_booth if @sponsorship.booth_assigned?
+      fee += plan.price_booth if sponsorship.booth_assigned?
       fee
     end
   end

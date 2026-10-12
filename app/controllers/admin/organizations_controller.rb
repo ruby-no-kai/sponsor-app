@@ -11,7 +11,7 @@ module Admin
     end
 
     def show
-      @sponsorships = @organization.sponsorships.includes(:conference, :plan).order(id: :desc)
+      @sponsorships = organization.sponsorships.includes(:conference, :plan).order(id: :desc)
       @conferences_open_for_application = Conference.application_open.order(id: :desc)
     end
 
@@ -35,8 +35,8 @@ module Admin
 
     def update
       respond_to do |format|
-        if @organization.update(organization_params)
-          format.html { redirect_to organization_path(@organization), notice: 'Organization was successfully updated.' }
+        if organization.update(organization_params)
+          format.html { redirect_to organization_path(organization), notice: 'Organization was successfully updated.' }
         else
           format.html { render :edit }
         end
@@ -46,6 +46,9 @@ module Admin
     private def set_organization
       @organization = Organization.find_by!(domain: params[:slug])
     end
+
+    #: () -> Organization
+    private def organization = Must.because(@organization) { "set_organization runs before every member action" }
 
     private def organization_params
       params.require(:organization).permit(:name, :domain, :auto_acceptance_disabled)

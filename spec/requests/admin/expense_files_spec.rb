@@ -13,6 +13,48 @@ RSpec.describe "Admin Expense Files", type: :request do
     get claim_user_session_path(session_token.handle)
   end
 
+  describe "POST create" do
+    it "prepares a file and returns an upload session reporting to the admin path" do
+      session = {url: 'https://s3.example.com/', fields: {}, max_size: 1, id: 'x'}
+      allow_any_instance_of(ExpenseFile).to receive(:make_session).and_return(session) # rubocop:disable RSpec/AnyInstance
+
+      expect do
+        post conference_sponsorship_expense_files_path(conference, sponsorship), params: {filename: 'receipt.pdf', content_type: 'application/pdf'}, as: :json
+      end.to change(sponsorship.expense_files, :count).by(1)
+
+      file = sponsorship.expense_files.last
+      expect(file.filename).to eq('receipt.pdf')
+      expect(response.parsed_body['report_to']).to eq(conference_sponsorship_expense_file_path(conference, sponsorship, file))
+    end
+  end
+
+  describe "POST initiate_update" do
+    it "returns an upload session for the existing file" do
+      file = ExpenseFile.prepare(conference:, sponsorship:)
+      file.save!
+      session = {url: 'https://s3.example.com/', fields: {}, max_size: 1, id: 'x'}
+      allow_any_instance_of(ExpenseFile).to receive(:make_session).and_return(session) # rubocop:disable RSpec/AnyInstance
+
+      post initiate_update_conference_sponsorship_expense_file_path(conference, sponsorship, file), params: {content_type: 'image/png'}, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body['report_to']).to eq(conference_sponsorship_expense_file_path(conference, sponsorship, file))
+    end
+  end
+
+  describe "PATCH update" do
+    it "marks the file uploaded" do
+      file = ExpenseFile.prepare(conference:, sponsorship:)
+      file.save!
+      allow_any_instance_of(ExpenseFile).to receive(:update_object_header) { |f| f } # rubocop:disable RSpec/AnyInstance
+
+      patch conference_sponsorship_expense_file_path(conference, sponsorship, file), params: {filename: 'renamed.pdf', version_id: 'v1', extension: 'pdf'}, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(file.reload).to have_attributes(status: 'uploaded', filename: 'renamed.pdf')
+    end
+  end
+
   describe "GET show" do
     it "redirects to presigned S3 URL for file preview" do
       file = ExpenseFile.prepare(conference:, sponsorship:)

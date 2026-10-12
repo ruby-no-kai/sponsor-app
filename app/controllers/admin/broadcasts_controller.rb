@@ -7,16 +7,16 @@ module Admin
     before_action :set_broadcast, only: %i(show edit update dispatch_delivery)
 
     def index
-      @broadcasts = @conference.broadcasts.order(id: :desc)
+      @broadcasts = conference.broadcasts.order(id: :desc)
     end
 
     def new
-      @broadcast = Broadcast.new(conference: @conference)
+      @broadcast = Broadcast.new(conference:)
     end
 
     def create
       @broadcast = Broadcast.new(broadcast_params)
-      @broadcast.conference = @conference
+      @broadcast.conference = conference
       @broadcast.staff = current_staff
       @broadcast.status = :created
 
@@ -24,7 +24,7 @@ module Admin
         if @broadcast.save
           CreateBroadcastDeliveriesJob.perform_later(@broadcast, [recipient_filter].compact)
           format.html do
-            redirect_to conference_broadcast_path(@conference, @broadcast)
+            redirect_to conference_broadcast_path(conference, @broadcast)
           end
         else
           format.html do
@@ -42,8 +42,8 @@ module Admin
 
     def update
       respond_to do |format|
-        if @broadcast.update(broadcast_params)
-          format.html { redirect_to conference_broadcast_path(@conference, @broadcast), notice: 'Broadcast was successfully updated.' }
+        if broadcast.update(broadcast_params)
+          format.html { redirect_to conference_broadcast_path(conference, broadcast), notice: 'Broadcast was successfully updated.' }
         else
           format.html { render :edit }
         end
@@ -51,19 +51,25 @@ module Admin
     end
 
     def dispatch_delivery
-      @broadcast.update!(staff: current_staff)
-      @broadcast.perform_later!
-      redirect_to conference_broadcast_path(@conference, @broadcast), notice: 'Dispatched'
+      broadcast.update!(staff: current_staff)
+      broadcast.perform_later!
+      redirect_to conference_broadcast_path(conference, broadcast), notice: 'Dispatched'
     end
 
     private def set_broadcast
-      @broadcast = @conference.broadcasts.find_by!(id: params[:id])
+      @broadcast = conference.broadcasts.find_by!(id: params[:id])
     end
 
     private def set_conference
       @conference = Conference.find_by!(slug: params[:conference_slug])
       check_staff_conference_authorization!(@conference)
     end
+
+    #: () -> Conference
+    private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+    #: () -> Broadcast
+    private def broadcast = Must.because(@broadcast) { "set_broadcast runs before show, edit, update and dispatch_delivery" }
 
     private def broadcast_params
       params.require(:broadcast).permit(

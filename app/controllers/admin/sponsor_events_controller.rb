@@ -7,7 +7,7 @@ module Admin
     before_action :set_sponsor_event, only: %i(show edit update download_asset)
 
     def index
-      @sponsor_events = @conference.sponsor_events
+      @sponsor_events = conference.sponsor_events
         .includes(:sponsorship)
         .order(status: :asc, starts_at: :asc)
     end
@@ -19,19 +19,19 @@ module Admin
     end
 
     def download_asset
-      asset = @sponsor_event.asset_file
+      asset = sponsor_event.asset_file
       raise ActiveRecord::RecordNotFound unless asset
 
       redirect_to asset.download_url, allow_other_host: true
     end
 
     def update
-      @sponsor_event.assign_attributes(sponsor_event_params)
-      @sponsor_event.staff = current_staff
+      sponsor_event.assign_attributes(sponsor_event_params)
+      sponsor_event.staff = current_staff
 
-      if @sponsor_event.save
-        ProcessSponsorEventEditJob.perform_later(@sponsor_event.last_editing_history)
-        redirect_to conference_sponsor_event_path(@conference, @sponsor_event), notice: 'Event was successfully updated.'
+      if sponsor_event.save
+        ProcessSponsorEventEditJob.perform_later(sponsor_event.last_editing_history)
+        redirect_to conference_sponsor_event_path(conference, sponsor_event), notice: 'Event was successfully updated.'
       else
         render :edit, status: :unprocessable_entity
       end
@@ -43,9 +43,15 @@ module Admin
     end
 
     private def set_sponsor_event
-      @sponsor_event = @conference.sponsor_events.find(params[:id])
+      @sponsor_event = conference.sponsor_events.find(params[:id])
       @sponsorship = @sponsor_event.sponsorship
     end
+
+    #: () -> Conference
+    private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+    #: () -> SponsorEvent
+    private def sponsor_event = Must.because(@sponsor_event) { "set_sponsor_event runs before show, edit, update and download_asset" }
 
     private def sponsor_event_params
       params.require(:sponsor_event).permit(

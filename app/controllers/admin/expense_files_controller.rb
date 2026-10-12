@@ -10,29 +10,29 @@ module Admin
     before_action :set_asset_file, only: [:show, :update, :destroy, :initiate_update]
 
     def create
-      @asset_file = ExpenseFile.prepare(conference: @conference, sponsorship: @sponsorship)
+      @asset_file = ExpenseFile.prepare(conference:, sponsorship:)
       @asset_file.assign_attributes(params.permit(:filename, :content_type))
       @asset_file.save!
       render json: make_session
     end
 
     def show
-      redirect_to @asset_file.download_url(disposition: :inline), allow_other_host: true
+      redirect_to asset_file.download_url(disposition: :inline), allow_other_host: true
     end
 
     def update
-      @asset_file.assign_attributes(params.permit(:filename, :content_type))
-      @asset_file.status = 'uploaded'
+      asset_file.assign_attributes(params.permit(:filename, :content_type))
+      asset_file.status = 'uploaded'
       super
     end
 
     def destroy
-      @asset_file.destroy!
+      asset_file.destroy!
       render json: {ok: true}
     end
 
     def initiate_update
-      @asset_file.content_type = params[:content_type] if params[:content_type].present?
+      asset_file.content_type = params[:content_type] if params[:content_type].present?
       render json: make_session
     end
 
@@ -42,15 +42,24 @@ module Admin
     end
 
     private def set_sponsorship
-      @sponsorship = Sponsorship.where(conference: @conference).find(params[:sponsorship_id])
+      @sponsorship = Sponsorship.where(conference:).find(params[:sponsorship_id])
     end
 
     private def set_asset_file
-      @asset_file = @sponsorship.expense_files.find(params[:id])
+      @asset_file = sponsorship.expense_files.find(params[:id])
     end
 
+    #: () -> Conference
+    private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+    #: () -> Sponsorship
+    private def sponsorship = Must.because(@sponsorship) { "set_sponsorship runs before every action" }
+
+    #: () -> ExpenseFile
+    private def asset_file = Must.because(@asset_file) { "set_asset_file or create assigns @asset_file" }
+
     private def asset_file_report_to_url(asset_file)
-      conference_sponsorship_expense_file_path(@conference, @sponsorship, asset_file)
+      conference_sponsorship_expense_file_path(conference, sponsorship, asset_file)
     end
   end
 end

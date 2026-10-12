@@ -7,11 +7,11 @@ module Admin
     before_action :set_plan, only: [:edit, :update]
 
     def index
-      @plans = @conference.plans.order(:rank)
+      @plans = conference.plans.order(:rank)
     end
 
     def new
-      @plan = Plan.new(conference: @conference)
+      @plan = Plan.new(conference:)
     end
 
     def edit
@@ -19,11 +19,11 @@ module Admin
 
     def create
       @plan = Plan.new(plan_params)
-      @plan.conference = @conference
+      @plan.conference = conference
 
       respond_to do |format|
         if @plan.save
-          format.html { redirect_to conference_plans_path(@conference), notice: 'Plan was successfully created.' }
+          format.html { redirect_to conference_plans_path(conference), notice: 'Plan was successfully created.' }
         else
           format.html { render :new }
         end
@@ -32,8 +32,8 @@ module Admin
 
     def update
       respond_to do |format|
-        if @plan.update(plan_params)
-          format.html { redirect_to conference_plans_path(@conference), notice: 'Plan was successfully updated.' }
+        if plan.update(plan_params)
+          format.html { redirect_to conference_plans_path(conference), notice: 'Plan was successfully updated.' }
         else
           format.html { render :edit }
         end
@@ -63,7 +63,13 @@ module Admin
     end
 
     private def set_plan
-      @plan = Plan.where(conference: @conference).find(params[:id])
+      @plan = Plan.where(conference:).find(params[:id])
     end
+
+    #: () -> Conference
+    private def conference = Must.because(@conference) { "set_conference runs before every action" }
+
+    #: () -> Plan
+    private def plan = Must.because(@plan) { "set_plan runs before edit and update" }
   end
 end

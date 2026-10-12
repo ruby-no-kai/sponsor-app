@@ -11,12 +11,12 @@ module Admin
     end
 
     def show
-      @plans_with_count = @conference
+      @plans_with_count = conference
         .plans
         .left_joins(:sponsorships)
         .group(:id)
         .select('plans.*, COUNT(sponsorships.plan_id) as cnt')
-        .map { |plan| [plan, plan.cnt, plan.capacity] }
+        .map { |plan| [plan, plan[:cnt], plan.capacity] }
         .sort_by { |plan, _cnt, _capa| plan.rank }
     end
 
@@ -24,22 +24,22 @@ module Admin
     end
 
     def sponsors_yml
-      render plain: GenerateSponsorsYamlFileJob.new(@conference, push: false).tap(&:perform_now).yaml_data
+      render plain: GenerateSponsorsYamlFileJob.new(conference, push: false).tap(&:perform_now).yaml_data
     end
 
     def sponsors_json
-      render plain: GenerateSponsorsYamlFileJob.new(@conference, push: false).tap(&:perform_now).json_data
+      render plain: GenerateSponsorsYamlFileJob.new(conference, push: false).tap(&:perform_now).json_data
     end
 
     def table_view
-      @sponsorships = @conference.sponsorships
+      @sponsorships = conference.sponsorships
         .includes_contacts
         .includes_requests
     end
 
     def asset_urls
       render json: {
-        files: @conference.sponsorships.includes(:asset_file).map(&:asset_file).compact.map do |asset|
+        files: conference.sponsorships.includes(:asset_file).map(&:asset_file).compact.map do |asset|
           [asset.filename, asset.download_url]
         end,
       }.to_json
@@ -65,11 +65,11 @@ module Admin
     end
 
     def update
-      @conference.assign_attributes(conference_params)
-      @conference.allow_restricted_access = true if current_staff.restricted_repos
+      conference.assign_attributes(conference_params)
+      conference.allow_restricted_access = true if current_staff.restricted_repos
       respond_to do |format|
-        if @conference.save
-          format.html { redirect_to @conference, notice: 'Conference was successfully updated.' }
+        if conference.save
+          format.html { redirect_to conference, notice: 'Conference was successfully updated.' }
         else
           format.html { render :edit }
         end
@@ -77,7 +77,7 @@ module Admin
     end
 
     def destroy
-      @conference.destroy
+      conference.destroy
       respond_to do |format|
         format.html { redirect_to conferences_url, notice: 'Conference was successfully destroyed.' }
       end
@@ -87,6 +87,9 @@ module Admin
       @conference = Conference.find_by!(slug: params[:slug])
       check_staff_conference_authorization!(@conference)
     end
+
+    #: () -> Conference
+    private def conference = Must.because(@conference) { "set_conference runs before every member action" }
 
     private def conference_params
       params.require(:conference).permit(
