@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 class ProcessBroadcastDeliveryMailgunEventJob < ApplicationJob
@@ -9,8 +9,9 @@ class ProcessBroadcastDeliveryMailgunEventJob < ApplicationJob
       delivery = BroadcastDelivery.lock.find(delivery_id)
       delivery.add_mailgun_event event_data
 
+      last_event = Must.because(delivery.mailgun_events.last) { "add_mailgun_event has just added an event" }
       # Events arrive out of order; only the latest one decides the status.
-      if event_data['id'] == delivery.mailgun_events.last['id']
+      if event_data['id'] == last_event['id']
         delivery.status = case event_data['event']
         when 'accepted'
           :accepted
@@ -30,13 +31,13 @@ class ProcessBroadcastDeliveryMailgunEventJob < ApplicationJob
       end
 
       delivery.save!
-      delivery.broadcast.update_status.save!
+      Must.expect(delivery.broadcast).update_status.save!
     end
   end
 
   attr_reader :event_data
 
   def user_variables
-    event_data['user-variables'] || {}
+    Must.because(event_data) { "perform sets the event data" }['user-variables'] || {}
   end
 end

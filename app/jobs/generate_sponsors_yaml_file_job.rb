@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 class GenerateSponsorsYamlFileJob < ApplicationJob
@@ -15,21 +15,21 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
   end
 
   def repo
-    @conference.github_repo
+    conference.github_repo
   end
 
   def data
-    sponsorships = @conference.sponsorships
+    sponsorships = conference.sponsorships
       .have_presence
       .order(id: :asc)
       .includes(:plan)
       .includes(:organization)
       .includes(:asset_file)
-      .group_by { |s| s.plan.name.downcase.gsub(/[^a-z0-9]/, '_') }
+      .group_by { |s| presence_plan(s).name.downcase.gsub(/[^a-z0-9]/, '_') }
 
     @last = SponsorshipEditingHistory.where(sponsorship_id: sponsorships.each_value.flat_map { |ss| ss.map(&:id) }).order(id: :desc).first
     unless @last # this is falsy if no sponsorships have presense
-      Rails.logger.warn "Conference #{@conference.slug} (#{@conference.id}) have no sponsorships with presense, resulting null sponsors data"
+      Rails.logger.warn "Conference #{conference.slug} (#{conference.id}) have no sponsorships with presense, resulting null sponsors data"
       return
     end
     @last_id = @last.id
@@ -38,17 +38,17 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       [
         base_plan_slug,
         {
-          base_plan: sponsorships[0].plan.name.downcase,
-          plans: sponsorships.group_by { |s| s.plan_name.downcase.gsub(/[^a-z0-9]/, '_') }.map do |plan_slug, sponsors|
+          base_plan: presence_plan(sponsorships.fetch(0)).name.downcase,
+          plans: sponsorships.group_by { |s| Must.because(s.plan_name) { "have_presence selects sponsorships with a plan" }.downcase.gsub(/[^a-z0-9]/, '_') }.map do |plan_slug, sponsors|
             [
               plan_slug,
               {
-                plan_name: sponsors[0].plan_name,
+                plan_name: sponsors.fetch(0).plan_name,
                 sponsors: sponsors.map do |sp|
                   {
                     id: sp.id,
                     asset_file_id: sp.asset_file&.id,
-                    base_plan: sp.plan.name.downcase,
+                    base_plan: presence_plan(sp).name.downcase,
                     plan_name: sp.plan_name,
                     slug: sp.slug,
                     name: sp.name,
@@ -65,7 +65,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
   end
 
   def events_data
-    events = @conference.sponsor_events
+    events = conference.sponsor_events
       .accepted
       .includes(sponsorship: :organization)
       .order(starts_at: :asc, id: :asc)
@@ -129,14 +129,17 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
   end
 
   def push_to_github
-    return unless repo
-    return if yaml_data.nil?
+    github_repo = repo
+    return unless github_repo
+
+    content = yaml_data
+    return if content.nil?
 
     push_id = @last_id || "event-#{@last_event_editing_history_id}"
     GitHubPusher.new(
-      conference: @conference,
-      filepath: repo.path,
-      content: yaml_data,
+      conference: conference,
+      filepath: github_repo.path,
+      content: content,
       last_editing_history_id: @last_id,
       last_event_editing_history_id: @last_event_editing_history_id,
       push_id:,
@@ -156,9 +159,10 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
         .order(id: :asc)
       if edits.any?
         lines = edits.map do |edit|
-          actor = edit.staff ? "#{edit.staff.login} (staff)" : "sponsor"
+          staff = edit.staff
+          actor = staff ? "#{staff.login} (staff)" : "sponsor"
           fields = edit.diff_summary.map { |s| "`#{s}`" }.join(", ")
-          "- **#{edit.sponsorship.name}** (#{fields}) — by #{actor}"
+          "- **#{Must.expect(edit.sponsorship).name}** (#{fields}) — by #{actor}"
         end
         sections << "**Sponsorship changes:**\n#{lines.join("\n")}"
       end
@@ -171,15 +175,22 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
         .order(id: :asc)
       if event_edits.any?
         lines = event_edits.map do |edit|
-          actor = edit.staff ? "#{edit.staff.login} (staff)" : "sponsor"
+          staff = edit.staff
+          actor = staff ? "#{staff.login} (staff)" : "sponsor"
           fields = edit.diff_summary.map { |s| "`#{s}`" }.join(", ")
-          "- **#{edit.sponsor_event.title}** (#{fields}) — by #{actor}"
+          "- **#{Must.expect(edit.sponsor_event).title}** (#{fields}) — by #{actor}"
         end
         sections << "**Event changes:**\n#{lines.join("\n")}"
       end
     end
 
     sections.any? ? sections.join("\n\n") : nil
+  end
+
+  private def conference = Must.because(@conference) { "perform sets the conference" }
+
+  private def presence_plan(sponsorship)
+    Must.because(sponsorship.plan) { "have_presence selects sponsorships with a plan" }
   end
 
   # For debugging
@@ -224,7 +235,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     end
 
     private def read_ids_from_ref(ref)
-      existing = octokit.contents(@repo.name, path: @filepath, ref: ref)
+      existing = octokit.contents(repo.name, path: @filepath, ref: ref)
       content = Base64.decode64(existing[:content])
       last_id = content =~ /\blast_editing_history: (\d+)/ ? ::Regexp.last_match(1).to_i : 0
       last_event_id = content =~ /\blast_event_editing_history: (\d+)/ ? ::Regexp.last_match(1).to_i : 0
@@ -234,27 +245,27 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     end
 
     private def ensure_branch
-      octokit.branch(@repo.name, @branch_name)
+      octokit.branch(repo.name, @branch_name)
     rescue Octokit::NotFound
-      head_sha = octokit.branch(@repo.name, base_branch)[:commit][:sha]
-      octokit.create_ref(@repo.name, "refs/heads/#{@branch_name}", head_sha)
+      head_sha = octokit.branch(repo.name, base_branch)[:commit][:sha]
+      octokit.create_ref(repo.name, "refs/heads/#{@branch_name}", head_sha)
     end
 
     private def commit_content
       begin
-        blob_sha = octokit.contents(@repo.name, path: @filepath, ref: @branch_name)[:sha]
+        blob_sha = octokit.contents(repo.name, path: @filepath, ref: @branch_name)[:sha]
       rescue Octokit::NotFound
         blob_sha = nil
       end
 
       retries = 0
       begin
-        octokit.update_contents(@repo.name, @filepath, @pr_title, blob_sha, @content, branch: @branch_name)
+        octokit.update_contents(repo.name, @filepath, @pr_title, blob_sha, @content, branch: @branch_name)
       rescue Octokit::Conflict, Octokit::UnprocessableEntity
         if retries < MAX_RETRIES && !branch_has_newer_data?
           retries += 1
           begin
-            blob_sha = octokit.contents(@repo.name, path: @filepath, ref: @branch_name)[:sha]
+            blob_sha = octokit.contents(repo.name, path: @filepath, ref: @branch_name)[:sha]
           rescue Octokit::NotFound
             blob_sha = nil
           end
@@ -268,7 +279,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     end
 
     private def branch_has_newer_data?
-      existing = octokit.contents(@repo.name, path: @filepath, ref: @branch_name)
+      existing = octokit.contents(repo.name, path: @filepath, ref: @branch_name)
       existing_content = Base64.decode64(existing[:content])
 
       branch_last_id = existing_content =~ /\blast_editing_history: (\d+)/ ? ::Regexp.last_match(1).to_i : 0
@@ -283,31 +294,33 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
 
     private def create_or_update_pull_request
       full_summary = @build_summary&.call(@base_last_id, @base_last_event_id)
-      owner = @repo.name.split('/')[0]
-      existing_prs = octokit.pull_requests(@repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
+      owner = repo.name.split('/')[0]
+      existing_prs = octokit.pull_requests(repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
       if existing_prs.any?
         pr_number = existing_prs[0][:number]
-        octokit.update_pull_request(@repo.name, pr_number, title: @pr_title, body: full_summary)
+        octokit.update_pull_request(repo.name, pr_number, title: @pr_title, body: full_summary)
         incremental = @build_summary&.call(@prev_last_id, @prev_last_event_id)
-        octokit.add_comment(@repo.name, pr_number, incremental) if incremental
+        octokit.add_comment(repo.name, pr_number, incremental) if incremental
       else
         begin
-          octokit.create_pull_request(@repo.name, base_branch, @branch_name, @pr_title, full_summary)
+          octokit.create_pull_request(repo.name, base_branch, @branch_name, @pr_title, full_summary)
         rescue Octokit::UnprocessableEntity
           # Concurrent job already created PR
-          existing_prs = octokit.pull_requests(@repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
+          existing_prs = octokit.pull_requests(repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
           if existing_prs.any?
             pr_number = existing_prs[0][:number]
-            octokit.update_pull_request(@repo.name, pr_number, title: @pr_title, body: full_summary)
+            octokit.update_pull_request(repo.name, pr_number, title: @pr_title, body: full_summary)
             incremental = @build_summary&.call(@prev_last_id, @prev_last_event_id)
-            octokit.add_comment(@repo.name, pr_number, incremental) if incremental
+            octokit.add_comment(repo.name, pr_number, incremental) if incremental
           end
         end
       end
     end
 
     private def github_installation
-      @github_installation ||= GithubInstallation.new(@repo.name, branch: @repo.branch)
+      @github_installation ||= GithubInstallation.new(repo.name, branch: repo.branch)
     end
+
+    private def repo = Must.because(@repo) { "push returns early without a github_repo" }
   end
 end

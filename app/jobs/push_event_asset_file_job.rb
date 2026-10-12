@@ -6,16 +6,16 @@ require 'open3'
 class PushEventAssetFileJob < ApplicationJob
   def perform(record)
     resolve_record(record)
-    @sponsorship = @event.sponsorship
-    @conference = @event.conference
+    @sponsorship = event.sponsorship
+    @conference = event.conference
 
-    return if @conference.github_repo_images_path.blank?
+    return if conference.github_repo_images_path.blank?
 
-    repo = @conference.github_repo
+    repo = conference.github_repo
     return unless repo
-    return unless @event.accepted?
+    return unless event.accepted?
 
-    asset_file = @event.asset_file
+    asset_file = event.asset_file
     return unless asset_file
 
     gi = GithubInstallation.new(repo.name, branch: repo.branch)
@@ -86,10 +86,10 @@ class PushEventAssetFileJob < ApplicationJob
 
   private def push_to_github(gi, repo, asset_file, webp_content)
     octokit = gi.octokit
-    images_path = @conference.github_repo_images_path.chomp('/')
-    filepath = "#{images_path}/events/#{@sponsorship.id}-#{@event.id}.webp"
-    branch_name = "sponsor-app/event-asset/#{@sponsorship.id}-#{@event.id}/#{@editing_history.id}"
-    pr_title = "Event asset: #{@sponsorship.name} [#{@event.id}@#{@editing_history.id}]"
+    images_path = Must.because(conference.github_repo_images_path) { "perform returns early without github_repo_images_path" }.chomp('/')
+    filepath = "#{images_path}/events/#{sponsorship.id}-#{event.id}.webp"
+    branch_name = "sponsor-app/event-asset/#{sponsorship.id}-#{event.id}/#{editing_history.id}"
+    pr_title = "Event asset: #{sponsorship.name} [#{event.id}@#{editing_history.id}]"
 
     begin
       octokit.delete_branch(repo.name, branch_name)
@@ -114,11 +114,19 @@ class PushEventAssetFileJob < ApplicationJob
     body = <<~MARKDOWN
       ## Event Asset
 
-      - **Event:** #{@event.title}
-      - **Sponsor:** #{@sponsorship.name} (#{@conference.name})
-      - **Admin:** #{conference_sponsor_event_url(@conference, @event)}
+      - **Event:** #{event.title}
+      - **Sponsor:** #{sponsorship.name} (#{conference.name})
+      - **Admin:** #{conference_sponsor_event_url(conference, event)}
     MARKDOWN
 
     octokit.create_pull_request(repo.name, gi.base_branch, branch_name, pr_title, body)
   end
+
+  private def event = Must.because(@event) { "resolve_record sets the event" }
+
+  private def editing_history = Must.because(@editing_history) { "resolve_record sets the editing history, which every saved event has" }
+
+  private def sponsorship = Must.because(@sponsorship) { "perform sets the event's required sponsorship" }
+
+  private def conference = Must.because(@conference) { "perform sets the event's required conference" }
 end

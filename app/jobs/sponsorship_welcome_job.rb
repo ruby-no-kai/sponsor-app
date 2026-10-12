@@ -3,7 +3,8 @@
 
 class SponsorshipWelcomeJob < ApplicationJob
   def perform(sponsorship)
-    token = SessionToken.create!(email: sponsorship.contact.email, expires_at: Time.zone.now + 1.year)
+    contact = Must.because(sponsorship.contact) { "sponsorships validate the presence of their contact" }
+    token = SessionToken.create!(email: contact.email, expires_at: Time.zone.now + 1.year)
 
     SponsorshipWelcomeMailer.with(
       sponsorship: sponsorship,
@@ -21,6 +22,7 @@ class SponsorshipWelcomeJob < ApplicationJob
     EnsureSponsorshipTitoDiscountCodeJob.perform_later(sponsorship, 'attendee')
     GenerateSponsorsYamlFileJob.perform_later(sponsorship.conference)
 
-    BackfillSponsorshipAssetFileChecksumJob.perform_later(sponsorship.asset_file) if sponsorship.asset_file.checksum_sha256 == '-'
+    asset_file = Must.because(sponsorship.asset_file) { "sponsorships validate the presence of their asset file" }
+    BackfillSponsorshipAssetFileChecksumJob.perform_later(asset_file) if asset_file.checksum_sha256 == '-'
   end
 end

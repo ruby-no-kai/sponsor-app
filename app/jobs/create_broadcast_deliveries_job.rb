@@ -38,7 +38,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
 
       private def plan_scope
         if params[:plan_id].present?
-          plan = @broadcast.conference.plans.where(id: params[:plan_id]).first
+          plan = Must.expect(@broadcast.conference).plans.where(id: params[:plan_id]).first
           if plan
             return Sponsorship.where(plan:)
           end
@@ -71,10 +71,11 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
 
       private def sponsorships_to_recipients(scope)
         scope.map do |sponsorship|
+          contact = Must.because(sponsorship.contact) { "sponsorships validate the presence of their contact" }
           Recipient.new(
             sponsorship: sponsorship,
-            email: sponsorship.contact.email,
-            email_ccs: sponsorship.contact.email_ccs,
+            email: contact.email,
+            email_ccs: contact.email_ccs,
           )
         end
       end
@@ -82,7 +83,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
 
     class All < Base
       def recipients
-        scope = scope_sponsorships(@broadcast.conference.sponsorships.includes(:contact))
+        scope = scope_sponsorships(Must.expect(@broadcast.conference).sponsorships.includes(:contact))
         sponsorships_to_recipients(scope)
       end
     end
@@ -99,7 +100,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
       def recipients
         scope = Sponsorship.where(id: Array(params[:sponsorship_ids]))
         if params[:exclude_current_sponsors].present?
-          scope = scope.where.not(organization_id: @broadcast.conference.sponsorships.pluck(:organization_id))
+          scope = scope.where.not(organization_id: Must.expect(@broadcast.conference).sponsorships.pluck(:organization_id))
         end
         sponsorships_to_recipients(scope)
       end
@@ -165,17 +166,19 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
   def filter_recipients(kind, params)
     case kind.to_s
     when 'all'
-      Filters::All.new(broadcast: @broadcast, params: params).recipients
+      Filters::All.new(broadcast: broadcast, params: params).recipients
     when 'past_sponsors'
-      Filters::PastSponsors.new(broadcast: @broadcast, params: params).recipients
+      Filters::PastSponsors.new(broadcast: broadcast, params: params).recipients
     when 'raw'
-      Filters::Raw.new(broadcast: @broadcast, params: params).recipients
+      Filters::Raw.new(broadcast: broadcast, params: params).recipients
     when 'manual'
-      Filters::Manual.new(broadcast: @broadcast, params: params).recipients
+      Filters::Manual.new(broadcast: broadcast, params: params).recipients
     when 'none'
       []
     else
       []
     end
   end
+
+  private def broadcast = Must.because(@broadcast) { "perform sets the broadcast before filtering recipients" }
 end

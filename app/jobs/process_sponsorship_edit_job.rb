@@ -3,21 +3,22 @@
 
 class ProcessSponsorshipEditJob < ApplicationJob
   def perform(edit)
-    @sponsorship = edit.sponsorship
-    @conference = @sponsorship.conference
+    sponsorship = Must.expect(edit.sponsorship)
+    conference = Must.expect(sponsorship.conference)
 
-    actor = edit.staff ? "#{edit.staff.login} (staff)" : 'sponsor'
+    staff = edit.staff
+    actor = staff ? "#{staff.login} (staff)" : 'sponsor'
     SlackWebhookJob.perform_now(
       {
-        text: ":pencil: <#{conference_sponsorship_url(@conference, @sponsorship)}|#{@sponsorship.name}> edited by #{actor} [#{edit.diff_summary.map { |s| "`#{s}`" }.join(", ")}] <#{conference_sponsorship_editing_histories_url(@conference, @sponsorship)}|diff>",
+        text: ":pencil: <#{conference_sponsorship_url(conference, sponsorship)}|#{sponsorship.name}> edited by #{actor} [#{edit.diff_summary.map { |s| "`#{s}`" }.join(", ")}] <#{conference_sponsorship_editing_histories_url(conference, sponsorship)}|diff>",
       },
       hook_name: :feed,
     )
 
-    GenerateSponsorsYamlFileJob.perform_now(@conference)
+    GenerateSponsorsYamlFileJob.perform_now(conference)
 
-    EnsureSponsorshipTitoDiscountCodeJob.perform_now(@sponsorship, 'attendee')
-    EnsureSponsorshipTitoDiscountCodeJob.perform_now(@sponsorship, 'booth_staff')
-    EnsureSponsorshipTitoDiscountCodeJob.perform_now(@sponsorship, 'booth_paid')
+    EnsureSponsorshipTitoDiscountCodeJob.perform_now(sponsorship, 'attendee')
+    EnsureSponsorshipTitoDiscountCodeJob.perform_now(sponsorship, 'booth_staff')
+    EnsureSponsorshipTitoDiscountCodeJob.perform_now(sponsorship, 'booth_paid')
   end
 end

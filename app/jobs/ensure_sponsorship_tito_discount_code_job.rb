@@ -7,23 +7,24 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
 
     @kind = kind
     @sponsorship = sponsorship
-    @conference = @sponsorship.conference
-    return if @conference.tito_slug.blank?
+    conference = Must.expect(sponsorship.conference)
+    @conference = conference
+    return if conference.tito_slug.blank?
 
-    @discount_code = @sponsorship.tito_discount_codes.where(kind: kind).first
+    discount_code = sponsorship.tito_discount_codes.where(kind: kind).first
 
-    if @discount_code
-      return if @discount_code.quantity == quantity && !ignore_quantity
+    if discount_code
+      return if discount_code.quantity == quantity && !ignore_quantity
 
-      tito.update_discount_code(@conference.tito_slug, @discount_code.tito_discount_code_id, **discount_code_attributes)
-      @discount_code.update!(quantity: quantity)
+      tito.update_discount_code(tito_slug, discount_code.tito_discount_code_id, **discount_code_attributes)
+      discount_code.update!(quantity: quantity)
     else
       return if quantity < 1
 
-      tito_discount_code = tito.create_discount_code(@conference.tito_slug, **discount_code_attributes)
+      tito_discount_code = tito.create_discount_code(tito_slug, **discount_code_attributes)
       TitoDiscountCode.create!(
-        sponsorship: @sponsorship,
-        kind: @kind,
+        sponsorship: sponsorship,
+        kind: kind,
         code: code,
         quantity: quantity,
         tito_discount_code_id: tito_discount_code.fetch(:discount_code).fetch(:id),
@@ -32,7 +33,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
   end
 
   def code
-    "#{code_prefix}_#{@sponsorship.id}_#{@sponsorship.ticket_key[0, 12]}"
+    "#{code_prefix}_#{sponsorship.id}_#{sponsorship.ticket_key[0, 12]}"
   end
 
   def discount_code_attributes
@@ -42,16 +43,16 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
       value: '100.0',
       only_show_attached: true,
       reveal_secret: true,
-      block_registrations_if_not_applicable: @kind != 'attendee',
+      block_registrations_if_not_applicable: kind != 'attendee',
       quantity: quantity,
       release_ids: quantity > 0 ? release_ids : nil,
       source_id: tito_source.tito_source_id,
-      description_for_organizer: "sponsorship=#{@sponsorship.id}, domain=#{@sponsorship.organization&.domain}, plan=#{@sponsorship.plan&.name}",
+      description_for_organizer: "sponsorship=#{sponsorship.id}, domain=#{sponsorship.organization&.domain}, plan=#{sponsorship.plan&.name}",
     }
-    if @kind == 'booth_paid'
+    if kind == 'booth_paid'
       retval.merge!(
         type: 'MoneyOffDiscountCode',
-        value: @sponsorship.conference.tito_booth_paid_flat_discount_amount.to_s,
+        value: conference.tito_booth_paid_flat_discount_amount.to_s,
       )
     end
     retval
@@ -59,10 +60,10 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
 
   def quantity
     {
-      'attendee' => @sponsorship.total_number_of_attendees,
-      'booth_staff' => @sponsorship.total_number_of_booth_staff,
-      'booth_paid' => @sponsorship.total_number_of_booth_staff > 0 ? 6 : 0,
-    }.fetch(@kind)
+      'attendee' => sponsorship.total_number_of_attendees,
+      'booth_staff' => sponsorship.total_number_of_booth_staff,
+      'booth_paid' => sponsorship.total_number_of_booth_staff > 0 ? 6 : 0,
+    }.fetch(kind)
   end
 
   def code_prefix
@@ -70,7 +71,7 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
       'attendee' => 'sa',
       'booth_staff' => 'sb',
       'booth_paid' => 'se',
-    }.fetch(@kind)
+    }.fetch(kind)
   end
 
   def release_slugs
@@ -78,20 +79,20 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
       'attendee' => %w(sponsor),
       'booth_staff' => %w(exhibitor),
       'booth_paid' => %w(exhibitor-paid),
-    }.fetch(@kind)
+    }.fetch(kind)
   end
 
   def tito_source
-    @tito_source ||= @sponsorship.tito_source || begin
+    @tito_source ||= sponsorship.tito_source || begin
       source = tito.create_source(
-        @conference.tito_slug,
-        code: @sponsorship.tito_source_code,
-        name: "Sponsor: #{@sponsorship.name} (#{@sponsorship.id})",
-        description: "Sponsor: #{@sponsorship.organization.name}, Conference: #{@conference.name} (#{@conference.id})",
+        tito_slug,
+        code: sponsorship.tito_source_code,
+        name: "Sponsor: #{sponsorship.name} (#{sponsorship.id})",
+        description: "Sponsor: #{Must.expect(sponsorship.organization).name}, Conference: #{conference.name} (#{conference.id})",
       ).fetch(:source).fetch(:id)
       TitoSource.create!(
-        conference: @conference,
-        sponsorship: @sponsorship,
+        conference: conference,
+        sponsorship: sponsorship,
         tito_source_id: source.to_s,
       )
     end
@@ -100,10 +101,10 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
   def release_ids
     @release_ids ||= TitoCachedRelease.transaction do
       release_slugs.map do |slug|
-        TitoCachedRelease.where(conference: @conference, tito_release_slug: slug).first&.tito_release_id or begin
-          id = tito.get_release(@conference.tito_slug, slug).fetch(:release).fetch(:id)
+        TitoCachedRelease.where(conference: conference, tito_release_slug: slug).first&.tito_release_id or begin
+          id = tito.get_release(tito_slug, slug).fetch(:release).fetch(:id)
           TitoCachedRelease.create!(
-            conference: @conference,
+            conference: conference,
             tito_release_slug: slug,
             tito_release_id: id.to_s,
           ).tito_release_id
@@ -115,4 +116,12 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
   def tito
     @tito ||= TitoApi.new
   end
+
+  private def kind = Must.because(@kind) { "perform sets the kind" }
+
+  private def sponsorship = Must.because(@sponsorship) { "perform sets the sponsorship" }
+
+  private def conference = Must.because(@conference) { "perform sets the conference" }
+
+  private def tito_slug = Must.because(conference.tito_slug) { "perform returns early for a conference without a tito_slug" }
 end

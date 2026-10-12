@@ -8,10 +8,11 @@ require 'optparse'
 
 class SlackWebhookJob < ApplicationJob
   def perform(payload, hook_name: :default)
-    return unless webhook_url(hook_name)
+    url = webhook_url(hook_name)
+    return unless url
 
     Net::HTTP.post_form(
-      URI.parse(webhook_url(hook_name)),
+      URI.parse(url),
       payload: payload.to_json,
     )
   end
