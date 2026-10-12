@@ -5,6 +5,13 @@
 class TitoApi
   ENDPOINT = "https://api.tito.io/v3"
 
+  # faraday_middleware's ParseJson passes parser options to JSON.parse positionally, which json 3 rejects.
+  class ParseJson < FaradayMiddleware::ParseJson
+    define_parser do |body, parser_options|
+      ::JSON.parse(body, **(parser_options || {})) unless body.strip.empty?
+    end
+  end
+
   def initialize(token: Rails.application.config.x.tito.token, endpoint: ENDPOINT)
     @token = token
     @endpoint = ENDPOINT
@@ -72,7 +79,7 @@ class TitoApi
       builder.use Faraday::Response::Logger, Rails.logger, bodies: true do |log|
         log.filter(/^authorization:.+$/i, 'authorization: [redacted]')
       end
-      builder.use FaradayMiddleware::ParseJson, content_type: /\bjson$/, parser_options: {symbolize_names: true}
+      builder.use ParseJson, content_type: /\bjson$/, parser_options: {symbolize_names: true}
       builder.use FaradayMiddleware::EncodeJson
       builder.use Faraday::Response::RaiseError
 
