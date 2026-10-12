@@ -203,3 +203,51 @@ class TitoTicketRetraction::Preconditions
   sig { returns(T::Boolean) }
   def valid_discount_code_used; end
 end
+
+class EnsureSponsorshipTitoDiscountCodeJob::DiscountCodeAttributes
+  sig do
+    params(
+      code: String,
+      type: String,
+      value: String,
+      only_show_attached: T::Boolean,
+      reveal_secret: T::Boolean,
+      block_registrations_if_not_applicable: T::Boolean,
+      quantity: Integer,
+      release_ids: T.nilable(T::Array[String]),
+      source_id: String,
+      description_for_organizer: String,
+    ).returns(T.attached_class)
+  end
+  def self.new(code:, type:, value:, only_show_attached:, reveal_secret:, block_registrations_if_not_applicable:, quantity:, release_ids:, source_id:, description_for_organizer:); end
+
+  sig { returns(String) }
+  def code; end
+
+  sig { returns(String) }
+  def type; end
+
+  sig { returns(String) }
+  def value; end
+
+  sig { returns(T::Boolean) }
+  def only_show_attached; end
+
+  sig { returns(T::Boolean) }
+  def reveal_secret; end
+
+  sig { returns(T::Boolean) }
+  def block_registrations_if_not_applicable; end
+
+  sig { returns(Integer) }
+  def quantity; end
+
+  sig { returns(T.nilable(T::Array[String])) }
+  def release_ids; end
+
+  sig { returns(String) }
+  def source_id; end
+
+  sig { returns(String) }
+  def description_for_organizer; end
+end
