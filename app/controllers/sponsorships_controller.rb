@@ -68,7 +68,7 @@ class SponsorshipsController < ApplicationController
       end
     end
 
-    @sponsorship.locale = I18n.locale
+    @sponsorship.locale = I18n.locale.to_s
     @sponsorship.conference = @conference
     affiliated_organization = Organization.find_by(affiliation_code: params[:affiliation])
     @sponsorship.assume_organization(affiliated_organization:)
@@ -77,7 +77,7 @@ class SponsorshipsController < ApplicationController
     respond_to do |format|
       if @sponsorship.save(context: :update_by_user)
         (session[:sponsorship_ids] ||= []).unshift @sponsorship.id
-        session[:asset_file_ids]&.delete(@sponsorship.asset_file.id)
+        session[:asset_file_ids]&.delete(@sponsorship.asset_file_id)
         SponsorshipWelcomeJob.perform_later(@sponsorship)
         format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: t('.notice') }
       else
@@ -95,7 +95,7 @@ class SponsorshipsController < ApplicationController
     sp = sponsorship_params
     sp.delete(:asset_file_id) if @sponsorship.asset_file_id
     @sponsorship.assign_attributes(sp)
-    @sponsorship.locale = I18n.locale
+    @sponsorship.locale = I18n.locale.to_s
 
     respond_to do |format|
       if @sponsorship.save(context: :update_by_user)
