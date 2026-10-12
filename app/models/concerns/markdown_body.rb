@@ -1,6 +1,7 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
+# @requires_ancestor: ActiveRecord::Base
 module MarkdownBody
   def html
     if persisted?

@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 # Cached Tito 'release' object (ticket kind) for a conference.
