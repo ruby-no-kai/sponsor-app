@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class Announcement < ApplicationRecord
@@ -18,14 +18,17 @@ class Announcement < ApplicationRecord
   scope :for_sponsors, -> { where(exhibitors_only: false) }
   scope :for_exhibitors, -> { where('1=1') }
 
+  #: () -> String
   def to_param
     "#{issue}:#{locale}"
   end
 
+  #: () -> Announcement::PrivateAssociationRelation
   def all_locales
     Must.expect(conference).announcements.where(issue: issue)
   end
 
+  #: () -> void
   def generate_issue
     if conference && !persisted? && issue.blank?
       loop do
@@ -35,6 +38,7 @@ class Announcement < ApplicationRecord
     end
   end
 
+  #: () -> void
   def bump_revision
     return unless conference
 
@@ -43,6 +47,7 @@ class Announcement < ApplicationRecord
     end
   end
 
+  #: (String | bool flag) -> bool
   def published=(flag)
     flag = flag == '1' if flag.is_a?(String)
     case
@@ -56,19 +61,23 @@ class Announcement < ApplicationRecord
     flag
   end
 
+  #: () -> bool
   def published
     !!published_at
   end
   alias_method :published?, :published
 
+  #: () -> bool
   def draft?
     !published?
   end
 
+  #: () -> bool
   def pin?
     stickiness > 0
   end
 
+  #: (String | bool flag) -> void
   def new_revision=(flag)
     flag = flag == '1' if flag.is_a?(String)
     self.revision = if flag
@@ -78,14 +87,17 @@ class Announcement < ApplicationRecord
     end
   end
 
+  #: () -> bool
   def new_revision
     revision_changed?
   end
 
+  #: () -> Integer
   def latest_revision
     all_locales.group(:issue).pluck(Arel.sql('MAX(revision)'))[0] || 1
   end
 
+  #: () -> bool
   def revision_behind?
     revision < latest_revision
   end

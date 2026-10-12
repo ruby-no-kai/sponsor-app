@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class Contact < ApplicationRecord
@@ -14,18 +14,22 @@ class Contact < ApplicationRecord
 
   validate :validate_email_ccs
 
+  #: String | bool
   attr_writer :_keep
 
+  #: () -> (String | bool)?
   def _keep
     return @_keep if defined? @_keep
 
-    @_keep = persisted?
+    @_keep = persisted? #: (String | bool)?
   end
 
+  #: () -> Array[String]
   def email_ccs
     email_cc&.strip&.split(/[,;]\s*/) || []
   end
 
+  #: () -> void
   def validate_email_ccs
     email_ccs.each do |email|
       unless email.include?('@')
