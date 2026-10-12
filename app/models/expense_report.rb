@@ -12,8 +12,8 @@ class ExpenseReport < ApplicationRecord
   validate :validate_custom_sponsorship
 
   def recalculate_totals
-    self.total_amount = line_items.sum(:amount)
-    self.total_tax_amount = line_items.sum(:tax_amount)
+    self.total_amount = line_items.sum(:amount).to_d
+    self.total_tax_amount = line_items.sum(:tax_amount).to_d
   end
 
   def submit!
@@ -79,6 +79,7 @@ class ExpenseReport < ApplicationRecord
   end
 
   private def validate_custom_sponsorship
+    sponsorship = self.sponsorship
     return unless sponsorship
 
     errors.add(:sponsorship, 'must be a custom sponsorship') unless sponsorship.customization

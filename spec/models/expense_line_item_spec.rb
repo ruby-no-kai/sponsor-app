@@ -69,5 +69,10 @@ RSpec.describe ExpenseLineItem, type: :model do
       item.assign_next_position
       expect(item.position).to eq(1)
     end
+
+    it 'raises without an expense report' do
+      item = described_class.new(title: 'Orphan', amount: 100, tax_amount: 10)
+      expect { item.assign_next_position }.to raise_error(Must::Violation)
+    end
   end
 end

@@ -6,13 +6,13 @@ class ExpenseReportReview < ApplicationRecord
   belongs_to :staff, optional: true
 
   validates :action, inclusion: {in: %w[approve reject]}
-  validates :comment, presence: true, if: -> { action == 'reject' }
+  validates :comment, presence: true, if: ->(review) { review.action == 'reject' }
 
   def self.create_for!(submission, action:, comment:, staff:)
     transaction do
       submission.review&.destroy!
       review = submission.create_review!(action:, comment:, staff:)
-      report = submission.expense_report
+      report = Must.expect(submission.expense_report)
       report.status = action == 'approve' ? 'approved' : 'rejected'
       report.save!
       review
