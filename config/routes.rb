@@ -128,6 +128,9 @@ Rails.application.routes.draw do
       rpc 'GetConference' => 'api/admin/conferences'
 
       # Form descriptions
+      rpc 'GetFormDescription' => 'api/admin/form_descriptions'
+      rpc 'CreateFormDescription' => 'api/admin/form_descriptions'
+      rpc 'UpdateFormDescription' => 'api/admin/form_descriptions'
 
       # Plans
 

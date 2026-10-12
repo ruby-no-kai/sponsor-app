@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "rubykaigi/sponsor_app/form_description.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// The writable fields of a form description, taken by AdminService.CreateFormDescription and
+// UpdateFormDescription.
+message FormDescriptionInput {
+  // Locale of the texts: one of the locales the application form is offered in.
+  string locale = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      in: [
+        "en",
+        "ja"
+      ]
+    }
+  ];
+
+  // Introduction at the top of the form, in Markdown.
+  string head = 2 [(buf.validate.field).string.max_len = 65536];
+
+  // Help beside the plan selection, in Markdown.
+  string plan_help = 3 [(buf.validate.field).string.max_len = 65536];
+
+  // Help beside the booth request, in Markdown.
+  string booth_help = 4 [(buf.validate.field).string.max_len = 65536];
+
+  // The policies an applicant agrees to, in Markdown.
+  string policy_help = 5 [(buf.validate.field).string.max_len = 65536];
+
+  // Help beside the ticket section, in Markdown.
+  string ticket_help = 6 [(buf.validate.field).string.max_len = 65536];
+
+  // Introduction to the sponsor event submission page, in Markdown.
+  string sponsor_event_help = 7 [(buf.validate.field).string.max_len = 65536];
+
+  // The requirements a sponsor event must meet to be listed, in Markdown.
+  string event_policy = 8 [(buf.validate.field).string.max_len = 65536];
+
+  // Alternatives the form offers in case the plan applied for cannot be granted, in the order it
+  // lists them. A condition naming a plan the conference does not have is answered with
+  // PROBLEM_TYPE_INVALID_RECORD.
+  repeated FallbackOption fallback_options = 9 [
+    (buf.validate.field).repeated.max_items = 50,
+    (buf.validate.field).cel = {
+      id: "fallback_options.distinct"
+      message: "options sharing a value must differ in their conditions"
+      // Past max_items the quadratic check would exceed protovalidate's iteration budget and raise.
+      expression: "this.size() > 50 || this.all(a, this.filter(b, b.value == a.value && b.conditions == a.conditions).size() == 1)"
+    }
+  ];
+}
+
+// Request for AdminService.GetFormDescription.
+message AdminServiceGetFormDescriptionRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Locale of the form description, such as "en".
+  string locale = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+// Response for AdminService.GetFormDescription.
+message AdminServiceGetFormDescriptionResponse {
+  // The form description the request names.
+  FormDescription form_description = 1;
+}
+
+// Request for AdminService.CreateFormDescription.
+message AdminServiceCreateFormDescriptionRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // The form description to create. Its locale must not be described yet.
+  FormDescriptionInput input = 2 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.CreateFormDescription.
+message AdminServiceCreateFormDescriptionResponse {
+  // The form description created, with its texts rendered.
+  FormDescription form_description = 1;
+}
+
+// Request for AdminService.UpdateFormDescription.
+message AdminServiceUpdateFormDescriptionRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Locale of the form description to update, such as "en".
+  string locale = 2 [(buf.validate.field).string.min_len = 1];
+
+  // Every writable field, replacing what is stored. A changed locale must not be described yet.
+  FormDescriptionInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.UpdateFormDescription.
+message AdminServiceUpdateFormDescriptionResponse {
+  // The form description as updated, with its texts rendered.
+  FormDescription form_description = 1;
+}

@@ -42,6 +42,12 @@ RSpec.describe 'Connect services' do # rubocop:disable RSpec/DescribeClass
           end
         end
 
+        it 'carries any Input message in a field named input, which InvalidRecord errors name' do
+          inputs = method.input_type.select { it.subtype.is_a?(Google::Protobuf::Descriptor) && it.subtype.name.end_with?('Input') }
+
+          expect(inputs.map(&:name)).to all(eq('input'))
+        end
+
         it 'references no internal type' do
           names = [method.input_type, method.output_type].flat_map { reachable_types(it).keys }
 
