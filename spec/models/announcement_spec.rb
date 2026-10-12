@@ -46,6 +46,21 @@ RSpec.describe Announcement, type: :model do
     end
   end
 
+  describe '#all_locales' do
+    it 'returns every locale of the same issue in the conference' do
+      en = FactoryBot.create(:announcement, staff:, conference:, issue: 'shared', locale: 'en')
+      ja = FactoryBot.create(:announcement, staff:, conference:, issue: 'shared', locale: 'ja')
+      FactoryBot.create(:announcement, staff:, conference:, issue: 'other', locale: 'en')
+      FactoryBot.create(:announcement, staff:, conference: FactoryBot.create(:conference), issue: 'shared', locale: 'en')
+
+      expect(en.all_locales).to contain_exactly(en, ja)
+    end
+
+    it 'raises without a conference' do
+      expect { described_class.new.all_locales }.to raise_error(Must::Violation)
+    end
+  end
+
   describe '#published?' do
     it 'returns false when published_at is nil' do
       announcement = FactoryBot.build_stubbed(:announcement, staff:, conference:)

@@ -1,10 +1,12 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class FormDescription < ApplicationRecord
   FallbackOptionCondition = Data.define(:plans, :booth_request) do
+    #: () -> Hash[Symbol, untyped]
     def as_json = to_h.compact
 
+    #: () -> bool
     def valid?
       plans_valid = plans.nil? || plans.is_a?(Array)
       booth_valid = booth_request.nil? || [true, false].include?(booth_request)
@@ -13,19 +15,25 @@ class FormDescription < ApplicationRecord
   end
 
   FallbackOption = Data.define(:value, :name, :conditions, :priority_human) do
+    #: () -> bool
     def valid?
       return false if value.blank? || name.blank?
       return false if priority_human.present? && !priority_human.is_a?(Array)
-      return true if conditions.nil?
 
-      conditions.is_a?(Array) && conditions.all? { |cond| cond.is_a?(FallbackOptionCondition) && cond.valid? }
+      conds = conditions
+      return true if conds.nil?
+
+      conds.is_a?(Array) && conds.all? { |cond| cond.is_a?(FallbackOptionCondition) && cond.valid? }
     end
 
+    #: () -> Hash[Symbol, untyped]
     def as_json = to_h.merge(conditions: conditions&.map(&:as_json)).compact
 
+    #: () -> Hash[Symbol, String]
     def to_dataset
-      dataset = {}
-      dataset[:conditions] = JSON.generate(conditions.map(&:as_json)) if conditions.present?
+      dataset = {} #: Hash[Symbol, String]
+      conds = conditions.presence
+      dataset[:conditions] = JSON.generate(conds.map(&:as_json)) if conds
       dataset[:priority_human] = JSON.generate(priority_human) if priority_human.present?
       dataset
     end
@@ -35,18 +43,21 @@ class FormDescription < ApplicationRecord
 
   validate :validate_fallback_options_json
 
+  #: () -> String
   def to_param
     locale
   end
 
   before_save :render_markdown
 
+  #: () -> Array[FallbackOption]
   def fallback_options
     build_fallback_options(read_attribute(:fallback_options))
   end
 
+  #: (String | Array[untyped] | nil value) -> void
   def fallback_options=(value)
-    @fallback_options_error = false
+    @fallback_options_error = false #: bool?
 
     # Parse input into array
     parsed_value = case value
@@ -81,6 +92,7 @@ class FormDescription < ApplicationRecord
     write_attribute(:fallback_options, parsed_value)
   end
 
+  #: (untyped raw_array) -> Array[FallbackOption]
   private def build_fallback_options(raw_array)
     if raw_array.is_a?(Hash)
       return raw_array.map { |value, name| FallbackOption.new(value:, name:, conditions: nil, priority_human: nil) }
@@ -111,12 +123,14 @@ class FormDescription < ApplicationRecord
     end
   end
 
+  #: () -> void
   private def validate_fallback_options_json
     if @fallback_options_error
       errors.add(:fallback_options, 'must be valid JSON struct')
     end
   end
 
+  #: () -> void
   def render_markdown
     %i(
       head

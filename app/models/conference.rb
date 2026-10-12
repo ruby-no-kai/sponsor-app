@@ -1,8 +1,9 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class Conference < ApplicationRecord
-  GithubRepo = Struct.new(:raw, :name, :path, :branch, keyword_init: true) do
+  GithubRepo = Data.define(:raw, :name, :path, :branch) do
+    #: () -> String
     def to_s
       raw
     end
@@ -35,77 +36,100 @@ class Conference < ApplicationRecord
   before_validation :generate_reception_key
   before_validation :generate_invite_code
 
+  #: () -> String?
   def to_param
     slug
   end
 
+  #: () -> bool?
   def application_open?
     t = Time.zone.now
-    application_opens_at && application_opens_at <= t && (!application_closes_at || t < application_closes_at)
+    opens_at = application_opens_at
+    closes_at = application_closes_at
+    opens_at && opens_at <= t && (!closes_at || t < closes_at)
   end
 
+  #: () -> bool?
   def amendment_open?
     t = Time.zone.now
-    application_opens_at && application_opens_at <= t && (!amendment_closes_at || t < amendment_closes_at)
+    opens_at = application_opens_at
+    closes_at = amendment_closes_at
+    opens_at && opens_at <= t && (!closes_at || t < closes_at)
   end
 
+  #: () -> bool?
   def distributing_ticket?
     t = Time.zone.now
-    ticket_distribution_starts_at && ticket_distribution_starts_at <= t
+    starts_at = ticket_distribution_starts_at
+    starts_at && starts_at <= t
   end
 
+  #: () -> bool
   def pass_retraction_enabled?
     t = Time.zone.now
-    pass_retraction_disables_at.nil? || t < pass_retraction_disables_at
+    disables_at = pass_retraction_disables_at
+    disables_at.nil? || t < disables_at
   end
 
+  #: () -> bool?
   def event_submission_open?
     t = Time.zone.now
-    event_submission_starts_at && event_submission_starts_at <= t
+    starts_at = event_submission_starts_at
+    starts_at && starts_at <= t
   end
 
+  #: () -> FormDescription
   def form_description_for_locale
     form_descriptions.find_by(locale: I18n.locale) || form_descriptions.find_by!(locale: 'en')
   end
 
+  #: () -> GithubRepo?
   def github_repo
-    ghr = read_attribute(:github_repo)
+    ghr = read_attribute(:github_repo) #: String?
     if @github_repo&.raw != ghr
-      m = ghr.match(/^(.+?)(?:@(.+?))?(?::(.+?))$/)
-      @github_repo = m && GithubRepo.new(
+      m = ghr&.match(/^(.+?)(?:@(.+?))?(?::(.+?))$/)
+      path = m && m[3].presence
+      @github_repo = m && path && GithubRepo.new(
         raw: ghr,
         name: m[1],
         branch: m[2].presence,
-        path: m[3].presence,
-      )
+        path:,
+      ) #: GithubRepo?
     end
     @github_repo
   end
 
+  #: () -> void
   def validate_valid_github_repo
     return if self[:github_repo].blank?
 
-    unless github_repo && github_repo.name.present? && github_repo.path.present?
+    repo = github_repo
+    unless repo && repo.name.present?
       errors.add :github_repo, :invalid
     end
   end
 
+  #: (String? code) -> bool
   def verify_invite_code(code)
     return true unless hidden?
 
     code.present? && Rack::Utils.secure_compare(code, invite_code)
   end
 
+  #: () -> void
   private def generate_slug
     self.slug = name.remove(' ').parameterize if slug.blank?
   end
 
   # NOTE: Reception functionality removed; this method kept for historical data preservation.
   # The reception_key column has a NOT NULL constraint and contains historical data.
+  #: () -> void
   private def generate_reception_key
-    self.reception_key ||= SecureRandom.urlsafe_base64(96)
+    key = reception_key #: String?
+    self.reception_key = SecureRandom.urlsafe_base64(96) unless key
   end
 
+  #: () -> void
   private def generate_invite_code
     if hidden?
       self.invite_code ||= SecureRandom.urlsafe_base64(48)

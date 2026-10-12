@@ -1,4 +1,4 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class Broadcast < ApplicationRecord
@@ -15,8 +15,9 @@ class Broadcast < ApplicationRecord
   validates :status, presence: true
   validates :title, presence: true
   validates :body, presence: true
-  validate :forbid_changes_to_delivered_content, if: -> { persisted? && status_was == 'sent' }
+  validate :forbid_changes_to_delivered_content, if: ->(record) { record.persisted? && record.status_was == 'sent' }
 
+  #: (?now: ActiveSupport::TimeWithZone) -> void
   def perform_later!(now: Time.current)
     update!(status: :pending, dispatched_at: now)
     deliveries.each do |delivery|
@@ -25,6 +26,7 @@ class Broadcast < ApplicationRecord
     end
   end
 
+  #: () -> self
   def update_status
     return self if created? || preparing? || modifying? || ready?
 
@@ -40,6 +42,7 @@ class Broadcast < ApplicationRecord
     self
   end
 
+  #: () -> void
   private def forbid_changes_to_delivered_content
     errors.add(:title, 'cannot be changed after dispatch') if title_changed?
     errors.add(:body, 'cannot be changed after dispatch') if body_changed?
