@@ -266,6 +266,16 @@ mise run ui:build       # vite build, to check the bundle
 cd ui && pnpm run format  # oxfmt
 ```
 
+To add an SPA screen:
+
+1. Add its path pattern to its domain's section of `ui/src/routes/paths.ts`. Until a path is listed there, the dev server keeps sending it to Rails. A pattern ending in `:id` also matches a HAML `new` page beside it; list that page in `RAILS_PATHS` there until the SPA renders it.
+2. Add a route module under `ui/src/routes/` and wire it into its domain's section of `ui/src/router.tsx` with `lazy`, under the `/admin` tree or the sponsor tree.
+3. Fetch with `useRpc(AdminService.method.getConference, {conferenceSlug})` and mutate with `useRpcMutation` from `ui/src/lib/rpc.ts`. When there is no data, throw the error so the route's error boundary shows its Connect code, problem type and request ID.
+4. Link with Kumo's `Link`, `LinkButton` or `Sidebar.MenuButton` and an `href`. A path in `paths.ts` navigates in place, and any other is a full page load of the HAML page.
+
+- `ui/src/lib/errors.ts` reads Connect error details: `fieldViolations` turns a `google.rpc.BadRequest` into TanStack Form errors, `problemTypeOf` maps a problem back to `ProblemType`, `requestIdOf` reads `google.rpc.RequestInfo`.
+- `ui/src/lib/forms.ts` converts between input values and message fields: int64 IDs, `datetime-local` timestamps in the browser's time zone, and `optional` strings.
+- An RPC answering `unauthenticated` sends the browser to the Rails sign-in page, which brings it back afterwards. RPCs are same-origin and need no CSRF token.
 - Code imported by a `*.test.ts` must be erasable TypeScript with `.ts` import extensions, as Node strips the types without compiling. tsconfig's `erasableSyntaxOnly` enforces the former; a missing `.ts` extension surfaces only when `mise run ui:test` loads the module.
 
 ## Development Notes
