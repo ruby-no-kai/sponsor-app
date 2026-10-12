@@ -105,6 +105,7 @@ class PassRedemption
         'expand' => 'tickets',
         'search[source]' => source,
         'search[states]' => %w(paid unpaid complete confirmed incomplete cancelled),
+        'page[size]' => '1000',
       ),
       sponsorship:,
     )

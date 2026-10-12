@@ -132,4 +132,18 @@ RSpec.describe PassRedemption do
       expect { described_class.list_for_sponsorship(sponsorship) }.to raise_error(Must::Violation)
     end
   end
+
+  describe '.list_for_source_id' do
+    let(:api) { instance_double(TitoApi, list_registrations: {registrations: [], meta: {total_pages: 1}}) }
+
+    before do
+      allow(TitoApi).to receive(:new).and_return(api)
+    end
+
+    it "requests Tito's maximum page size" do
+      described_class.list_for_source_id('rubykaigi/2025', 'ss_1')
+
+      expect(api).to have_received(:list_registrations).with('rubykaigi/2025', hash_including('page[size]' => '1000'))
+    end
+  end
 end
