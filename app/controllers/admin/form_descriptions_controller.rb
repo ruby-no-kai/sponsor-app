@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -6,16 +6,20 @@ module Admin
     before_action :set_conference
     before_action :set_form_description, only: [:show, :edit, :update]
 
+    #: () -> void
     def show
     end
 
+    #: () -> void
     def new
       @form_description = FormDescription.new(conference:)
     end
 
+    #: () -> void
     def edit
     end
 
+    #: () -> void
     def create
       @form_description = FormDescription.new(form_description_params)
       @form_description.conference = conference
@@ -29,6 +33,7 @@ module Admin
       end
     end
 
+    #: () -> void
     def update
       respond_to do |format|
         if form_description.update(form_description_params)
@@ -39,6 +44,7 @@ module Admin
       end
     end
 
+    #: () -> ActionController::Parameters
     private def form_description_params
       params.require(:form_description).permit(
         :locale,
@@ -53,13 +59,15 @@ module Admin
       )
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
       check_staff_conference_authorization!(conference)
     end
 
+    #: () -> void
     private def set_form_description
-      @form_description = FormDescription.where(conference:).find_by!(locale: params[:locale])
+      @form_description = FormDescription.where(conference:).find_by!(locale: params[:locale]) #: FormDescription?
     end
 
     #: () -> Conference

@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -6,10 +6,12 @@ module Admin
     before_action :require_unrestricted_staff, only: [:index, :new, :create, :destroy]
     before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :sponsors_json, :asset_urls, :table_view]
 
+    #: () -> void
     def index
-      @conferences = Conference.all
+      @conferences = Conference.all #: Conference::PrivateRelation?
     end
 
+    #: () -> void
     def show
       @plans_with_count = conference
         .plans
@@ -17,26 +19,31 @@ module Admin
         .group(:id)
         .select('plans.*, COUNT(sponsorships.plan_id) as cnt')
         .map { |plan| [plan, plan[:cnt], plan.capacity] }
-        .sort_by { |plan, _cnt, _capa| plan.rank }
+        .sort_by { |plan, _cnt, _capa| plan.rank } #: Array[[Plan, Integer, Integer]]?
     end
 
+    #: () -> void
     def attendees_keeper
     end
 
+    #: () -> void
     def sponsors_yml
       render plain: GenerateSponsorsYamlFileJob.new(conference, push: false).tap(&:perform_now).yaml_data
     end
 
+    #: () -> void
     def sponsors_json
       render plain: GenerateSponsorsYamlFileJob.new(conference, push: false).tap(&:perform_now).json_data
     end
 
+    #: () -> void
     def table_view
       @sponsorships = conference.sponsorships
         .includes_contacts
-        .includes_requests
+        .includes_requests #: Sponsorship::PrivateAssociationRelation?
     end
 
+    #: () -> void
     def asset_urls
       render json: {
         files: conference.sponsorships.includes(:asset_file).map(&:asset_file).compact.map do |asset|
@@ -45,13 +52,16 @@ module Admin
       }.to_json
     end
 
+    #: () -> void
     def new
       @conference = Conference.new
     end
 
+    #: () -> void
     def edit
     end
 
+    #: () -> void
     def create
       @conference = Conference.new(conference_params)
 
@@ -64,6 +74,7 @@ module Admin
       end
     end
 
+    #: () -> void
     def update
       conference.assign_attributes(conference_params)
       conference.allow_restricted_access = true if current_staff.restricted_repos
@@ -76,6 +87,7 @@ module Admin
       end
     end
 
+    #: () -> void
     def destroy
       conference.destroy
       respond_to do |format|
@@ -83,14 +95,16 @@ module Admin
       end
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:slug])
+      @conference = Conference.find_by!(slug: params[:slug]) #: Conference?
       check_staff_conference_authorization!(conference)
     end
 
     #: () -> Conference
     private def conference = Must.because(@conference) { "set_conference runs before every member action" }
 
+    #: () -> ActionController::Parameters
     private def conference_params
       params.require(:conference).permit(
         :name,

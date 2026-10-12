@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -6,14 +6,17 @@ module Admin
     before_action :set_conference
     before_action :set_broadcast, only: %i(show edit update dispatch_delivery)
 
+    #: () -> void
     def index
-      @broadcasts = conference.broadcasts.order(id: :desc)
+      @broadcasts = conference.broadcasts.order(id: :desc) #: Broadcast::PrivateAssociationRelation?
     end
 
+    #: () -> void
     def new
       @broadcast = Broadcast.new(conference:)
     end
 
+    #: () -> void
     def create
       @broadcast = Broadcast.new(broadcast_params)
       @broadcast.conference = conference
@@ -34,12 +37,15 @@ module Admin
       end
     end
 
+    #: () -> void
     def show
     end
 
+    #: () -> void
     def edit
     end
 
+    #: () -> void
     def update
       respond_to do |format|
         if broadcast.update(broadcast_params)
@@ -50,18 +56,21 @@ module Admin
       end
     end
 
+    #: () -> void
     def dispatch_delivery
       broadcast.update!(staff: current_staff)
       broadcast.perform_later!
       redirect_to conference_broadcast_path(conference, broadcast), notice: 'Dispatched'
     end
 
+    #: () -> void
     private def set_broadcast
-      @broadcast = conference.broadcasts.find_by!(id: params[:id])
+      @broadcast = conference.broadcasts.find_by!(id: params[:id]) #: Broadcast?
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
       check_staff_conference_authorization!(conference)
     end
 
@@ -71,6 +80,7 @@ module Admin
     #: () -> Broadcast
     private def broadcast = Must.because(@broadcast) { "set_broadcast runs before show, edit, update and dispatch_delivery" }
 
+    #: () -> ActionController::Parameters
     private def broadcast_params
       params.require(:broadcast).permit(
         :campaign,
@@ -80,6 +90,7 @@ module Admin
       )
     end
 
+    #: () -> ActionController::Parameters
     private def recipient_filter
       params.require(:recipient_filter).permit(
         :kind,

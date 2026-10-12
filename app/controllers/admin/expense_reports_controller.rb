@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -7,13 +7,15 @@ module Admin
     before_action :set_sponsorship, except: [:index]
     before_action :set_expense_report, except: [:index]
 
+    #: () -> void
     def index
       @sponsorships = conference.sponsorships
         .where(customization: true)
         .includes(:plan, :expense_report)
-        .order(:name)
+        .order(:name) #: Sponsorship::PrivateAssociationRelation?
     end
 
+    #: () -> void
     def show
       respond_to do |format|
         format.html
@@ -21,6 +23,7 @@ module Admin
       end
     end
 
+    #: () -> void
     def update
       expense_report.recalculate_totals
       expense_report.refresh_submission_snapshot
@@ -29,6 +32,7 @@ module Admin
       render json: report_json
     end
 
+    #: () -> void
     def calculate
       plan = sponsorship.plan
       tax_rates = Rails.configuration.x.expense_report.tax_rates #: Array[Rational]
@@ -43,17 +47,20 @@ module Admin
       }
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
       check_staff_conference_authorization!(conference)
     end
 
+    #: () -> void
     private def set_sponsorship
-      @sponsorship = Sponsorship.where(conference:).find(params[:sponsorship_id])
+      @sponsorship = Sponsorship.where(conference:).find(params[:sponsorship_id]) #: Sponsorship?
     end
 
+    #: () -> void
     private def set_expense_report
-      @expense_report = sponsorship.expense_report
+      @expense_report = sponsorship.expense_report #: ExpenseReport?
       raise ActiveRecord::RecordNotFound unless @expense_report
     end
 
@@ -66,10 +73,12 @@ module Admin
     #: () -> ExpenseReport
     private def expense_report = Must.because(@expense_report) { "set_expense_report runs before every action but index" }
 
+    #: () -> Hash[String, untyped]
     private def report_json
       ExpenseReportResource.new(expense_report.reload).to_h
     end
 
+    #: () -> (Integer | BigDecimal)
     private def calculate_total_fee
       plan = sponsorship.plan
       return 0 unless plan

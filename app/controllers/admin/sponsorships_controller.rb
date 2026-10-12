@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -6,12 +6,14 @@ module Admin
     before_action :set_conference
     before_action :set_sponsorship
 
+    #: () -> void
     def show
-      @pinned_staff_notes = sponsorship.staff_notes.where('stickiness > 0').order(stickiness: :desc, created_at: :desc).includes(:staff)
-      @staff_notes = sponsorship.staff_notes.where('stickiness = 0').order(stickiness: :desc, created_at: :desc).includes(:staff).limit(5)
-      @new_staff_note = SponsorshipStaffNote.new(sponsorship:)
+      @pinned_staff_notes = sponsorship.staff_notes.where('stickiness > 0').order(stickiness: :desc, created_at: :desc).includes(:staff) #: SponsorshipStaffNote::PrivateAssociationRelation?
+      @staff_notes = sponsorship.staff_notes.where('stickiness = 0').order(stickiness: :desc, created_at: :desc).includes(:staff).limit(5) #: SponsorshipStaffNote::PrivateAssociationRelation?
+      @new_staff_note = SponsorshipStaffNote.new(sponsorship:) #: SponsorshipStaffNote?
     end
 
+    #: () -> void
     def download_asset
       asset = sponsorship.asset_file
       raise ActiveRecord::RecordNotFound unless asset
@@ -19,6 +21,7 @@ module Admin
       redirect_to(asset.download_url, allow_other_host: true)
     end
 
+    #: () -> void
     def edit
       sponsorship.build_alternate_billing_contact unless sponsorship.alternate_billing_contact
       sponsorship.build_billing_request unless sponsorship.billing_request
@@ -26,6 +29,7 @@ module Admin
       sponsorship.build_note unless sponsorship.note
     end
 
+    #: () -> void
     def update
       sponsorship.assign_attributes(sponsorship_params)
       sponsorship.staff = current_staff
@@ -39,6 +43,7 @@ module Admin
       end
     end
 
+    #: () -> void
     def destroy
       return render(status: :not_found, plain: '') if sponsorship.withdrawn?
 
@@ -51,6 +56,7 @@ module Admin
       end
     end
 
+    #: () -> ActionController::Parameters
     private def sponsorship_params
       params.require(:sponsorship).permit(
         :plan_id,
@@ -88,13 +94,15 @@ module Admin
       end
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
       check_staff_conference_authorization!(conference)
     end
 
+    #: () -> void
     private def set_sponsorship
-      @sponsorship = Sponsorship.where(conference:).find(params[:id])
+      @sponsorship = Sponsorship.where(conference:).find(params[:id]) #: Sponsorship?
     end
 
     #: () -> Conference

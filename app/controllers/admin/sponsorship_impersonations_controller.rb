@@ -1,10 +1,11 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
   class SponsorshipImpersonationsController < Admin::ApplicationController
     before_action :require_sponsor_impersonation
 
+    #: () -> void
     def create
       conference = Conference.find_by!(slug: params[:conference_slug])
       check_staff_conference_authorization!(conference)
@@ -18,6 +19,7 @@ module Admin
       redirect_to claim_user_session_path(token)
     end
 
+    #: () -> void
     private def require_sponsor_impersonation
       unless Rails.configuration.x.dev.sponsor_impersonation
         raise ActionController::RoutingError, 'Not Found'

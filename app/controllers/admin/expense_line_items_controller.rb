@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -8,6 +8,7 @@ module Admin
     before_action :set_expense_report
     before_action :set_line_item, only: [:update, :destroy]
 
+    #: () -> void
     def create
       @line_item = expense_report.line_items.build(line_item_params)
       @line_item.assign_next_position
@@ -21,6 +22,7 @@ module Admin
       render json: report_json
     end
 
+    #: () -> void
     def update
       ActiveRecord::Base.transaction do
         line_item.assign_attributes(line_item_params)
@@ -33,6 +35,7 @@ module Admin
       render json: report_json
     end
 
+    #: () -> void
     def destroy
       ActiveRecord::Base.transaction do
         line_item.destroy!
@@ -42,22 +45,26 @@ module Admin
       render json: report_json
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
       check_staff_conference_authorization!(conference)
     end
 
+    #: () -> void
     private def set_sponsorship
-      @sponsorship = Sponsorship.where(conference:).find(params[:sponsorship_id])
+      @sponsorship = Sponsorship.where(conference:).find(params[:sponsorship_id]) #: Sponsorship?
     end
 
+    #: () -> void
     private def set_expense_report
-      @expense_report = sponsorship.expense_report
+      @expense_report = sponsorship.expense_report #: ExpenseReport?
       raise ActiveRecord::RecordNotFound unless @expense_report
     end
 
+    #: () -> void
     private def set_line_item
-      @line_item = expense_report.line_items.find(params[:id])
+      @line_item = expense_report.line_items.find(params[:id]) #: ExpenseLineItem?
     end
 
     #: () -> Conference
@@ -77,6 +84,7 @@ module Admin
       params.require(:expense_line_item).permit(:title, :notes, :amount, :tax_rate, :tax_amount, :preliminal, :position)
     end
 
+    #: () -> void
     private def sync_file_ids
       new_ids = Array(params[:expense_line_item][:file_ids]).map(&:to_i)
       current_ids = line_item.expense_file_ids
@@ -91,6 +99,7 @@ module Admin
       end
     end
 
+    #: () -> void
     private def reindex_positions
       target_position = line_item.position
       items = expense_report.line_items.reload.where.not(id: line_item.id).order(:position, :id).to_a
@@ -102,6 +111,7 @@ module Admin
       end
     end
 
+    #: () -> void
     private def after_line_item_change
       expense_report.reload
       expense_report.recalculate_totals
@@ -109,6 +119,7 @@ module Admin
       expense_report.save!
     end
 
+    #: () -> Hash[String, untyped]
     private def report_json
       ExpenseReportResource.new(expense_report.reload).to_h
     end

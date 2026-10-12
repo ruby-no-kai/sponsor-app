@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -7,6 +7,7 @@ module Admin
     before_action :set_sponsorship
     before_action :set_expense_report
 
+    #: () -> void
     def create
       submission = expense_report.current_submission
       raise ActiveRecord::RecordNotFound unless submission
@@ -23,17 +24,20 @@ module Admin
       render status: :unprocessable_content, json: {error: e.record.errors.full_messages}
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
       check_staff_conference_authorization!(conference)
     end
 
+    #: () -> void
     private def set_sponsorship
-      @sponsorship = Sponsorship.where(conference:).find(params[:sponsorship_id])
+      @sponsorship = Sponsorship.where(conference:).find(params[:sponsorship_id]) #: Sponsorship?
     end
 
+    #: () -> void
     private def set_expense_report
-      @expense_report = sponsorship.expense_report
+      @expense_report = sponsorship.expense_report #: ExpenseReport?
       raise ActiveRecord::RecordNotFound unless @expense_report
     end
 

@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -6,6 +6,7 @@ module Admin
     before_action :set_conference
     before_action :set_announcement, only: %i(show edit update)
 
+    #: () -> void
     def index
       @announcements = conference.announcements
         .order('issue ASC, id ASC')
@@ -15,9 +16,10 @@ module Admin
           stickiest = Must.because(locales.max_by(&:stickiness)) { "group_by yields no empty group" }
           oldest = Must.because(locales.min_by(&:id)) { "group_by yields no empty group" }
           [-stickiest.stickiness, -oldest.id]
-        end
+        end #: Array[[String, Array[Announcement]]]?
     end
 
+    #: () -> void
     def new
       @announcement = Announcement.new(conference:)
       if params[:issue].present?
@@ -28,6 +30,7 @@ module Admin
       end
     end
 
+    #: () -> void
     def create
       @announcement = Announcement.new(announcement_params)
       @announcement.conference = conference
@@ -46,14 +49,17 @@ module Admin
       end
     end
 
+    #: () -> void
     def show
       @locales = announcement.all_locales
-        .select(:id, :conference_id, :issue, :locale, :title, :published_at)
+        .select(:id, :conference_id, :issue, :locale, :title, :published_at) #: Announcement::PrivateAssociationRelation?
     end
 
+    #: () -> void
     def edit
     end
 
+    #: () -> void
     def update
       a_params = announcement_params.except(:issue)
       respond_to do |format|
@@ -65,13 +71,15 @@ module Admin
       end
     end
 
+    #: () -> void
     private def set_announcement
       issue, locale = params[:id]&.split(':', 2)
-      @announcement = conference.announcements.find_by!(issue: issue, locale: locale)
+      @announcement = conference.announcements.find_by!(issue: issue, locale: locale) #: Announcement?
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
       check_staff_conference_authorization!(conference)
     end
 
@@ -81,6 +89,7 @@ module Admin
     #: () -> Announcement
     private def announcement = Must.because(@announcement) { "set_announcement runs before show, edit and update" }
 
+    #: () -> ActionController::Parameters
     private def announcement_params
       params.require(:announcement).permit(
         :issue,

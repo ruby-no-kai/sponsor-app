@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -6,17 +6,21 @@ module Admin
     before_action :set_conference
     before_action :set_plan, only: [:edit, :update]
 
+    #: () -> void
     def index
-      @plans = conference.plans.order(:rank)
+      @plans = conference.plans.order(:rank) #: Plan::PrivateAssociationRelation?
     end
 
+    #: () -> void
     def new
       @plan = Plan.new(conference:)
     end
 
+    #: () -> void
     def edit
     end
 
+    #: () -> void
     def create
       @plan = Plan.new(plan_params)
       @plan.conference = conference
@@ -30,6 +34,7 @@ module Admin
       end
     end
 
+    #: () -> void
     def update
       respond_to do |format|
         if plan.update(plan_params)
@@ -40,6 +45,7 @@ module Admin
       end
     end
 
+    #: () -> ActionController::Parameters
     private def plan_params
       params.require(:plan).permit(
         :name,
@@ -57,13 +63,15 @@ module Admin
       )
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
       check_staff_conference_authorization!(conference)
     end
 
+    #: () -> void
     private def set_plan
-      @plan = Plan.where(conference:).find(params[:id])
+      @plan = Plan.where(conference:).find(params[:id]) #: Plan?
     end
 
     #: () -> Conference

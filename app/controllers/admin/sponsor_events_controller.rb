@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Admin
@@ -6,18 +6,22 @@ module Admin
     before_action :set_conference
     before_action :set_sponsor_event, only: %i(show edit update download_asset)
 
+    #: () -> void
     def index
       @sponsor_events = conference.sponsor_events
         .includes(:sponsorship)
-        .order(status: :asc, starts_at: :asc)
+        .order(status: :asc, starts_at: :asc) #: SponsorEvent::PrivateAssociationRelation?
     end
 
+    #: () -> void
     def show
     end
 
+    #: () -> void
     def edit
     end
 
+    #: () -> void
     def download_asset
       asset = sponsor_event.asset_file
       raise ActiveRecord::RecordNotFound unless asset
@@ -25,6 +29,7 @@ module Admin
       redirect_to asset.download_url, allow_other_host: true
     end
 
+    #: () -> void
     def update
       sponsor_event.assign_attributes(sponsor_event_params)
       sponsor_event.staff = current_staff
@@ -37,14 +42,16 @@ module Admin
       end
     end
 
+    #: () -> void
     private def set_conference
-      @conference = Conference.find_by!(slug: params[:conference_slug])
+      @conference = Conference.find_by!(slug: params[:conference_slug]) #: Conference?
       check_staff_conference_authorization!(conference)
     end
 
+    #: () -> void
     private def set_sponsor_event
-      @sponsor_event = conference.sponsor_events.find(params[:id])
-      @sponsorship = sponsor_event.sponsorship
+      @sponsor_event = conference.sponsor_events.find(params[:id]) #: SponsorEvent?
+      @sponsorship = sponsor_event.sponsorship #: Sponsorship?
     end
 
     #: () -> Conference
@@ -53,6 +60,7 @@ module Admin
     #: () -> SponsorEvent
     private def sponsor_event = Must.because(@sponsor_event) { "set_sponsor_event runs before show, edit, update and download_asset" }
 
+    #: () -> ActionController::Parameters
     private def sponsor_event_params
       params.require(:sponsor_event).permit(
         :title,
