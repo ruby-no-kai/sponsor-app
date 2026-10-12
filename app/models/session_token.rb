@@ -30,11 +30,11 @@ class SessionToken < ApplicationRecord
   end
 
   def contacts
-    email ? Contact.where(kind: :primary, email: email) : nil
+    email ? Contact.where(kind: :primary, email: email) : Contact.none
   end
 
   def sponsorships
-    contacts&.includes(:sponsorship)&.map(&:sponsorship)&.sort_by(&:id)
+    contacts.includes(:sponsorship).map(&:sponsorship).sort_by(&:id)
   end
 
   def sponsorship_ids
