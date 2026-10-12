@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class SponsorEventsController < ApplicationController
@@ -7,10 +7,12 @@ class SponsorEventsController < ApplicationController
   before_action :require_accepted_sponsorship
   before_action :set_sponsor_event, only: %i(show edit update destroy)
 
+  #: () -> void
   def new
     @sponsor_event = current_sponsorship.sponsor_events.build
   end
 
+  #: () -> void
   def create
     @sponsor_event = current_sponsorship.sponsor_events.build(sponsor_event_params)
     sponsor_event.policy_acknowledged_at = Time.zone.now if params[:sponsor_event][:policy_agreement] == '1'
@@ -24,15 +26,18 @@ class SponsorEventsController < ApplicationController
     end
   end
 
+  #: () -> void
   def show
   end
 
+  #: () -> void
   def edit
     unless sponsor_event.editable_by_sponsor?
       redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: sponsor_event), alert: t('.withdrawn_not_editable')
     end
   end
 
+  #: () -> void
   def update
     unless sponsor_event.editable_by_sponsor?
       redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: sponsor_event), alert: t('.withdrawn_not_editable')
@@ -56,6 +61,7 @@ class SponsorEventsController < ApplicationController
     end
   end
 
+  #: () -> void
   def destroy
     unless sponsor_event.editable_by_sponsor?
       redirect_to user_conference_sponsorship_event_path(conference: current_conference, id: sponsor_event), alert: t('.withdrawn_not_editable')
@@ -68,22 +74,26 @@ class SponsorEventsController < ApplicationController
     redirect_to user_conference_sponsorship_path(conference: current_conference), notice: t('.notice')
   end
 
+  #: () -> void
   private def require_event_submission_open
-    unless current_conference&.event_submission_open?
+    unless current_conference.event_submission_open?
       redirect_to user_conference_sponsorship_path(conference: current_conference), alert: t('sponsor_events.event_submission_not_open')
     end
   end
 
+  #: () -> void
   private def require_accepted_sponsorship
-    unless current_sponsorship&.accepted?
+    unless current_sponsorship.accepted?
       redirect_to user_conference_sponsorship_path(conference: current_conference), alert: t('sponsor_events.sponsorship_not_accepted')
     end
   end
 
+  #: () -> void
   private def set_sponsor_event
-    @sponsor_event = current_sponsorship.sponsor_events.find(params[:id])
+    @sponsor_event = current_sponsorship.sponsor_events.find(params[:id]) #: SponsorEvent?
   end
 
+  #: () -> void
   private def assign_new_asset_file
     asset_file_id = params[:sponsor_event][:asset_file_id]
     return if asset_file_id.blank?
@@ -94,6 +104,7 @@ class SponsorEventsController < ApplicationController
     sponsor_event.asset_file = asset_file
   end
 
+  #: () -> void
   private def handle_asset_file_update
     asset_file_id = params[:sponsor_event][:asset_file_id]
 
@@ -109,6 +120,7 @@ class SponsorEventsController < ApplicationController
     end
   end
 
+  #: () -> ActionController::Parameters
   private def sponsor_event_params
     params.require(:sponsor_event).permit(
       :title,
@@ -121,5 +133,6 @@ class SponsorEventsController < ApplicationController
     )
   end
 
+  #: () -> SponsorEvent
   private def sponsor_event = Must.because(@sponsor_event) { "set_sponsor_event, new or create assigns @sponsor_event" }
 end

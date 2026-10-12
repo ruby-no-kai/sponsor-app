@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 require 'openssl'
@@ -7,6 +7,7 @@ module Webhooks
   class MailgunController < ApplicationController
     skip_before_action :verify_authenticity_token
 
+    #: () -> void
     def webhook
       return render(status: :unauthorized, plain: 'Signature Invalid') unless signature_valid?
 
@@ -18,8 +19,9 @@ module Webhooks
       render status: :ok, plain: 'OK'
     end
 
+    #: () -> bool
     private def signature_valid?
-      api_key = Rails.application.config.x.mailgun.api_key
+      api_key = Rails.application.config.x.mailgun.api_key #: String?
       raise "no MAILGUN_API_KEY provided" unless api_key
 
       ts = params.dig(:signature, :timestamp)
@@ -35,10 +37,12 @@ module Webhooks
       Rack::Utils.secure_compare signature, expected_signature
     end
 
+    #: () -> ActionController::Parameters
     private def event_data
       params.require('event-data').permit!
     end
 
+    #: () -> untyped
     private def user_variables
       event_data['user-variables'] || {}
     end

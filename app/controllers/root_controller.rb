@@ -1,7 +1,8 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class RootController < ApplicationController
+  #: () -> void
   def index
     if current_available_sponsorships&.exists?
       redirect_to user_conferences_path
@@ -11,10 +12,10 @@ class RootController < ApplicationController
     unless current_staff_maybe
       session.clear
       request.session_options[:skip] = true
-      @cacheable = true
+      @cacheable = true #: bool?
       response.headers['Cache-Control'] = 'public, s-maxage=3600, max-age=0'
     end
 
-    @conferences = Conference.application_open.publicly_visible.order(id: :asc)
+    @conferences = Conference.application_open.publicly_visible.order(id: :asc) #: Conference::PrivateRelation?
   end
 end

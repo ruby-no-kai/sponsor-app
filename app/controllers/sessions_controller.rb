@@ -1,10 +1,12 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
+  #: () -> void
   def new
   end
 
+  #: () -> void
   def create
     contact = Contact.find_by(kind: :primary, email: params[:email])
 
@@ -20,6 +22,7 @@ class SessionsController < ApplicationController
     redirect_to new_user_session_path, notice: t('.email_sent')
   end
 
+  #: () -> void
   def claim
     session_token = SessionToken.find_by!(handle: params[:handle])
     if session_token.expired?
@@ -44,6 +47,7 @@ class SessionsController < ApplicationController
     end
   end
 
+  #: () -> void
   def destroy
     session.delete(:sponsorship_ids)
     session.delete(:sponsorship_id)
@@ -51,6 +55,7 @@ class SessionsController < ApplicationController
     redirect_to '/'
   end
 
+  #: () -> void
   private def set_back_to
     if params[:back_to]
       uri = Addressable::URI.parse(params[:back_to])

@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class ExpenseReportsController < ApplicationController
@@ -7,6 +7,7 @@ class ExpenseReportsController < ApplicationController
   before_action :require_custom_sponsorship
   before_action :set_expense_report, only: [:show, :update, :calculate]
 
+  #: () -> void
   def create
     @expense_report = current_sponsorship.expense_report
     unless @expense_report
@@ -23,6 +24,7 @@ class ExpenseReportsController < ApplicationController
     end
   end
 
+  #: () -> void
   def show
     respond_to do |format|
       format.html
@@ -30,6 +32,7 @@ class ExpenseReportsController < ApplicationController
     end
   end
 
+  #: () -> void
   def update
     expense_report.reopen_if_rejected
     expense_report.recalculate_totals
@@ -39,6 +42,7 @@ class ExpenseReportsController < ApplicationController
     render json: report_json
   end
 
+  #: () -> void
   def calculate
     plan = current_sponsorship.plan
     render json: {
@@ -51,23 +55,28 @@ class ExpenseReportsController < ApplicationController
     }
   end
 
+  #: () -> void
   private def set_conference
-    @conference = current_conference
+    @conference = current_conference #: Conference?
   end
 
+  #: () -> void
   private def require_custom_sponsorship
     render status: :forbidden, json: {error: 'Not a custom sponsorship'} unless current_sponsorship.customization
   end
 
+  #: () -> void
   private def set_expense_report
-    @expense_report = current_sponsorship.expense_report
+    @expense_report = current_sponsorship.expense_report #: ExpenseReport?
     raise ActiveRecord::RecordNotFound unless @expense_report
   end
 
+  #: () -> Hash[String, untyped]
   private def report_json
     ExpenseReportResource.new(expense_report.reload).to_h
   end
 
+  #: () -> (BigDecimal | Integer)
   private def calculate_total_fee
     plan = current_sponsorship.plan
     return 0 unless plan
@@ -77,7 +86,9 @@ class ExpenseReportsController < ApplicationController
     fee
   end
 
+  #: () -> Conference
   private def conference = Must.because(@conference) { "set_conference runs before every action" }
 
+  #: () -> ExpenseReport
   private def expense_report = Must.because(@expense_report) { "set_expense_report or create assigns @expense_report" }
 end

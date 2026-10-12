@@ -1,16 +1,18 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class ExhibitionsController < ApplicationController
   before_action :require_sponsorship_session
 
+  #: () -> void
   def new
     return render(status: :not_found, plain: '404') if current_sponsorship.exhibition
     return render(status: :not_found, plain: '404') unless current_sponsorship.booth_assigned?
 
-    @exhibition = Exhibition.new(sponsorship: current_sponsorship)
+    @exhibition = Exhibition.new(sponsorship: current_sponsorship) #: Exhibition?
   end
 
+  #: () -> void
   def create
     return render(status: :not_found, plain: '404') unless current_sponsorship.booth_assigned?
 
@@ -30,11 +32,13 @@ class ExhibitionsController < ApplicationController
     end
   end
 
+  #: () -> void
   def edit
     @exhibition = current_sponsorship.exhibition
     raise ActiveRecord::RecordNotFound unless @exhibition
   end
 
+  #: () -> void
   def update
     @exhibition = current_sponsorship.exhibition
     raise ActiveRecord::RecordNotFound unless @exhibition
@@ -52,6 +56,7 @@ class ExhibitionsController < ApplicationController
     end
   end
 
+  #: () -> ActionController::Parameters
   private def exhibition_params
     params.require(:exhibition).permit(
       :description,
