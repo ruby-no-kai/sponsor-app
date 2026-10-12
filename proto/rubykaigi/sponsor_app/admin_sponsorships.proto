@@ -1,0 +1,176 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "rubykaigi/sponsor_app/admin_sponsorship.proto";
+import "rubykaigi/sponsor_app/form_description.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// The fields of a sponsorship organizers can change, taken by AdminService.UpdateSponsorship.
+// Every field replaces what is stored.
+message AdminSponsorshipInput {
+  // Whom the organizers write to.
+  message Contact {
+    // Email address.
+    string email = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.email = true
+    ];
+
+    // Further addresses to copy, separated by commas or semicolons. Absent copies nobody.
+    optional string email_cc = 2;
+
+    // Postal address.
+    string address = 3 [(buf.validate.field).required = true];
+
+    // Company name.
+    string organization = 4 [(buf.validate.field).required = true];
+
+    // Department within the company. Absent names none.
+    optional string unit = 5;
+
+    // Person's name.
+    string name = 6 [(buf.validate.field).required = true];
+  }
+
+  // Whom invoices go to, when not to the contact.
+  message BillingContact {
+    // Email address.
+    string email = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.email = true
+    ];
+
+    // Postal address.
+    string address = 2 [(buf.validate.field).required = true];
+
+    // Company name.
+    string organization = 3 [(buf.validate.field).required = true];
+
+    // Department within the company. Absent names none.
+    optional string unit = 4;
+
+    // Person's name.
+    string name = 5 [(buf.validate.field).required = true];
+  }
+
+  // ID of the plan sponsored, one of the conference's plans. Absent leaves the plan undetermined.
+  // A plan of another conference is answered `not_found`.
+  optional int64 plan_id = 1 [(buf.validate.field).int64.gt = 0];
+
+  // Name the sponsor is listed under.
+  string name = 2 [(buf.validate.field).required = true];
+
+  // URL of the sponsor's website.
+  string url = 3 [(buf.validate.field).required = true];
+
+  // The sponsor's introduction.
+  string profile = 4 [(buf.validate.field).required = true];
+
+  // Whether the sponsor asked for a booth.
+  bool booth_requested = 5;
+
+  // Whether the sponsor is assigned a booth.
+  bool booth_assigned = 6;
+
+  // Alternative in case the plan applied for cannot be granted, as a fallback option value of the
+  // application form. Empty picks none. Unlike on the application form, a value the form does not
+  // offer is accepted, so a sponsorship keeps a value its form has since dropped.
+  string fallback_option = 7 [(buf.validate.field).string.max_len = 100];
+
+  // Whether the custom package named in customization_name is confirmed.
+  bool customization = 8;
+
+  // Name of a custom package arranged for this sponsor. Absent arranges none.
+  optional string customization_name = 9;
+
+  // Whether to leave the sponsor out of the sponsor list published to the conference website.
+  bool suspended = 10;
+
+  // Whether the application is accepted. Accepting an accepted sponsorship keeps its accepted_at.
+  bool accepted = 11;
+
+  // Conference tickets granted beyond the plan's. Absent grants none.
+  optional int32 number_of_additional_attendees = 12 [(buf.validate.field).int32.gte = 0];
+
+  // Whom the organizers write to.
+  Contact contact = 13 [(buf.validate.field).required = true];
+
+  // Whom invoices go to. Absent sends them to contact, removing any billing contact stored.
+  optional BillingContact alternate_billing_contact = 14;
+
+  // What the sponsor asked of the custom package. Blank removes the request.
+  string customization_request = 15;
+
+  // What the sponsor asked of billing. Blank removes the request.
+  string billing_request = 16;
+
+  // Anything else the sponsor told the organizers. Blank removes it.
+  string note = 17;
+}
+
+// Request for AdminService.GetSponsorship.
+message AdminServiceGetSponsorshipRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.GetSponsorship: the sponsorship and what an editor of it offers.
+message AdminServiceGetSponsorshipResponse {
+  // The sponsorship the request names.
+  AdminSponsorship sponsorship = 1;
+
+  // The plans the sponsorship can be put on: every plan of the conference, lowest rank first.
+  repeated AdminSponsorship.Plan plan_choices = 4;
+
+  // The fallback options the conference's application form offers in the sponsorship's locale, or
+  // in English when the form is not described in that locale. Empty when it offers none.
+  repeated FallbackOption fallback_option_choices = 5;
+}
+
+// Request for AdminService.UpdateSponsorship.
+message AdminServiceUpdateSponsorshipRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // Every changeable field, replacing what is stored.
+  AdminSponsorshipInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.UpdateSponsorship.
+message AdminServiceUpdateSponsorshipResponse {
+  // The sponsorship as updated.
+  AdminSponsorship sponsorship = 1;
+}
+
+// Request for AdminService.WithdrawSponsorship.
+message AdminServiceWithdrawSponsorshipRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference that has not withdrawn.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.WithdrawSponsorship.
+message AdminServiceWithdrawSponsorshipResponse {
+  // The sponsorship as withdrawn.
+  AdminSponsorship sponsorship = 1;
+}

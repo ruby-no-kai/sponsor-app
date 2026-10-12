@@ -23,6 +23,8 @@ export const paths = {
   planEdit: "/admin/conferences/:slug/plans/:id/edit",
 
   // Sponsorships
+  sponsorship: "/admin/conferences/:slug/sponsorships/:id",
+  sponsorshipEdit: "/admin/conferences/:slug/sponsorships/:id/edit",
 
   // Organizations
 

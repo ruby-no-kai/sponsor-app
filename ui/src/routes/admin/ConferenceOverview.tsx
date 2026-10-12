@@ -51,7 +51,7 @@ export default function ConferenceOverview() {
             {group.sponsorships.map((sponsorship) => (
               <Row key={sponsorship.id.toString()}>
                 <span className="min-w-0 break-words">
-                  <SponsorshipName base={base} sponsorship={sponsorship} />
+                  <SponsorshipName slug={conference.slug} sponsorship={sponsorship} />
                 </span>
                 <SponsorshipBadges sponsorship={sponsorship} />
               </Row>
@@ -65,7 +65,7 @@ export default function ConferenceOverview() {
             {withdrawn.map((sponsorship) => (
               <Row key={sponsorship.id.toString()}>
                 <span className="min-w-0 break-words text-kumo-subtle">
-                  <SponsorshipName base={base} sponsorship={sponsorship} />
+                  <SponsorshipName slug={conference.slug} sponsorship={sponsorship} />
                 </span>
               </Row>
             ))}
@@ -239,11 +239,13 @@ function Term({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function SponsorshipName({ base, sponsorship }: { base: string; sponsorship: SponsorshipSummary }) {
+function SponsorshipName({ slug, sponsorship }: { slug: string; sponsorship: SponsorshipSummary }) {
   return (
     <>
       {sponsorship.customizationName !== undefined && `${sponsorship.customizationName}: `}
-      <Link href={`${base}/sponsorships/${sponsorship.id}`}>{sponsorship.name}</Link>
+      <Link href={generatePath(paths.sponsorship, { slug, id: sponsorship.id.toString() })}>
+        {sponsorship.name}
+      </Link>
     </>
   );
 }

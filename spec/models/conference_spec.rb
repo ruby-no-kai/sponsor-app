@@ -384,6 +384,24 @@ RSpec.describe Conference, type: :model do
     end
   end
 
+  describe '#form_description_for_locale_maybe' do
+    let(:conference) { FactoryBot.create(:conference) }
+
+    it 'returns the form description of the given locale, falling back to English' do
+      en_desc = FactoryBot.create(:form_description, conference:, locale: 'en')
+      ja_desc = FactoryBot.create(:form_description, conference:, locale: 'ja')
+
+      expect(conference.form_description_for_locale_maybe('ja')).to eq(ja_desc)
+      expect(conference.form_description_for_locale_maybe('fr')).to eq(en_desc)
+    end
+
+    it 'returns nil when English locale not found' do
+      FactoryBot.create(:form_description, conference:, locale: 'ja')
+
+      expect(conference.form_description_for_locale_maybe('fr')).to be_nil
+    end
+  end
+
   describe '#github_repo' do
     it 'parses full format with branch and path' do
       conference = FactoryBot.build_stubbed(:conference, github_repo: 'ruby-no-kai/sponsor-app@master:data/sponsors.yml')
