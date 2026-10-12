@@ -55,6 +55,36 @@ RSpec.describe "Admin Expense Files", type: :request do
     end
   end
 
+  describe "upload round trip" do
+    let(:s3_client) do
+      Aws::S3::Client.new(
+        stub_responses: {
+          head_object: {version_id: 'v1', last_modified: Time.zone.now, checksum_sha256: 'sum', content_type: 'application/pdf'},
+        },
+        region: 'ap-northeast-1',
+      )
+    end
+
+    before do
+      allow(Aws::STS::Client).to receive(:new).and_return(Aws::STS::Client.new(stub_responses: true, region: 'ap-northeast-1'))
+      allow(Aws::S3::Client).to receive(:new).and_return(s3_client)
+    end
+
+    it "prepares, re-initiates and records an upload end to end" do
+      post conference_sponsorship_expense_files_path(conference, sponsorship), params: {filename: 'receipt.pdf', content_type: 'application/pdf'}
+      expect(response).to have_http_status(:ok)
+      file = ExpenseFile.find(response.parsed_body.fetch('id'))
+      expect(response.parsed_body['report_to']).to eq(conference_sponsorship_expense_file_path(conference, sponsorship, file))
+
+      post initiate_update_conference_sponsorship_expense_file_path(conference, sponsorship, file), params: {content_type: 'application/pdf'}
+      expect(response).to have_http_status(:ok)
+
+      patch conference_sponsorship_expense_file_path(conference, sponsorship, file), params: {extension: 'pdf'}
+      expect(response).to have_http_status(:ok)
+      expect(file.reload).to have_attributes(status: 'uploaded', version_id: 'v1')
+    end
+  end
+
   describe "GET show" do
     it "redirects to presigned S3 URL for file preview" do
       file = ExpenseFile.prepare(conference:, sponsorship:)

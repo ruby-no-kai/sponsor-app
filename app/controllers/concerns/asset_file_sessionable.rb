@@ -30,8 +30,11 @@ module AssetFileSessionable
     )
   end
 
+  # Each controller must implement this method
   #: () -> asset_file_record
-  private def asset_file = Must.because(@asset_file) { "set_asset_file or create assigns @asset_file" }
+  private def asset_file
+    raise NotImplementedError, "#{self.class} must implement #asset_file"
+  end
 
   # Each controller must implement this method
   #: (asset_file_record) -> String
