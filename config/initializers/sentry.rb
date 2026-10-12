@@ -5,6 +5,6 @@ Sentry.init do |config|
   config.background_worker_threads = 0 if ENV['AWS_LAMBDA_FUNCTION_NAME']
 
   config.traces_sample_rate = 0.25
-  config.enable_logs = true
+  config.rails.structured_logging.enabled = true
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
 end
