@@ -35,6 +35,12 @@ RSpec.describe "Sponsorships", type: :request do
       expect(conference.sponsorships.count).to eq(1)
     end
 
+    it "ignores asset_file_id_to_copy" do
+      post user_conference_sponsorship_path(conference), params: {sponsorship: sponsorship_params.merge(policy_agreement: '1', asset_file_id_to_copy: '1')}
+      expect(response).to have_http_status(:found)
+      expect(conference.sponsorships.count).to eq(1)
+    end
+
     it "rejects an application with the policy checkbox unchecked" do
       post user_conference_sponsorship_path(conference), params: {sponsorship: sponsorship_params.merge(policy_agreement: '0')}
       expect(response).to have_http_status(:ok)

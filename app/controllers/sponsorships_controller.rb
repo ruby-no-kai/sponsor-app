@@ -113,7 +113,6 @@ class SponsorshipsController < ApplicationController
       :url,
       :profile,
       :asset_file_id,
-      :asset_file_id_to_copy,
       :booth_requested,
       :fallback_option,
       :number_of_additional_attendees,
