@@ -17,7 +17,7 @@ class FormDescription < ApplicationRecord
       return false if priority_human.present? && !priority_human.is_a?(Array)
       return true if conditions.nil?
 
-      conditions.is_a?(Array) && conditions.all?(&:valid?)
+      conditions.is_a?(Array) && conditions.all? { |cond| cond.is_a?(FallbackOptionCondition) && cond.valid? }
     end
 
     def as_json = to_h.merge(conditions: conditions&.map(&:as_json)).compact
@@ -66,7 +66,7 @@ class FormDescription < ApplicationRecord
       value
     end
 
-    unless parsed_value.is_a?(Array)
+    unless parsed_value.is_a?(Array) && parsed_value.all?(Hash)
       @fallback_options_error = true
       return
     end
@@ -88,8 +88,12 @@ class FormDescription < ApplicationRecord
     return [] if raw_array.blank?
 
     raw_array.map do |opt|
-      conditions = if opt['conditions'].present?
-        opt['conditions'].map do |cond|
+      # Malformed conditions are kept as-is so FallbackOption#valid? rejects them.
+      conditions = opt['conditions'].presence
+      if conditions.is_a?(Array)
+        conditions = conditions.map do |cond|
+          next cond unless cond.is_a?(Hash)
+
           FallbackOptionCondition.new(
             plans: cond['plans'],
             booth_request: cond['booth_request'],
