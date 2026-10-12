@@ -86,6 +86,11 @@ module ConnectHelper
     bad_request_of(error).field_violations.map { [it.field, it.reason] }
   end
 
+  # The problem type of an error without its URI prefix, such as "not-found".
+  def problem_type_of(error)
+    error.detail(Protobufable::ProblemDetails).type.delete_prefix('https://sponsorships.rubykaigi.org/problems/')
+  end
+
   def sign_in_staff(staff)
     get claim_user_session_path(FactoryBot.create(:session_token, staff:).handle)
   end

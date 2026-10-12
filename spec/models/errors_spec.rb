@@ -110,5 +110,38 @@ RSpec.describe Errors do
     it 'names no field without an Input' do
       expect(violations(described_class.new(record:)).map(&:first)).to all(eq(''))
     end
+
+    describe 'an autosaved association' do
+      # As autosave imports an associated record's errors.
+      def import(sponsorship, association, associated, attribute, type)
+        sponsorship.errors.import(ActiveModel::Error.new(associated, attribute, type), attribute: :"#{association}.#{attribute}")
+      end
+
+      let(:record) do
+        Sponsorship.new.tap do |sponsorship|
+          import(sponsorship, :contact, Contact.new, :email_cc, :invalid)
+          import(sponsorship, :alternate_billing_contact, Contact.new, :email, :blank)
+          import(sponsorship, :alternate_billing_contact, Contact.new, :email_cc, :invalid)
+          import(sponsorship, :billing_request, SponsorshipRequest.new, :body, :blank)
+        end
+      end
+
+      it "names the field within the Input's field of the association's name" do
+        error = described_class.new(record:, input_class: Rk::SponsorApp::AdminSponsorshipInput, field_prefix: 'input', json_names: true)
+
+        expect(violations(error)).to eq([
+          ['input.contact.emailCc', 'INVALID', 'is invalid'],
+          ['input.alternateBillingContact.email', 'BLANK', "can't be blank"],
+          ['', 'INVALID', 'Alternate billing contact email cc is invalid'],
+          ['', 'BLANK', "Additional Note for Billing can't be blank"],
+        ])
+      end
+
+      it 'names fields as the binary encoding spells them' do
+        error = described_class.new(record:, input_class: Rk::SponsorApp::AdminSponsorshipInput, field_prefix: 'input')
+
+        expect(violations(error).map(&:first)).to eq(['input.contact.email_cc', 'input.alternate_billing_contact.email', '', ''])
+      end
+    end
   end
 end

@@ -80,7 +80,13 @@ class Conference < ApplicationRecord
 
   #: () -> FormDescription
   def form_description_for_locale
-    form_descriptions.find_by(locale: I18n.locale) || form_descriptions.find_by!(locale: 'en')
+    form_description_for_locale_maybe || form_descriptions.find_by!(locale: 'en')
+  end
+
+  # The form description in the locale, or the English one when the locale has none.
+  #: (?String) -> FormDescription?
+  def form_description_for_locale_maybe(locale = I18n.locale.to_s)
+    form_descriptions.find_by(locale:) || form_descriptions.find_by(locale: 'en')
   end
 
   #: () -> GithubRepo?

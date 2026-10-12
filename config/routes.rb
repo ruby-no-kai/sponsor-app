@@ -143,6 +143,9 @@ Rails.application.routes.draw do
       rpc 'UpdatePlan' => 'api/admin/plans'
 
       # Sponsorships
+      rpc 'GetSponsorship' => 'api/admin/sponsorships'
+      rpc 'UpdateSponsorship' => 'api/admin/sponsorships'
+      rpc 'WithdrawSponsorship' => 'api/admin/sponsorships'
 
       # Organizations
 

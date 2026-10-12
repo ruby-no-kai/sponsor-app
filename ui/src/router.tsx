@@ -114,6 +114,20 @@ export const router = createBrowserRouter([
               },
 
               // Sponsorships
+              {
+                path: paths.sponsorship,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorshipDetail.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorshipEdit,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorshipEditor.tsx")).default,
+                },
+              },
 
               // Organizations
 
