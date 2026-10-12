@@ -60,7 +60,7 @@ RUN bundle config set deployment true \
  && true
 ENV BUNDLE_JOBS=100
 RUN bundle install
-RUN bundle binstubs bundler aws_lambda_ric --force --path /usr/local/bin
+RUN BUNDLE_BIN=/usr/local/bin bundle binstubs bundler aws_lambda_ric --force
 
 ###
 
