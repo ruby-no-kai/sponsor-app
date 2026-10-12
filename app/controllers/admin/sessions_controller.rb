@@ -58,7 +58,7 @@ module Admin
           restricted_repos: restricted_privileges,
         )
       else
-        render status: :not_found, plain: "Unsupported provider: #{auth[:provider]}"
+        return render(status: :not_found, plain: "Unsupported provider: #{auth[:provider]}")
       end
 
       session[:staff_id] = staff.id
