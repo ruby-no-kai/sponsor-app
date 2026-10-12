@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 class Announcement < ApplicationRecord
@@ -23,7 +23,7 @@ class Announcement < ApplicationRecord
   end
 
   def all_locales
-    conference.announcements.where(issue: issue)
+    Must.expect(conference).announcements.where(issue: issue)
   end
 
   def generate_issue
