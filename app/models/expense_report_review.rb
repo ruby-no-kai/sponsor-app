@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class ExpenseReportReview < ApplicationRecord
@@ -8,6 +8,7 @@ class ExpenseReportReview < ApplicationRecord
   validates :action, inclusion: {in: %w[approve reject]}
   validates :comment, presence: true, if: ->(review) { review.action == 'reject' }
 
+  #: (ExpenseReportSubmission, action: String, comment: String?, staff: Staff?) -> ExpenseReportReview
   def self.create_for!(submission, action:, comment:, staff:)
     transaction do
       submission.review&.destroy!

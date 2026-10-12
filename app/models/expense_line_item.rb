@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class ExpenseLineItem < ApplicationRecord
@@ -12,15 +12,17 @@ class ExpenseLineItem < ApplicationRecord
 
   before_save :calculate_tax_amount
 
+  #: () -> void
   def assign_next_position
     self.position = (Must.expect(expense_report).line_items.maximum(:position).to_i + 1)
   end
 
+  #: () -> void
   private def calculate_tax_amount
     rate = tax_rate
     return if rate.nil?
 
-    decimal = Rails.configuration.x.expense_report.decimal
+    decimal = Rails.configuration.x.expense_report.decimal #: Integer
     self.tax_amount = (amount * rate).floor(decimal)
   end
 end

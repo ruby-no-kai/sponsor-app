@@ -1,7 +1,28 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class ExpenseReport < ApplicationRecord
+  #: type snapshot_line_item = {
+  #|   id: Integer,
+  #|   title: String,
+  #|   notes: String?,
+  #|   amount: String,
+  #|   tax_rate: String?,
+  #|   tax_amount: String,
+  #|   preliminal: bool,
+  #|   position: Integer,
+  #|   file_ids: Array[Integer],
+  #| }
+
+  #: type snapshot = {
+  #|   id: Integer,
+  #|   status: String,
+  #|   total_amount: String,
+  #|   total_tax_amount: String,
+  #|   revision: Integer,
+  #|   line_items: Array[snapshot_line_item],
+  #| }
+
   belongs_to :sponsorship
   has_many :line_items, -> { order(:position) }, class_name: 'ExpenseLineItem', inverse_of: :expense_report, dependent: :destroy
   has_many :submissions, class_name: 'ExpenseReportSubmission', dependent: :destroy
@@ -11,11 +32,13 @@ class ExpenseReport < ApplicationRecord
   validates :total_tax_amount, numericality: {less_than: 10_000_000_000}, allow_nil: true
   validate :validate_custom_sponsorship
 
+  #: () -> void
   def recalculate_totals
     self.total_amount = line_items.sum(:amount).to_d
     self.total_tax_amount = line_items.sum(:tax_amount).to_d
   end
 
+  #: () -> void
   def submit!
     raise "Cannot submit: status is #{status}" unless status == 'draft'
 
@@ -27,6 +50,7 @@ class ExpenseReport < ApplicationRecord
     end
   end
 
+  #: () -> void
   def withdraw_submission!
     raise "Cannot withdraw: status is #{status}" unless status == 'submitted'
 
@@ -34,10 +58,12 @@ class ExpenseReport < ApplicationRecord
     save!
   end
 
+  #: () -> void
   def reopen_if_rejected
     self.status = 'draft' if status == 'rejected'
   end
 
+  #: () -> snapshot
   def build_snapshot_data
     {
       id:,
@@ -61,6 +87,7 @@ class ExpenseReport < ApplicationRecord
     }
   end
 
+  #: () -> void
   def refresh_submission_snapshot
     return unless status == 'submitted'
 
@@ -70,14 +97,17 @@ class ExpenseReport < ApplicationRecord
     sub.update!(data: build_snapshot_data)
   end
 
+  #: () -> ExpenseReportSubmission?
   def current_submission
     submissions.order(revision: :desc).first
   end
 
+  #: () -> ExpenseReportReview?
   def latest_review
     current_submission&.review
   end
 
+  #: () -> void
   private def validate_custom_sponsorship
     sponsorship = self.sponsorship
     return unless sponsorship
