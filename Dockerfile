@@ -16,7 +16,7 @@ RUN APP_ENV=production NODE_ENV=production VITE_BUILD=1 pnpm run build
 
 ###
 
-FROM public.ecr.aws/sorah/ruby:3.4-dev AS vipsbuilder
+FROM public.ecr.aws/sorah/ruby:4.0-dev AS vipsbuilder
 
 ARG LIBVIPS_VERSION=8.18.0
 ARG LIBVIPS_SHA384=9ef821ecfad15281aa61df51ef3af168a4f835f79b2fa34374d152245006ebdd7ba952665cfecb930f51f1758e43ee26
@@ -43,7 +43,7 @@ RUN --mount=type=tmpfs,target=/build/libvips \
 
 ###
 
-FROM public.ecr.aws/sorah/ruby:3.4-dev as builder
+FROM public.ecr.aws/sorah/ruby:4.0-dev as builder
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update \
@@ -64,7 +64,7 @@ RUN bundle binstubs bundler aws_lambda_ric --force --path /usr/local/bin
 
 ###
 
-FROM public.ecr.aws/sorah/ruby:3.4
+FROM public.ecr.aws/sorah/ruby:4.0
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update \
