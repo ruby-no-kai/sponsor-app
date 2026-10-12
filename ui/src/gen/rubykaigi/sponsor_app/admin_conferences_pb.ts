@@ -5,6 +5,8 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { AdminConference } from "./admin_conference_pb.ts";
 import { file_rubykaigi_sponsor_app_admin_conference } from "./admin_conference_pb.ts";
 import type { PlanSummary } from "./plan_summary_pb.ts";
@@ -17,7 +19,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file rubykaigi/sponsor_app/admin_conferences.proto.
  */
 export const file_rubykaigi_sponsor_app_admin_conferences: GenFile = /*@__PURE__*/
-  fileDesc("Ci1ydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fY29uZmVyZW5jZXMucHJvdG8SFXJ1YnlrYWlnaS5zcG9uc29yX2FwcCIkCiJBZG1pblNlcnZpY2VMaXN0Q29uZmVyZW5jZXNSZXF1ZXN0ImIKI0FkbWluU2VydmljZUxpc3RDb25mZXJlbmNlc1Jlc3BvbnNlEjsKC2NvbmZlcmVuY2VzGAEgAygLMiYucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQ29uZmVyZW5jZSJbCiBBZG1pblNlcnZpY2VHZXRDb25mZXJlbmNlUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJCL1AQohQWRtaW5TZXJ2aWNlR2V0Q29uZmVyZW5jZVJlc3BvbnNlEjoKCmNvbmZlcmVuY2UYASABKAsyJi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5Db25mZXJlbmNlEiAKGGZvcm1fZGVzY3JpcHRpb25fbG9jYWxlcxgCIAMoCRIxCgVwbGFucxgDIAMoCzIiLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5QbGFuU3VtbWFyeRI/CgxzcG9uc29yc2hpcHMYBCADKAsyKS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvcnNoaXBTdW1tYXJ5QhHqAg5Sazo6U3BvbnNvckFwcGIGcHJvdG8z", [file_buf_validate_validate, file_rubykaigi_sponsor_app_admin_conference, file_rubykaigi_sponsor_app_plan_summary, file_rubykaigi_sponsor_app_sponsorship_summary]);
+  fileDesc("Ci1ydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fY29uZmVyZW5jZXMucHJvdG8SFXJ1YnlrYWlnaS5zcG9uc29yX2FwcCIkCiJBZG1pblNlcnZpY2VMaXN0Q29uZmVyZW5jZXNSZXF1ZXN0ImIKI0FkbWluU2VydmljZUxpc3RDb25mZXJlbmNlc1Jlc3BvbnNlEjsKC2NvbmZlcmVuY2VzGAEgAygLMiYucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQ29uZmVyZW5jZSJbCiBBZG1pblNlcnZpY2VHZXRDb25mZXJlbmNlUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJCL1AQohQWRtaW5TZXJ2aWNlR2V0Q29uZmVyZW5jZVJlc3BvbnNlEjoKCmNvbmZlcmVuY2UYASABKAsyJi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5Db25mZXJlbmNlEiAKGGZvcm1fZGVzY3JpcHRpb25fbG9jYWxlcxgCIAMoCRIxCgVwbGFucxgDIAMoCzIiLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5QbGFuU3VtbWFyeRI/CgxzcG9uc29yc2hpcHMYBCADKAsyKS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvcnNoaXBTdW1tYXJ5IpQMCg9Db25mZXJlbmNlSW5wdXQSYwoEbmFtZRgBIAEoCUJVukhSugFHChljb25mZXJlbmNlLm5hbWUubm90X2JsYW5rEhd2YWx1ZSBtdXN0IG5vdCBiZSBibGFuaxoRdGhpcy50cmltKCkgIT0gJyfIAQFyAxj/ARIvCgRzbHVnGAIgASgJQiG6SB7IAQFyGRhAMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSLAoVY29udGFjdF9lbWFpbF9hZGRyZXNzGAMgASgJQg26SArIAQFyBRj/AWABEj0KFGFwcGxpY2F0aW9uX29wZW5zX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBEj4KFWFwcGxpY2F0aW9uX2Nsb3Nlc19hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAYgBARI8ChNhbWVuZG1lbnRfY2xvc2VzX2F0GAYgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgCiAEBEkMKGmV2ZW50X3N1Ym1pc3Npb25fc3RhcnRzX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgDiAEBEkYKHXRpY2tldF9kaXN0cmlidXRpb25fc3RhcnRzX2F0GAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgEiAEBEkQKG3Bhc3NfcmV0cmFjdGlvbl9kaXNhYmxlc19hdBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIBYgBARIXCg9ub19wbGFuX2FsbG93ZWQYCiABKAgSJwoOYm9vdGhfY2FwYWNpdHkYCyABKAVCCrpIB8gBARoCKABIBogBARIuCiZhZGRpdGlvbmFsX2F0dGVuZGVlc19yZWdpc3RyYXRpb25fb3BlbhgMIAEoCBIOCgZoaWRkZW4YDSABKAgSHwoXYWxsb3dfcmVzdHJpY3RlZF9hY2Nlc3MYDiABKAgSkAEKC2dpdGh1Yl9yZXBvGA8gASgJQna6SHO6AWsKHWNvbmZlcmVuY2UuZ2l0aHViX3JlcG8uZm9ybWF0EiBtdXN0IGJlIG93bmVyL3JlcG9bQGJyYW5jaF06cGF0aBoodGhpcy5tYXRjaGVzKCdeKC4rPykoPzpAKC4rPykpPzooLis/KSQnKXIDGP8BSAeIAQESMAoXZ2l0aHViX3JlcG9faW1hZ2VzX3BhdGgYECABKAlCCrpIB3IFEAEY/wFICIgBARKAAQoJdGl0b19zbHVnGBEgASgJQmi6SGW6AV0KG2NvbmZlcmVuY2UudGl0b19zbHVnLmZvcm1hdBIfbXVzdCBiZSBhY2NvdW50X3NsdWcvZXZlbnRfc2x1ZxoddGhpcy5tYXRjaGVzKCdeW14vXSsvW14vXSskJylyAxj/AUgJiAEBEsgBCiR0aXRvX2Jvb3RoX3BhaWRfZmxhdF9kaXNjb3VudF9hbW91bnQYEiABKAlCmQG6SJUBugGRAQo2Y29uZmVyZW5jZS50aXRvX2Jvb3RoX3BhaWRfZmxhdF9kaXNjb3VudF9hbW91bnQuZm9ybWF0EiltdXN0IGJlIGFuIGFtb3VudCBzdWNoIGFzIDEwMDAgb3IgMTAwMC41MBosdGhpcy5tYXRjaGVzKCdeWzAtOV17MSw2fShbLl1bMC05XXsxLDJ9KT8kJylCFwoVX2FwcGxpY2F0aW9uX29wZW5zX2F0QhgKFl9hcHBsaWNhdGlvbl9jbG9zZXNfYXRCFgoUX2FtZW5kbWVudF9jbG9zZXNfYXRCHQobX2V2ZW50X3N1Ym1pc3Npb25fc3RhcnRzX2F0QiAKHl90aWNrZXRfZGlzdHJpYnV0aW9uX3N0YXJ0c19hdEIeChxfcGFzc19yZXRyYWN0aW9uX2Rpc2FibGVzX2F0QhEKD19ib290aF9jYXBhY2l0eUIOCgxfZ2l0aHViX3JlcG9CGgoYX2dpdGh1Yl9yZXBvX2ltYWdlc19wYXRoQgwKCl90aXRvX3NsdWciZAojQWRtaW5TZXJ2aWNlQ3JlYXRlQ29uZmVyZW5jZVJlcXVlc3QSPQoFaW5wdXQYASABKAsyJi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQ29uZmVyZW5jZUlucHV0Qga6SAPIAQEiYgokQWRtaW5TZXJ2aWNlQ3JlYXRlQ29uZmVyZW5jZVJlc3BvbnNlEjoKCmNvbmZlcmVuY2UYASABKAsyJi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5Db25mZXJlbmNlIp0BCiNBZG1pblNlcnZpY2VVcGRhdGVDb25mZXJlbmNlUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBI9CgVpbnB1dBgCIAEoCzImLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Db25mZXJlbmNlSW5wdXRCBrpIA8gBASJiCiRBZG1pblNlcnZpY2VVcGRhdGVDb25mZXJlbmNlUmVzcG9uc2USOgoKY29uZmVyZW5jZRgBIAEoCzImLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pbkNvbmZlcmVuY2UiYAolQWRtaW5TZXJ2aWNlR2V0QXR0ZW5kZWVzS2VlcGVyUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJCK+AQomQWRtaW5TZXJ2aWNlR2V0QXR0ZW5kZWVzS2VlcGVyUmVzcG9uc2USGgoSaW5jbHVkZWRfYXR0ZW5kZWVzGAEgASgFEhwKFGFkZGl0aW9uYWxfYXR0ZW5kZWVzGAIgASgFEhcKD3RvdGFsX2F0dGVuZGVlcxgDIAEoBRJBCgxzcG9uc29yc2hpcHMYBCADKAsyKy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvcnNoaXBBdHRlbmRlZXMiqQEKFFNwb25zb3JzaGlwQXR0ZW5kZWVzEj4KC3Nwb25zb3JzaGlwGAEgASgLMikucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JzaGlwU3VtbWFyeRIaChJpbmNsdWRlZF9hdHRlbmRlZXMYAiABKAUSHAoUYWRkaXRpb25hbF9hdHRlbmRlZXMYAyABKAUSFwoPdG90YWxfYXR0ZW5kZWVzGAQgASgFImYKK0FkbWluU2VydmljZUxpc3RTcG9uc29yc2hpcFRhYmxlUm93c1JlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQiegosQWRtaW5TZXJ2aWNlTGlzdFNwb25zb3JzaGlwVGFibGVSb3dzUmVzcG9uc2USSgoWc3BvbnNvcnNoaXBfdGFibGVfcm93cxgBIAMoCzIqLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yc2hpcFRhYmxlUm93IsECChNTcG9uc29yc2hpcFRhYmxlUm93Ej4KC3Nwb25zb3JzaGlwGAEgASgLMikucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JzaGlwU3VtbWFyeRIWCglwbGFuX25hbWUYAiABKAlIAIgBARIgChNkaXNwbGF5ZWRfcGxhbl9uYW1lGAMgASgJSAGIAQESHAoPYmlsbGluZ19yZXF1ZXN0GAQgASgJSAKIAQESIgoVY3VzdG9taXphdGlvbl9yZXF1ZXN0GAUgASgJSAOIAQESEQoEbm90ZRgGIAEoCUgEiAEBQgwKCl9wbGFuX25hbWVCFgoUX2Rpc3BsYXllZF9wbGFuX25hbWVCEgoQX2JpbGxpbmdfcmVxdWVzdEIYChZfY3VzdG9taXphdGlvbl9yZXF1ZXN0QgcKBV9ub3RlQhHqAg5Sazo6U3BvbnNvckFwcGIGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_timestamp, file_rubykaigi_sponsor_app_admin_conference, file_rubykaigi_sponsor_app_plan_summary, file_rubykaigi_sponsor_app_sponsorship_summary]);
 
 /**
  * Request for AdminService.ListConferences.
@@ -121,4 +123,459 @@ export type AdminServiceGetConferenceResponse = Message<"rubykaigi.sponsor_app.A
  */
 export const AdminServiceGetConferenceResponseSchema: GenMessage<AdminServiceGetConferenceResponse> = /*@__PURE__*/
   messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 3);
+
+/**
+ * The writable fields of a conference, taken by AdminService.CreateConference and
+ * UpdateConference.
+ *
+ * The server generates a hidden conference's invite code, which application_form_url carries.
+ *
+ * @generated from message rubykaigi.sponsor_app.ConferenceInput
+ */
+export type ConferenceInput = Message<"rubykaigi.sponsor_app.ConferenceInput"> & {
+  /**
+   * Display name, such as "RubyKaigi 2026".
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * Identifier used in URLs and in requests that name the conference, such as "rubykaigi2048":
+   * lowercase letters, digits, "-" and "_". A slug another conference has is answered with
+   * PROBLEM_TYPE_INVALID_RECORD.
+   *
+   * @generated from field: string slug = 2;
+   */
+  slug: string;
+
+  /**
+   * Email address where sponsors reach the organizers.
+   *
+   * @generated from field: string contact_email_address = 3;
+   */
+  contactEmailAddress: string;
+
+  /**
+   * When sponsors can start applying. Absent leaves applications closed.
+   *
+   * @generated from field: optional google.protobuf.Timestamp application_opens_at = 4;
+   */
+  applicationOpensAt?: Timestamp | undefined;
+
+  /**
+   * When applications stop being accepted. Absent keeps them open once application_opens_at has
+   * passed.
+   *
+   * @generated from field: optional google.protobuf.Timestamp application_closes_at = 5;
+   */
+  applicationClosesAt?: Timestamp | undefined;
+
+  /**
+   * When sponsors can no longer edit their application. Absent means editing has no deadline.
+   *
+   * @generated from field: optional google.protobuf.Timestamp amendment_closes_at = 6;
+   */
+  amendmentClosesAt?: Timestamp | undefined;
+
+  /**
+   * When accepted sponsors can start submitting sponsor-hosted events. Absent keeps event
+   * submission closed.
+   *
+   * @generated from field: optional google.protobuf.Timestamp event_submission_starts_at = 7;
+   */
+  eventSubmissionStartsAt?: Timestamp | undefined;
+
+  /**
+   * When accepted sponsors can start claiming their tickets. Absent keeps tickets undistributed.
+   *
+   * @generated from field: optional google.protobuf.Timestamp ticket_distribution_starts_at = 8;
+   */
+  ticketDistributionStartsAt?: Timestamp | undefined;
+
+  /**
+   * When sponsors can no longer void a redeemed pass themselves. Absent keeps voiding available.
+   *
+   * @generated from field: optional google.protobuf.Timestamp pass_retraction_disables_at = 9;
+   */
+  passRetractionDisablesAt?: Timestamp | undefined;
+
+  /**
+   * Whether an application may be submitted without choosing a plan.
+   *
+   * @generated from field: bool no_plan_allowed = 10;
+   */
+  noPlanAllowed: boolean;
+
+  /**
+   * Number of booths available to exhibitors. Zero offers no booths, and the application form then
+   * asks for no booth request.
+   *
+   * @generated from field: optional int32 booth_capacity = 11;
+   */
+  boothCapacity?: number | undefined;
+
+  /**
+   * Whether sponsors are invited to request tickets beyond those their plan includes.
+   *
+   * @generated from field: bool additional_attendees_registration_open = 12;
+   */
+  additionalAttendeesRegistrationOpen: boolean;
+
+  /**
+   * Whether the conference is left out of the public conference list. Applying then needs the
+   * invite code that application_form_url carries.
+   *
+   * @generated from field: bool hidden = 13;
+   */
+  hidden: boolean;
+
+  /**
+   * Whether staff restricted to some conferences may manage this one, given read access to
+   * github_repo.
+   *
+   * @generated from field: bool allow_restricted_access = 14;
+   */
+  allowRestrictedAccess: boolean;
+
+  /**
+   * Where the sponsor list is published, as "owner/repo@branch:path", such as
+   * "ruby-no-kai/rubykaigi.org@master:data/year_2026/sponsors.yml". The branch is optional.
+   * Absent leaves the sponsor list unpublished.
+   *
+   * @generated from field: optional string github_repo = 15;
+   */
+  githubRepo?: string | undefined;
+
+  /**
+   * Directory of github_repo under which the images of accepted sponsor events are committed, such
+   * as "images". Absent leaves the images unpublished.
+   *
+   * @generated from field: optional string github_repo_images_path = 16;
+   */
+  githubRepoImagesPath?: string | undefined;
+
+  /**
+   * Ti.to event that sponsors' tickets are issued through, as "account/event". Absent issues no
+   * tickets through Ti.to.
+   *
+   * @generated from field: optional string tito_slug = 17;
+   */
+  titoSlug?: string | undefined;
+
+  /**
+   * Amount taken off each booth staff ticket an exhibitor pays for, in the Ti.to event's currency:
+   * a decimal of up to six digits and two decimal places, such as "15000" or "15000.50".
+   *
+   * @generated from field: string tito_booth_paid_flat_discount_amount = 18;
+   */
+  titoBoothPaidFlatDiscountAmount: string;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.ConferenceInput.
+ * Use `create(ConferenceInputSchema)` to create a new message.
+ */
+export const ConferenceInputSchema: GenMessage<ConferenceInput> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 4);
+
+/**
+ * Request for AdminService.CreateConference.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCreateConferenceRequest
+ */
+export type AdminServiceCreateConferenceRequest = Message<"rubykaigi.sponsor_app.AdminServiceCreateConferenceRequest"> & {
+  /**
+   * The conference to create.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ConferenceInput input = 1;
+   */
+  input?: ConferenceInput | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCreateConferenceRequest.
+ * Use `create(AdminServiceCreateConferenceRequestSchema)` to create a new message.
+ */
+export const AdminServiceCreateConferenceRequestSchema: GenMessage<AdminServiceCreateConferenceRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 5);
+
+/**
+ * Response for AdminService.CreateConference.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCreateConferenceResponse
+ */
+export type AdminServiceCreateConferenceResponse = Message<"rubykaigi.sponsor_app.AdminServiceCreateConferenceResponse"> & {
+  /**
+   * The conference created, with what the server generated for it.
+   *
+   * @generated from field: rubykaigi.sponsor_app.AdminConference conference = 1;
+   */
+  conference?: AdminConference | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCreateConferenceResponse.
+ * Use `create(AdminServiceCreateConferenceResponseSchema)` to create a new message.
+ */
+export const AdminServiceCreateConferenceResponseSchema: GenMessage<AdminServiceCreateConferenceResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 6);
+
+/**
+ * Request for AdminService.UpdateConference.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceUpdateConferenceRequest
+ */
+export type AdminServiceUpdateConferenceRequest = Message<"rubykaigi.sponsor_app.AdminServiceUpdateConferenceRequest"> & {
+  /**
+   * Slug of the conference to update, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * Every writable field, replacing what is stored. The slug may change.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ConferenceInput input = 2;
+   */
+  input?: ConferenceInput | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceUpdateConferenceRequest.
+ * Use `create(AdminServiceUpdateConferenceRequestSchema)` to create a new message.
+ */
+export const AdminServiceUpdateConferenceRequestSchema: GenMessage<AdminServiceUpdateConferenceRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 7);
+
+/**
+ * Response for AdminService.UpdateConference.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceUpdateConferenceResponse
+ */
+export type AdminServiceUpdateConferenceResponse = Message<"rubykaigi.sponsor_app.AdminServiceUpdateConferenceResponse"> & {
+  /**
+   * The conference as updated.
+   *
+   * @generated from field: rubykaigi.sponsor_app.AdminConference conference = 1;
+   */
+  conference?: AdminConference | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceUpdateConferenceResponse.
+ * Use `create(AdminServiceUpdateConferenceResponseSchema)` to create a new message.
+ */
+export const AdminServiceUpdateConferenceResponseSchema: GenMessage<AdminServiceUpdateConferenceResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 8);
+
+/**
+ * Request for AdminService.GetAttendeesKeeper.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceGetAttendeesKeeperRequest
+ */
+export type AdminServiceGetAttendeesKeeperRequest = Message<"rubykaigi.sponsor_app.AdminServiceGetAttendeesKeeperRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceGetAttendeesKeeperRequest.
+ * Use `create(AdminServiceGetAttendeesKeeperRequestSchema)` to create a new message.
+ */
+export const AdminServiceGetAttendeesKeeperRequestSchema: GenMessage<AdminServiceGetAttendeesKeeperRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 9);
+
+/**
+ * Response for AdminService.GetAttendeesKeeper: the conference tickets that active sponsorships
+ * receive, which the organizers keep seats for.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceGetAttendeesKeeperResponse
+ */
+export type AdminServiceGetAttendeesKeeperResponse = Message<"rubykaigi.sponsor_app.AdminServiceGetAttendeesKeeperResponse"> & {
+  /**
+   * Tickets the plans of all active sponsorships include.
+   *
+   * @generated from field: int32 included_attendees = 1;
+   */
+  includedAttendees: number;
+
+  /**
+   * Tickets all active sponsorships requested beyond those their plans include.
+   *
+   * @generated from field: int32 additional_attendees = 2;
+   */
+  additionalAttendees: number;
+
+  /**
+   * included_attendees plus additional_attendees.
+   *
+   * @generated from field: int32 total_attendees = 3;
+   */
+  totalAttendees: number;
+
+  /**
+   * Every active sponsorship of the conference, most tickets first, then oldest application
+   * first.
+   *
+   * @generated from field: repeated rubykaigi.sponsor_app.SponsorshipAttendees sponsorships = 4;
+   */
+  sponsorships: SponsorshipAttendees[];
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceGetAttendeesKeeperResponse.
+ * Use `create(AdminServiceGetAttendeesKeeperResponseSchema)` to create a new message.
+ */
+export const AdminServiceGetAttendeesKeeperResponseSchema: GenMessage<AdminServiceGetAttendeesKeeperResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 10);
+
+/**
+ * The conference tickets one active sponsorship receives.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorshipAttendees
+ */
+export type SponsorshipAttendees = Message<"rubykaigi.sponsor_app.SponsorshipAttendees"> & {
+  /**
+   * The sponsorship.
+   *
+   * @generated from field: rubykaigi.sponsor_app.SponsorshipSummary sponsorship = 1;
+   */
+  sponsorship?: SponsorshipSummary | undefined;
+
+  /**
+   * Tickets its plan includes. Zero while the plan is undetermined.
+   *
+   * @generated from field: int32 included_attendees = 2;
+   */
+  includedAttendees: number;
+
+  /**
+   * Tickets it requested beyond those its plan includes.
+   *
+   * @generated from field: int32 additional_attendees = 3;
+   */
+  additionalAttendees: number;
+
+  /**
+   * included_attendees plus additional_attendees.
+   *
+   * @generated from field: int32 total_attendees = 4;
+   */
+  totalAttendees: number;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorshipAttendees.
+ * Use `create(SponsorshipAttendeesSchema)` to create a new message.
+ */
+export const SponsorshipAttendeesSchema: GenMessage<SponsorshipAttendees> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 11);
+
+/**
+ * Request for AdminService.ListSponsorshipTableRows.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceListSponsorshipTableRowsRequest
+ */
+export type AdminServiceListSponsorshipTableRowsRequest = Message<"rubykaigi.sponsor_app.AdminServiceListSponsorshipTableRowsRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceListSponsorshipTableRowsRequest.
+ * Use `create(AdminServiceListSponsorshipTableRowsRequestSchema)` to create a new message.
+ */
+export const AdminServiceListSponsorshipTableRowsRequestSchema: GenMessage<AdminServiceListSponsorshipTableRowsRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 12);
+
+/**
+ * Response for AdminService.ListSponsorshipTableRows.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceListSponsorshipTableRowsResponse
+ */
+export type AdminServiceListSponsorshipTableRowsResponse = Message<"rubykaigi.sponsor_app.AdminServiceListSponsorshipTableRowsResponse"> & {
+  /**
+   * One row per sponsorship of the conference, withdrawn ones included, oldest application first.
+   * Not paginated, as a conference has a few hundred sponsorships at most.
+   *
+   * @generated from field: repeated rubykaigi.sponsor_app.SponsorshipTableRow sponsorship_table_rows = 1;
+   */
+  sponsorshipTableRows: SponsorshipTableRow[];
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceListSponsorshipTableRowsResponse.
+ * Use `create(AdminServiceListSponsorshipTableRowsResponseSchema)` to create a new message.
+ */
+export const AdminServiceListSponsorshipTableRowsResponseSchema: GenMessage<AdminServiceListSponsorshipTableRowsResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 13);
+
+/**
+ * A sponsorship with its plan and the notes its application carries, for reading many
+ * sponsorships side by side.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorshipTableRow
+ */
+export type SponsorshipTableRow = Message<"rubykaigi.sponsor_app.SponsorshipTableRow"> & {
+  /**
+   * The sponsorship.
+   *
+   * @generated from field: rubykaigi.sponsor_app.SponsorshipSummary sponsorship = 1;
+   */
+  sponsorship?: SponsorshipSummary | undefined;
+
+  /**
+   * Name of the plan sponsored. Absent while the plan is undetermined.
+   *
+   * @generated from field: optional string plan_name = 2;
+   */
+  planName?: string | undefined;
+
+  /**
+   * Name the sponsor is published under: the custom package's name once it is confirmed,
+   * otherwise plan_name. Absent while the plan is undetermined and no custom package is confirmed.
+   *
+   * @generated from field: optional string displayed_plan_name = 3;
+   */
+  displayedPlanName?: string | undefined;
+
+  /**
+   * The sponsor's note for billing, such as a contract to sign or a due date, as written. Absent
+   * when there is none.
+   *
+   * @generated from field: optional string billing_request = 4;
+   */
+  billingRequest?: string | undefined;
+
+  /**
+   * The sponsor's note on their plan, as written. Absent when there is none.
+   *
+   * @generated from field: optional string customization_request = 5;
+   */
+  customizationRequest?: string | undefined;
+
+  /**
+   * Any other note from the sponsor, as written. Absent when there is none.
+   *
+   * @generated from field: optional string note = 6;
+   */
+  note?: string | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorshipTableRow.
+ * Use `create(SponsorshipTableRowSchema)` to create a new message.
+ */
+export const SponsorshipTableRowSchema: GenMessage<SponsorshipTableRow> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_conferences, 14);
 

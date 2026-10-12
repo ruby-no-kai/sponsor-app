@@ -27,4 +27,21 @@ message AdminConference {
 
   // Number of booths available to exhibitors. Zero when the conference offers no booths.
   int32 booth_capacity = 5;
+
+  // Where the sponsor list is published, as "owner/repo@branch:path", such as
+  // "ruby-no-kai/rubykaigi.org@master:data/year_2026/sponsors.yml". The branch is optional. Absent
+  // when the sponsor list is not published.
+  optional string github_repo = 6;
+
+  // Directory of github_repo under which the images of accepted sponsor events are committed, such
+  // as "images". Absent when the images are not published.
+  optional string github_repo_images_path = 7;
+
+  // Ti.to event that sponsors' tickets are issued through, as "account/event". Absent when tickets
+  // are not issued through Ti.to.
+  optional string tito_slug = 8;
+
+  // Amount taken off each booth staff ticket an exhibitor pays for, in the Ti.to event's currency,
+  // as a decimal such as "15000.0".
+  string tito_booth_paid_flat_discount_amount = 9;
 }

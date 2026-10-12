@@ -8,3 +8,9 @@ class Google::Protobuf::Any
   sig { params(klass: T.untyped).returns(T.untyped) }
   def unpack(klass); end
 end
+
+# google/protobuf/well_known_types reopens Timestamp with this after tapioca gem has run.
+class Google::Protobuf::Timestamp
+  sig { returns(Time) }
+  def to_time; end
+end

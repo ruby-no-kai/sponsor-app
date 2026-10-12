@@ -38,6 +38,46 @@ module Rk
       attr_writer booth_capacity(): ::Integer | ::Float
       def clear_booth_capacity: () -> void
 
+      # Where the sponsor list is published, as "owner/repo@branch:path", such as
+      # "ruby-no-kai/rubykaigi.org@master:data/year_2026/sponsors.yml". The branch is optional. Absent
+      # when the sponsor list is not published.
+      attr_reader github_repo(): ::String
+      attr_writer github_repo(): ::String | ::Symbol
+      def has_github_repo?: () -> bool
+      def clear_github_repo: () -> void
+
+      # Directory of github_repo under which the images of accepted sponsor events are committed, such
+      # as "images". Absent when the images are not published.
+      attr_reader github_repo_images_path(): ::String
+      attr_writer github_repo_images_path(): ::String | ::Symbol
+      def has_github_repo_images_path?: () -> bool
+      def clear_github_repo_images_path: () -> void
+
+      # Ti.to event that sponsors' tickets are issued through, as "account/event". Absent when tickets
+      # are not issued through Ti.to.
+      attr_reader tito_slug(): ::String
+      attr_writer tito_slug(): ::String | ::Symbol
+      def has_tito_slug?: () -> bool
+      def clear_tito_slug: () -> void
+
+      # Amount taken off each booth staff ticket an exhibitor pays for, in the Ti.to event's currency,
+      # as a decimal such as "15000.0".
+      attr_reader tito_booth_paid_flat_discount_amount(): ::String
+      attr_writer tito_booth_paid_flat_discount_amount(): ::String | ::Symbol
+      def clear_tito_booth_paid_flat_discount_amount: () -> void
+
+      attr_reader _github_repo(): ::String?
+      def has__github_repo?: () -> bool
+      def clear__github_repo: () -> void
+
+      attr_reader _github_repo_images_path(): ::String?
+      def has__github_repo_images_path?: () -> bool
+      def clear__github_repo_images_path: () -> void
+
+      attr_reader _tito_slug(): ::String?
+      def has__tito_slug?: () -> bool
+      def clear__tito_slug: () -> void
+
       type init_map = {
         conference: (::Rk::SponsorApp::Conference | ::Rk::SponsorApp::Conference::init_map)?,
         "conference" => (::Rk::SponsorApp::Conference | ::Rk::SponsorApp::Conference::init_map)?,
@@ -49,6 +89,14 @@ module Rk
         "allow_restricted_access" => bool?,
         booth_capacity: (::Integer | ::Float)?,
         "booth_capacity" => (::Integer | ::Float)?,
+        github_repo: (::String | ::Symbol)?,
+        "github_repo" => (::String | ::Symbol)?,
+        github_repo_images_path: (::String | ::Symbol)?,
+        "github_repo_images_path" => (::String | ::Symbol)?,
+        tito_slug: (::String | ::Symbol)?,
+        "tito_slug" => (::String | ::Symbol)?,
+        tito_booth_paid_flat_discount_amount: (::String | ::Symbol)?,
+        "tito_booth_paid_flat_discount_amount" => (::String | ::Symbol)?,
       }
 
       def initialize: (?init_map initial_value) -> void
@@ -59,6 +107,10 @@ module Rk
         | ("application_form_url" name) -> ::String
         | ("allow_restricted_access" name) -> bool
         | ("booth_capacity" name) -> ::Integer
+        | ("github_repo" name) -> ::String
+        | ("github_repo_images_path" name) -> ::String
+        | ("tito_slug" name) -> ::String
+        | ("tito_booth_paid_flat_discount_amount" name) -> ::String
 
       def []=:
           ("conference" name, ::Rk::SponsorApp::Conference? value) -> void
@@ -66,6 +118,10 @@ module Rk
         | ("application_form_url" name, (::String | ::Symbol) value) -> void
         | ("allow_restricted_access" name, bool value) -> void
         | ("booth_capacity" name, (::Integer | ::Float) value) -> void
+        | ("github_repo" name, (::String | ::Symbol) value) -> void
+        | ("github_repo_images_path" name, (::String | ::Symbol) value) -> void
+        | ("tito_slug" name, (::String | ::Symbol) value) -> void
+        | ("tito_booth_paid_flat_discount_amount" name, (::String | ::Symbol) value) -> void
     end
   end
 end

@@ -3,6 +3,7 @@ syntax = "proto3";
 package rubykaigi.sponsor_app;
 
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 import "rubykaigi/sponsor_app/admin_conference.proto";
 import "rubykaigi/sponsor_app/plan_summary.proto";
 import "rubykaigi/sponsor_app/sponsorship_summary.proto";
@@ -44,4 +45,232 @@ message AdminServiceGetConferenceResponse {
 
   // Every sponsorship of the conference, withdrawn ones included, oldest application first.
   repeated SponsorshipSummary sponsorships = 4;
+}
+
+// The writable fields of a conference, taken by AdminService.CreateConference and
+// UpdateConference.
+//
+// The server generates a hidden conference's invite code, which application_form_url carries.
+message ConferenceInput {
+  // Display name, such as "RubyKaigi 2026".
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).cel = {
+      id: "conference.name.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Identifier used in URLs and in requests that name the conference, such as "rubykaigi2048":
+  // lowercase letters, digits, "-" and "_". A slug another conference has is answered with
+  // PROBLEM_TYPE_INVALID_RECORD.
+  string slug = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      max_len: 64
+      pattern: "^[a-z0-9][a-z0-9_-]*$"
+    }
+  ];
+
+  // Email address where sponsors reach the organizers.
+  string contact_email_address = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      max_len: 255
+      email: true
+    }
+  ];
+
+  // When sponsors can start applying. Absent leaves applications closed.
+  optional google.protobuf.Timestamp application_opens_at = 4;
+
+  // When applications stop being accepted. Absent keeps them open once application_opens_at has
+  // passed.
+  optional google.protobuf.Timestamp application_closes_at = 5;
+
+  // When sponsors can no longer edit their application. Absent means editing has no deadline.
+  optional google.protobuf.Timestamp amendment_closes_at = 6;
+
+  // When accepted sponsors can start submitting sponsor-hosted events. Absent keeps event
+  // submission closed.
+  optional google.protobuf.Timestamp event_submission_starts_at = 7;
+
+  // When accepted sponsors can start claiming their tickets. Absent keeps tickets undistributed.
+  optional google.protobuf.Timestamp ticket_distribution_starts_at = 8;
+
+  // When sponsors can no longer void a redeemed pass themselves. Absent keeps voiding available.
+  optional google.protobuf.Timestamp pass_retraction_disables_at = 9;
+
+  // Whether an application may be submitted without choosing a plan.
+  bool no_plan_allowed = 10;
+
+  // Number of booths available to exhibitors. Zero offers no booths, and the application form then
+  // asks for no booth request.
+  optional int32 booth_capacity = 11 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32.gte = 0
+  ];
+
+  // Whether sponsors are invited to request tickets beyond those their plan includes.
+  bool additional_attendees_registration_open = 12;
+
+  // Whether the conference is left out of the public conference list. Applying then needs the
+  // invite code that application_form_url carries.
+  bool hidden = 13;
+
+  // Whether staff restricted to some conferences may manage this one, given read access to
+  // github_repo.
+  bool allow_restricted_access = 14;
+
+  // Where the sponsor list is published, as "owner/repo@branch:path", such as
+  // "ruby-no-kai/rubykaigi.org@master:data/year_2026/sponsors.yml". The branch is optional.
+  // Absent leaves the sponsor list unpublished.
+  optional string github_repo = 15 [
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).cel = {
+      id: "conference.github_repo.format"
+      message: "must be owner/repo[@branch]:path"
+      // The parse Conference#github_repo applies.
+      expression: "this.matches('^(.+?)(?:@(.+?))?:(.+?)$')"
+    }
+  ];
+
+  // Directory of github_repo under which the images of accepted sponsor events are committed, such
+  // as "images". Absent leaves the images unpublished.
+  optional string github_repo_images_path = 16 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 255
+  }];
+
+  // Ti.to event that sponsors' tickets are issued through, as "account/event". Absent issues no
+  // tickets through Ti.to.
+  optional string tito_slug = 17 [
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).cel = {
+      id: "conference.tito_slug.format"
+      message: "must be account_slug/event_slug"
+      expression: "this.matches('^[^/]+/[^/]+$')"
+    }
+  ];
+
+  // Amount taken off each booth staff ticket an exhibitor pays for, in the Ti.to event's currency:
+  // a decimal of up to six digits and two decimal places, such as "15000" or "15000.50".
+  string tito_booth_paid_flat_discount_amount = 18 [(buf.validate.field).cel = {
+    id: "conference.tito_booth_paid_flat_discount_amount.format"
+    message: "must be an amount such as 1000 or 1000.50"
+    expression: "this.matches('^[0-9]{1,6}([.][0-9]{1,2})?$')"
+  }];
+}
+
+// Request for AdminService.CreateConference.
+message AdminServiceCreateConferenceRequest {
+  // The conference to create.
+  ConferenceInput input = 1 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.CreateConference.
+message AdminServiceCreateConferenceResponse {
+  // The conference created, with what the server generated for it.
+  AdminConference conference = 1;
+}
+
+// Request for AdminService.UpdateConference.
+message AdminServiceUpdateConferenceRequest {
+  // Slug of the conference to update, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Every writable field, replacing what is stored. The slug may change.
+  ConferenceInput input = 2 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.UpdateConference.
+message AdminServiceUpdateConferenceResponse {
+  // The conference as updated.
+  AdminConference conference = 1;
+}
+
+// Request for AdminService.GetAttendeesKeeper.
+message AdminServiceGetAttendeesKeeperRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for AdminService.GetAttendeesKeeper: the conference tickets that active sponsorships
+// receive, which the organizers keep seats for.
+message AdminServiceGetAttendeesKeeperResponse {
+  // Tickets the plans of all active sponsorships include.
+  int32 included_attendees = 1;
+
+  // Tickets all active sponsorships requested beyond those their plans include.
+  int32 additional_attendees = 2;
+
+  // included_attendees plus additional_attendees.
+  int32 total_attendees = 3;
+
+  // Every active sponsorship of the conference, most tickets first, then oldest application
+  // first.
+  repeated SponsorshipAttendees sponsorships = 4;
+}
+
+// The conference tickets one active sponsorship receives.
+message SponsorshipAttendees {
+  // The sponsorship.
+  SponsorshipSummary sponsorship = 1;
+
+  // Tickets its plan includes. Zero while the plan is undetermined.
+  int32 included_attendees = 2;
+
+  // Tickets it requested beyond those its plan includes.
+  int32 additional_attendees = 3;
+
+  // included_attendees plus additional_attendees.
+  int32 total_attendees = 4;
+}
+
+// Request for AdminService.ListSponsorshipTableRows.
+message AdminServiceListSponsorshipTableRowsRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for AdminService.ListSponsorshipTableRows.
+message AdminServiceListSponsorshipTableRowsResponse {
+  // One row per sponsorship of the conference, withdrawn ones included, oldest application first.
+  // Not paginated, as a conference has a few hundred sponsorships at most.
+  repeated SponsorshipTableRow sponsorship_table_rows = 1;
+}
+
+// A sponsorship with its plan and the notes its application carries, for reading many
+// sponsorships side by side.
+message SponsorshipTableRow {
+  // The sponsorship.
+  SponsorshipSummary sponsorship = 1;
+
+  // Name of the plan sponsored. Absent while the plan is undetermined.
+  optional string plan_name = 2;
+
+  // Name the sponsor is published under: the custom package's name once it is confirmed,
+  // otherwise plan_name. Absent while the plan is undetermined and no custom package is confirmed.
+  optional string displayed_plan_name = 3;
+
+  // The sponsor's note for billing, such as a contract to sign or a due date, as written. Absent
+  // when there is none.
+  optional string billing_request = 4;
+
+  // The sponsor's note on their plan, as written. Absent when there is none.
+  optional string customization_request = 5;
+
+  // Any other note from the sponsor, as written. Absent when there is none.
+  optional string note = 6;
 }

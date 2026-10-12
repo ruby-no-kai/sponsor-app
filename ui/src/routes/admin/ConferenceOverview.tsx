@@ -16,6 +16,7 @@ import { groupCounts, groupSponsorships } from "./sponsorshipGroups.ts";
 export default function ConferenceOverview() {
   const { slug = "" } = useParams();
   const { data, error } = useRpc(AdminService.method.getConference, { conferenceSlug: slug });
+  const viewer = useRpc(AdminService.method.getViewer, {}).data?.staff;
   useDocumentTitle(data?.conference?.conference?.name ?? slug);
 
   if (error !== undefined && data === undefined) throw error;
@@ -81,9 +82,15 @@ export default function ConferenceOverview() {
         subtitle={<Text variant="mono">{conference.slug}</Text>}
         actions={
           <>
-            <LinkButton href={`${base}/edit`} variant="primary" icon={PencilSimpleIcon}>
-              Edit
-            </LinkButton>
+            {viewer !== undefined && !viewer.restricted && (
+              <LinkButton
+                href={generatePath(paths.conferenceEdit, { slug: conference.slug })}
+                variant="primary"
+                icon={PencilSimpleIcon}
+              >
+                Edit
+              </LinkButton>
+            )}
             <LinkButton
               href={adminConference.applicationFormUrl}
               variant="secondary"
@@ -169,6 +176,23 @@ export default function ConferenceOverview() {
               <Row>
                 <Link href={`${base}/plans`}>View all plans</Link>
                 <Link href={`${base}/plans/new`}>Add plan</Link>
+              </Row>
+            </Rows>
+          </Card>
+
+          <Card title="Exports">
+            <Rows>
+              <Row>
+                <Link href={`${base}/sponsors_yml`}>sponsors.yml</Link>
+              </Row>
+              <Row>
+                <Link href={`${base}/sponsors_json`}>sponsors.json</Link>
+              </Row>
+              <Row>
+                <Link href={`${base}/asset_urls`}>Asset URLs</Link>
+                <Text variant="secondary" as="span">
+                  Valid for an hour
+                </Text>
               </Row>
             </Rows>
           </Card>

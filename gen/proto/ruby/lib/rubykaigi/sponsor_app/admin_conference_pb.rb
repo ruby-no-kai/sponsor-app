@@ -7,7 +7,7 @@ require 'google/protobuf'
 require 'rubykaigi/sponsor_app/conference_pb'
 
 
-descriptor_data = "\n,rubykaigi/sponsor_app/admin_conference.proto\x12\x15rubykaigi.sponsor_app\x1a&rubykaigi/sponsor_app/conference.proto\"\xfd\x01\n\x0f\x41\x64minConference\x12\x41\n\nconference\x18\x01 \x01(\x0b\x32!.rubykaigi.sponsor_app.ConferenceR\nconference\x12\x16\n\x06hidden\x18\x02 \x01(\x08R\x06hidden\x12\x30\n\x14\x61pplication_form_url\x18\x03 \x01(\tR\x12\x61pplicationFormUrl\x12\x36\n\x17\x61llow_restricted_access\x18\x04 \x01(\x08R\x15\x61llowRestrictedAccess\x12%\n\x0e\x62ooth_capacity\x18\x05 \x01(\x05R\rboothCapacityB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
+descriptor_data = "\n,rubykaigi/sponsor_app/admin_conference.proto\x12\x15rubykaigi.sponsor_app\x1a&rubykaigi/sponsor_app/conference.proto\"\x8a\x04\n\x0f\x41\x64minConference\x12\x41\n\nconference\x18\x01 \x01(\x0b\x32!.rubykaigi.sponsor_app.ConferenceR\nconference\x12\x16\n\x06hidden\x18\x02 \x01(\x08R\x06hidden\x12\x30\n\x14\x61pplication_form_url\x18\x03 \x01(\tR\x12\x61pplicationFormUrl\x12\x36\n\x17\x61llow_restricted_access\x18\x04 \x01(\x08R\x15\x61llowRestrictedAccess\x12%\n\x0e\x62ooth_capacity\x18\x05 \x01(\x05R\rboothCapacity\x12$\n\x0bgithub_repo\x18\x06 \x01(\tH\x00R\ngithubRepo\x88\x01\x01\x12:\n\x17github_repo_images_path\x18\x07 \x01(\tH\x01R\x14githubRepoImagesPath\x88\x01\x01\x12 \n\ttito_slug\x18\x08 \x01(\tH\x02R\x08titoSlug\x88\x01\x01\x12M\n$tito_booth_paid_flat_discount_amount\x18\t \x01(\tR\x1ftitoBoothPaidFlatDiscountAmountB\x0e\n\x0c_github_repoB\x1a\n\x18_github_repo_images_pathB\x0c\n\n_tito_slugB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)

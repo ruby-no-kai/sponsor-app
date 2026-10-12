@@ -5,7 +5,11 @@ import {
   formatTimestamp,
   idFromInput,
   idToInput,
+  int32FromInput,
+  int32ToInput,
   optionalFromInput,
+  optionalInt32FromInput,
+  optionalInt32ToInput,
   optionalToInput,
   timestampFromInput,
   timestampToInput,
@@ -31,6 +35,27 @@ describe("optional strings", () => {
     assert.equal(optionalFromInput(""), undefined);
     assert.equal(optionalFromInput("Gold"), "Gold");
     assert.equal(optionalToInput(undefined), "");
+  });
+});
+
+describe("int32", () => {
+  it("round-trips a whole number", () => {
+    assert.equal(int32FromInput(int32ToInput(-42)), -42);
+    assert.equal(int32FromInput(" 7 "), 7);
+  });
+
+  it("rejects what an int32 cannot hold", () => {
+    for (const value of ["", "1.5", "1e3", "0x10", "abc", "2147483648", "-2147483649"]) {
+      assert.throws(() => int32FromInput(value), RangeError, value);
+    }
+    assert.equal(int32FromInput("2147483647"), 2147483647);
+  });
+
+  it("leaves an empty optional input unset rather than zero", () => {
+    assert.equal(optionalInt32FromInput(""), undefined);
+    assert.equal(optionalInt32FromInput("0"), 0);
+    assert.equal(optionalInt32ToInput(undefined), "");
+    assert.throws(() => optionalInt32FromInput("x"), RangeError);
   });
 });
 
