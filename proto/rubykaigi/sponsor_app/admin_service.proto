@@ -37,6 +37,25 @@ service AdminService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
+  // Creates a conference. Restricted staff are answered `permission_denied`. A slug another
+  // conference has is answered with PROBLEM_TYPE_INVALID_RECORD.
+  rpc CreateConference(AdminServiceCreateConferenceRequest) returns (AdminServiceCreateConferenceResponse);
+
+  // Replaces every writable field of a conference. Restricted staff are answered
+  // `permission_denied`. A slug another conference has is answered with
+  // PROBLEM_TYPE_INVALID_RECORD.
+  rpc UpdateConference(AdminServiceUpdateConferenceRequest) returns (AdminServiceUpdateConferenceResponse);
+
+  // Returns the conference tickets that each active sponsorship of a conference receives.
+  rpc GetAttendeesKeeper(AdminServiceGetAttendeesKeeperRequest) returns (AdminServiceGetAttendeesKeeperResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Lists every sponsorship of a conference with its plan and the notes its application carries.
+  rpc ListSponsorshipTableRows(AdminServiceListSponsorshipTableRowsRequest) returns (AdminServiceListSponsorshipTableRowsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   // Form descriptions
 
   // Returns a conference's application form description in one locale.

@@ -112,6 +112,609 @@ module Rk
         | ("plans" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::PlanSummary, ::Rk::SponsorApp::PlanSummary] value) -> void
         | ("sponsorships" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorshipSummary, ::Rk::SponsorApp::SponsorshipSummary] value) -> void
     end
+
+    # The writable fields of a conference, taken by AdminService.CreateConference and
+    # UpdateConference.
+    # The server generates a hidden conference's invite code, which application_form_url carries.
+    class ConferenceInput < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::ConferenceInput]
+
+      # Display name, such as "RubyKaigi 2026".
+      attr_reader name(): ::String
+      attr_writer name(): ::String | ::Symbol
+      def clear_name: () -> void
+
+      # Identifier used in URLs and in requests that name the conference, such as "rubykaigi2048":
+      # lowercase letters, digits, "-" and "_". A slug another conference has is answered with
+      # PROBLEM_TYPE_INVALID_RECORD.
+      attr_reader slug(): ::String
+      attr_writer slug(): ::String | ::Symbol
+      def clear_slug: () -> void
+
+      # Email address where sponsors reach the organizers.
+      attr_reader contact_email_address(): ::String
+      attr_writer contact_email_address(): ::String | ::Symbol
+      def clear_contact_email_address: () -> void
+
+      # When sponsors can start applying. Absent leaves applications closed.
+      attr_reader application_opens_at(): ::Google::Protobuf::Timestamp?
+      attr_writer application_opens_at(): (::Google::Protobuf::Timestamp | ::Time)?
+      def has_application_opens_at?: () -> bool
+      def clear_application_opens_at: () -> void
+
+      # When applications stop being accepted. Absent keeps them open once application_opens_at has
+      # passed.
+      attr_reader application_closes_at(): ::Google::Protobuf::Timestamp?
+      attr_writer application_closes_at(): (::Google::Protobuf::Timestamp | ::Time)?
+      def has_application_closes_at?: () -> bool
+      def clear_application_closes_at: () -> void
+
+      # When sponsors can no longer edit their application. Absent means editing has no deadline.
+      attr_reader amendment_closes_at(): ::Google::Protobuf::Timestamp?
+      attr_writer amendment_closes_at(): (::Google::Protobuf::Timestamp | ::Time)?
+      def has_amendment_closes_at?: () -> bool
+      def clear_amendment_closes_at: () -> void
+
+      # When accepted sponsors can start submitting sponsor-hosted events. Absent keeps event
+      # submission closed.
+      attr_reader event_submission_starts_at(): ::Google::Protobuf::Timestamp?
+      attr_writer event_submission_starts_at(): (::Google::Protobuf::Timestamp | ::Time)?
+      def has_event_submission_starts_at?: () -> bool
+      def clear_event_submission_starts_at: () -> void
+
+      # When accepted sponsors can start claiming their tickets. Absent keeps tickets undistributed.
+      attr_reader ticket_distribution_starts_at(): ::Google::Protobuf::Timestamp?
+      attr_writer ticket_distribution_starts_at(): (::Google::Protobuf::Timestamp | ::Time)?
+      def has_ticket_distribution_starts_at?: () -> bool
+      def clear_ticket_distribution_starts_at: () -> void
+
+      # When sponsors can no longer void a redeemed pass themselves. Absent keeps voiding available.
+      attr_reader pass_retraction_disables_at(): ::Google::Protobuf::Timestamp?
+      attr_writer pass_retraction_disables_at(): (::Google::Protobuf::Timestamp | ::Time)?
+      def has_pass_retraction_disables_at?: () -> bool
+      def clear_pass_retraction_disables_at: () -> void
+
+      # Whether an application may be submitted without choosing a plan.
+      attr_accessor no_plan_allowed(): bool
+      def clear_no_plan_allowed: () -> void
+
+      # Number of booths available to exhibitors. Zero offers no booths, and the application form then
+      # asks for no booth request.
+      attr_reader booth_capacity(): ::Integer
+      attr_writer booth_capacity(): ::Integer | ::Float
+      def has_booth_capacity?: () -> bool
+      def clear_booth_capacity: () -> void
+
+      # Whether sponsors are invited to request tickets beyond those their plan includes.
+      attr_accessor additional_attendees_registration_open(): bool
+      def clear_additional_attendees_registration_open: () -> void
+
+      # Whether the conference is left out of the public conference list. Applying then needs the
+      # invite code that application_form_url carries.
+      attr_accessor hidden(): bool
+      def clear_hidden: () -> void
+
+      # Whether staff restricted to some conferences may manage this one, given read access to
+      # github_repo.
+      attr_accessor allow_restricted_access(): bool
+      def clear_allow_restricted_access: () -> void
+
+      # Where the sponsor list is published, as "owner/repo@branch:path", such as
+      # "ruby-no-kai/rubykaigi.org@master:data/year_2026/sponsors.yml". The branch is optional.
+      # Absent leaves the sponsor list unpublished.
+      attr_reader github_repo(): ::String
+      attr_writer github_repo(): ::String | ::Symbol
+      def has_github_repo?: () -> bool
+      def clear_github_repo: () -> void
+
+      # Directory of github_repo under which the images of accepted sponsor events are committed, such
+      # as "images". Absent leaves the images unpublished.
+      attr_reader github_repo_images_path(): ::String
+      attr_writer github_repo_images_path(): ::String | ::Symbol
+      def has_github_repo_images_path?: () -> bool
+      def clear_github_repo_images_path: () -> void
+
+      # Ti.to event that sponsors' tickets are issued through, as "account/event". Absent issues no
+      # tickets through Ti.to.
+      attr_reader tito_slug(): ::String
+      attr_writer tito_slug(): ::String | ::Symbol
+      def has_tito_slug?: () -> bool
+      def clear_tito_slug: () -> void
+
+      # Amount taken off each booth staff ticket an exhibitor pays for, in the Ti.to event's currency:
+      # a decimal of up to six digits and two decimal places, such as "15000" or "15000.50".
+      attr_reader tito_booth_paid_flat_discount_amount(): ::String
+      attr_writer tito_booth_paid_flat_discount_amount(): ::String | ::Symbol
+      def clear_tito_booth_paid_flat_discount_amount: () -> void
+
+      attr_reader _application_opens_at(): ::Google::Protobuf::Timestamp?
+      def has__application_opens_at?: () -> bool
+      def clear__application_opens_at: () -> void
+
+      attr_reader _application_closes_at(): ::Google::Protobuf::Timestamp?
+      def has__application_closes_at?: () -> bool
+      def clear__application_closes_at: () -> void
+
+      attr_reader _amendment_closes_at(): ::Google::Protobuf::Timestamp?
+      def has__amendment_closes_at?: () -> bool
+      def clear__amendment_closes_at: () -> void
+
+      attr_reader _event_submission_starts_at(): ::Google::Protobuf::Timestamp?
+      def has__event_submission_starts_at?: () -> bool
+      def clear__event_submission_starts_at: () -> void
+
+      attr_reader _ticket_distribution_starts_at(): ::Google::Protobuf::Timestamp?
+      def has__ticket_distribution_starts_at?: () -> bool
+      def clear__ticket_distribution_starts_at: () -> void
+
+      attr_reader _pass_retraction_disables_at(): ::Google::Protobuf::Timestamp?
+      def has__pass_retraction_disables_at?: () -> bool
+      def clear__pass_retraction_disables_at: () -> void
+
+      attr_reader _booth_capacity(): ::Integer?
+      def has__booth_capacity?: () -> bool
+      def clear__booth_capacity: () -> void
+
+      attr_reader _github_repo(): ::String?
+      def has__github_repo?: () -> bool
+      def clear__github_repo: () -> void
+
+      attr_reader _github_repo_images_path(): ::String?
+      def has__github_repo_images_path?: () -> bool
+      def clear__github_repo_images_path: () -> void
+
+      attr_reader _tito_slug(): ::String?
+      def has__tito_slug?: () -> bool
+      def clear__tito_slug: () -> void
+
+      type init_map = {
+        name: (::String | ::Symbol)?,
+        "name" => (::String | ::Symbol)?,
+        slug: (::String | ::Symbol)?,
+        "slug" => (::String | ::Symbol)?,
+        contact_email_address: (::String | ::Symbol)?,
+        "contact_email_address" => (::String | ::Symbol)?,
+        application_opens_at: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        "application_opens_at" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        application_closes_at: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        "application_closes_at" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        amendment_closes_at: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        "amendment_closes_at" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        event_submission_starts_at: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        "event_submission_starts_at" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        ticket_distribution_starts_at: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        "ticket_distribution_starts_at" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        pass_retraction_disables_at: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        "pass_retraction_disables_at" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
+        no_plan_allowed: bool?,
+        "no_plan_allowed" => bool?,
+        booth_capacity: (::Integer | ::Float)?,
+        "booth_capacity" => (::Integer | ::Float)?,
+        additional_attendees_registration_open: bool?,
+        "additional_attendees_registration_open" => bool?,
+        hidden: bool?,
+        "hidden" => bool?,
+        allow_restricted_access: bool?,
+        "allow_restricted_access" => bool?,
+        github_repo: (::String | ::Symbol)?,
+        "github_repo" => (::String | ::Symbol)?,
+        github_repo_images_path: (::String | ::Symbol)?,
+        "github_repo_images_path" => (::String | ::Symbol)?,
+        tito_slug: (::String | ::Symbol)?,
+        "tito_slug" => (::String | ::Symbol)?,
+        tito_booth_paid_flat_discount_amount: (::String | ::Symbol)?,
+        "tito_booth_paid_flat_discount_amount" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("name" name) -> ::String
+        | ("slug" name) -> ::String
+        | ("contact_email_address" name) -> ::String
+        | ("application_opens_at" name) -> ::Google::Protobuf::Timestamp?
+        | ("application_closes_at" name) -> ::Google::Protobuf::Timestamp?
+        | ("amendment_closes_at" name) -> ::Google::Protobuf::Timestamp?
+        | ("event_submission_starts_at" name) -> ::Google::Protobuf::Timestamp?
+        | ("ticket_distribution_starts_at" name) -> ::Google::Protobuf::Timestamp?
+        | ("pass_retraction_disables_at" name) -> ::Google::Protobuf::Timestamp?
+        | ("no_plan_allowed" name) -> bool
+        | ("booth_capacity" name) -> ::Integer
+        | ("additional_attendees_registration_open" name) -> bool
+        | ("hidden" name) -> bool
+        | ("allow_restricted_access" name) -> bool
+        | ("github_repo" name) -> ::String
+        | ("github_repo_images_path" name) -> ::String
+        | ("tito_slug" name) -> ::String
+        | ("tito_booth_paid_flat_discount_amount" name) -> ::String
+
+      def []=:
+          ("name" name, (::String | ::Symbol) value) -> void
+        | ("slug" name, (::String | ::Symbol) value) -> void
+        | ("contact_email_address" name, (::String | ::Symbol) value) -> void
+        | ("application_opens_at" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+        | ("application_closes_at" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+        | ("amendment_closes_at" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+        | ("event_submission_starts_at" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+        | ("ticket_distribution_starts_at" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+        | ("pass_retraction_disables_at" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+        | ("no_plan_allowed" name, bool value) -> void
+        | ("booth_capacity" name, (::Integer | ::Float) value) -> void
+        | ("additional_attendees_registration_open" name, bool value) -> void
+        | ("hidden" name, bool value) -> void
+        | ("allow_restricted_access" name, bool value) -> void
+        | ("github_repo" name, (::String | ::Symbol) value) -> void
+        | ("github_repo_images_path" name, (::String | ::Symbol) value) -> void
+        | ("tito_slug" name, (::String | ::Symbol) value) -> void
+        | ("tito_booth_paid_flat_discount_amount" name, (::String | ::Symbol) value) -> void
+    end
+
+    # Request for AdminService.CreateConference.
+    class AdminServiceCreateConferenceRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCreateConferenceRequest]
+
+      # The conference to create.
+      attr_accessor input(): ::Rk::SponsorApp::ConferenceInput?
+      def has_input?: () -> bool
+      def clear_input: () -> void
+
+      type init_map = {
+        input: (::Rk::SponsorApp::ConferenceInput | ::Rk::SponsorApp::ConferenceInput::init_map)?,
+        "input" => (::Rk::SponsorApp::ConferenceInput | ::Rk::SponsorApp::ConferenceInput::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("input" name) -> ::Rk::SponsorApp::ConferenceInput?
+
+      def []=:
+          ("input" name, ::Rk::SponsorApp::ConferenceInput? value) -> void
+    end
+
+    # Response for AdminService.CreateConference.
+    class AdminServiceCreateConferenceResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCreateConferenceResponse]
+
+      # The conference created, with what the server generated for it.
+      attr_accessor conference(): ::Rk::SponsorApp::AdminConference?
+      def has_conference?: () -> bool
+      def clear_conference: () -> void
+
+      type init_map = {
+        conference: (::Rk::SponsorApp::AdminConference | ::Rk::SponsorApp::AdminConference::init_map)?,
+        "conference" => (::Rk::SponsorApp::AdminConference | ::Rk::SponsorApp::AdminConference::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference" name) -> ::Rk::SponsorApp::AdminConference?
+
+      def []=:
+          ("conference" name, ::Rk::SponsorApp::AdminConference? value) -> void
+    end
+
+    # Request for AdminService.UpdateConference.
+    class AdminServiceUpdateConferenceRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceUpdateConferenceRequest]
+
+      # Slug of the conference to update, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # Every writable field, replacing what is stored. The slug may change.
+      attr_accessor input(): ::Rk::SponsorApp::ConferenceInput?
+      def has_input?: () -> bool
+      def clear_input: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        input: (::Rk::SponsorApp::ConferenceInput | ::Rk::SponsorApp::ConferenceInput::init_map)?,
+        "input" => (::Rk::SponsorApp::ConferenceInput | ::Rk::SponsorApp::ConferenceInput::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("input" name) -> ::Rk::SponsorApp::ConferenceInput?
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("input" name, ::Rk::SponsorApp::ConferenceInput? value) -> void
+    end
+
+    # Response for AdminService.UpdateConference.
+    class AdminServiceUpdateConferenceResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceUpdateConferenceResponse]
+
+      # The conference as updated.
+      attr_accessor conference(): ::Rk::SponsorApp::AdminConference?
+      def has_conference?: () -> bool
+      def clear_conference: () -> void
+
+      type init_map = {
+        conference: (::Rk::SponsorApp::AdminConference | ::Rk::SponsorApp::AdminConference::init_map)?,
+        "conference" => (::Rk::SponsorApp::AdminConference | ::Rk::SponsorApp::AdminConference::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference" name) -> ::Rk::SponsorApp::AdminConference?
+
+      def []=:
+          ("conference" name, ::Rk::SponsorApp::AdminConference? value) -> void
+    end
+
+    # Request for AdminService.GetAttendeesKeeper.
+    class AdminServiceGetAttendeesKeeperRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceGetAttendeesKeeperRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+    end
+
+    # Response for AdminService.GetAttendeesKeeper: the conference tickets that active sponsorships
+    # receive, which the organizers keep seats for.
+    class AdminServiceGetAttendeesKeeperResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceGetAttendeesKeeperResponse]
+
+      # Tickets the plans of all active sponsorships include.
+      attr_reader included_attendees(): ::Integer
+      attr_writer included_attendees(): ::Integer | ::Float
+      def clear_included_attendees: () -> void
+
+      # Tickets all active sponsorships requested beyond those their plans include.
+      attr_reader additional_attendees(): ::Integer
+      attr_writer additional_attendees(): ::Integer | ::Float
+      def clear_additional_attendees: () -> void
+
+      # included_attendees plus additional_attendees.
+      attr_reader total_attendees(): ::Integer
+      attr_writer total_attendees(): ::Integer | ::Float
+      def clear_total_attendees: () -> void
+
+      # Every active sponsorship of the conference, most tickets first, then oldest application
+      # first.
+      attr_accessor sponsorships(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorshipAttendees, ::Rk::SponsorApp::SponsorshipAttendees]
+      def clear_sponsorships: () -> void
+
+      type init_map = {
+        included_attendees: (::Integer | ::Float)?,
+        "included_attendees" => (::Integer | ::Float)?,
+        additional_attendees: (::Integer | ::Float)?,
+        "additional_attendees" => (::Integer | ::Float)?,
+        total_attendees: (::Integer | ::Float)?,
+        "total_attendees" => (::Integer | ::Float)?,
+        sponsorships: ::Array[::Rk::SponsorApp::SponsorshipAttendees]?,
+        "sponsorships" => ::Array[::Rk::SponsorApp::SponsorshipAttendees]?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("included_attendees" name) -> ::Integer
+        | ("additional_attendees" name) -> ::Integer
+        | ("total_attendees" name) -> ::Integer
+        | ("sponsorships" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorshipAttendees, ::Rk::SponsorApp::SponsorshipAttendees]
+
+      def []=:
+          ("included_attendees" name, (::Integer | ::Float) value) -> void
+        | ("additional_attendees" name, (::Integer | ::Float) value) -> void
+        | ("total_attendees" name, (::Integer | ::Float) value) -> void
+        | ("sponsorships" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorshipAttendees, ::Rk::SponsorApp::SponsorshipAttendees] value) -> void
+    end
+
+    # The conference tickets one active sponsorship receives.
+    class SponsorshipAttendees < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorshipAttendees]
+
+      # The sponsorship.
+      attr_accessor sponsorship(): ::Rk::SponsorApp::SponsorshipSummary?
+      def has_sponsorship?: () -> bool
+      def clear_sponsorship: () -> void
+
+      # Tickets its plan includes. Zero while the plan is undetermined.
+      attr_reader included_attendees(): ::Integer
+      attr_writer included_attendees(): ::Integer | ::Float
+      def clear_included_attendees: () -> void
+
+      # Tickets it requested beyond those its plan includes.
+      attr_reader additional_attendees(): ::Integer
+      attr_writer additional_attendees(): ::Integer | ::Float
+      def clear_additional_attendees: () -> void
+
+      # included_attendees plus additional_attendees.
+      attr_reader total_attendees(): ::Integer
+      attr_writer total_attendees(): ::Integer | ::Float
+      def clear_total_attendees: () -> void
+
+      type init_map = {
+        sponsorship: (::Rk::SponsorApp::SponsorshipSummary | ::Rk::SponsorApp::SponsorshipSummary::init_map)?,
+        "sponsorship" => (::Rk::SponsorApp::SponsorshipSummary | ::Rk::SponsorApp::SponsorshipSummary::init_map)?,
+        included_attendees: (::Integer | ::Float)?,
+        "included_attendees" => (::Integer | ::Float)?,
+        additional_attendees: (::Integer | ::Float)?,
+        "additional_attendees" => (::Integer | ::Float)?,
+        total_attendees: (::Integer | ::Float)?,
+        "total_attendees" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("sponsorship" name) -> ::Rk::SponsorApp::SponsorshipSummary?
+        | ("included_attendees" name) -> ::Integer
+        | ("additional_attendees" name) -> ::Integer
+        | ("total_attendees" name) -> ::Integer
+
+      def []=:
+          ("sponsorship" name, ::Rk::SponsorApp::SponsorshipSummary? value) -> void
+        | ("included_attendees" name, (::Integer | ::Float) value) -> void
+        | ("additional_attendees" name, (::Integer | ::Float) value) -> void
+        | ("total_attendees" name, (::Integer | ::Float) value) -> void
+    end
+
+    # Request for AdminService.ListSponsorshipTableRows.
+    class AdminServiceListSponsorshipTableRowsRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceListSponsorshipTableRowsRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+    end
+
+    # Response for AdminService.ListSponsorshipTableRows.
+    class AdminServiceListSponsorshipTableRowsResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceListSponsorshipTableRowsResponse]
+
+      # One row per sponsorship of the conference, withdrawn ones included, oldest application first.
+      # Not paginated, as a conference has a few hundred sponsorships at most.
+      attr_accessor sponsorship_table_rows(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorshipTableRow, ::Rk::SponsorApp::SponsorshipTableRow]
+      def clear_sponsorship_table_rows: () -> void
+
+      type init_map = {
+        sponsorship_table_rows: ::Array[::Rk::SponsorApp::SponsorshipTableRow]?,
+        "sponsorship_table_rows" => ::Array[::Rk::SponsorApp::SponsorshipTableRow]?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("sponsorship_table_rows" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorshipTableRow, ::Rk::SponsorApp::SponsorshipTableRow]
+
+      def []=:
+          ("sponsorship_table_rows" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorshipTableRow, ::Rk::SponsorApp::SponsorshipTableRow] value) -> void
+    end
+
+    # A sponsorship with its plan and the notes its application carries, for reading many
+    # sponsorships side by side.
+    class SponsorshipTableRow < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorshipTableRow]
+
+      # The sponsorship.
+      attr_accessor sponsorship(): ::Rk::SponsorApp::SponsorshipSummary?
+      def has_sponsorship?: () -> bool
+      def clear_sponsorship: () -> void
+
+      # Name of the plan sponsored. Absent while the plan is undetermined.
+      attr_reader plan_name(): ::String
+      attr_writer plan_name(): ::String | ::Symbol
+      def has_plan_name?: () -> bool
+      def clear_plan_name: () -> void
+
+      # Name the sponsor is published under: the custom package's name once it is confirmed,
+      # otherwise plan_name. Absent while the plan is undetermined and no custom package is confirmed.
+      attr_reader displayed_plan_name(): ::String
+      attr_writer displayed_plan_name(): ::String | ::Symbol
+      def has_displayed_plan_name?: () -> bool
+      def clear_displayed_plan_name: () -> void
+
+      # The sponsor's note for billing, such as a contract to sign or a due date, as written. Absent
+      # when there is none.
+      attr_reader billing_request(): ::String
+      attr_writer billing_request(): ::String | ::Symbol
+      def has_billing_request?: () -> bool
+      def clear_billing_request: () -> void
+
+      # The sponsor's note on their plan, as written. Absent when there is none.
+      attr_reader customization_request(): ::String
+      attr_writer customization_request(): ::String | ::Symbol
+      def has_customization_request?: () -> bool
+      def clear_customization_request: () -> void
+
+      # Any other note from the sponsor, as written. Absent when there is none.
+      attr_reader note(): ::String
+      attr_writer note(): ::String | ::Symbol
+      def has_note?: () -> bool
+      def clear_note: () -> void
+
+      attr_reader _plan_name(): ::String?
+      def has__plan_name?: () -> bool
+      def clear__plan_name: () -> void
+
+      attr_reader _displayed_plan_name(): ::String?
+      def has__displayed_plan_name?: () -> bool
+      def clear__displayed_plan_name: () -> void
+
+      attr_reader _billing_request(): ::String?
+      def has__billing_request?: () -> bool
+      def clear__billing_request: () -> void
+
+      attr_reader _customization_request(): ::String?
+      def has__customization_request?: () -> bool
+      def clear__customization_request: () -> void
+
+      attr_reader _note(): ::String?
+      def has__note?: () -> bool
+      def clear__note: () -> void
+
+      type init_map = {
+        sponsorship: (::Rk::SponsorApp::SponsorshipSummary | ::Rk::SponsorApp::SponsorshipSummary::init_map)?,
+        "sponsorship" => (::Rk::SponsorApp::SponsorshipSummary | ::Rk::SponsorApp::SponsorshipSummary::init_map)?,
+        plan_name: (::String | ::Symbol)?,
+        "plan_name" => (::String | ::Symbol)?,
+        displayed_plan_name: (::String | ::Symbol)?,
+        "displayed_plan_name" => (::String | ::Symbol)?,
+        billing_request: (::String | ::Symbol)?,
+        "billing_request" => (::String | ::Symbol)?,
+        customization_request: (::String | ::Symbol)?,
+        "customization_request" => (::String | ::Symbol)?,
+        note: (::String | ::Symbol)?,
+        "note" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("sponsorship" name) -> ::Rk::SponsorApp::SponsorshipSummary?
+        | ("plan_name" name) -> ::String
+        | ("displayed_plan_name" name) -> ::String
+        | ("billing_request" name) -> ::String
+        | ("customization_request" name) -> ::String
+        | ("note" name) -> ::String
+
+      def []=:
+          ("sponsorship" name, ::Rk::SponsorApp::SponsorshipSummary? value) -> void
+        | ("plan_name" name, (::String | ::Symbol) value) -> void
+        | ("displayed_plan_name" name, (::String | ::Symbol) value) -> void
+        | ("billing_request" name, (::String | ::Symbol) value) -> void
+        | ("customization_request" name, (::String | ::Symbol) value) -> void
+        | ("note" name, (::String | ::Symbol) value) -> void
+    end
   end
 end
 
@@ -123,6 +726,17 @@ module Google
         | ("rubykaigi.sponsor_app.AdminServiceListConferencesResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceListConferencesResponse)])
         | ("rubykaigi.sponsor_app.AdminServiceGetConferenceRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceGetConferenceRequest)])
         | ("rubykaigi.sponsor_app.AdminServiceGetConferenceResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceGetConferenceResponse)])
+        | ("rubykaigi.sponsor_app.ConferenceInput" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ConferenceInput)])
+        | ("rubykaigi.sponsor_app.AdminServiceCreateConferenceRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCreateConferenceRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceCreateConferenceResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCreateConferenceResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceUpdateConferenceRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceUpdateConferenceRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceUpdateConferenceResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceUpdateConferenceResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceGetAttendeesKeeperRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceGetAttendeesKeeperRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceGetAttendeesKeeperResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceGetAttendeesKeeperResponse)])
+        | ("rubykaigi.sponsor_app.SponsorshipAttendees" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorshipAttendees)])
+        | ("rubykaigi.sponsor_app.AdminServiceListSponsorshipTableRowsRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceListSponsorshipTableRowsRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceListSponsorshipTableRowsResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceListSponsorshipTableRowsResponse)])
+        | ("rubykaigi.sponsor_app.SponsorshipTableRow" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorshipTableRow)])
         | ...
     end
   end

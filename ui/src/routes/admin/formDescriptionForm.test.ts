@@ -6,22 +6,20 @@ import { BadRequestSchema } from "../../gen/google/rpc/error_details_pb.ts";
 import { FormDescriptionInputSchema } from "../../gen/rubykaigi/sponsor_app/admin_form_descriptions_pb.ts";
 import { FormDescriptionSchema } from "../../gen/rubykaigi/sponsor_app/form_description_pb.ts";
 import { fieldViolations } from "../../lib/errors.ts";
+import { errorAnchor, erroredFields, fieldLabel } from "../../lib/fieldErrors.ts";
 import {
+  FORM_DESCRIPTION_LAYOUT,
   FORM_LOCALES,
   boothRequestFromInput,
   boothRequestToInput,
   collidingOptions,
   defaultLocale,
   emptyFallbackOption,
-  errorAnchor,
-  erroredFields,
   errorsAt,
-  fieldLabel,
   formValuesFrom,
   inputFrom,
   isBoothRequest,
   movedIndex,
-  parentPath,
   planChoices,
   withCollisions,
 } from "./formDescriptionForm.ts";
@@ -195,58 +193,48 @@ describe("defaultLocale", () => {
 });
 
 describe("field paths", () => {
-  it("step up one segment at a time", () => {
-    assert.equal(parentPath("fallbackOptions[1].conditions[0]"), "fallbackOptions[1].conditions");
-    assert.equal(parentPath("fallbackOptions[1].conditions"), "fallbackOptions[1]");
-    assert.equal(parentPath("fallbackOptions[1]"), "fallbackOptions");
-    assert.equal(parentPath("fallbackOptions"), undefined);
-  });
+  const anchor = (path: string) => errorAnchor(path, FORM_DESCRIPTION_LAYOUT);
+  const label = (path: string) => fieldLabel(path, FORM_DESCRIPTION_LAYOUT);
 
   it("show an error on a list of strings' element on the list", () => {
+    assert.equal(anchor("fallbackOptions[0].priorityHuman[2]"), "fallbackOptions[0].priorityHuman");
     assert.equal(
-      errorAnchor("fallbackOptions[0].priorityHuman[2]"),
-      "fallbackOptions[0].priorityHuman",
-    );
-    assert.equal(
-      errorAnchor("fallbackOptions[0].conditions[1].plans[0]"),
+      anchor("fallbackOptions[0].conditions[1].plans[0]"),
       "fallbackOptions[0].conditions[1].plans",
     );
-    assert.equal(
-      errorAnchor("fallbackOptions[0].conditions[1]"),
-      "fallbackOptions[0].conditions[1]",
-    );
-    assert.equal(errorAnchor("fallbackOptions[0]"), "fallbackOptions[0]");
+    assert.equal(anchor("fallbackOptions[0].conditions[1]"), "fallbackOptions[0].conditions[1]");
+    assert.equal(anchor("fallbackOptions[0]"), "fallbackOptions[0]");
   });
 
   it("are labelled as the editor labels their fields", () => {
-    assert.equal(fieldLabel("planHelp"), "Plan help");
-    assert.equal(fieldLabel("fallbackOptions"), "Fallback options");
-    assert.equal(fieldLabel("fallbackOptions[1].value"), "Option #2 › Value");
+    assert.equal(label("planHelp"), "Plan help");
+    assert.equal(label("fallbackOptions"), "Fallback options");
+    assert.equal(label("fallbackOptions[1].value"), "Option #2 › Value");
     assert.equal(
-      fieldLabel("fallbackOptions[0].conditions[2].boothRequest"),
+      label("fallbackOptions[0].conditions[2].boothRequest"),
       "Option #1 › Condition #3 › Booth",
     );
-    assert.equal(
-      fieldLabel("fallbackOptions[0].priorityHuman[1]"),
-      "Option #1 › Then, in order #2",
-    );
-    assert.equal(fieldLabel("unknownField"), "unknownField");
+    assert.equal(label("fallbackOptions[0].priorityHuman[1]"), "Option #1 › Then, in order #2");
+    assert.equal(label("unknownField"), "unknownField");
   });
 });
 
 describe("erroredFields", () => {
   it("lists errored fields in the editor's order, a list's element errors on the list", () => {
-    const fields = erroredFields({
-      "fallbackOptions[1].value": { errors: ["is required"] },
-      "fallbackOptions[0].priorityHuman[1]": { errors: ["must not be empty"] },
-      "fallbackOptions[0].priorityHuman[0]": { errors: ["too long"] },
-      "fallbackOptions[0].conditions[0]": {
-        errors: ["a condition must name plans or a booth request"],
+    const fields = erroredFields(
+      {
+        "fallbackOptions[1].value": { errors: ["is required"] },
+        "fallbackOptions[0].priorityHuman[1]": { errors: ["must not be empty"] },
+        "fallbackOptions[0].priorityHuman[0]": { errors: ["too long"] },
+        "fallbackOptions[0].conditions[0]": {
+          errors: ["a condition must name plans or a booth request"],
+        },
+        fallbackOptions: { errors: ["options sharing a value must differ in their conditions"] },
+        head: { errors: [] },
+        locale: { errors: [undefined, "value must be in list [en, ja]"] },
       },
-      fallbackOptions: { errors: ["options sharing a value must differ in their conditions"] },
-      head: { errors: [] },
-      locale: { errors: [undefined, "value must be in list [en, ja]"] },
-    });
+      FORM_DESCRIPTION_LAYOUT,
+    );
 
     assert.deepEqual(fields, [
       { path: "locale", label: "Locale", message: "value must be in list [en, ja]" },

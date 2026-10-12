@@ -1,5 +1,4 @@
 import {
-  Banner,
   Button,
   Checkbox,
   Collapsible,
@@ -12,7 +11,6 @@ import {
   TagInput,
   Text,
 } from "@cloudflare/kumo";
-import { ConnectError } from "@connectrpc/connect";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -20,10 +18,9 @@ import {
   ListPlusIcon,
   PlusIcon,
   TrashIcon,
-  WarningIcon,
 } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { generatePath, useNavigate, useParams } from "react-router";
 import { useSWRConfig } from "swr";
@@ -32,33 +29,32 @@ import type { FormDescription } from "../../gen/rubykaigi/sponsor_app/form_descr
 import { ProblemType } from "../../gen/rubykaigi/sponsor_app/problem_pb.ts";
 import { fieldViolations, problemTypeOf } from "../../lib/errors.ts";
 import type { FormErrors } from "../../lib/errors.ts";
+import { erroredFields } from "../../lib/fieldErrors.ts";
 import { useSaveRejection } from "../../lib/rejection.ts";
 import { isRpcKeyOf, useRpc, useRpcMutation } from "../../lib/rpc.ts";
 import { useDocumentTitle } from "../../lib/title.ts";
 import { toastManager } from "../../lib/toast.ts";
-import { RpcErrorDetails } from "../RouteError.tsx";
 import { paths } from "../paths.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
+import { SaveBar, SaveErrorBanner, useFieldReveal } from "./FormParts.tsx";
 import { SandboxedHtml } from "./SandboxedHtml.tsx";
 import {
   BOOTH_REQUEST_LABELS,
   FIELD_LABELS,
+  FORM_DESCRIPTION_LAYOUT,
   FORM_LOCALES,
   MARKDOWN_FIELDS,
   defaultLocale,
   emptyCondition,
   emptyFallbackOption,
-  erroredFields,
   errorsAt,
   formValuesFrom,
   inputFrom,
   isBoothRequest,
   movedIndex,
-  parentPath,
   planChoices,
   withCollisions,
 } from "./formDescriptionForm.ts";
-import type { FieldError } from "./formDescriptionForm.ts";
 
 // One page for new, show and edit: the HAML admin has all three, so each of its links lands here.
 export default function FormDescriptionEditor() {
@@ -115,14 +111,8 @@ function Editor({
   const [newLocale] = useState(() => defaultLocale(describedLocales));
   // The error of the last save, for its code and request ID.
   const [saveError, setSaveError] = useState<unknown>();
-  // A fresh object per failed save, so the same field is scrolled to again.
-  const [attention, setAttention] = useState<{ path: string }>();
-  const formRef = useRef<HTMLFormElement>(null);
+  const { formRef, reveal } = useFieldReveal();
   const rejection = useSaveRejection();
-
-  useEffect(() => {
-    if (attention !== undefined) revealField(formRef.current, attention.path);
-  }, [attention]);
 
   const form = useForm({
     defaultValues: formValuesFrom(saved, newLocale),
@@ -140,8 +130,8 @@ function Editor({
       } catch (error) {
         setSaveError(error);
         rejection.reject(formApi, value, withCollisions(saveErrors(error), value.fallbackOptions));
-        const [first] = erroredFields(formApi.state.fieldMeta);
-        if (first !== undefined) setAttention({ path: first.path });
+        const [first] = erroredFields(formApi.state.fieldMeta, FORM_DESCRIPTION_LAYOUT);
+        if (first !== undefined) reveal(first.path);
         return;
       }
       setSaveError(undefined);
@@ -494,26 +484,27 @@ function Editor({
       <form.Subscribe
         selector={(state) => ({
           formError: state.errorMap.onChange,
-          errored: erroredFields(state.fieldMeta),
+          errored: erroredFields(state.fieldMeta, FORM_DESCRIPTION_LAYOUT),
           isSubmitting: state.isSubmitting,
+          isDirty: state.isDirty,
         })}
       >
-        {({ formError, errored, isSubmitting }) => (
-          <div className="flex flex-col gap-3">
-            {(typeof formError === "string" || errored.length > 0) && (
+        {({ formError, errored, isSubmitting, isDirty }) => (
+          <SaveBar
+            isDirty={isDirty}
+            banner={
               <SaveErrorBanner
-                formError={typeof formError === "string" ? formError : undefined}
+                formError={formError}
                 errored={errored}
                 error={saveError}
-                onShow={(path) => setAttention({ path })}
+                onShow={reveal}
               />
-            )}
-            <div>
-              <Button type="submit" variant="primary" loading={isSubmitting}>
-                {saved === undefined ? "Create" : "Save"}
-              </Button>
-            </div>
-          </div>
+            }
+          >
+            <Button type="submit" variant="primary" loading={isSubmitting}>
+              {saved === undefined ? "Create" : "Save"}
+            </Button>
+          </SaveBar>
         )}
       </form.Subscribe>
     </form>
@@ -532,57 +523,6 @@ function saveErrors(error: unknown): FormErrors {
 const LOCALE_ITEMS = Object.fromEntries(FORM_LOCALES.map((locale) => [locale, locale]));
 
 const PLANS_HELP = `Any of these. Leave all unchecked to match any plan, with ${FIELD_LABELS.boothRequest} set to ${BOOTH_REQUEST_LABELS.requested} or ${BOOTH_REQUEST_LABELS.not_requested}.`;
-
-// Beside the Save button, so a rejected save is seen whichever field it concerns.
-function SaveErrorBanner({
-  formError,
-  errored,
-  error,
-  onShow,
-}: {
-  formError: string | undefined;
-  errored: readonly FieldError[];
-  error: unknown;
-  onShow: (path: string) => void;
-}) {
-  const [first] = errored;
-  return (
-    <Banner
-      variant="error"
-      icon={<WarningIcon />}
-      title="Not saved"
-      description={
-        <div className="flex flex-col gap-2">
-          {formError !== undefined && <div>{formError}</div>}
-          {first !== undefined && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span>
-                {errored.length === 1
-                  ? `${first.label}: ${first.message}`
-                  : `${errored.length} fields need attention, starting with ${first.label}: ${first.message}`}
-              </span>
-              <Button variant="secondary" size="sm" onClick={() => onShow(first.path)}>
-                Show
-              </Button>
-            </div>
-          )}
-          {error !== undefined && <RpcErrorDetails error={ConnectError.from(error)} withCode />}
-        </div>
-      }
-    />
-  );
-}
-
-// Scrolls to the field at a path, or else the nearest one enclosing it, and focuses a text field.
-function revealField(form: HTMLFormElement | null, path: string): void {
-  for (let at: string | undefined = path; at !== undefined; at = parentPath(at)) {
-    const element = form?.querySelector<HTMLElement>(`[data-field="${CSS.escape(at)}"]`);
-    if (element === null || element === undefined) continue;
-    element.scrollIntoView({ behavior: "smooth", block: "center" });
-    if (element.matches("input, textarea")) element.focus({ preventScroll: true });
-    return;
-  }
-}
 
 function joined(errors: readonly unknown[]): string | undefined {
   const messages = errors.filter((error): error is string => typeof error === "string");

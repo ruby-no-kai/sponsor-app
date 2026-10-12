@@ -31,7 +31,7 @@ export default function ConferenceList() {
           Conferences
         </Text>
         {viewer !== undefined && !viewer.restricted && (
-          <LinkButton href="/admin/conferences/new" variant="primary" icon={PlusIcon}>
+          <LinkButton href={paths.conferenceNew} variant="primary" icon={PlusIcon}>
             New conference
           </LinkButton>
         )}

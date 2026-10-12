@@ -4,7 +4,7 @@
 
 import type { GenFile, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { AdminServiceGetConferenceRequestSchema, AdminServiceGetConferenceResponseSchema, AdminServiceListConferencesRequestSchema, AdminServiceListConferencesResponseSchema } from "./admin_conferences_pb.ts";
+import type { AdminServiceCreateConferenceRequestSchema, AdminServiceCreateConferenceResponseSchema, AdminServiceGetAttendeesKeeperRequestSchema, AdminServiceGetAttendeesKeeperResponseSchema, AdminServiceGetConferenceRequestSchema, AdminServiceGetConferenceResponseSchema, AdminServiceListConferencesRequestSchema, AdminServiceListConferencesResponseSchema, AdminServiceListSponsorshipTableRowsRequestSchema, AdminServiceListSponsorshipTableRowsResponseSchema, AdminServiceUpdateConferenceRequestSchema, AdminServiceUpdateConferenceResponseSchema } from "./admin_conferences_pb.ts";
 import { file_rubykaigi_sponsor_app_admin_conferences } from "./admin_conferences_pb.ts";
 import type { AdminServiceCreateFormDescriptionRequestSchema, AdminServiceCreateFormDescriptionResponseSchema, AdminServiceGetFormDescriptionRequestSchema, AdminServiceGetFormDescriptionResponseSchema, AdminServiceUpdateFormDescriptionRequestSchema, AdminServiceUpdateFormDescriptionResponseSchema } from "./admin_form_descriptions_pb.ts";
 import { file_rubykaigi_sponsor_app_admin_form_descriptions } from "./admin_form_descriptions_pb.ts";
@@ -15,7 +15,7 @@ import { file_rubykaigi_sponsor_app_admin_viewer } from "./admin_viewer_pb.ts";
  * Describes the file rubykaigi/sponsor_app/admin_service.proto.
  */
 export const file_rubykaigi_sponsor_app_admin_service: GenFile = /*@__PURE__*/
-  fileDesc("CilydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fc2VydmljZS5wcm90bxIVcnVieWthaWdpLnNwb25zb3JfYXBwMuoHCgxBZG1pblNlcnZpY2USjQEKD0xpc3RDb25mZXJlbmNlcxI5LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VMaXN0Q29uZmVyZW5jZXNSZXF1ZXN0GjoucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUxpc3RDb25mZXJlbmNlc1Jlc3BvbnNlIgOQAgEShwEKDUdldENvbmZlcmVuY2USNy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Q29uZmVyZW5jZVJlcXVlc3QaOC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Q29uZmVyZW5jZVJlc3BvbnNlIgOQAgESlgEKEkdldEZvcm1EZXNjcmlwdGlvbhI8LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VHZXRGb3JtRGVzY3JpcHRpb25SZXF1ZXN0Gj0ucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUdldEZvcm1EZXNjcmlwdGlvblJlc3BvbnNlIgOQAgESmgEKFUNyZWF0ZUZvcm1EZXNjcmlwdGlvbhI/LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VDcmVhdGVGb3JtRGVzY3JpcHRpb25SZXF1ZXN0GkAucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUNyZWF0ZUZvcm1EZXNjcmlwdGlvblJlc3BvbnNlEpoBChVVcGRhdGVGb3JtRGVzY3JpcHRpb24SPy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlVXBkYXRlRm9ybURlc2NyaXB0aW9uUmVxdWVzdBpALnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VVcGRhdGVGb3JtRGVzY3JpcHRpb25SZXNwb25zZRJ7CglHZXRWaWV3ZXISMy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Vmlld2VyUmVxdWVzdBo0LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VHZXRWaWV3ZXJSZXNwb25zZSIDkAIBEnAKB1NpZ25PdXQSMS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlU2lnbk91dFJlcXVlc3QaMi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlU2lnbk91dFJlc3BvbnNlQhHqAg5Sazo6U3BvbnNvckFwcGIGcHJvdG8z", [file_rubykaigi_sponsor_app_admin_conferences, file_rubykaigi_sponsor_app_admin_form_descriptions, file_rubykaigi_sponsor_app_admin_viewer]);
+  fileDesc("CilydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fc2VydmljZS5wcm90bxIVcnVieWthaWdpLnNwb25zb3JfYXBwMsoMCgxBZG1pblNlcnZpY2USjQEKD0xpc3RDb25mZXJlbmNlcxI5LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VMaXN0Q29uZmVyZW5jZXNSZXF1ZXN0GjoucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUxpc3RDb25mZXJlbmNlc1Jlc3BvbnNlIgOQAgEShwEKDUdldENvbmZlcmVuY2USNy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Q29uZmVyZW5jZVJlcXVlc3QaOC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Q29uZmVyZW5jZVJlc3BvbnNlIgOQAgESiwEKEENyZWF0ZUNvbmZlcmVuY2USOi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlQ3JlYXRlQ29uZmVyZW5jZVJlcXVlc3QaOy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlQ3JlYXRlQ29uZmVyZW5jZVJlc3BvbnNlEosBChBVcGRhdGVDb25mZXJlbmNlEjoucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZVVwZGF0ZUNvbmZlcmVuY2VSZXF1ZXN0GjsucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZVVwZGF0ZUNvbmZlcmVuY2VSZXNwb25zZRKWAQoSR2V0QXR0ZW5kZWVzS2VlcGVyEjwucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUdldEF0dGVuZGVlc0tlZXBlclJlcXVlc3QaPS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0QXR0ZW5kZWVzS2VlcGVyUmVzcG9uc2UiA5ACARKoAQoYTGlzdFNwb25zb3JzaGlwVGFibGVSb3dzEkIucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUxpc3RTcG9uc29yc2hpcFRhYmxlUm93c1JlcXVlc3QaQy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlTGlzdFNwb25zb3JzaGlwVGFibGVSb3dzUmVzcG9uc2UiA5ACARKWAQoSR2V0Rm9ybURlc2NyaXB0aW9uEjwucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUdldEZvcm1EZXNjcmlwdGlvblJlcXVlc3QaPS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Rm9ybURlc2NyaXB0aW9uUmVzcG9uc2UiA5ACARKaAQoVQ3JlYXRlRm9ybURlc2NyaXB0aW9uEj8ucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUNyZWF0ZUZvcm1EZXNjcmlwdGlvblJlcXVlc3QaQC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlQ3JlYXRlRm9ybURlc2NyaXB0aW9uUmVzcG9uc2USmgEKFVVwZGF0ZUZvcm1EZXNjcmlwdGlvbhI/LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VVcGRhdGVGb3JtRGVzY3JpcHRpb25SZXF1ZXN0GkAucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZVVwZGF0ZUZvcm1EZXNjcmlwdGlvblJlc3BvbnNlEnsKCUdldFZpZXdlchIzLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VHZXRWaWV3ZXJSZXF1ZXN0GjQucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUdldFZpZXdlclJlc3BvbnNlIgOQAgEScAoHU2lnbk91dBIxLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VTaWduT3V0UmVxdWVzdBoyLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VTaWduT3V0UmVzcG9uc2VCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_rubykaigi_sponsor_app_admin_conferences, file_rubykaigi_sponsor_app_admin_form_descriptions, file_rubykaigi_sponsor_app_admin_viewer]);
 
 /**
  * The staff area: conferences, their sponsorships and everything organizers manage.
@@ -59,6 +59,49 @@ export const AdminService: GenService<{
     methodKind: "unary";
     input: typeof AdminServiceGetConferenceRequestSchema;
     output: typeof AdminServiceGetConferenceResponseSchema;
+  },
+  /**
+   * Creates a conference. Restricted staff are answered `permission_denied`. A slug another
+   * conference has is answered with PROBLEM_TYPE_INVALID_RECORD.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.AdminService.CreateConference
+   */
+  createConference: {
+    methodKind: "unary";
+    input: typeof AdminServiceCreateConferenceRequestSchema;
+    output: typeof AdminServiceCreateConferenceResponseSchema;
+  },
+  /**
+   * Replaces every writable field of a conference. Restricted staff are answered
+   * `permission_denied`. A slug another conference has is answered with
+   * PROBLEM_TYPE_INVALID_RECORD.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.AdminService.UpdateConference
+   */
+  updateConference: {
+    methodKind: "unary";
+    input: typeof AdminServiceUpdateConferenceRequestSchema;
+    output: typeof AdminServiceUpdateConferenceResponseSchema;
+  },
+  /**
+   * Returns the conference tickets that each active sponsorship of a conference receives.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.AdminService.GetAttendeesKeeper
+   */
+  getAttendeesKeeper: {
+    methodKind: "unary";
+    input: typeof AdminServiceGetAttendeesKeeperRequestSchema;
+    output: typeof AdminServiceGetAttendeesKeeperResponseSchema;
+  },
+  /**
+   * Lists every sponsorship of a conference with its plan and the notes its application carries.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.AdminService.ListSponsorshipTableRows
+   */
+  listSponsorshipTableRows: {
+    methodKind: "unary";
+    input: typeof AdminServiceListSponsorshipTableRowsRequestSchema;
+    output: typeof AdminServiceListSponsorshipTableRowsResponseSchema;
   },
   /**
    * Returns a conference's application form description in one locale.

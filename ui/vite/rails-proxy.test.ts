@@ -47,7 +47,7 @@ describe("destinationOf", () => {
     for (const url of [
       "/",
       "/admin/conferences/rubykaigi2048/plans",
-      "/admin/conferences/new",
+      "/admin/conferences/rubykaigi2048/sponsors_yml",
       "/admin/session/new?back_to=%2Fadmin",
       "/auth/github/callback",
       "/conferences/rubykaigi2048/sponsorship",

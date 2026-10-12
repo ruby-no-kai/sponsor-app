@@ -6,7 +6,11 @@ export const paths = {
   // Conferences
   admin: "/admin",
   conferences: "/admin/conferences",
+  conferenceNew: "/admin/conferences/new",
   conference: "/admin/conferences/:slug",
+  conferenceEdit: "/admin/conferences/:slug/edit",
+  attendeesKeeper: "/admin/conferences/:slug/attendees_keeper",
+  sponsorshipTable: "/admin/conferences/:slug/table_view",
 
   // Form descriptions
   formDescriptionNew: "/admin/conferences/:slug/form_descriptions/new",
@@ -43,7 +47,7 @@ export const paths = {
 const SPA_PATHS: readonly string[] = Object.values(paths);
 
 // HAML pages that a pattern above would otherwise match. Drop an entry once the SPA renders it.
-const RAILS_PATHS: readonly string[] = ["/admin/conferences/new"];
+const RAILS_PATHS: readonly string[] = [];
 
 const matches = (patterns: readonly string[], pathname: string) =>
   patterns.some((path) => matchPath({ path, end: true }, pathname) !== null);
