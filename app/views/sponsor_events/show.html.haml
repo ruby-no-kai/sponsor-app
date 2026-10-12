@@ -67,11 +67,11 @@
         .card-header= t('.actions')
         .card-body
           %p.card-text
-            = link_to t('.edit'), edit_user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), class: 'btn btn-primary'
+            = link_to t('.edit'), edit_user_conference_sponsorship_event_path(conference_slug: current_conference, id: @sponsor_event), class: 'btn btn-primary'
 
           %hr
           %p.card-text.text-danger
-            = button_to t('.withdraw'), user_conference_sponsorship_event_path(conference: current_conference, id: @sponsor_event), method: :delete, class: 'btn btn-outline-danger', data: { confirm: t('.withdraw_confirm') }
+            = button_to t('.withdraw'), user_conference_sponsorship_event_path(conference_slug: current_conference, id: @sponsor_event), method: :delete, class: 'btn btn-outline-danger', data: { confirm: t('.withdraw_confirm') }
 
 %p.mt-4
-  = link_to t('.back_to_sponsorship'), user_conference_sponsorship_path(conference: current_conference), class: 'btn btn-secondary'
+  = link_to t('.back_to_sponsorship'), user_conference_sponsorship_path(conference_slug: current_conference), class: 'btn btn-secondary'

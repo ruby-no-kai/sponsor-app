@@ -3,7 +3,7 @@
 class SponsorshipsController < ApplicationController
   def show
     unless current_sponsorship
-      return redirect_to new_user_conference_sponsorship_path(conference: @conference)
+      return redirect_to new_user_conference_sponsorship_path(conference_slug: params[:conference_slug])
     end
 
     @sponsorship = current_sponsorship
@@ -20,7 +20,8 @@ class SponsorshipsController < ApplicationController
   def edit
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
-    raise ActiveRecord::RecordNotFound if !@conference&.amendment_open? && !current_staff
+    raise ActiveRecord::RecordNotFound unless @conference
+    raise ActiveRecord::RecordNotFound if !@conference.amendment_open? && !current_staff
 
     @sponsorship.build_nested_attributes_associations
   end
@@ -78,7 +79,7 @@ class SponsorshipsController < ApplicationController
         (session[:sponsorship_ids] ||= []).unshift @sponsorship.id
         session[:asset_file_ids]&.delete(@sponsorship.asset_file.id)
         SponsorshipWelcomeJob.perform_later(@sponsorship)
-        format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: t('.notice') }
+        format.html { redirect_to user_conference_sponsorship_path(conference_slug: @conference), notice: t('.notice') }
       else
         @sponsorship.build_nested_attributes_associations
         format.html { render :new }
@@ -89,7 +90,8 @@ class SponsorshipsController < ApplicationController
   def update
     @sponsorship = current_sponsorship
     @conference = current_sponsorship&.conference
-    raise ActiveRecord::RecordNotFound unless @conference&.amendment_open?
+    raise ActiveRecord::RecordNotFound unless @conference
+    raise ActiveRecord::RecordNotFound if !@conference.amendment_open? && !current_staff
 
     sp = sponsorship_params
     sp.delete(:asset_file_id) if @sponsorship.asset_file_id
@@ -99,7 +101,7 @@ class SponsorshipsController < ApplicationController
     respond_to do |format|
       if @sponsorship.save(context: :update_by_user)
         ProcessSponsorshipEditJob.perform_later(@sponsorship.last_editing_history)
-        format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: 'Your application was successfully updated.' }
+        format.html { redirect_to user_conference_sponsorship_path(conference_slug: @conference), notice: 'Your application was successfully updated.' }
       else
         format.html { render :edit }
       end
@@ -113,10 +115,10 @@ class SponsorshipsController < ApplicationController
       :url,
       :profile,
       :asset_file_id,
-      :asset_file_id_to_copy,
       :booth_requested,
       :fallback_option,
       :number_of_additional_attendees,
+      :policy_agreement,
       contact_attributes: %i(id email email_cc address organization unit name),
       alternate_billing_contact_attributes: %i(_keep id email address organization unit name),
       billing_request_attributes: %i(id body),

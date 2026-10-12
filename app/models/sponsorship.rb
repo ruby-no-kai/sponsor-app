@@ -88,7 +88,7 @@ class Sponsorship < ApplicationRecord
   validate :validate_word_count, on: :update_by_user
   validate :validate_no_plan_allowance, on: :update_by_user
   validate :validate_fallback_option, on: :update_by_user
-  validate :policy_agreement
+  validate :validate_policy_agreement, on: :update_by_user, if: :new_record?
 
   accepts_nested_attributes_for :contact, allow_destroy: true, reject_if: ->(attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :alternate_billing_contact, allow_destroy: true, reject_if: ->(attrs) { attrs['kind'].present? }
@@ -165,7 +165,7 @@ class Sponsorship < ApplicationRecord
   end
 
   def policy_agreement=(other)
-    @policy_agreement = !!other
+    @policy_agreement = ActiveModel::Type::Boolean.new.cast(other)
   end
 
   def billing_contact
