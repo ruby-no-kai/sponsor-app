@@ -194,7 +194,7 @@ mise run lint:proto     # buf lint and buf format check
 
 - Never edit generated files under `gen/`. Edit `proto/`, run `mise run gen`, and commit its output with the `.proto` change. hk's pre-commit hook regenerates and stages it, and CI fails when it is stale.
 - `gen/proto/ruby/` also holds hand-written files the generator keeps: the gemspec and `lib/sponsor_app-proto.rb`.
-- Message classes cannot be reloaded, as google-protobuf raises when a descriptor is registered twice. Restart Rails after regenerating.
+- Message classes cannot be reloaded, as google-protobuf raises when a descriptor is registered twice. The Procfile's `proto` process regenerates `gen/` on `.proto` edits, and its `web` process restarts Rails when `gen/proto/ruby/` changes.
 - Sorbet ignores the generated `.rbs`. Message types come from tapioca's Protobuf DSL compiler.
 
 ## Development Notes

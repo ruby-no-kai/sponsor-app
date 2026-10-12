@@ -4,6 +4,7 @@ buf = "1.73.0"
 # The protobuf release that google-protobuf in Gemfile.lock is built from. Another
 # release emits different code.
 "aqua:protocolbuffers/protobuf/protoc" = "36.2"
+watchexec = "2.7.4"
 
 [env]
 # sorbet-static ships only precompiled platform gems, which a `ruby` lockfile
@@ -62,3 +63,8 @@ run = [
   "buf lint",
   "buf format --diff --exit-code",
 ]
+
+# $PORT is the one trustless allocates, so the inner shell expands it.
+[tasks.server]
+description = "Rails server behind trustless"
+run = "trustless exec sponsor-app bash -c 'bin/rails s --port $PORT'"
