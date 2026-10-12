@@ -19,6 +19,7 @@ RSpec.describe "Admin Expense Files", type: :request do
       file.filename = 'receipt.pdf'
       file.save!
 
+      allow(Aws::S3::Client).to receive(:new).and_return(instance_double(Aws::S3::Client))
       presigner = instance_double(Aws::S3::Presigner)
       allow(Aws::S3::Presigner).to receive(:new).and_return(presigner)
       allow(presigner).to receive(:presigned_url).and_return("https://s3.example.com/presigned")

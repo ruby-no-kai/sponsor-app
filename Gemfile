@@ -60,6 +60,7 @@ group :development, :test do
 
   gem 'letter_opener_web'
   gem 'rspec-rails'
+  gem 'webmock', require: false
   gem 'factory_bot_rails'
 
   gem "rubocop", require: false
