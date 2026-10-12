@@ -192,6 +192,14 @@ RSpec.describe TitoTicketRetraction, type: :model do
       expect(result).to eq(retraction)
       expect(retraction.tito_registration).to eq(api_response[:registration])
     end
+
+    it 'raises when the conference has no tito_slug' do
+      conference.update!(tito_slug: nil)
+      allow(mock_api).to receive(:get_registration)
+
+      expect { retraction.refresh_tito_registration(api: mock_api) }.to raise_error(Must::Violation)
+      expect(mock_api).not_to have_received(:get_registration)
+    end
   end
 
   describe '#preconditions' do
@@ -353,6 +361,14 @@ RSpec.describe TitoTicketRetraction, type: :model do
 
       it 'properly encodes the slug' do
         expect(retraction.tito_admin_url).to include('john%2Bdoe%40example.com')
+      end
+    end
+
+    context 'without a conference' do
+      let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :with_tito_registration, sponsorship:, conference: nil) }
+
+      it 'raises' do
+        expect { retraction.tito_admin_url }.to raise_error(Must::Violation)
       end
     end
   end

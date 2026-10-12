@@ -1,6 +1,7 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
+# @requires_ancestor: ActiveRecord::Base
 module EditingHistory
   extend ActiveSupport::Concern
 
@@ -13,7 +14,7 @@ module EditingHistory
   end
 
   def diff_summary
-    diff.map { |d| "#{d[0]}#{d[1]}" }
+    Must.because(diff) { "diff is calculated before validation" }.map { |d| "#{d[0]}#{d[1]}" }
   end
 
   private def calculate_diff
@@ -24,7 +25,7 @@ module EditingHistory
 
   private def last_raw
     @last_raw ||= if persisted?
-      target.editing_histories.order(id: :desc).where('id < ?', id).first&.raw || {}
+      Must.expect(target).editing_histories.order(id: :desc).where('id < ?', id).first&.raw || {}
     else
       target&.editing_histories&.order(id: :desc)&.first&.raw || {}
     end

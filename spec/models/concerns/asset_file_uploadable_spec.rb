@@ -32,4 +32,10 @@ RSpec.describe AssetFileUploadable do
       )
     end
   end
+
+  describe '.asset_file_bucket' do
+    it 'is available on including models' do
+      expect(ExpenseFile.asset_file_bucket).to eq(Rails.application.config.x.asset_file_uploadable.bucket)
+    end
+  end
 end

@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 class TitoTicketRetraction < ApplicationRecord
@@ -23,7 +23,8 @@ class TitoTicketRetraction < ApplicationRecord
   end
 
   def refresh_tito_registration(api: TitoApi.new)
-    self.tito_registration = api.get_registration(sponsorship.conference.tito_slug, tito_registration_id, 'expand' => 'tickets').fetch(:registration)
+    tito_slug = Must.because(Must.expect(Must.expect(sponsorship).conference).tito_slug) { "retractions are only made on conferences with a tito_slug" }
+    self.tito_registration = api.get_registration(tito_slug, tito_registration_id, 'expand' => 'tickets').fetch(:registration)
     self
   end
 
@@ -62,7 +63,7 @@ class TitoTicketRetraction < ApplicationRecord
   end
 
   def tito_admin_url
-    "https://dashboard.tito.io/#{conference.tito_slug}/registrations/#{URI.encode_www_form_component(tito_registration&.fetch("slug")&.to_s)}"
+    "https://dashboard.tito.io/#{Must.expect(conference).tito_slug}/registrations/#{URI.encode_www_form_component(tito_registration&.fetch("slug")&.to_s)}"
   end
 
   def ticket_release_slugs

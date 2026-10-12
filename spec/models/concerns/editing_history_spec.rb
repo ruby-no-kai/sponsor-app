@@ -84,6 +84,11 @@ RSpec.describe EditingHistory do
       history.diff = []
       expect(history.diff_summary).to eq([])
     end
+
+    it 'raises before the diff is calculated' do
+      history = SponsorshipEditingHistory.new(sponsorship:, raw: {name: 'Test'})
+      expect { history.diff_summary }.to raise_error(Must::Violation)
+    end
   end
 
   describe '#last_raw (private method)' do
@@ -148,6 +153,14 @@ RSpec.describe EditingHistory do
 
         last_raw = history.send(:last_raw)
         expect(last_raw).to eq({})
+      end
+
+      it 'raises without a target' do
+        history = SponsorshipEditingHistory.create!(sponsorship:, raw: {'name' => 'First'})
+        history.sponsorship = nil
+        history.instance_variable_set(:@last_raw, nil)
+
+        expect { history.send(:last_raw) }.to raise_error(Must::Violation)
       end
     end
   end

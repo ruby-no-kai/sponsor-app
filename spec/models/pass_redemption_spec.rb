@@ -103,4 +103,33 @@ RSpec.describe PassRedemption do
       end
     end
   end
+
+  describe '.list_for_sponsorship' do
+    let(:api) { instance_double(TitoApi, list_registrations: {registrations: [], meta: {total_pages: 1}}) }
+
+    before do
+      allow(TitoApi).to receive(:new).and_return(api)
+    end
+
+    it "lists registrations from the sponsorship's source" do
+      TitoSource.create!(conference:, sponsorship:, tito_source_id: '1')
+
+      expect(described_class.list_for_sponsorship(sponsorship).registrations).to be_empty
+      expect(api).to have_received(:list_registrations).with(
+        'rubykaigi/2025',
+        hash_including('search[source]' => sponsorship.tito_source_code),
+      )
+    end
+
+    it 'raises until the source exists on Tito' do
+      expect { described_class.list_for_sponsorship(sponsorship) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it 'raises when the conference has no tito_slug' do
+      conference.update!(tito_slug: nil)
+      TitoSource.create!(conference:, sponsorship:, tito_source_id: '1')
+
+      expect { described_class.list_for_sponsorship(sponsorship) }.to raise_error(Must::Violation)
+    end
+  end
 end

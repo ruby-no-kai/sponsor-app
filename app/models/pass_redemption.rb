@@ -89,10 +89,13 @@ class PassRedemption
   end
 
   def self.list_for_sponsorship(sponsorship)
-    source = TitoSource.find_by!(sponsorship:, conference: sponsorship.conference)
-    list_for_source_id(sponsorship.conference.tito_slug, source.code, sponsorship:)
+    conference = Must.expect(sponsorship.conference)
+    # Raises RecordNotFound until the sponsorship's source exists on Tito.
+    TitoSource.find_by!(sponsorship:, conference:)
+    tito_slug = Must.because(conference.tito_slug) { "PassRedemptionsController requires a tito_slug" }
+    list_for_source_id(tito_slug, sponsorship.tito_source_code, sponsorship:)
   rescue PaginationNotSupported
-    raise PaginationNotSupported, "Pagination not supported, encountered for #{sponsorship.name.inspect} on event=#{sponsorship.conference.slug.inspect}"
+    raise PaginationNotSupported, "Pagination not supported, encountered for #{sponsorship.name.inspect} on event=#{Must.expect(sponsorship.conference).slug.inspect}"
   end
 
   def self.list_for_source_id(tito_event, source, sponsorship: nil)
