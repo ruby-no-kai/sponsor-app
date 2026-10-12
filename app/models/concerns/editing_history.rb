@@ -18,9 +18,7 @@ module EditingHistory
   end
 
   private def calculate_diff
-    if last_raw && !diff
-      self.diff = Hashdiff.diff(last_raw, raw)
-    end
+    self.diff = Hashdiff.diff(last_raw, raw) unless diff
   end
 
   private def last_raw
