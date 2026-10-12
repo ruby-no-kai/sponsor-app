@@ -1,116 +1,148 @@
+# typed: strict
 # frozen_string_literal: true
 
 # XXX: move this to somewhere else (is this a model???)
 
 class TitoApi
-  ENDPOINT = "https://api.tito.io/v3"
+  #: type json_object = Hash[Symbol, untyped]
+  #: type query = Hash[String | Symbol, String | Array[String]]
 
+  ENDPOINT = "https://api.tito.io/v3" #: String
+  DEFAULT_TIMEOUT = 20 #: Integer
+  CONNECT_TIMEOUT = 3 #: Integer
+
+  #: (?token: String?, ?endpoint: String) -> void
   def initialize(token: Rails.application.config.x.tito.token, endpoint: ENDPOINT)
-    @token = token
-    @endpoint = ENDPOINT
-    raise ArgumentError, "token is blank" if @token.blank?
+    @token = token.presence || raise(ArgumentError, "token is blank") #: String
+    @endpoint = endpoint
+    @http = nil #: HTTPX::Session?
   end
 
-  attr_reader :token, :endpoint
+  #: String
+  attr_reader :token
 
+  #: String
+  attr_reader :endpoint
+
+  #: (String, String) -> json_object
   def get_release(slug, release_slug)
-    get("#{slug}/releases/#{escape(release_slug)}").body
+    get("#{slug}/releases/#{escape(release_slug)}")
   end
 
+  #: (String) -> json_object
   def list_releases(slug)
-    get("#{slug}/releases").body
+    get("#{slug}/releases")
   end
 
+  #: (String, String | Integer) -> json_object
   def get_discount_code(slug, discount_code_id)
-    get("#{slug}/discount_codes/#{escape(discount_code_id.to_s)}").body
+    get("#{slug}/discount_codes/#{escape(discount_code_id.to_s)}")
   end
 
+  #: (String, code: String, type: String, value: String, **untyped) -> json_object
   def create_discount_code(slug, code:, type:, value:, **kwargs)
-    post("#{slug}/discount_codes", discount_code: kwargs.merge(code: code, type: type, value: value)).body
+    post("#{slug}/discount_codes", discount_code: kwargs.merge(code: code, type: type, value: value))
   end
 
+  #: (String, String | Integer, code: String, type: String, value: String, **untyped) -> json_object
   def update_discount_code(slug, id, code:, type:, value:, **kwargs)
-    put("#{slug}/discount_codes/#{escape(id.to_s)}", discount_code: kwargs.merge(code: code, type: type, value: value)).body
+    put("#{slug}/discount_codes/#{escape(id.to_s)}", discount_code: kwargs.merge(code: code, type: type, value: value))
   end
 
+  #: (String, ?query) -> json_object
   def list_registrations(slug, query = {})
-    get("#{slug}/registrations", query.merge(version: '3.1')).body
+    get("#{slug}/registrations", query.merge(version: '3.1'))
   end
 
+  #: (String, String | Integer, ?query) -> json_object
   def get_registration(event_slug, registration_slug, query = {})
-    get("#{event_slug}/registrations/#{escape(registration_slug.to_s)}", query).body
+    # An explicit headers: keeps Sorbet from reading query as keyword arguments.
+    get("#{event_slug}/registrations/#{escape(registration_slug.to_s)}", query, headers: nil)
   end
 
+  #: (String, String | Integer) -> json_object
   def cancel_registration(event_slug, registration_slug)
-    post("#{event_slug}/registrations/#{escape(registration_slug.to_s)}/cancellation").body
+    post("#{event_slug}/registrations/#{escape(registration_slug.to_s)}/cancellation")
   end
 
+  #: (String, String | Integer, content: String) -> json_object
   def create_registration_note(event_slug, registration_slug, content:)
-    post("#{event_slug}/registrations/#{escape(registration_slug.to_s)}/notes", note: {content:}).body
+    post("#{event_slug}/registrations/#{escape(registration_slug.to_s)}/notes", note: {content:})
   end
 
+  #: (String, String) -> json_object
   def get_ticket(account_event_slug, ticket_slug)
-    get("#{account_event_slug}/tickets/#{escape(ticket_slug)}").body
+    get("#{account_event_slug}/tickets/#{escape(ticket_slug)}")
   end
 
+  #: (String, String, **untyped) -> json_object
   def patch_ticket(account_event_slug, ticket_slug, **kwargs)
-    patch("#{account_event_slug}/tickets/#{escape(ticket_slug)}", ticket: kwargs).body
+    patch("#{account_event_slug}/tickets/#{escape(ticket_slug)}", ticket: kwargs)
   end
 
+  #: (String, name: String, code: String, ?description: String, **untyped) -> json_object
   def create_source(slug, name:, code:, description: '', **kwargs)
-    post("#{slug}/sources", source: kwargs.merge(name:, code:, description:)).body
+    post("#{slug}/sources", source: kwargs.merge(name:, code:, description:))
   end
 
-  def default_headers
-    {
-      'Authorization' => "Token token=#{token}",
-    }
+  # Tito expects "Authorization: Token token=<token>".
+  #: () -> HTTPX::Session
+  def http
+    @http ||= HTTPX
+      .plugin(:auth)
+      .with(
+        origin: endpoint_uri.origin,
+        base_path: "#{endpoint_uri.path.chomp("/")}/",
+        headers: {'accept' => 'application/json'},
+        timeout: {connect_timeout: CONNECT_TIMEOUT, request_timeout: DEFAULT_TIMEOUT},
+        debug: Rails.logger,
+        debug_level: 2,
+        debug_redact: :headers,
+      )
+      .authorization("token=#{token}", auth_header_type: "Token")
   end
 
-  def faraday
-    @faraday ||= Faraday.new(headers: default_headers, url: endpoint) do |builder|
-      builder.use Faraday::Response::Logger, Rails.logger, bodies: true do |log|
-        log.filter(/^authorization:.+$/i, 'authorization: [redacted]')
-      end
-      builder.use FaradayMiddleware::ParseJson, content_type: /\bjson$/, parser_options: {symbolize_names: true}
-      builder.use FaradayMiddleware::EncodeJson
-      builder.use Faraday::Response::RaiseError
-
-      builder.adapter :net_http
-    end
-  end
-
+  #: (String, ?query, ?headers: Hash[String, String]?) -> json_object
   def get(path, params = {}, headers: nil)
     request(:get, path, params, nil, headers: headers)
   end
 
+  #: (String, ?params: query, ?body: json_object?, ?headers: Hash[String, String]?, **untyped) -> json_object
   def put(path, params: {}, body: nil, headers: nil, **bodyhash)
     request(:put, path, params, body || bodyhash, headers: headers)
   end
 
+  #: (String, ?params: query, ?body: json_object?, ?headers: Hash[String, String]?, **untyped) -> json_object
   def patch(path, params: {}, body: nil, headers: nil, **bodyhash)
     request(:patch, path, params, body || bodyhash, headers: headers)
   end
 
-  def post(path, params: {}, body: nil, headers: nil, timeout: 20, **bodyhash)
+  #: (String, ?params: query, ?body: json_object?, ?headers: Hash[String, String]?, ?timeout: Integer, **untyped) -> json_object
+  def post(path, params: {}, body: nil, headers: nil, timeout: DEFAULT_TIMEOUT, **bodyhash)
     request(:post, path, params, body || bodyhash, headers: headers, timeout: timeout)
   end
 
-  def request(method, path, params = {}, body, conn: faraday, headers: nil, timeout: 20)
-    conn.send(method) do |req|
-      req.url(path, params)
-      if body
-        req.body = body
-        req.headers['Accept'] = 'application/json'
-        req.headers['Content-Type'] = 'application/json'
-      end
-      req.headers.update(headers) if headers
-      req.options.timeout = timeout
-      req.options.open_timeout = 3
-    end
+  #: (Symbol, String, ?query, json_object?, ?headers: Hash[String, String]?, ?timeout: Integer) -> json_object
+  def request(method, path, params = {}, body, headers: nil, timeout: DEFAULT_TIMEOUT)
+    options = {params:} #: Hash[Symbol, untyped]
+    options[:json] = body if body
+    options[:headers] = headers if headers
+
+    session = http.with(timeout: {connect_timeout: CONNECT_TIMEOUT, request_timeout: timeout})
+    response = session.request(method, path, **options)
+    response.raise_for_status
+    return {} if response.body.empty?
+
+    response.json(symbolize_names: true)
   end
 
+  #: (String) -> String
   def escape(x)
     URI.encode_www_form_component(x)
+  end
+
+  #: () -> URI::Generic
+  private def endpoint_uri
+    URI(endpoint)
   end
 end

@@ -20,8 +20,7 @@ gem 'omniauth-github'
 gem 'octokit'
 gem 'jwt'
 gem 'hashdiff'
-gem 'faraday'
-gem 'faraday_middleware'
+gem 'httpx'
 
 gem 'nokogiri', require: false
 gem 'rexml', require: false # letter-opener
@@ -60,8 +59,8 @@ group :development, :test do
 
   gem 'letter_opener_web'
   gem 'rspec-rails'
-  gem 'webmock', require: false
   gem 'factory_bot_rails'
+  gem 'webmock', require: false
 
   gem "rubocop", require: false
   gem "rubocop-shopify", require: false
