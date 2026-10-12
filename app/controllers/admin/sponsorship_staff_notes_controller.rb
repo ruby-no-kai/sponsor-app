@@ -4,21 +4,16 @@
 module Admin
   class SponsorshipStaffNotesController < Admin::ApplicationController
     before_action :set_conference
+    before_action :set_sponsorship
     before_action :set_staff_note, only: [:edit, :update, :destroy]
 
     def index
-      @sponsorship = Sponsorship.find(params[:sponsorship_id])
-      @conference = @sponsorship.conference
-
       @new_staff_note = SponsorshipStaffNote.new
       @new_staff_note.sponsorship = @sponsorship
       @staff_notes = @sponsorship.staff_notes.order(stickiness: :desc, created_at: :desc).includes(:staff)
     end
 
     def create
-      @sponsorship = Sponsorship.find(params[:sponsorship_id])
-      @conference = @sponsorship.conference
-
       @staff_note = SponsorshipStaffNote.new(staff_note_params)
       @staff_note.staff = current_staff
       @staff_note.sponsorship = @sponsorship
@@ -83,9 +78,12 @@ module Admin
       check_staff_conference_authorization!(@conference)
     end
 
+    private def set_sponsorship
+      @sponsorship = Sponsorship.where(conference: @conference).find(params[:sponsorship_id])
+    end
+
     private def set_staff_note
-      @staff_note = SponsorshipStaffNote.where(conference: @conference).find(params[:id])
-      @sponsorship = @staff_note.sponsorship
+      @staff_note = @sponsorship.staff_notes.find(params[:id])
     end
 
     private def staff_note_params

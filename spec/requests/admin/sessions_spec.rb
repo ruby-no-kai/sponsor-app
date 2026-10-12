@@ -122,4 +122,19 @@ RSpec.describe "GET /auth/github/callback", type: :request do
       expect(staff.restricted_repos).to eq([restricted_repo])
     end
   end
+
+  context "with an unsupported provider" do
+    around do |example|
+      Rails.application.env_config['omniauth.auth'] = OmniAuth::AuthHash.new(provider: 'developer', uid: '12345', info: {name: 'Octo Cat'})
+      example.run
+    ensure
+      Rails.application.env_config.delete('omniauth.auth')
+    end
+
+    it "responds not found without signing in" do
+      get '/auth/developer/callback'
+      expect(response).to have_http_status(:not_found)
+      expect(Staff.find_by(uid: '12345')).to be_nil
+    end
+  end
 end

@@ -13,7 +13,7 @@ module Admin
 
     def slacktown
       SlackWebhookJob.perform_later(
-        text: "This is SlackWebhookJob Test Notification invoked by #{current_staff&.login}",
+        {text: "This is SlackWebhookJob Test Notification invoked by #{current_staff.login}"},
       )
       render plain: "Slack Slack Slack"
     end

@@ -14,9 +14,11 @@ RSpec.describe "Admin Dashboard", type: :request do
 
   context "with unrestricted staff" do
     it "notifies slack on slacktown" do
+      allow(SlackWebhookJob).to receive(:perform_later).and_call_original
+
       get slacktown_path
       expect(response).to have_http_status(:ok)
-      expect(SlackWebhookJob).to have_received(:perform_later)
+      expect(SlackWebhookJob).to have_received(:perform_later).with({text: a_string_including(staff.login)})
     end
 
     it "sends a test mail on mailtown" do
