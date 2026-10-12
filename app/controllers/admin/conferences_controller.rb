@@ -78,7 +78,7 @@ module Admin
     def destroy
       @conference.destroy
       respond_to do |format|
-        format.html { redirect_to _conferences_url, notice: 'Conference was successfully destroyed.' }
+        format.html { redirect_to conferences_url, notice: 'Conference was successfully destroyed.' }
       end
     end
 
