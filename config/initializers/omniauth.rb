@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 OmniAuth.config.allowed_request_methods = %i[get post] # FIXME: migrate to OmniAuth 2 fully

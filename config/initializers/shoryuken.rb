@@ -1,10 +1,14 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module Shoryuken
   module Middleware
     module Server
       class SentryReporter
+        # A batch worker receives every message of the batch as an Array.
+        #: type sqs_message = Shoryuken::Message | Array[Shoryuken::Message]
+
+        #: [T] (Object & Shoryuken::Worker, String, sqs_message, untyped) { () -> T } -> T
         def call(worker_instance, queue, sqs_msg, body, &block)
           return block.call unless ::Sentry.initialized?
 
@@ -28,6 +32,7 @@ module Shoryuken
           end
         end
 
+        #: (Object & Shoryuken::Worker, String, sqs_message, untyped) -> Hash[Symbol, Hash[Symbol, untyped]]
         def generate_contexts(worker_instance, queue, sqs_msg, body)
           shoryuken_class = sqs_msg.message_attributes.dig('shoryuken_class', :string_value) unless sqs_msg.is_a?(Array)
           job_class = shoryuken_class || worker_instance&.class&.name
@@ -63,6 +68,7 @@ module Shoryuken
           context
         end
 
+        #: (Sentry::Transaction?, Integer) -> void
         def finish_transaction(transaction, status)
           return unless transaction
 

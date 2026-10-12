@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 require 'aws-sdk-s3'
@@ -7,6 +7,7 @@ require 'aws-sdk-s3'
 module Aws
   module S3
     class PresignedPost
+      #: () -> String
       def bucket_url
         params = Aws::S3::EndpointParameters.new(
           bucket: @bucket_name,
