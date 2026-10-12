@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "rubykaigi/sponsor_app/conference.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// Request for AdminService.ListConferences.
+message AdminServiceListConferencesRequest {}
+
+// Response for AdminService.ListConferences.
+message AdminServiceListConferencesResponse {
+  // Every conference the signed-in staff member can manage, hidden ones included, most recently
+  // created first. Not paginated, as there is one conference a year.
+  repeated Conference conferences = 1;
+}
+
+// Request for AdminService.GetConference.
+message AdminServiceGetConferenceRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1;
+}
+
+// Response for AdminService.GetConference.
+message AdminServiceGetConferenceResponse {
+  // The conference the request names.
+  Conference conference = 1;
+}
