@@ -303,6 +303,73 @@ ConnectRpcRails::GetQuery::PROTOCOL_VERSION = T.let(T.unsafe(nil), String)
 # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/get_query.rb:24
 ConnectRpcRails::GetQuery::URL_SAFE_BASE64 = T.let(T.unsafe(nil), Regexp)
 
+# pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:38
+module ConnectRpcRails::MessageValidatable
+  extend ::ActiveSupport::Concern
+
+  mixes_in_class_methods ::ConnectRpcRails::MessageValidatable::ClassMethods
+
+  private
+
+  # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:179
+  def connect_error_for_violation(error); end
+
+  # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:202
+  def render_connect_violation(error); end
+
+  # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:162
+  def validate_connect_message!; end
+
+  class << self
+    # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:96
+    def field_path(path, message_class, json_names:); end
+
+    # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:148
+    def googleapis_class(name); end
+
+    # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:141
+    def reason(rule_id); end
+
+    private
+
+    # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:117
+    def field_message(field); end
+
+    # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:128
+    def subscript(element); end
+  end
+end
+
+# pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:60
+ConnectRpcRails::MessageValidatable::BAD_REQUEST = T.let(T.unsafe(nil), String)
+
+# pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:78
+module ConnectRpcRails::MessageValidatable::ClassMethods
+  # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:83
+  def method_added(method_name); end
+end
+
+# pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:66
+ConnectRpcRails::MessageValidatable::FALLBACK_REASON = T.let(T.unsafe(nil), String)
+
+# pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:42
+class ConnectRpcRails::MessageValidatable::MissingDescriptorError < ::StandardError; end
+
+# pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:63
+ConnectRpcRails::MessageValidatable::REASON_PATTERN = T.let(T.unsafe(nil), Regexp)
+
+# pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:45
+class ConnectRpcRails::MessageValidatable::ViolationError < ::StandardError
+  # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:53
+  def initialize(violations, request_message); end
+
+  # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:50
+  def request_message; end
+
+  # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/message_validatable.rb:47
+  def violations; end
+end
+
 # pkg:gem/connect_rpc_rails#lib/connect_rpc_rails/railtie.rb:14
 class ConnectRpcRails::Railtie < ::Rails::Railtie; end
 

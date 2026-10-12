@@ -205,7 +205,7 @@ Rails serves the services in `proto/` over the [Connect protocol](https://connec
 - Controllers live in `app/controllers/api/admin/`, one action per RPC. They inherit `Api::Admin::ApplicationController`, which authenticates with the HAML side's session cookie.
 - Every RPC declares its policy right above its `def`: `authorize :any_staff`, `:unrestricted_staff` or `:conference`. Serving an RPC without one raises. `:conference` reads the request's `conference_slug`, which must be field 1.
 - Responses are built by Alba resources in `app/resources/api/`, bound to their message with `with_protobuf`. Controllers never build a response field by field.
-- Errors are problems: raise an `Errors::*` class from `app/models/errors.rb`, each typed by a `ProblemType` value in `proto/rubykaigi/sponsor_app/problem.proto`. Titles live under `problem_details.titles` in `config/locales/`.
+- Errors are problems: raise an `Errors::*` class from `app/models/errors.rb`, each typed by a `ProblemType` value in `proto/rubykaigi/sponsor_app/problem.proto`. Titles live under `problem_details.titles` in `config/locales/`. `buf.validate` rules on request fields are checked after authentication and answer `invalid_argument` with a `google.rpc.BadRequest`.
 - A POST must send `Connect-Protocol-Version: 1`, and a request whose `Sec-Fetch-Site` or `Origin` names another origin is refused (`ConnectForgeryProtection`).
 - Routes are drawn only when `config.x.connect_rpc.enabled` is set: always in development and test, and in production only with `SPONSOR_APP_CONNECT_RPC`, because CloudFront does not forward `Connect-Protocol-Version`, `Connect-Timeout-Ms` or `Sec-Fetch-Site`.
 

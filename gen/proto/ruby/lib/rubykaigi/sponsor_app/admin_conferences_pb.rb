@@ -4,10 +4,11 @@
 
 require 'google/protobuf'
 
+require 'buf/validate/validate_pb'
 require 'rubykaigi/sponsor_app/conference_pb'
 
 
-descriptor_data = "\n-rubykaigi/sponsor_app/admin_conferences.proto\x12\x15rubykaigi.sponsor_app\x1a&rubykaigi/sponsor_app/conference.proto\"$\n\"AdminServiceListConferencesRequest\"j\n#AdminServiceListConferencesResponse\x12\x43\n\x0b\x63onferences\x18\x01 \x03(\x0b\x32!.rubykaigi.sponsor_app.ConferenceR\x0b\x63onferences\"K\n AdminServiceGetConferenceRequest\x12\'\n\x0f\x63onference_slug\x18\x01 \x01(\tR\x0e\x63onferenceSlug\"f\n!AdminServiceGetConferenceResponse\x12\x41\n\nconference\x18\x01 \x01(\x0b\x32!.rubykaigi.sponsor_app.ConferenceR\nconferenceB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
+descriptor_data = "\n-rubykaigi/sponsor_app/admin_conferences.proto\x12\x15rubykaigi.sponsor_app\x1a\x1b\x62uf/validate/validate.proto\x1a&rubykaigi/sponsor_app/conference.proto\"$\n\"AdminServiceListConferencesRequest\"j\n#AdminServiceListConferencesResponse\x12\x43\n\x0b\x63onferences\x18\x01 \x03(\x0b\x32!.rubykaigi.sponsor_app.ConferenceR\x0b\x63onferences\"k\n AdminServiceGetConferenceRequest\x12G\n\x0f\x63onference_slug\x18\x01 \x01(\tB\x1e\xbaH\x1br\x19\x10\x01\x32\x15^[a-z0-9][a-z0-9_-]*$R\x0e\x63onferenceSlug\"f\n!AdminServiceGetConferenceResponse\x12\x41\n\nconference\x18\x01 \x01(\x0b\x32!.rubykaigi.sponsor_app.ConferenceR\nconferenceB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)

@@ -9,6 +9,7 @@ RSpec.describe 'buf.validate rules' do # rubocop:disable RSpec/DescribeClass
     validator = Protovalidate::Validator.new
 
     expect(messages).to include(Rk::SponsorApp::ExpenseLineItemPatch)
+    expect(messages).to include(Rk::SponsorApp::AdminServiceGetConferenceRequest)
     expect { validator.register(*messages) }.not_to raise_error
   end
 end

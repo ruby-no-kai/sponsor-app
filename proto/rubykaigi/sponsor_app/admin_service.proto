@@ -17,11 +17,12 @@ option ruby_package = "Rk::SponsorApp";
 // `permission_denied` for any other.
 //
 // A problem the server raises carries a packed protobufable.ProblemDetails whose `type` is listed
-// in ProblemType. A rejected or malformed call and an unexpected failure carry no ProblemDetails,
-// only the Connect code. Each of these errors carries a google.rpc.RequestInfo holding the ID to
-// quote when reporting it. A call the transport refuses outright, such as a GET of an RPC with
-// side effects (405), an unsupported Content-Type (415) or an unknown RPC (404), is answered with
-// a plain-text body instead.
+// in ProblemType. A request breaking a field's rules is answered `invalid_argument` with a
+// google.rpc.BadRequest naming each field. A rejected or malformed call and an unexpected failure
+// carry no ProblemDetails, only the Connect code. Each of these errors carries a
+// google.rpc.RequestInfo holding the ID to quote when reporting it. A call the transport refuses
+// outright, such as a GET of an RPC with side effects (405), an unsupported Content-Type (415) or
+// an unknown RPC (404), is answered with a plain-text body instead.
 service AdminService {
   // Conferences
 
