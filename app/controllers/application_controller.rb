@@ -37,7 +37,8 @@ class ApplicationController < ActionController::Base
   helper_method def current_staff_maybe
     return @current_staff if defined? @current_staff
 
-    @current_staff = session[:staff_id] && Staff.find_by(id: session[:staff_id])
+    staff_id = session[:staff_id]
+    @current_staff = (Staff.find_by(id: staff_id) if staff_id)
   end
 
   helper_method def current_staff = Must.because(current_staff_maybe) { "require_staff gates this action" }
