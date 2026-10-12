@@ -31,7 +31,7 @@ RSpec.describe "Sponsorships", type: :request do
 
     it "creates a sponsorship when the policy is agreed" do
       post user_conference_sponsorship_path(conference), params: {sponsorship: sponsorship_params.merge(policy_agreement: '1')}
-      expect(response).to have_http_status(:found)
+      expect(response).to redirect_to(user_conference_sponsorship_path(conference))
       expect(conference.sponsorships.count).to eq(1)
     end
 
@@ -54,6 +54,13 @@ RSpec.describe "Sponsorships", type: :request do
     end
   end
 
+  describe "GET show" do
+    it "redirects to the application form without a sponsorship session" do
+      get user_conference_sponsorship_path(conference)
+      expect(response).to redirect_to(new_user_conference_sponsorship_path(conference))
+    end
+  end
+
   describe "PATCH update" do
     let(:sponsorship) { FactoryBot.create(:sponsorship, conference:, plan:) }
     let(:session_token) { FactoryBot.create(:session_token, email: sponsorship.contact.email) }
@@ -64,7 +71,7 @@ RSpec.describe "Sponsorships", type: :request do
 
     it "does not require policy agreement on amendment" do
       patch user_conference_sponsorship_path(conference), params: {sponsorship: {name: 'Renamed'}}
-      expect(response).to have_http_status(:found)
+      expect(response).to redirect_to(user_conference_sponsorship_path(conference))
       expect(sponsorship.reload.name).to eq('Renamed')
     end
   end

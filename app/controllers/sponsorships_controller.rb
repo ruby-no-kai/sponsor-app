@@ -3,7 +3,7 @@
 class SponsorshipsController < ApplicationController
   def show
     unless current_sponsorship
-      return redirect_to new_user_conference_sponsorship_path(conference: @conference)
+      return redirect_to new_user_conference_sponsorship_path(conference_slug: params[:conference_slug])
     end
 
     @sponsorship = current_sponsorship
@@ -79,7 +79,7 @@ class SponsorshipsController < ApplicationController
         (session[:sponsorship_ids] ||= []).unshift @sponsorship.id
         session[:asset_file_ids]&.delete(@sponsorship.asset_file.id)
         SponsorshipWelcomeJob.perform_later(@sponsorship)
-        format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: t('.notice') }
+        format.html { redirect_to user_conference_sponsorship_path(conference_slug: @conference), notice: t('.notice') }
       else
         @sponsorship.build_nested_attributes_associations
         format.html { render :new }
@@ -101,7 +101,7 @@ class SponsorshipsController < ApplicationController
     respond_to do |format|
       if @sponsorship.save(context: :update_by_user)
         ProcessSponsorshipEditJob.perform_later(@sponsorship.last_editing_history)
-        format.html { redirect_to user_conference_sponsorship_path(conference: @conference), notice: 'Your application was successfully updated.' }
+        format.html { redirect_to user_conference_sponsorship_path(conference_slug: @conference), notice: 'Your application was successfully updated.' }
       else
         format.html { render :edit }
       end
