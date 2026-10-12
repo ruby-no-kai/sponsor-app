@@ -7,23 +7,25 @@ class ProcessBroadcastDeliveryMailgunEventJob < ApplicationJob
     ApplicationRecord.transaction do
       delivery = BroadcastDelivery.lock.find(delivery_id)
       delivery.add_mailgun_event event_data
-      return if event_data['id'] != delivery.mailgun_events.last['id']
 
-      delivery.status = case event_data['event']
-      when 'accepted'
-        :accepted
-      when 'rejected'
-        :rejected
-      when 'failed'
-        :failed
-      when 'delivered'
-        :delivered
-      when 'opened'
-        :opened
-      when 'clicked'
-        :clicked
-      else
-        delivery.status
+      # Events arrive out of order; only the latest one decides the status.
+      if event_data['id'] == delivery.mailgun_events.last['id']
+        delivery.status = case event_data['event']
+        when 'accepted'
+          :accepted
+        when 'rejected'
+          :rejected
+        when 'failed'
+          :failed
+        when 'delivered'
+          :delivered
+        when 'opened'
+          :opened
+        when 'clicked'
+          :clicked
+        else
+          delivery.status
+        end
       end
 
       delivery.save!
