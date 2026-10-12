@@ -9,6 +9,7 @@ local generated = List(
   "third_party/sorbet/rbi/dsl/buf/**",
   "third_party/sorbet/rbi/dsl/protobufable/**",
   "app/javascript/gen/**",
+  "ui/src/gen/**",
 )
 
 local linters = new Mapping<String, Step> {
@@ -37,6 +38,7 @@ local linters = new Mapping<String, Step> {
     exclude = generated + List("spec/fixtures/files/sponsors_yaml/**")
   }
 
+  // ui/ has a pnpm-lock.yaml of its own, so it is a workspace of its own with its own oxfmt.
   ["oxfmt"] {
     workspace_indicator = "pnpm-lock.yaml"
     glob = "**/*.{ts,tsx,js,jsx,css,sass,scss}"
@@ -51,6 +53,14 @@ local linters = new Mapping<String, Step> {
   ["gen"] {
     fix = "mise run gen"
     stage = generated
+  }
+  // tsc checks the whole project at once, so no file list is passed. It waits for `gen`, which
+  // installs ui/ and rewrites ui/src/gen.
+  ["ui"] {
+    glob = List("ui/**/*.ts", "ui/**/*.tsx", "ui/tsconfig.json", "ui/pnpm-lock.yaml")
+    exclude = List("ui/node_modules/**")
+    depends = "gen"
+    check = "mise run ui:typecheck"
   }
 }
 

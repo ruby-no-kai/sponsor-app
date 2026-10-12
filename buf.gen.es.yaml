@@ -1,0 +1,19 @@
+# TypeScript for the SPA in ui/. A template of its own, as buf.gen.yaml's
+# Ruby must not include the googleapis input below.
+version: v2
+plugins:
+  # The local plugin is locked to the @bufbuild/protobuf runtime by ui/pnpm-lock.yaml.
+  - local: ui/node_modules/.bin/protoc-gen-es
+    out: ui/src/gen
+    include_imports: true
+    opt:
+      - target=ts
+      # Lets node:test load modules that import generated code by stripping their types.
+      - import_extension=ts
+      - erasable_syntax=true
+inputs:
+  - directory: proto
+  # The SPA decodes google.rpc.BadRequest and RequestInfo from Connect error details.
+  - module: buf.build/googleapis/googleapis:c17df5b2beca46928cc87d5656bd5343
+    paths:
+      - google/rpc/error_details.proto

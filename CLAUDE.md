@@ -90,6 +90,7 @@ Uses Shoryuken (AWS SQS) for background processing:
 
 - Vite-based build via vite_rails gem
 - Bootstrap 4 for styling
+- `ui/`: a React SPA reimplementing the HAML screens on the Connect RPC API, development only (see "SPA (ui/)")
 
 ### External Integrations
 
@@ -121,6 +122,7 @@ Uses Shoryuken (AWS SQS) for background processing:
 # Install dependencies
 bundle install
 pnpm install
+mise run ui:install    # ui/ is a pnpm project of its own
 
 # Setup database (requires Docker Compose for PostgreSQL)
 docker-compose up -d
@@ -146,6 +148,13 @@ rails db:reset                      # Drop, recreate, migrate, and seed
 rspec                               # Run all tests
 rspec spec/models/sponsorship_spec.rb  # Run specific test file
 rspec spec/models/sponsorship_spec.rb:42  # Run test at line 42
+```
+
+In a git worktree, `worktree:bootstrap` installs the root and `ui/` packages and the gems, and creates a test database of the worktree's own on the main checkout's compose db. Export the variables it prints:
+
+```bash
+mise trust && mise run worktree:bootstrap <slice>   # creates sponsor_app2_test_<slice>
+export COMPOSE_PROJECT_NAME=sponsor-app DATABASE_URL=postgres://...   # as printed
 ```
 
 ### Asset Management
@@ -184,15 +193,16 @@ Sorbet with inline RBS comments (`#:`); see `docs/type-checking.md`.
 
 ### Protocol Buffers
 
-`proto/` is the schema of record (package `rubykaigi.sponsor_app`, Ruby namespace `Rk::SponsorApp`). buf generates Ruby and RBS from it into `gen/proto/ruby/`, the `sponsor_app-proto` path gem that Bundler loads at boot. Generated files are committed.
+`proto/` is the schema of record (package `rubykaigi.sponsor_app`, Ruby namespace `Rk::SponsorApp`). buf generates Ruby and RBS from it into `gen/proto/ruby/`, the `sponsor_app-proto` path gem that Bundler loads at boot, and TypeScript into `ui/src/gen/` for the SPA. Generated files are committed.
 
 ```bash
-mise run gen            # Run every generator: gen/ from proto/, then the message RBIs (boots Rails, needs no database)
-mise run gen:proto      # Regenerate gen/ only
+mise run gen            # Run every generator: gen/ and ui/src/gen from proto/, then the message RBIs (boots Rails, needs no database)
+mise run gen:proto      # Regenerate gen/ and ui/src/gen only
 mise run lint:proto     # buf lint and buf format check
 ```
 
-- Never edit generated files under `gen/`. Edit `proto/`, run `mise run gen`, and commit its output with the `.proto` change. hk's pre-commit hook regenerates and stages it, and CI fails when it is stale.
+- Never edit generated files under `gen/` or `ui/src/gen/`. Edit `proto/`, run `mise run gen`, and commit its output with the `.proto` change. hk's pre-commit hook regenerates and stages it, and CI fails when it is stale.
+- `buf.gen.yaml` generates the Ruby, and `buf.gen.es.yaml` the TypeScript with protoc-gen-es from `ui/node_modules`, so `mise run gen` runs `ui:install` first. The TypeScript also covers `google/rpc/error_details.proto` for the SPA's error handling. No Ruby is generated for `google/`, `buf/validate/` or `protobufable/`, whose gems ship it.
 - `gen/proto/ruby/` also holds hand-written files the generator keeps: the gemspec and `lib/sponsor_app-proto.rb`.
 - Message classes cannot be reloaded, as google-protobuf raises when a descriptor is registered twice. The Procfile's `proto` process regenerates `gen/` on `.proto` edits, and its `web` process restarts Rails when `gen/proto/ruby/` changes.
 - Sorbet ignores the generated `.rbs`. Message types come from tapioca's Protobuf DSL compiler.
@@ -234,6 +244,20 @@ curl -b jar 'http://sponsor-app.localhost:1355/rubykaigi.sponsor_app.AdminServic
 ```
 
 An error is a JSON body `{"code", "message", "details"}`, each detail a protobuf message named by `type` and encoded in unpadded base64 under `value`.
+
+### SPA (ui/)
+
+`ui/` is a standalone pnpm project, not part of the root `package.json`: React, React Router (data mode), SWR, TanStack Form, [Kumo](https://github.com/cloudflare/kumo) on Tailwind CSS 4, and Connect-ES on the code generated into `ui/src/gen/`. It is development only. Production serves the HAML pages, and the Docker image leaves `ui/` out.
+
+```bash
+mise run ui:install     # pnpm install --frozen-lockfile in ui/
+mise run ui:typecheck   # tsc --noEmit (TypeScript 7)
+mise run ui:test        # node:test suites (*.test.ts), run with Node's type stripping
+mise run ui:build       # vite build, to check the bundle
+cd ui && pnpm run format  # oxfmt
+```
+
+- Code imported by a `*.test.ts` must be erasable TypeScript with `.ts` import extensions, as Node strips the types without compiling. tsconfig's `erasableSyntaxOnly` enforces the former; a missing `.ts` extension surfaces only when `mise run ui:test` loads the module.
 
 ## Development Notes
 

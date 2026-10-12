@@ -58,6 +58,8 @@ jobs:
       - run: mise run lint:proto
       # protoc-gen-es comes from node_modules.
       - run: mise run js:install
+      # protoc-gen-es comes from ui/node_modules.
+      - run: mise run ui:install
       - run: mise run --force gen
       # Also catches generated files that were never committed.
       - name: Check generated files are committed
@@ -68,3 +70,14 @@ jobs:
             echo "::error::Generated files are stale. Run 'mise run gen' and commit the result."
             exit 1
           fi
+
+  ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+      - run: mise run ui:install
+      - run: mise run ui:test
+      - run: mise run ui:typecheck
