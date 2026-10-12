@@ -107,7 +107,7 @@ RSpec.describe PushEventAssetFileJob, type: :job do
     it 'converts image to webp using vipsthumbnail' do
       described_class.perform_now(editing_history)
 
-      expect(octokit).to have_received(:update_contents) do |_repo, _path, _msg, _sha, content, **_opts| # rubocop:disable Metrics/ParameterLists
+      expect(octokit).to have_received(:update_contents) do |_repo, _path, _msg, _sha, content, **_opts|
         expect(content[0..3]).to eq("RIFF")
         expect(content[8..11]).to eq("WEBP")
       end

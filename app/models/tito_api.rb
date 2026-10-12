@@ -96,7 +96,7 @@ class TitoApi
     request(:post, path, params, body || bodyhash, headers: headers, timeout: timeout)
   end
 
-  def request(method, path, params = {}, body, conn: faraday, headers: nil, timeout: 20) # rubocop:disable Style/OptionalArguments
+  def request(method, path, params = {}, body, conn: faraday, headers: nil, timeout: 20)
     conn.send(method) do |req|
       req.url(path, params)
       if body

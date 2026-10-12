@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Admin::ApplicationController < ::ApplicationController
   layout 'admin'
   before_action :require_staff
@@ -5,7 +7,7 @@ class Admin::ApplicationController < ::ApplicationController
   class RestrictedAccessForbidden < StandardError; end
 
   rescue_from(RestrictedAccessForbidden) do
-    render status: 403, plain: 'Forbidden'
+    render status: :forbidden, plain: 'Forbidden'
   end
 
   private def check_staff_conference_authorization!(conference)

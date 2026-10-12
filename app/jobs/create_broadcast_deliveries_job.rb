@@ -96,7 +96,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
 
     class Manual < Base
       def recipients
-        scope = Sponsorship.where(id: [*params[:sponsorship_ids]])
+        scope = Sponsorship.where(id: Array(params[:sponsorship_ids]))
         if params[:exclude_current_sponsors].present?
           scope = scope.where.not(organization_id: @broadcast.conference.sponsorships.pluck(:organization_id))
         end
@@ -106,7 +106,7 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
 
     class Raw < Base
       def recipients
-        [*params[:emails]].flatten.flat_map do |email_lines|
+        Array(params[:emails]).flatten.flat_map do |email_lines|
           email_lines.to_s.each_line.map do |email|
             Recipient.new(
               email: email.chomp,

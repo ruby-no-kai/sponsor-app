@@ -57,7 +57,7 @@ class FormDescription < ApplicationRecord
           JSON.parse(value)
         rescue JSON::ParserError
           @fallback_options_error = true
-          return value
+          return
         end
       end
     when nil
@@ -68,13 +68,13 @@ class FormDescription < ApplicationRecord
 
     unless parsed_value.is_a?(Array)
       @fallback_options_error = true
-      return value
+      return
     end
 
     options = build_fallback_options(parsed_value)
     unless options.all?(&:valid?)
       @fallback_options_error = true
-      return value
+      return
     end
 
     write_attribute(:fallback_options, parsed_value)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Admin::BoothAssignmentsController < ::Admin::ApplicationController
   before_action :set_conference
 
@@ -28,14 +30,12 @@ class Admin::BoothAssignmentsController < ::Admin::ApplicationController
     redirect_to conference_booth_assignment_path(@conference), notice: 'Assignment updated'
   end
 
-  private
-
-  def set_conference
+  private def set_conference
     @conference = Conference.find_by!(slug: params[:conference_slug])
     check_staff_conference_authorization!(@conference)
   end
 
-  def booth_assignments_param
+  private def booth_assignments_param
     params.require(:booth_assignments).permit!
   end
 end
