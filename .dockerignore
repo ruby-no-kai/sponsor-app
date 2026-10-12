@@ -5,3 +5,5 @@
 /public/vite*
 vendor/
 .terraform/
+/sorbet/
+/third_party/

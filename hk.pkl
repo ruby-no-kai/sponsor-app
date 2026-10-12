@@ -8,6 +8,11 @@ local linters = new Mapping<String, Step> {
     fix = "cd {{workspace}} && bundle exec rubocop --force-exclusion --autocorrect {{ workspace_files }}"
     batch = true
   }
+  // srb typechecks the whole project at once, so no file list is passed.
+  ["sorbet"] {
+    glob = List("**/*.rb", "**/*.rbi", "sorbet/config", "Gemfile.lock")
+    check = "bundle exec srb tc"
+  }
   ["actionlint"] = Builtins.actionlint
   ["newlines"] = Builtins.newlines
 

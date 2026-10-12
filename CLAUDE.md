@@ -169,8 +169,18 @@ bundle exec shoryuken -R -C config/shoryuken.yml
 ### Code Quality
 
 ```bash
-# No formal linter configured; follow existing code style
+hk check                # RuboCop, Sorbet and other linters (also runs as the pre-commit hook)
+mise run typecheck      # Sorbet type check (bundle exec srb tc)
+mise run tapioca        # Regenerate RBIs after a Gemfile.lock, model or column change
 ```
+
+### Type Checking
+
+Sorbet with inline RBS comments (`#:`); see `docs/type-checking.md`.
+
+- New Ruby files under `app/`, `lib/` and `config/` start at `# typed: strict`. Spec files carry no sigil.
+- Never write `sig`, `T.let`, `T.must` or other `T.` forms in `.rb` files; `sorbet-runtime` is not loaded.
+- Run `bundle` commands under the mise environment (`mise x -- bundle ...`); the lockfile has no `ruby` platform.
 
 ## Development Notes
 
