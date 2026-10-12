@@ -92,7 +92,7 @@ class TitoApi
       .plugin(:auth)
       .with(
         origin: endpoint_uri.origin,
-        base_path: "#{endpoint_uri.path.chomp("/")}/",
+        base_path: "#{endpoint_uri.path.to_s.chomp("/")}/",
         headers: {'accept' => 'application/json'},
         timeout: {connect_timeout: CONNECT_TIMEOUT, request_timeout: DEFAULT_TIMEOUT},
         debug: Rails.logger,
@@ -141,8 +141,12 @@ class TitoApi
     URI.encode_www_form_component(x)
   end
 
-  #: () -> URI::Generic
+  #: () -> URI::HTTP
   private def endpoint_uri
-    URI(endpoint)
+    uri = URI(endpoint)
+    case uri
+    when URI::HTTP then uri
+    else raise ArgumentError, "endpoint is not an HTTP(S) URL: #{endpoint}"
+    end
   end
 end
