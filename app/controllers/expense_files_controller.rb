@@ -5,6 +5,7 @@ class ExpenseFilesController < ApplicationController
 
   before_action :require_sponsorship_session
   before_action :set_conference
+  before_action :require_custom_sponsorship
   before_action :set_asset_file, only: [:show, :update, :destroy, :initiate_update]
 
   def create
@@ -36,6 +37,10 @@ class ExpenseFilesController < ApplicationController
 
   private def set_conference
     @conference = current_conference
+  end
+
+  private def require_custom_sponsorship
+    render status: :forbidden, json: {error: 'Not a custom sponsorship'} unless current_sponsorship.customization
   end
 
   private def set_asset_file
