@@ -16,11 +16,14 @@ module Shoryuken
             transaction = ::Sentry.start_transaction(name: scope.transaction_name, source: scope.transaction_source, op: "queue.shoryuken")
             scope.set_span(transaction) if transaction
 
-            yield
+            result = yield
           rescue Exception => exception
             ::Sentry.capture_exception(exception, hint: {background: false})
             finish_transaction(transaction, 500)
             raise
+          else
+            finish_transaction(transaction, 200)
+            result
           end
         end
 
@@ -49,7 +52,7 @@ module Shoryuken
             context[:Shoryuken][:body] = body
           end
 
-          if sqs_msg.is_a?(Array) # not batch worker
+          if sqs_msg.is_a?(Array) # batch worker
             context[:Shoryuken][:batched] = true
           else
             context[:Shoryuken][:message_id] = sqs_msg.message_id
