@@ -16,7 +16,7 @@ class PassRedemption
       free && !cancelled && !paid && !refunded && !partially_refunded && tickets.group_by(&:release_id).size == 1 && tickets.group_by(&:discount_code).size == 1
     end
 
-    def as_json
+    def as_json(_options = nil)
       to_h.merge(
         tickets: tickets.map(&:as_json),
         retractable: retractable?,
@@ -30,7 +30,7 @@ class PassRedemption
     :state,
     :void, :assigned
   ) do
-    def as_json = to_h
+    def as_json(_options = nil) = to_h
   end
 
   class Collection
