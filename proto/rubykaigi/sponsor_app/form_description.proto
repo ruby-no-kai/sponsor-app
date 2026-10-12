@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// How a conference's application form reads in one locale: the help shown beside its sections,
+// and the alternative plans an applicant may pick.
+//
+// The help texts are Markdown written by staff. Each `*_html` field holds its rendering, which
+// staff may embed raw HTML in and which the form shows as is.
+message FormDescription {
+  // Locale of the texts, such as "en" or "ja". Unique within the conference.
+  string locale = 1;
+
+  // Introduction at the top of the form.
+  string head = 2;
+
+  // Help beside the plan selection.
+  string plan_help = 3;
+
+  // Help beside the booth request.
+  string booth_help = 4;
+
+  // The policies an applicant agrees to.
+  string policy_help = 5;
+
+  // Help beside the ticket section.
+  string ticket_help = 6;
+
+  // Introduction to the sponsor event submission page.
+  string sponsor_event_help = 7;
+
+  // The requirements a sponsor event must meet to be listed.
+  string event_policy = 8;
+
+  // `head` rendered as HTML.
+  string head_html = 9;
+
+  // `plan_help` rendered as HTML.
+  string plan_help_html = 10;
+
+  // `booth_help` rendered as HTML.
+  string booth_help_html = 11;
+
+  // `policy_help` rendered as HTML.
+  string policy_help_html = 12;
+
+  // `ticket_help` rendered as HTML.
+  string ticket_help_html = 13;
+
+  // `sponsor_event_help` rendered as HTML.
+  string sponsor_event_help_html = 14;
+
+  // `event_policy` rendered as HTML.
+  string event_policy_html = 15;
+
+  // Alternatives the form offers in case the plan applied for cannot be granted, in the order it
+  // lists them.
+  repeated FallbackOption fallback_options = 16;
+}
+
+// An alternative an applicant picks in case the plan they applied for cannot be granted, such as
+// "change to Gold if Platinum is unavailable".
+message FallbackOption {
+  // When the form offers the option. It is offered when any condition matches, and always when
+  // there are none.
+  message Condition {
+    option (buf.validate.message).cel = {
+      id: "fallback_option.condition.not_empty"
+      message: "a condition must name plans or a booth request"
+      expression: "size(this.plans) > 0 || has(this.booth_request)"
+    };
+
+    // Names of the plans the applicant picked, any of which matches. Empty matches any plan.
+    repeated string plans = 1 [(buf.validate.field).repeated = {
+      unique: true
+      items: {
+        string: {
+          min_len: 1
+          max_len: 100
+        }
+      }
+    }];
+
+    // Whether the applicant requested a booth. Absent matches either.
+    optional bool booth_request = 2;
+  }
+
+  // What the sponsorship records as its fallback option, such as "platinum+booth,gold". Options
+  // sharing a value differ in their conditions.
+  string value = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 100,
+    (buf.validate.field).cel = {
+      id: "fallback_option.value.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Label the form shows, in the form description's locale.
+  string name = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 200,
+    (buf.validate.field).cel = {
+      id: "fallback_option.name.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // When the form offers the option.
+  repeated Condition conditions = 3 [(buf.validate.field).repeated.max_items = 10];
+
+  // The plans the sponsor ends up with, in order of preference, which the form lists after the
+  // plan applied for. Each is a plan name or "{plan}" for the plan applied for, optionally
+  // followed by "!booth" or "!no_booth", or "!withdraw" alone.
+  repeated string priority_human = 4 [(buf.validate.field).repeated = {
+    max_items: 10
+    items: {
+      string: {
+        min_len: 1
+        max_len: 100
+      }
+    }
+  }];
+}

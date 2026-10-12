@@ -3,6 +3,7 @@ syntax = "proto3";
 package rubykaigi.sponsor_app;
 
 import "rubykaigi/sponsor_app/admin_conferences.proto";
+import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
 import "rubykaigi/sponsor_app/admin_viewer.proto";
 
 option ruby_package = "Rk::SponsorApp";
@@ -37,6 +38,19 @@ service AdminService {
   }
 
   // Form descriptions
+
+  // Returns a conference's application form description in one locale.
+  rpc GetFormDescription(AdminServiceGetFormDescriptionRequest) returns (AdminServiceGetFormDescriptionResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Describes a conference's application form in a locale it is not described in yet. A locale
+  // already described is answered `aborted` with PROBLEM_TYPE_CONFLICT.
+  rpc CreateFormDescription(AdminServiceCreateFormDescriptionRequest) returns (AdminServiceCreateFormDescriptionResponse);
+
+  // Replaces every writable field of a form description and renders its texts again. Moving it to
+  // a locale already described is answered `aborted` with PROBLEM_TYPE_CONFLICT.
+  rpc UpdateFormDescription(AdminServiceUpdateFormDescriptionRequest) returns (AdminServiceUpdateFormDescriptionResponse);
 
   // Plans
 

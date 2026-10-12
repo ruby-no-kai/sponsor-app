@@ -6,6 +6,8 @@ import type { GenFile, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { AdminServiceGetConferenceRequestSchema, AdminServiceGetConferenceResponseSchema, AdminServiceListConferencesRequestSchema, AdminServiceListConferencesResponseSchema } from "./admin_conferences_pb.ts";
 import { file_rubykaigi_sponsor_app_admin_conferences } from "./admin_conferences_pb.ts";
+import type { AdminServiceCreateFormDescriptionRequestSchema, AdminServiceCreateFormDescriptionResponseSchema, AdminServiceGetFormDescriptionRequestSchema, AdminServiceGetFormDescriptionResponseSchema, AdminServiceUpdateFormDescriptionRequestSchema, AdminServiceUpdateFormDescriptionResponseSchema } from "./admin_form_descriptions_pb.ts";
+import { file_rubykaigi_sponsor_app_admin_form_descriptions } from "./admin_form_descriptions_pb.ts";
 import type { AdminServiceGetViewerRequestSchema, AdminServiceGetViewerResponseSchema, AdminServiceSignOutRequestSchema, AdminServiceSignOutResponseSchema } from "./admin_viewer_pb.ts";
 import { file_rubykaigi_sponsor_app_admin_viewer } from "./admin_viewer_pb.ts";
 
@@ -13,7 +15,7 @@ import { file_rubykaigi_sponsor_app_admin_viewer } from "./admin_viewer_pb.ts";
  * Describes the file rubykaigi/sponsor_app/admin_service.proto.
  */
 export const file_rubykaigi_sponsor_app_admin_service: GenFile = /*@__PURE__*/
-  fileDesc("CilydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fc2VydmljZS5wcm90bxIVcnVieWthaWdpLnNwb25zb3JfYXBwMpcECgxBZG1pblNlcnZpY2USjQEKD0xpc3RDb25mZXJlbmNlcxI5LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VMaXN0Q29uZmVyZW5jZXNSZXF1ZXN0GjoucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUxpc3RDb25mZXJlbmNlc1Jlc3BvbnNlIgOQAgEShwEKDUdldENvbmZlcmVuY2USNy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Q29uZmVyZW5jZVJlcXVlc3QaOC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Q29uZmVyZW5jZVJlc3BvbnNlIgOQAgESewoJR2V0Vmlld2VyEjMucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUdldFZpZXdlclJlcXVlc3QaNC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Vmlld2VyUmVzcG9uc2UiA5ACARJwCgdTaWduT3V0EjEucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZVNpZ25PdXRSZXF1ZXN0GjIucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZVNpZ25PdXRSZXNwb25zZUIR6gIOUms6OlNwb25zb3JBcHBiBnByb3RvMw", [file_rubykaigi_sponsor_app_admin_conferences, file_rubykaigi_sponsor_app_admin_viewer]);
+  fileDesc("CilydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fc2VydmljZS5wcm90bxIVcnVieWthaWdpLnNwb25zb3JfYXBwMuoHCgxBZG1pblNlcnZpY2USjQEKD0xpc3RDb25mZXJlbmNlcxI5LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VMaXN0Q29uZmVyZW5jZXNSZXF1ZXN0GjoucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUxpc3RDb25mZXJlbmNlc1Jlc3BvbnNlIgOQAgEShwEKDUdldENvbmZlcmVuY2USNy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Q29uZmVyZW5jZVJlcXVlc3QaOC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Q29uZmVyZW5jZVJlc3BvbnNlIgOQAgESlgEKEkdldEZvcm1EZXNjcmlwdGlvbhI8LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VHZXRGb3JtRGVzY3JpcHRpb25SZXF1ZXN0Gj0ucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUdldEZvcm1EZXNjcmlwdGlvblJlc3BvbnNlIgOQAgESmgEKFUNyZWF0ZUZvcm1EZXNjcmlwdGlvbhI/LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VDcmVhdGVGb3JtRGVzY3JpcHRpb25SZXF1ZXN0GkAucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluU2VydmljZUNyZWF0ZUZvcm1EZXNjcmlwdGlvblJlc3BvbnNlEpoBChVVcGRhdGVGb3JtRGVzY3JpcHRpb24SPy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlVXBkYXRlRm9ybURlc2NyaXB0aW9uUmVxdWVzdBpALnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VVcGRhdGVGb3JtRGVzY3JpcHRpb25SZXNwb25zZRJ7CglHZXRWaWV3ZXISMy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlR2V0Vmlld2VyUmVxdWVzdBo0LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pblNlcnZpY2VHZXRWaWV3ZXJSZXNwb25zZSIDkAIBEnAKB1NpZ25PdXQSMS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlU2lnbk91dFJlcXVlc3QaMi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5TZXJ2aWNlU2lnbk91dFJlc3BvbnNlQhHqAg5Sazo6U3BvbnNvckFwcGIGcHJvdG8z", [file_rubykaigi_sponsor_app_admin_conferences, file_rubykaigi_sponsor_app_admin_form_descriptions, file_rubykaigi_sponsor_app_admin_viewer]);
 
 /**
  * The staff area: conferences, their sponsorships and everything organizers manage.
@@ -57,6 +59,38 @@ export const AdminService: GenService<{
     methodKind: "unary";
     input: typeof AdminServiceGetConferenceRequestSchema;
     output: typeof AdminServiceGetConferenceResponseSchema;
+  },
+  /**
+   * Returns a conference's application form description in one locale.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.AdminService.GetFormDescription
+   */
+  getFormDescription: {
+    methodKind: "unary";
+    input: typeof AdminServiceGetFormDescriptionRequestSchema;
+    output: typeof AdminServiceGetFormDescriptionResponseSchema;
+  },
+  /**
+   * Describes a conference's application form in a locale it is not described in yet. A locale
+   * already described is answered `aborted` with PROBLEM_TYPE_CONFLICT.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.AdminService.CreateFormDescription
+   */
+  createFormDescription: {
+    methodKind: "unary";
+    input: typeof AdminServiceCreateFormDescriptionRequestSchema;
+    output: typeof AdminServiceCreateFormDescriptionResponseSchema;
+  },
+  /**
+   * Replaces every writable field of a form description and renders its texts again. Moving it to
+   * a locale already described is answered `aborted` with PROBLEM_TYPE_CONFLICT.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.AdminService.UpdateFormDescription
+   */
+  updateFormDescription: {
+    methodKind: "unary";
+    input: typeof AdminServiceUpdateFormDescriptionRequestSchema;
+    output: typeof AdminServiceUpdateFormDescriptionResponseSchema;
   },
   /**
    * Returns the signed-in staff member.

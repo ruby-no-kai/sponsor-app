@@ -54,4 +54,54 @@ RSpec.describe Errors do
       end
     end
   end
+
+  describe Errors::InvalidRecord do
+    let(:record) do
+      FormDescription.new.tap do |form_description|
+        form_description.errors.add(:fallback_options, 'options[0].value: value is required')
+        form_description.errors.add(:locale, :blank)
+        form_description.errors.add(:conference, :blank)
+        form_description.errors.add(:base, 'Something is off')
+      end
+    end
+
+    def violations(error)
+      error.problem_information.grep(Google::Rpc::BadRequest).sole.field_violations.map do |violation|
+        [violation.field, violation.reason, violation.description]
+      end
+    end
+
+    it 'is the invalid-record problem, detailing every error' do
+      problem = described_class.new(record:).to_problem
+
+      expect(problem).to have_attributes(
+        type: 'https://sponsorships.rubykaigi.org/problems/invalid-record',
+        status: 422,
+        title: 'Invalid Record',
+        detail: "Fallback Options options[0].value: value is required; Locale can't be blank; " \
+          "Conference can't be blank; Something is off",
+      )
+    end
+
+    it 'names the Input field an attribute maps to, as ProtoJSON spells it' do
+      error = described_class.new(record:, input_class: Rk::SponsorApp::FormDescriptionInput, field_prefix: 'input', json_names: true)
+
+      expect(violations(error)).to eq([
+        ['input.fallbackOptions', 'INVALID_VALUE', 'options[0].value: value is required'],
+        ['input.locale', 'BLANK', "can't be blank"],
+        ['', 'BLANK', "Conference can't be blank"],
+        ['', 'INVALID_VALUE', 'Something is off'],
+      ])
+    end
+
+    it 'names fields as the binary encoding spells them' do
+      error = described_class.new(record:, input_class: Rk::SponsorApp::FormDescriptionInput, field_prefix: 'input')
+
+      expect(violations(error).map(&:first)).to eq(['input.fallback_options', 'input.locale', '', ''])
+    end
+
+    it 'names no field without an Input' do
+      expect(violations(described_class.new(record:)).map(&:first)).to all(eq(''))
+    end
+  end
 end
