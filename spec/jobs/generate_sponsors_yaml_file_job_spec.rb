@@ -67,9 +67,11 @@ RSpec.describe GenerateSponsorsYamlFileJob, type: :job do
         last_editing_history_id: 5,
         last_event_editing_history_id: nil,
         push_id: 5,
+        build_summary:,
       )
     end
 
+    let(:build_summary) { nil }
     let(:branch) { "sponsor-app/#{conference.slug}" }
     let(:title) { "Update sponsors.yml for #{conference.slug} (5)" }
     let(:octokit) { instance_double(Octokit::Client) }
@@ -101,6 +103,33 @@ RSpec.describe GenerateSponsorsYamlFileJob, type: :job do
       pusher.push
 
       expect(GithubInstallation).not_to have_received(:new)
+    end
+
+    context 'with an open pull request' do
+      let(:build_summary) { ->(last_id, last_event_id) { "since #{last_id}/#{last_event_id}" } }
+
+      def file_at(last_id, sha)
+        {content: Base64.encode64("# last_editing_history: #{last_id}, last_event_editing_history: 0\n"), sha:}
+      end
+
+      before do
+        allow(octokit).to receive(:contents).with('ruby-no-kai/rubykaigi.org', path: 'data/sponsors.yml', ref: 'main').and_return(file_at(2, 'base-blob'))
+        allow(octokit).to receive(:contents).with('ruby-no-kai/rubykaigi.org', path: 'data/sponsors.yml', ref: branch).and_return(file_at(4, 'branch-blob'))
+        allow(octokit).to receive(:branch).with('ruby-no-kai/rubykaigi.org', branch).and_return({commit: {sha: 'def'}})
+        allow(octokit).to receive(:pull_requests).and_return([{number: 42}])
+        allow(octokit).to receive(:update_pull_request)
+        allow(octokit).to receive(:add_comment)
+      end
+
+      it 'updates it with the summary since the base branch and comments the summary since the last push' do
+        pusher.push
+
+        expect(octokit).to have_received(:update_contents).with('ruby-no-kai/rubykaigi.org', 'data/sponsors.yml', title, 'branch-blob', anything, branch:)
+        expect(octokit).to have_received(:update_pull_request).with('ruby-no-kai/rubykaigi.org', 42, title:, body: 'since 2/0')
+        expect(octokit).to have_received(:add_comment).with('ruby-no-kai/rubykaigi.org', 42, 'since 4/0')
+        expect(octokit).not_to have_received(:create_ref)
+        expect(octokit).not_to have_received(:create_pull_request)
+      end
     end
   end
 end

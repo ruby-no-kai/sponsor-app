@@ -177,7 +177,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       last_editing_history_id: @last_id,
       last_event_editing_history_id: @last_event_editing_history_id,
       push_id:,
-      build_summary: method(:build_edit_summary),
+      build_summary: ->(from_last_id, from_last_event_id) { build_edit_summary(from_last_id, from_last_event_id) },
     ).push
   end
 
@@ -240,7 +240,8 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     MAX_RETRIES = 3 #: Integer
 
     #: (conference: Conference, filepath: String, content: String, last_editing_history_id: Integer?,
-    #|  last_event_editing_history_id: Integer?, push_id: Integer | String, ?build_summary: Method?) -> void
+    #|  last_event_editing_history_id: Integer?, push_id: Integer | String,
+    #|  ?build_summary: (^(Integer, Integer) -> String?)?) -> void
     def initialize(conference:, filepath:, content:, last_editing_history_id:, last_event_editing_history_id:, push_id:, build_summary: nil)
       @conference = conference
       @repo = conference.github_repo #: Conference::GithubRepo?
@@ -251,10 +252,6 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       @branch_name = "sponsor-app/#{conference.slug}" #: String
       @pr_title = "Update sponsors.yml for #{conference.slug} (#{push_id})" #: String
       @build_summary = build_summary
-      @base_last_id = nil #: Integer?
-      @base_last_event_id = nil #: Integer?
-      @prev_last_id = nil #: Integer?
-      @prev_last_event_id = nil #: Integer?
     end
 
     #: () -> void
@@ -266,16 +263,11 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
         return
       end
 
-      read_previous_ids
+      base_ids = read_ids_from_ref(base_branch)
+      prev_ids = read_ids_from_ref(@branch_name)
       ensure_branch
       commit_content
-      create_or_update_pull_request
-    end
-
-    #: () -> void
-    private def read_previous_ids
-      @base_last_id, @base_last_event_id = read_ids_from_ref(base_branch)
-      @prev_last_id, @prev_last_event_id = read_ids_from_ref(@branch_name)
+      create_or_update_pull_request(base_ids:, prev_ids:)
     end
 
     #: (String) -> [Integer, Integer]
@@ -340,15 +332,15 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       false # Branch or file doesn't exist
     end
 
-    #: () -> void
-    private def create_or_update_pull_request
-      full_summary = @build_summary&.call(@base_last_id, @base_last_event_id) #: String?
+    #: (base_ids: [Integer, Integer], prev_ids: [Integer, Integer]) -> void
+    private def create_or_update_pull_request(base_ids:, prev_ids:)
+      full_summary = @build_summary&.call(*base_ids)
       owner = repo.name.split('/')[0]
       existing_prs = octokit.pull_requests(repo.name, state: 'open', head: "#{owner}:#{@branch_name}")
       if existing_prs.any?
         pr_number = existing_prs[0][:number]
         octokit.update_pull_request(repo.name, pr_number, title: @pr_title, body: full_summary)
-        incremental = @build_summary&.call(@prev_last_id, @prev_last_event_id) #: String?
+        incremental = @build_summary&.call(*prev_ids)
         octokit.add_comment(repo.name, pr_number, incremental) if incremental
       else
         begin
@@ -359,7 +351,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
           if existing_prs.any?
             pr_number = existing_prs[0][:number]
             octokit.update_pull_request(repo.name, pr_number, title: @pr_title, body: full_summary)
-            incremental = @build_summary&.call(@prev_last_id, @prev_last_event_id) #: String?
+            incremental = @build_summary&.call(*prev_ids)
             octokit.add_comment(repo.name, pr_number, incremental) if incremental
           end
         end
