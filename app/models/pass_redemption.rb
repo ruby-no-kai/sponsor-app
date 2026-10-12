@@ -1,4 +1,4 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 # Controls Tito registrations and tickets thru source attributed to a sponsorship, for self managed pass management.
@@ -13,10 +13,12 @@ class PassRedemption
     :free, :paid, :cancelled, :refunded, :partially_refunded,
     :tickets
   ) do
+    #: () -> bool
     def retractable? # XXX: dupe with TitoTicketRetraction
       free && !cancelled && !paid && !refunded && !partially_refunded && tickets.group_by(&:release_id).size == 1 && tickets.group_by(&:discount_code).size == 1
     end
 
+    #: (?untyped) -> Hash[Symbol, untyped]
     def as_json(_options = nil)
       to_h.merge(
         tickets: tickets.map(&:as_json),
@@ -31,12 +33,14 @@ class PassRedemption
     :state,
     :void, :assigned
   ) do
+    #: (?untyped) -> Hash[Symbol, untyped]
     def as_json(_options = nil) = to_h
   end
 
   class Collection
+    #: (TitoApi::json_object, ?sponsorship: Sponsorship?, ?conference: Conference?) -> Collection
     def self.from_tito_registration_list(tito_registration_list, sponsorship: nil, conference: sponsorship&.conference)
-      if (tito_registration_list.dig('meta', 'total_pages') || 0) > 1
+      if (tito_registration_list.dig(:meta, :total_pages) || 0) > 1
         raise PaginationNotSupported
       end
 
@@ -81,20 +85,27 @@ class PassRedemption
       new(registrations:)
     end
 
+    #: (registrations: Array[Registration]) -> void
     def initialize(registrations:)
       @registrations = registrations
     end
 
+    #: Array[Registration]
     attr_reader :registrations
   end
 
+  #: (Sponsorship) -> Collection
   def self.list_for_sponsorship(sponsorship)
-    source = TitoSource.find_by!(sponsorship:, conference: sponsorship.conference)
-    list_for_source_id(sponsorship.conference.tito_slug, source.code, sponsorship:)
+    conference = Must.expect(sponsorship.conference)
+    # Raises RecordNotFound until the sponsorship's source exists on Tito.
+    TitoSource.find_by!(sponsorship:, conference:)
+    tito_slug = Must.because(conference.tito_slug) { "PassRedemptionsController requires a tito_slug" }
+    list_for_source_id(tito_slug, sponsorship.tito_source_code, sponsorship:)
   rescue PaginationNotSupported
-    raise PaginationNotSupported, "Pagination not supported, encountered for #{sponsorship.name.inspect} on event=#{sponsorship.conference.slug.inspect}"
+    raise PaginationNotSupported, "Pagination not supported, encountered for #{sponsorship.name.inspect} on event=#{Must.expect(sponsorship.conference).slug.inspect}"
   end
 
+  #: (String, String, ?sponsorship: Sponsorship?) -> Collection
   def self.list_for_source_id(tito_event, source, sponsorship: nil)
     Collection.from_tito_registration_list(
       TitoApi.new.list_registrations(
@@ -102,6 +113,7 @@ class PassRedemption
         'expand' => 'tickets',
         'search[source]' => source,
         'search[states]' => %w(paid unpaid complete confirmed incomplete cancelled),
+        'page[size]' => '1000',
       ),
       sponsorship:,
     )

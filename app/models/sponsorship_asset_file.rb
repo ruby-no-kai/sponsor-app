@@ -43,8 +43,8 @@ class SponsorshipAssetFile < ApplicationRecord
     dst.extension = extension
     dst.save!
     s3_client.copy_object(
-      bucket: self.class.asset_file_bucket,
-      copy_source: "#{self.class.asset_file_bucket}/#{object_key}",
+      bucket: asset_file_bucket,
+      copy_source: "#{asset_file_bucket}/#{object_key}",
       key: dst.object_key,
     )
     dst.update_object_header

@@ -90,6 +90,12 @@ RSpec.describe SessionToken, type: :model do
 
   describe '#contacts' do
     it 'returns empty relation when email is nil' do
+      token = FactoryBot.create(:session_token, email: nil)
+      expect(token.contacts).to be_a(ActiveRecord::Relation)
+      expect(token.contacts).to be_empty
+    end
+
+    it 'returns empty relation when no contact matches' do
       token = FactoryBot.create(:session_token)
       expect(token.contacts).to be_empty
     end
@@ -122,6 +128,11 @@ RSpec.describe SessionToken, type: :model do
       expect(token.sponsorships).to eq([])
     end
 
+    it 'returns empty array when email is nil' do
+      token = FactoryBot.create(:session_token, email: nil)
+      expect(token.sponsorships).to eq([])
+    end
+
     it 'sorts sponsorships by id' do
       sponsorship2 = FactoryBot.create(:sponsorship, conference:)
 
@@ -143,6 +154,11 @@ RSpec.describe SessionToken, type: :model do
 
     it 'returns empty array when no sponsorships' do
       token = FactoryBot.create(:session_token)
+      expect(token.sponsorship_ids).to eq([])
+    end
+
+    it 'returns empty array when email is nil' do
+      token = FactoryBot.create(:session_token, email: nil)
       expect(token.sponsorship_ids).to eq([])
     end
   end

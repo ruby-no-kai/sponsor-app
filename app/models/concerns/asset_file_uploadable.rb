@@ -1,12 +1,13 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 require 'active_support/concern'
 
+# @requires_ancestor: ActiveRecord::Base
 module AssetFileUploadable
   extend ActiveSupport::Concern
 
-  MAX_FILE_SIZE = 200.megabytes
+  MAX_FILE_SIZE = 200.megabytes #: Integer
 
   included do
     validates :handle, presence: true
@@ -19,45 +20,52 @@ module AssetFileUploadable
     after_destroy :destroy_s3_object
   end
 
+  #: () -> String
   def object_key
     raise unless persisted?
 
-    "#{self.class.asset_file_global_prefix}#{prefix}#{handle}--#{id}"
+    "#{asset_file_global_prefix}#{prefix}#{handle}--#{id}"
   end
 
+  #: () -> { url: String, fields: Hash[String, String], max_size: Integer, id: String }
   def make_session
     upload_url_and_fields.merge(
       id: id.to_s,
     )
   end
 
+  #: (?disposition: Symbol) -> String
   def download_url(disposition: :attachment)
-    encoded_filename = ERB::Util.url_encode(filename)
-    content_disposition = if filename.ascii_only?
-      "#{disposition}; filename=\"#{filename}\""
+    name = filename.to_s
+    encoded_filename = ERB::Util.url_encode(name)
+    content_disposition = if name.ascii_only?
+      "#{disposition}; filename=\"#{name}\""
     else
       "#{disposition}; filename=\"#{encoded_filename}\"; filename*=UTF-8''#{encoded_filename}"
     end
 
     presigner.presigned_url(
       :get_object,
-      bucket: self.class.asset_file_bucket,
+      bucket: asset_file_bucket,
       key: object_key,
       expires_in: 3600,
       response_content_disposition: content_disposition,
     )
   end
 
+  #: (**untyped) -> untyped
   def get_object(**args)
-    s3_client.get_object(bucket: self.class.asset_file_bucket, key: object_key, **args)
+    s3_client.get_object(bucket: asset_file_bucket, key: object_key, **args)
   end
 
+  #: (**untyped) -> untyped
   def put_object(**args)
-    s3_client.put_object(bucket: self.class.asset_file_bucket, key: object_key, **args)
+    s3_client.put_object(bucket: asset_file_bucket, key: object_key, **args)
   end
 
+  #: () -> { url: String, fields: Hash[String, String], max_size: Integer }
   def upload_url_and_fields
-    max_file_size = self.class.const_get(:MAX_FILE_SIZE)
+    max_file_size = self.class.const_get(:MAX_FILE_SIZE) #: Integer
 
     # Use exact Content-Type from model attribute (validated by AR before this call).
     # This pins the presigned POST to the specific content type the client declared.
@@ -77,8 +85,8 @@ module AssetFileUploadable
     # see also config/initializers/aws_s3_patches.rb to force dualstack endpoint
     sign = Aws::S3::PresignedPost.new(
       Session.new(self).credentials,
-      self.class.asset_file_region,
-      self.class.asset_file_bucket,
+      asset_file_region,
+      asset_file_bucket,
       post_opts,
     )
     {
@@ -88,8 +96,9 @@ module AssetFileUploadable
     }
   end
 
+  #: () -> self
   def update_object_header
-    head = s3_client.head_object(bucket: self.class.asset_file_bucket, key: object_key, checksum_mode: :enabled)
+    head = s3_client.head_object(bucket: asset_file_bucket, key: object_key, checksum_mode: :enabled)
     self.version_id = head.version_id if head.version_id != version_id
     self.last_modified_at = head.last_modified
     self.checksum_sha256 = head.checksum_sha256 || "-"
@@ -97,57 +106,96 @@ module AssetFileUploadable
     self
   end
 
+  #: () -> Aws::S3::Client
   def s3_client
-    @s3_client ||= Aws::S3::Client.new(use_dualstack_endpoint: true, region: self.class.asset_file_region, logger: Rails.logger)
+    @s3_client ||= Aws::S3::Client.new(use_dualstack_endpoint: true, region: asset_file_region, logger: Rails.logger) #: Aws::S3::Client?
   end
 
+  #: () -> void
   private def capture_object_key_for_cleanup
-    @object_key_for_cleanup = object_key
+    @object_key_for_cleanup = object_key #: String?
   end
 
+  #: () -> void
   private def destroy_s3_object
     return unless @object_key_for_cleanup
 
-    s3_client.delete_object(bucket: self.class.asset_file_bucket, key: @object_key_for_cleanup)
+    s3_client.delete_object(bucket: asset_file_bucket, key: @object_key_for_cleanup)
   rescue Aws::S3::Errors::ServiceError => e
     Rails.logger.warn("Failed to delete S3 object #{@object_key_for_cleanup}: #{e.message}")
   end
 
+  #: () -> Aws::S3::Presigner
   private def presigner
-    @presigner ||= Aws::S3::Presigner.new(client: s3_client)
+    @presigner ||= Aws::S3::Presigner.new(client: s3_client) #: Aws::S3::Presigner?
   end
 
-  class_methods do
+  #: () -> String?
+  def asset_file_region
+    AssetFileUploadable.config.region
+  end
+
+  #: () -> String?
+  def asset_file_bucket
+    AssetFileUploadable.config.bucket
+  end
+
+  #: () -> String?
+  def asset_file_global_prefix
+    AssetFileUploadable.config.prefix
+  end
+
+  #: () -> String?
+  def asset_file_role
+    AssetFileUploadable.config.role
+  end
+
+  #: () -> untyped
+  def self.config
+    Rails.application.config.x.asset_file_uploadable
+  end
+
+  module ClassMethods
+    #: () -> String?
     def asset_file_region
-      Rails.application.config.x.asset_file_uploadable.region
+      AssetFileUploadable.config.region
     end
 
+    #: () -> String?
     def asset_file_bucket
-      Rails.application.config.x.asset_file_uploadable.bucket
+      AssetFileUploadable.config.bucket
     end
 
+    #: () -> String?
     def asset_file_global_prefix
-      Rails.application.config.x.asset_file_uploadable.prefix
+      AssetFileUploadable.config.prefix
     end
 
+    #: () -> String?
     def asset_file_role
-      Rails.application.config.x.asset_file_uploadable.role
+      AssetFileUploadable.config.role
     end
   end
 
   class Session
+    #: (AssetFileUploadable) -> void
     def initialize(file)
       @file = file
+      @sts = nil #: Aws::STS::Client?
+      @role_session = nil #: untyped
     end
 
+    #: AssetFileUploadable
     attr_reader :file
 
+    #: () -> Aws::STS::Client
     def sts
       @sts ||= Aws::STS::Client.new
     end
 
+    #: () -> Hash[Symbol, untyped]
     def iam_policy
-      resource = "arn:aws:s3:::#{file.class.asset_file_bucket}/#{file.object_key}"
+      resource = "arn:aws:s3:::#{file.asset_file_bucket}/#{file.object_key}"
       {
         Version: '2012-10-17',
         Statement: [
@@ -175,15 +223,17 @@ module AssetFileUploadable
       }
     end
 
+    #: () -> untyped
     def role_session
       @role_session ||= sts.assume_role(
         duration_seconds: 900,
-        role_arn: file.class.asset_file_role,
+        role_arn: file.asset_file_role,
         role_session_name: "file-#{file.id}",
         policy: iam_policy.to_json,
       )
     end
 
+    #: () -> Aws::Credentials
     def credentials
       Aws::Credentials.new(
         role_session.credentials.access_key_id,

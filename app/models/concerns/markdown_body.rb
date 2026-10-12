@@ -1,7 +1,9 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
+# @requires_ancestor: ActiveRecord::Base
 module MarkdownBody
+  #: () -> ActiveSupport::SafeBuffer
   def html
     if persisted?
       Rails.cache.fetch("#{self.class.name}:html:#{id}/#{updated_at.to_f}", expires_in: 1.month) { render_html }.html_safe # rubocop:disable Rails/OutputSafety
@@ -10,6 +12,7 @@ module MarkdownBody
     end
   end
 
+  #: () -> String
   def render_html
     Commonmarker.to_html(
       body,
