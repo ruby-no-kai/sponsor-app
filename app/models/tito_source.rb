@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 # cache of 'source' object on Tito

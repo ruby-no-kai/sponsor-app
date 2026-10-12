@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 # Controls Tito registrations and tickets thru source attributed to a sponsorship, for self managed pass management.
