@@ -21,6 +21,7 @@ import { toastManager } from "../../lib/toast.ts";
 import { NotFound } from "../RouteError.tsx";
 import { paths } from "../paths.ts";
 import { ConfirmButton } from "./ConfirmButton.tsx";
+import { StaffNotes } from "./StaffNotes.tsx";
 import { useConferenceName, useConferenceTitle } from "./conferenceTitle.ts";
 import {
   EVENT_STATUS_LABELS,
@@ -93,77 +94,99 @@ function Detail({ slug, id, sponsorshipId }: { slug: string; id: string; sponsor
         }
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="flex flex-col gap-4">
-          <BasicInformation
-            sponsorship={sponsorship}
-            downloadHref={`${sponsorshipBase}/download_asset`}
-          />
-          <Card title="Organization">
-            {sponsorship.organization === undefined ? (
-              <Text variant="secondary">Unknown</Text>
-            ) : (
-              <Link
-                href={`/admin/organizations/${encodeURIComponent(sponsorship.organization.domain)}`}
-              >
-                {sponsorship.organization.name}
-              </Link>
-            )}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div className="flex flex-col gap-4 lg:col-span-2">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="flex flex-col gap-4">
+              <BasicInformation
+                sponsorship={sponsorship}
+                downloadHref={`${sponsorshipBase}/download_asset`}
+              />
+              <Card title="Organization">
+                {sponsorship.organization === undefined ? (
+                  <Text variant="secondary">Unknown</Text>
+                ) : (
+                  <Link
+                    href={`/admin/organizations/${encodeURIComponent(sponsorship.organization.domain)}`}
+                  >
+                    {sponsorship.organization.name}
+                  </Link>
+                )}
+              </Card>
+            </div>
+            <div className="flex flex-col gap-4">
+              <Invitations sponsorship={sponsorship} />
+              <Requests sponsorship={sponsorship} />
+              {sponsorship.boothAssigned && (
+                <Card title="Booth details">
+                  {sponsorship.exhibitionDescription === undefined ? (
+                    <Badge variant="warning">Not submitted</Badge>
+                  ) : (
+                    <Text>
+                      <span className="whitespace-pre-wrap">
+                        {sponsorship.exhibitionDescription}
+                      </span>
+                    </Text>
+                  )}
+                </Card>
+              )}
+              {sponsorship.sponsorEvents.length > 0 && (
+                <Card title="Events">
+                  <ul className="flex flex-col gap-1">
+                    {sponsorship.sponsorEvents.map((event) => {
+                      const status = labelOf(EVENT_STATUS_LABELS, event.status);
+                      return (
+                        <li key={event.id.toString()} className="flex justify-between gap-2">
+                          <Link href={`${base}/events/${event.id}`}>{event.title}</Link>
+                          <Badge variant={status.tone}>{status.text}</Badge>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </Card>
+              )}
+              {sponsorship.customizationName !== undefined && (
+                <ExpenseReport
+                  sponsorship={sponsorship}
+                  href={`${sponsorshipBase}/expense_report`}
+                />
+              )}
+            </div>
+          </div>
+
+          <Card title="Introduction">
+            <Text bold>{sponsorship.name}</Text>
+            <Text>
+              <span className="whitespace-pre-wrap">{sponsorship.profile}</span>
+            </Text>
+            <div className="flex flex-wrap justify-between gap-2">
+              {isWebUrl(sponsorship.url) ? (
+                <Link href={sponsorship.url} target="_blank" rel="noreferrer" className="break-all">
+                  {sponsorship.url}
+                </Link>
+              ) : (
+                <Text variant="mono">{sponsorship.url}</Text>
+              )}
+              <Text variant={isOverWordLimit(sponsorship) ? "error" : "secondary"} size="sm">
+                {wordCountText(sponsorship)}
+              </Text>
+            </div>
           </Card>
         </div>
-        <div className="flex flex-col gap-4">
-          <Invitations sponsorship={sponsorship} />
-          <Requests sponsorship={sponsorship} />
-          {sponsorship.boothAssigned && (
-            <Card title="Booth details">
-              {sponsorship.exhibitionDescription === undefined ? (
-                <Badge variant="warning">Not submitted</Badge>
-              ) : (
-                <Text>
-                  <span className="whitespace-pre-wrap">{sponsorship.exhibitionDescription}</span>
-                </Text>
-              )}
-            </Card>
-          )}
-          {sponsorship.sponsorEvents.length > 0 && (
-            <Card title="Events">
-              <ul className="flex flex-col gap-1">
-                {sponsorship.sponsorEvents.map((event) => {
-                  const status = labelOf(EVENT_STATUS_LABELS, event.status);
-                  return (
-                    <li key={event.id.toString()} className="flex justify-between gap-2">
-                      <Link href={`${base}/events/${event.id}`}>{event.title}</Link>
-                      <Badge variant={status.tone}>{status.text}</Badge>
-                    </li>
-                  );
-                })}
-              </ul>
-            </Card>
-          )}
-          {sponsorship.customizationName !== undefined && (
-            <ExpenseReport sponsorship={sponsorship} href={`${sponsorshipBase}/expense_report`} />
-          )}
-        </div>
-      </div>
 
-      <Card title="Introduction">
-        <Text bold>{sponsorship.name}</Text>
-        <Text>
-          <span className="whitespace-pre-wrap">{sponsorship.profile}</span>
-        </Text>
-        <div className="flex flex-wrap justify-between gap-2">
-          {isWebUrl(sponsorship.url) ? (
-            <Link href={sponsorship.url} target="_blank" rel="noreferrer" className="break-all">
-              {sponsorship.url}
-            </Link>
-          ) : (
-            <Text variant="mono">{sponsorship.url}</Text>
-          )}
-          <Text variant={isOverWordLimit(sponsorship) ? "error" : "secondary"} size="sm">
-            {wordCountText(sponsorship)}
-          </Text>
-        </div>
-      </Card>
+        <LayerCard>
+          <LayerCard.Secondary className="flex items-center justify-between gap-2">
+            <span>Notes</span>
+            <Link href={generatePath(paths.sponsorshipStaffNotes, pathParams)}>Show all</Link>
+          </LayerCard.Secondary>
+          <LayerCard.Primary>
+            <StaffNotes
+              target={target}
+              notes={[...data.pinnedStaffNotes, ...data.recentStaffNotes]}
+            />
+          </LayerCard.Primary>
+        </LayerCard>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card title="Contact">

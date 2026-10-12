@@ -94,8 +94,8 @@ service AdminService {
 
   // Sponsorships
 
-  // Returns one sponsorship of a conference with the plans and fallback options an editor of it
-  // offers.
+  // Returns one sponsorship of a conference with what its staff page shows: the latest staff
+  // notes, and the plans and fallback options an editor of it offers.
   rpc GetSponsorship(AdminServiceGetSponsorshipRequest) returns (AdminServiceGetSponsorshipResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -116,6 +116,20 @@ service AdminService {
   rpc ListSponsorshipEditingHistory(AdminServiceListSponsorshipEditingHistoryRequest) returns (AdminServiceListSponsorshipEditingHistoryResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Lists the staff notes on a sponsorship.
+  rpc ListSponsorshipStaffNotes(AdminServiceListSponsorshipStaffNotesRequest) returns (AdminServiceListSponsorshipStaffNotesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Writes a staff note on a sponsorship.
+  rpc CreateSponsorshipStaffNote(AdminServiceCreateSponsorshipStaffNoteRequest) returns (AdminServiceCreateSponsorshipStaffNoteResponse);
+
+  // Replaces the body and pinning of a staff note, whoever wrote it.
+  rpc UpdateSponsorshipStaffNote(AdminServiceUpdateSponsorshipStaffNoteRequest) returns (AdminServiceUpdateSponsorshipStaffNoteResponse);
+
+  // Deletes a staff note, whoever wrote it.
+  rpc DeleteSponsorshipStaffNote(AdminServiceDeleteSponsorshipStaffNoteRequest) returns (AdminServiceDeleteSponsorshipStaffNoteResponse);
 
   // Organizations
 

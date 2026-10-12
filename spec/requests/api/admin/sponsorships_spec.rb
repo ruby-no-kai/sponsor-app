@@ -131,6 +131,19 @@ RSpec.describe 'AdminService sponsorships', type: :request do
         expect(result.expense_report).to have_attributes(status: :STATUS_SUBMITTED, total_amount: '1200.0', total_tax_amount: '120.0')
       end
 
+      it 'returns the pinned staff notes and the five latest others' do
+        author = FactoryBot.create(:staff, login: 'author')
+        pinned = SponsorshipStaffNote.create!(sponsorship:, staff: author, body: '**Pinned**', stickiness: 1)
+        notes = Array.new(6) { |i| SponsorshipStaffNote.create!(sponsorship:, staff: author, body: "Note #{i}", created_at: i.hours.from_now) }
+
+        result = connect_call(rpc, request_for(sponsorship))
+
+        expect(result.pinned_staff_notes.map(&:id)).to eq([pinned.id])
+        expect(result.pinned_staff_notes.first).to have_attributes(pinned: true, staff_login: 'author', body: '**Pinned**')
+        expect(result.pinned_staff_notes.first.body_html).to include('<strong>Pinned</strong>')
+        expect(result.recent_staff_notes.map(&:id)).to eq(notes.reverse.first(5).map(&:id))
+      end
+
       it "offers the conference's plans and the fallback options of the sponsorship's locale" do
         platinum = plan
         gold = FactoryBot.create(:plan, conference:, name: 'Gold', rank: -1)

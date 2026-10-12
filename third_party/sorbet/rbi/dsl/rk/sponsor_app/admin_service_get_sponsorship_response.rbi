@@ -9,17 +9,25 @@ class Rk::SponsorApp::AdminServiceGetSponsorshipResponse < Google::Protobuf::Abs
   sig do
     params(
       fallback_option_choices: T.nilable(T::Array[Rk::SponsorApp::FallbackOption]),
+      pinned_staff_notes: T.nilable(T::Array[Rk::SponsorApp::SponsorshipStaffNote]),
       plan_choices: T.nilable(T::Array[Rk::SponsorApp::AdminSponsorship::Plan]),
+      recent_staff_notes: T.nilable(T::Array[Rk::SponsorApp::SponsorshipStaffNote]),
       sponsorship: T.nilable(Rk::SponsorApp::AdminSponsorship)
     ).void
   end
-  def initialize(fallback_option_choices: T.unsafe(nil), plan_choices: T.unsafe(nil), sponsorship: nil); end
+  def initialize(fallback_option_choices: T.unsafe(nil), pinned_staff_notes: T.unsafe(nil), plan_choices: T.unsafe(nil), recent_staff_notes: T.unsafe(nil), sponsorship: nil); end
 
   sig { void }
   def clear_fallback_option_choices; end
 
   sig { void }
+  def clear_pinned_staff_notes; end
+
+  sig { void }
   def clear_plan_choices; end
+
+  sig { void }
+  def clear_recent_staff_notes; end
 
   sig { void }
   def clear_sponsorship; end
@@ -33,11 +41,23 @@ class Rk::SponsorApp::AdminServiceGetSponsorshipResponse < Google::Protobuf::Abs
   sig { returns(Object) }
   def has_sponsorship?; end
 
+  sig { returns(Google::Protobuf::RepeatedField[Rk::SponsorApp::SponsorshipStaffNote]) }
+  def pinned_staff_notes; end
+
+  sig { params(value: Google::Protobuf::RepeatedField[Rk::SponsorApp::SponsorshipStaffNote]).void }
+  def pinned_staff_notes=(value); end
+
   sig { returns(Google::Protobuf::RepeatedField[Rk::SponsorApp::AdminSponsorship::Plan]) }
   def plan_choices; end
 
   sig { params(value: Google::Protobuf::RepeatedField[Rk::SponsorApp::AdminSponsorship::Plan]).void }
   def plan_choices=(value); end
+
+  sig { returns(Google::Protobuf::RepeatedField[Rk::SponsorApp::SponsorshipStaffNote]) }
+  def recent_staff_notes; end
+
+  sig { params(value: Google::Protobuf::RepeatedField[Rk::SponsorApp::SponsorshipStaffNote]).void }
+  def recent_staff_notes=(value); end
 
   sig { returns(T.nilable(Rk::SponsorApp::AdminSponsorship)) }
   def sponsorship; end

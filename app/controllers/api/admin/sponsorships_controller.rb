@@ -6,13 +6,18 @@ module Api
     class SponsorshipsController < Api::Admin::ApplicationController
       include Api::Admin::SponsorshipLookup
 
+      RECENT_STAFF_NOTE_COUNT = 5 #: Integer
+
       authorize :conference
       #: () -> Rk::SponsorApp::AdminServiceGetSponsorshipResponse
       def get_sponsorship
         sponsorship = find_sponsorship
+        staff_notes = sponsorship.staff_notes.includes(:staff).order(stickiness: :desc, created_at: :desc)
 
         Rk::SponsorApp::AdminServiceGetSponsorshipResponse.new(
           sponsorship: admin_sponsorship_message(sponsorship),
+          pinned_staff_notes: staff_notes.where('stickiness > 0').map { staff_note_message(it) },
+          recent_staff_notes: staff_notes.where(stickiness: 0).limit(RECENT_STAFF_NOTE_COUNT).map { staff_note_message(it) },
           plan_choices: conference.plans.order(:rank, :id).map { Api::AdminSponsorshipPlanResource.new(it).as_protobuf },
           fallback_option_choices: fallback_option_choices(sponsorship),
         )
@@ -135,6 +140,11 @@ module Api
       #: (Sponsorship) -> Rk::SponsorApp::AdminSponsorship
       private def admin_sponsorship_message(sponsorship)
         Api::AdminSponsorshipResource.new(sponsorship).as_protobuf
+      end
+
+      #: (SponsorshipStaffNote) -> Rk::SponsorApp::SponsorshipStaffNote
+      private def staff_note_message(staff_note)
+        Api::SponsorshipStaffNoteResource.new(staff_note).as_protobuf
       end
     end
   end
