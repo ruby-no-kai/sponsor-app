@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 # This configuration file will be evaluated by Puma. The top-level methods that

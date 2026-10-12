@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 Rails.configuration.x.release.release = begin
