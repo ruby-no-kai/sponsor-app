@@ -32,7 +32,7 @@ class SponsorshipAssetFilesController < ApplicationController
   end
 
   private def set_conference
-    @conference = current_conference_maybe
+    @conference = current_conference_maybe || raise(ActiveRecord::RecordNotFound)
   end
 
   private def set_asset_file
