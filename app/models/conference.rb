@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 class Conference < ApplicationRecord
@@ -41,27 +41,34 @@ class Conference < ApplicationRecord
 
   def application_open?
     t = Time.zone.now
-    application_opens_at && application_opens_at <= t && (!application_closes_at || t < application_closes_at)
+    opens_at = application_opens_at
+    closes_at = application_closes_at
+    opens_at && opens_at <= t && (!closes_at || t < closes_at)
   end
 
   def amendment_open?
     t = Time.zone.now
-    application_opens_at && application_opens_at <= t && (!amendment_closes_at || t < amendment_closes_at)
+    opens_at = application_opens_at
+    closes_at = amendment_closes_at
+    opens_at && opens_at <= t && (!closes_at || t < closes_at)
   end
 
   def distributing_ticket?
     t = Time.zone.now
-    ticket_distribution_starts_at && ticket_distribution_starts_at <= t
+    starts_at = ticket_distribution_starts_at
+    starts_at && starts_at <= t
   end
 
   def pass_retraction_enabled?
     t = Time.zone.now
-    pass_retraction_disables_at.nil? || t < pass_retraction_disables_at
+    disables_at = pass_retraction_disables_at
+    disables_at.nil? || t < disables_at
   end
 
   def event_submission_open?
     t = Time.zone.now
-    event_submission_starts_at && event_submission_starts_at <= t
+    starts_at = event_submission_starts_at
+    starts_at && starts_at <= t
   end
 
   def form_description_for_locale
@@ -103,7 +110,8 @@ class Conference < ApplicationRecord
   # NOTE: Reception functionality removed; this method kept for historical data preservation.
   # The reception_key column has a NOT NULL constraint and contains historical data.
   private def generate_reception_key
-    self.reception_key ||= SecureRandom.urlsafe_base64(96)
+    key = reception_key #: String?
+    self.reception_key = SecureRandom.urlsafe_base64(96) unless key
   end
 
   private def generate_invite_code

@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 class Plan < ApplicationRecord
@@ -22,7 +22,8 @@ class Plan < ApplicationRecord
   end
 
   def closed?(t = Time.zone.now)
-    closes_at ? closes_at <= t : false
+    at = closes_at
+    at ? at <= t : false
   end
 
   def words_limit_hard

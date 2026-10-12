@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 class Broadcast < ApplicationRecord
@@ -15,7 +15,7 @@ class Broadcast < ApplicationRecord
   validates :status, presence: true
   validates :title, presence: true
   validates :body, presence: true
-  validate :forbid_changes_to_delivered_content, if: -> { persisted? && status_was == 'sent' }
+  validate :forbid_changes_to_delivered_content, if: ->(record) { record.persisted? && record.status_was == 'sent' }
 
   def perform_later!(now: Time.current)
     update!(status: :pending, dispatched_at: now)
