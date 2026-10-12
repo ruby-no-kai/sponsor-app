@@ -156,7 +156,8 @@ class Sponsorship < ApplicationRecord
   end
 
   def word_count
-    profile&.scan(/[\w\-'’]+/)&.size || 0
+    text = profile #: String?
+    text&.scan(/[\w\-'’]+/)&.size || 0
   end
 
   def policy_agreement
@@ -262,18 +263,21 @@ class Sponsorship < ApplicationRecord
   end
 
   def tito_source_code
+    id = self.id #: Integer?
     raise "Cannot generate tito source code without id" unless id
 
     "ss_#{id}"
   end
 
   private def validate_correct_plan
+    plan = self.plan
     if plan && plan.conference_id != conference_id
       errors.add :plan, "can't have a plan for an another conference"
     end
   end
 
   private def validate_plan_availability
+    plan = self.plan
     if plan && plan_id_changed? && !plan.available?
       errors.add :plan, :unavailable
     end
@@ -298,6 +302,7 @@ class Sponsorship < ApplicationRecord
   end
 
   private def validate_word_count
+    plan = self.plan
     limit = plan&.words_limit_hard
     if limit && word_count > limit
       errors.add :profile, :too_long, maximum: plan.words_limit || 0
@@ -305,6 +310,7 @@ class Sponsorship < ApplicationRecord
   end
 
   private def validate_no_plan_allowance
+    conference = self.conference
     if !plan_id && conference && !conference.no_plan_allowed
       errors.add :plan, :no_plan_not_allowed
     end

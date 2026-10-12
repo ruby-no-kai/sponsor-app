@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 class SponsorEvent < ApplicationRecord
@@ -27,6 +27,7 @@ class SponsorEvent < ApplicationRecord
   end
 
   def to_h_for_history
+    starts_at = self.starts_at #: ActiveSupport::TimeWithZone?
     {
       "sponsorship_id" => sponsorship_id,
       "conference_id" => conference_id,
@@ -60,15 +61,22 @@ class SponsorEvent < ApplicationRecord
   end
 
   private def set_conference_from_sponsorship
-    self.conference_id ||= sponsorship&.conference_id
+    current = conference_id #: Integer?
+    return if current
+
+    from_sponsorship = sponsorship&.conference_id
+    self.conference_id = from_sponsorship if from_sponsorship
   end
 
   private def generate_slug
     return if slug.present?
-    return unless sponsorship&.organization
 
-    sequence = sponsorship.sponsor_events.count + 1
-    self.slug = "#{sponsorship.organization.domain}-#{sequence}"
+    host = sponsorship
+    organization = host&.organization
+    return unless host && organization
+
+    sequence = host.sponsor_events.count + 1
+    self.slug = "#{organization.domain}-#{sequence}"
   end
 
   private def validate_co_host_sponsorship_ids
