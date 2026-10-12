@@ -80,10 +80,11 @@ run = "pnpm install --frozen-lockfile && touch node_modules/.pnpm/lock.yaml"
 sources = ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"]
 outputs = ["node_modules/.pnpm/lock.yaml"]
 
-# $PORT is the one trustless allocates, so the inner shell expands it.
+# The ui/ dev server proxies to Rails on port 3000. trustless passes the port in $PORT, which the
+# inner shell expands.
 [tasks.server]
 description = "Rails server behind trustless"
-run = "trustless exec sponsor-app bash -c 'bin/rails s --port $PORT'"
+run = "trustless exec --port 3000 sponsor-app-rails bash -c 'bin/rails s --port $PORT'"
 
 # mise skips this while node_modules/.pnpm/lock.yaml is newer than the sources. A no-op install
 # leaves that file as it is, hence the touch.
