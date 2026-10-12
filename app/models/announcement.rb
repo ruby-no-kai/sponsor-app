@@ -50,7 +50,7 @@ class Announcement < ApplicationRecord
     when !flag
       self.published_at = nil
     end
-    flag # rubocop:disable Lint/Void
+    flag
   end
 
   def published

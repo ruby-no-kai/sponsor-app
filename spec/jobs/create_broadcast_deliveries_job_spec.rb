@@ -28,7 +28,7 @@ RSpec.describe CreateBroadcastDeliveriesJob, type: :job do
                     :sponsorship,
                     conference:,
                     booth_assigned: !!booth_status,
-                    name: [status, plan.name, locale, booth_status, n].map(&:to_s).join(' '),
+                    name: [status, plan.name, locale, booth_status, n].join(' '),
                     locale:,
                     plan:,
                     accepted_at: status == :accepted ? Time.zone.now : nil,

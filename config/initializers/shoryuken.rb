@@ -17,7 +17,7 @@ module Shoryuken
             scope.set_span(transaction) if transaction
 
             yield
-          rescue Exception => exception # rubocop:disable Lint/RescueException
+          rescue Exception => exception
             ::Sentry.capture_exception(exception, hint: {background: false})
             finish_transaction(transaction, 500)
             raise
@@ -34,7 +34,7 @@ module Shoryuken
             },
           }
 
-          if job_class == 'ActiveJob::QueueAdapters::ShoryukenAdapter::JobWrapper'
+          if job_class == 'Shoryuken::ActiveJob::JobWrapper'
             context[:'Active-Job'] = {
               job_class: body["job_class"],
               job_id: body["job_id"],

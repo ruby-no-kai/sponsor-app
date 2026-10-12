@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Admin::AnnouncementsController < Admin::ApplicationController
   before_action :set_conference
   before_action :set_announcement, only: %i(show edit update)
@@ -57,19 +59,17 @@ class Admin::AnnouncementsController < Admin::ApplicationController
     end
   end
 
-  private
-
-  def set_announcement
+  private def set_announcement
     issue, locale = params[:id]&.split(':', 2)
     @announcement = @conference.announcements.find_by!(issue: issue, locale: locale)
   end
 
-  def set_conference
+  private def set_conference
     @conference = Conference.find_by!(slug: params[:conference_slug])
     check_staff_conference_authorization!(@conference)
   end
 
-  def announcement_params
+  private def announcement_params
     params.require(:announcement).permit(
       :issue,
       :locale,
