@@ -74,7 +74,7 @@ module Admin
         access_token: access_token,
       )
 
-      octo.repository?(Rails.application.config.x.github.repo)
+      github_repo_writable?(octo, Rails.application.config.x.github.repo)
     end
 
     private def github_find_accessible_repos(access_token, repos)
@@ -83,8 +83,18 @@ module Admin
       )
 
       repos.select do |repo|
-        octo.repository?(repo)
+        github_repo_writable?(octo, repo)
       end
+    end
+
+    # Readable alone is not enough, as any GitHub user can read a public repo.
+    private def github_repo_writable?(octo, repo)
+      permissions = octo.repository(repo)[:permissions]
+      return false unless permissions
+
+      !!(permissions[:push] || permissions[:maintain] || permissions[:admin])
+    rescue Octokit::InvalidRepository, Octokit::NotFound
+      false
     end
   end
 end
