@@ -29,7 +29,8 @@ module Shoryuken
         end
 
         def generate_contexts(worker_instance, queue, sqs_msg, body)
-          job_class = sqs_msg.message_attributes.dig('shoryuken_class', :string_value) || worker_instance&.class&.name
+          shoryuken_class = sqs_msg.message_attributes.dig('shoryuken_class', :string_value) unless sqs_msg.is_a?(Array)
+          job_class = shoryuken_class || worker_instance&.class&.name
 
           context = {
             Shoryuken: {
