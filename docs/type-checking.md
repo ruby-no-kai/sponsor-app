@@ -111,7 +111,7 @@ To raise an older file, `bundle exec spoom srb bump --from false --to true` find
 - Files evaluated in another tool's DSL and unable to resolve, such as `config/ci.rb`, are `typed: ignore`.
 - A spec whose anonymous class defines `initialize` or `self.name` leaks those definitions into `Object` for the whole project. Such a spec is `typed: ignore`.
 - Sorbet does not read the `.rbs` that protoc writes into `gen/`. Tapioca's Protobuf DSL compiler types the generated messages instead.
-- Tapioca types an attribute declared with `Protobufable::JsonType` untyped, as the type has no signature it can read. Declare the reader in `sorbet/rbi/shims/<model>.rbi`, as `sorbet/rbi/shims/expense_report_submission.rbi` does.
+- Tapioca types an attribute declared with `Protobufable::JsonType` untyped, as the type has no signature it can read. Declare the reader in `sorbet/rbi/shims/<model>.rbi`, as `sorbet/rbi/shims/expense_report_submission.rbi` and `sorbet/rbi/shims/form_description.rbi` do.
 - `message`, the request body an action declares with `protobuf_body`, is typed by protobufable's tapioca DSL compiler as the declared class, or the union of the classes a controller's actions declare.
 - Sorbet extends a class with a concern's `ClassMethods` only when the class includes that concern itself, not through another module. A concern including one declares `mixes_in_class_methods` in a shim, as `sorbet/rbi/shims/protobuf_request_body.rbi` does.
 - `connect_request` in a Connect controller returns untyped. Read a field into a local declared with its type: `slug = connect_request.conference_slug #: String`.
