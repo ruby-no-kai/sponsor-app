@@ -239,8 +239,6 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
   class GitHubPusher
     MAX_RETRIES = 3 #: Integer
 
-    delegate :octokit, :base_branch, to: :github_installation
-
     #: (conference: Conference, filepath: String, content: String, last_editing_history_id: Integer?,
     #|  last_event_editing_history_id: Integer?, push_id: Integer | String, ?build_summary: Method?) -> void
     def initialize(conference:, filepath:, content:, last_editing_history_id:, last_event_editing_history_id:, push_id:, build_summary: nil)
@@ -372,6 +370,12 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     private def github_installation
       @github_installation ||= GithubInstallation.new(repo.name, branch: repo.branch) #: GithubInstallation?
     end
+
+    #: () -> Octokit::Client
+    private def octokit = github_installation.octokit
+
+    #: () -> String
+    private def base_branch = github_installation.base_branch
 
     #: () -> Conference::GithubRepo
     private def repo = Must.because(@repo) { "push returns early without a github_repo" }
