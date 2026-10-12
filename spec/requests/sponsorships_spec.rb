@@ -59,6 +59,19 @@ RSpec.describe "Sponsorships", type: :request do
       get user_conference_sponsorship_path(conference)
       expect(response).to redirect_to(new_user_conference_sponsorship_path(conference))
     end
+
+    it "links to the sponsor events by their conference paths" do
+      conference.update!(event_submission_starts_at: 1.day.ago)
+      sponsorship = FactoryBot.create(:sponsorship, conference:, plan:, accepted_at: Time.current)
+      sponsor_event = FactoryBot.create(:sponsor_event, :pending, sponsorship:)
+      get claim_user_session_path(FactoryBot.create(:session_token, email: sponsorship.contact.email).handle)
+
+      get user_conference_sponsorship_path(conference)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(href="#{user_conference_sponsorship_event_path(conference, sponsor_event)}"))
+      expect(response.body).to include(%(href="#{new_user_conference_sponsorship_event_path(conference)}"))
+    end
   end
 
   describe "PATCH update" do

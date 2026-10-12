@@ -41,7 +41,7 @@
             %ul.list-unstyled
               - events.each do |event|
                 %li.mb-2
-                  = link_to event.title, user_conference_sponsorship_event_path(conference: @conference, id: event)
+                  = link_to event.title, user_conference_sponsorship_event_path(conference_slug: @conference, id: event)
                   - case event.status
                   - when 'pending'
                     %span.badge.badge-warning= t('.events.status_pending')
@@ -55,7 +55,7 @@
             %p.card-text.text-muted= t('.events.no_events')
           - if @conference.event_submission_open?
             %p.card-text.mt-2
-              = link_to t('.events.submit_new'), new_user_conference_sponsorship_event_path(conference: @conference), class: 'btn btn-primary btn-sm'
+              = link_to t('.events.submit_new'), new_user_conference_sponsorship_event_path(conference_slug: @conference), class: 'btn btn-primary btn-sm'
 
   .col-md-6
     .card.text-dark
