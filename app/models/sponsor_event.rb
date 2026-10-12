@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class SponsorEvent < ApplicationRecord
@@ -22,10 +22,12 @@ class SponsorEvent < ApplicationRecord
 
   scope :by_starts_at, -> { order(starts_at: :asc) }
 
+  #: () -> bool
   def editable_by_sponsor?
     !withdrawn?
   end
 
+  #: () -> Hash[String, untyped]
   def to_h_for_history
     starts_at = self.starts_at #: ActiveSupport::TimeWithZone?
     {
@@ -50,16 +52,19 @@ class SponsorEvent < ApplicationRecord
     }
   end
 
+  #: () -> (Array[Sponsorship] | Sponsorship::PrivateRelation)
   def co_host_sponsorships
     return [] if co_host_sponsorship_ids.blank?
 
     Sponsorship.where(id: co_host_sponsorship_ids, conference_id:)
   end
 
+  #: () -> Array[Sponsorship]
   def all_host_sponsorships
     ([Must.expect(sponsorship)] + co_host_sponsorships).reject(&:withdrawn?)
   end
 
+  #: () -> void
   private def set_conference_from_sponsorship
     current = conference_id #: Integer?
     return if current
@@ -68,6 +73,7 @@ class SponsorEvent < ApplicationRecord
     self.conference_id = from_sponsorship if from_sponsorship
   end
 
+  #: () -> void
   private def generate_slug
     return if slug.present?
 
@@ -79,6 +85,7 @@ class SponsorEvent < ApplicationRecord
     self.slug = "#{organization.domain}-#{sequence}"
   end
 
+  #: () -> void
   private def validate_co_host_sponsorship_ids
     return if co_host_sponsorship_ids.blank?
 
@@ -91,6 +98,7 @@ class SponsorEvent < ApplicationRecord
     end
   end
 
+  #: () -> void
   private def validate_policy_acknowledged_on_create
     if policy_acknowledged_at.blank?
       errors.add(:policy_acknowledged_at, "must be acknowledged")

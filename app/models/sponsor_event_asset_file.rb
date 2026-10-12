@@ -1,11 +1,11 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class SponsorEventAssetFile < ApplicationRecord
   include AssetFileUploadable
 
-  MAX_FILE_SIZE = 20.megabytes
-  ALLOWED_CONTENT_TYPES = %w[image/jpeg image/png image/gif image/webp].freeze
+  MAX_FILE_SIZE = 20.megabytes #: Integer
+  ALLOWED_CONTENT_TYPES = %w[image/jpeg image/png image/gif image/webp].freeze #: Array[String]
 
   belongs_to :sponsorship
   belongs_to :sponsor_event, optional: true
@@ -14,6 +14,7 @@ class SponsorEventAssetFile < ApplicationRecord
   validate :content_type_allowed
   validate :validate_ownership_not_changed
 
+  #: (conference: Conference, sponsorship: Sponsorship) -> SponsorEventAssetFile
   def self.prepare(conference:, sponsorship:)
     record = new
     record.sponsorship = sponsorship
@@ -21,10 +22,12 @@ class SponsorEventAssetFile < ApplicationRecord
     record
   end
 
+  #: () -> String
   def filename
     "E#{id}_#{sponsor_event&.slug}.#{extension}"
   end
 
+  #: () -> void
   private def content_type_allowed
     return if content_type.blank?
     return if content_type.in?(ALLOWED_CONTENT_TYPES)
@@ -32,6 +35,7 @@ class SponsorEventAssetFile < ApplicationRecord
     errors.add(:content_type, "must be an image (JPEG, PNG, GIF, WebP)")
   end
 
+  #: () -> void
   private def validate_ownership_not_changed
     if sponsor_event_id_changed? && !sponsor_event_id_was.nil?
       errors.add :sponsor_event_id, "cannot be changed"

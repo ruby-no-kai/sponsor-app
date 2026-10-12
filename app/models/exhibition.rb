@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 class Exhibition < ApplicationRecord
@@ -7,6 +7,7 @@ class Exhibition < ApplicationRecord
 
   validates :description, presence: true
 
+  #: () -> Hash[String, untyped]
   def to_h_for_history
     {
       "sponsorship_id" => sponsorship_id,
