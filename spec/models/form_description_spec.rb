@@ -178,5 +178,23 @@ RSpec.describe FormDescription, type: :model do
       expect(form).not_to be_valid
       expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
     end
+
+    [
+      '[null]',
+      '[1]',
+      '[["a"]]',
+      '[{"value": "a", "name": "A", "conditions": "x"}]',
+      '[{"value": "a", "name": "A", "conditions": {"plans": ["Ruby"]}}]',
+      '[{"value": "a", "name": "A", "conditions": [1]}]',
+      '[{"value": "a", "name": "A", "conditions": ["x"]}]',
+    ].each do |json|
+      it "adds validation error for malformed shape #{json}" do
+        form = FactoryBot.build(:form_description, conference:, locale: 'en')
+        form.fallback_options = json
+
+        expect(form).not_to be_valid
+        expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
+      end
+    end
   end
 end
