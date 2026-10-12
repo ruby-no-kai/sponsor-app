@@ -45,6 +45,12 @@ RSpec.describe "Admin Plans", type: :request do
 
       expect(response).to redirect_to(conference_plans_path(conference))
     end
+
+    it "saves the talkable checkbox" do
+      post conference_plans_path(conference), params: {plan: {name: 'Gold', capacity: 3, price_text: 'p', words_limit: 10, talkable: '1'}}
+
+      expect(conference.plans.find_by!(name: 'Gold').talkable).to be(true)
+    end
   end
 
   describe "existing plan" do
@@ -60,6 +66,14 @@ RSpec.describe "Admin Plans", type: :request do
 
       expect(response).to redirect_to(conference_plans_path(conference))
       expect(plan.reload.name).to eq('Renamed')
+    end
+
+    it "updates talkable" do
+      patch conference_plan_path(conference, plan), params: {plan: {talkable: '1'}}
+      expect(plan.reload.talkable).to be(true)
+
+      patch conference_plan_path(conference, plan), params: {plan: {talkable: '0'}}
+      expect(plan.reload.talkable).to be(false)
     end
 
     it "does not find a plan of another conference" do
