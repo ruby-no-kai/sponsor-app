@@ -1,4 +1,4 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 require 'securerandom'
@@ -23,8 +23,10 @@ class Sponsorship < ApplicationRecord
 
   has_one :tito_source, dependent: nil
 
+  #: () -> Integer?
   def asset_file_id; asset_file&.id; end
 
+  #: (String | Integer | nil) -> void
   def asset_file_id=(other)
     self.asset_file = SponsorshipAssetFile.find_by(id: other.to_i)
   end
@@ -42,16 +44,19 @@ class Sponsorship < ApplicationRecord
 
   has_many :tito_discount_codes, dependent: :destroy
 
+  #: () -> TitoDiscountCode?
   def tito_attendee_discount_code
-    @tito_attendee_discount_code ||= tito_discount_codes.where(kind: 'attendee').first
+    @tito_attendee_discount_code ||= tito_discount_codes.where(kind: 'attendee').first #: TitoDiscountCode?
   end
 
+  #: () -> TitoDiscountCode?
   def tito_booth_staff_discount_code
-    @tito_booth_staff_discount_code ||= tito_discount_codes.where(kind: 'booth_staff').first
+    @tito_booth_staff_discount_code ||= tito_discount_codes.where(kind: 'booth_staff').first #: TitoDiscountCode?
   end
 
+  #: () -> TitoDiscountCode?
   def tito_booth_paid_discount_code
-    @tito_booth_paid_discount_code ||= tito_discount_codes.where(kind: 'booth_paid').first
+    @tito_booth_paid_discount_code ||= tito_discount_codes.where(kind: 'booth_paid').first #: TitoDiscountCode?
   end
 
   scope :active, -> { accepted.not_withdrawn }
@@ -100,6 +105,7 @@ class Sponsorship < ApplicationRecord
 
   before_validation :generate_ticket_key
 
+  #: () -> void
   def build_nested_attributes_associations
     build_contact unless contact
     build_alternate_billing_contact unless alternate_billing_contact
@@ -108,71 +114,88 @@ class Sponsorship < ApplicationRecord
     build_note unless note
   end
 
+  #: () -> bool
   def active?
     accepted? && !withdrawn?
   end
 
+  #: () -> void
   def accept
     self.accepted_at = Time.zone.now
   end
 
+  #: () -> bool
   def accepted?
     !!accepted_at
   end
 
+  #: () -> bool
   def accepted
     accepted?
   end
 
+  #: (String | bool | nil) -> void
   def accepted=(x)
     case
     when !x || x == '0'
       self.accepted_at = nil
-    when x && !accepted?
+    when !accepted?
       self.accepted_at = Time.zone.now
     else
       accepted?
     end
   end
 
+  #: () -> bool
   def withdrawn?
     !!withdrawn_at
   end
 
+  #: () -> bool
   def customized?
     customization && customization_name.present?
   end
 
+  #: () -> bool
   def customization_planned?
     !customization && customization_name.present?
   end
 
+  #: () -> String?
   def plan_name
     customized? ? (customization_name || plan&.name) : plan&.name
   end
 
+  #: () -> String?
   def slug
     organization&.slug
   end
 
+  #: () -> Integer
   def word_count
-    profile&.scan(/[\w\-'’]+/)&.size || 0
+    text = profile #: String?
+    text&.scan(/[\w\-'’]+/)&.size || 0
   end
 
+  #: () -> bool
   def policy_agreement
-    return @policy_agreement if defined? @policy_agreement
+    agreement = @policy_agreement
+    return agreement unless agreement.nil?
 
     @policy_agreement = persisted?
   end
 
+  #: (String | bool | nil) -> void
   def policy_agreement=(other)
-    @policy_agreement = !!other
+    @policy_agreement = !!other #: bool?
   end
 
+  #: () -> Contact?
   def billing_contact
     alternate_billing_contact || contact
   end
 
+  #: (?affiliated_organization: Organization?) -> void
   def assume_organization(affiliated_organization: nil)
     self.organization = if affiliated_organization
       affiliated_organization
@@ -181,6 +204,7 @@ class Sponsorship < ApplicationRecord
     end
   end
 
+  #: () -> Hash[String, untyped]
   def to_h_for_history
     {
       "conference_id" => conference&.id,
@@ -217,18 +241,20 @@ class Sponsorship < ApplicationRecord
     end
   end
 
+  #: () -> Hash[Symbol, untyped]
   def attributes_for_copy
     {
       name: name,
       url: url,
       profile: profile,
       asset_file_id: asset_file_id,
-      contact_attributes: contact.attributes.except('id', 'kind'),
+      contact_attributes: Must.because(contact) { "a saved sponsorship validates the presence of its contact" }.attributes.except('id', 'kind'),
       alternate_billing_contact_attributes: alternate_billing_contact&.attributes&.except('id', 'kind')&.merge(_keep: '1'),
       billing_request_attributes: billing_request&.attributes&.except('id', 'kind'),
     }.compact
   end
 
+  #: () -> Integer
   def total_number_of_attendees
     if active?
       (plan&.number_of_guests || 0) + (number_of_additional_attendees || 0)
@@ -237,23 +263,28 @@ class Sponsorship < ApplicationRecord
     end
   end
 
+  #: () -> Integer
   def total_number_of_booth_staff
     # (active? && booth_assigned?) ? [3, booth_size ? booth_size*2 : 0].max : 0 # FIXME:
     active? && booth_assigned? ? 2 : 0 # FIXME: make configurable per conference
   end
 
+  #: () -> Integer?
   def booth_size
     plan&.booth_size
   end
 
+  #: () -> Integer
   def assigned_booth_size
     booth_assigned? ? (plan&.booth_size || 0) : 0
   end
 
+  #: () -> bool
   def exhibitor?
     booth_assigned?
   end
 
+  #: () -> self
   def withdraw
     self.withdrawn_at = Time.zone.now
     self.booth_assigned = false
@@ -261,55 +292,69 @@ class Sponsorship < ApplicationRecord
     self
   end
 
+  #: () -> String
   def tito_source_code
+    id = self.id #: Integer?
     raise "Cannot generate tito source code without id" unless id
 
     "ss_#{id}"
   end
 
+  #: () -> void
   private def validate_correct_plan
+    plan = self.plan
     if plan && plan.conference_id != conference_id
       errors.add :plan, "can't have a plan for an another conference"
     end
   end
 
+  #: () -> void
   private def validate_plan_availability
+    plan = self.plan
     if plan && plan_id_changed? && !plan.available?
       errors.add :plan, :unavailable
     end
   end
 
+  #: () -> void
   private def validate_plan_change
     if plan_id_changed? && plan_id_was && accepted?
       errors.add :plan, :unchangeable_after_finalization
     end
   end
 
+  #: () -> void
   private def validate_policy_agreement
     unless policy_agreement
       errors.add :policy_agreement, "must agree with the policy"
     end
   end
 
+  #: () -> void
   private def validate_booth_eligibility
     if booth_requested && !plan&.booth_eligible?
       errors.add :booth_requested, :not_eligible
     end
   end
 
+  #: () -> void
   private def validate_word_count
+    plan = self.plan
     limit = plan&.words_limit_hard
     if limit && word_count > limit
       errors.add :profile, :too_long, maximum: plan.words_limit || 0
     end
   end
 
+  #: () -> void
   private def validate_no_plan_allowance
+    conference = self.conference
     if !plan_id && conference && !conference.no_plan_allowed
       errors.add :plan, :no_plan_not_allowed
     end
   end
 
+  #: () -> void
   private def validate_fallback_option
     form_desc = conference&.form_description_for_locale
     return unless form_desc
@@ -322,6 +367,7 @@ class Sponsorship < ApplicationRecord
     end
   end
 
+  #: () -> void
   private def generate_ticket_key
     if ticket_key.blank?
       loop do

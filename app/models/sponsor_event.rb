@@ -1,4 +1,4 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class SponsorEvent < ApplicationRecord
@@ -22,11 +22,14 @@ class SponsorEvent < ApplicationRecord
 
   scope :by_starts_at, -> { order(starts_at: :asc) }
 
+  #: () -> bool
   def editable_by_sponsor?
     !withdrawn?
   end
 
+  #: () -> Hash[String, untyped]
   def to_h_for_history
+    starts_at = self.starts_at #: ActiveSupport::TimeWithZone?
     {
       "sponsorship_id" => sponsorship_id,
       "conference_id" => conference_id,
@@ -49,28 +52,40 @@ class SponsorEvent < ApplicationRecord
     }
   end
 
+  #: () -> (Array[Sponsorship] | Sponsorship::PrivateRelation)
   def co_host_sponsorships
     return [] if co_host_sponsorship_ids.blank?
 
     Sponsorship.where(id: co_host_sponsorship_ids, conference_id:)
   end
 
+  #: () -> Array[Sponsorship]
   def all_host_sponsorships
-    ([sponsorship] + co_host_sponsorships).reject(&:withdrawn?)
+    ([Must.expect(sponsorship)] + co_host_sponsorships).reject(&:withdrawn?)
   end
 
+  #: () -> void
   private def set_conference_from_sponsorship
-    self.conference_id ||= sponsorship&.conference_id
+    current = conference_id #: Integer?
+    return if current
+
+    from_sponsorship = sponsorship&.conference_id
+    self.conference_id = from_sponsorship if from_sponsorship
   end
 
+  #: () -> void
   private def generate_slug
     return if slug.present?
-    return unless sponsorship&.organization
 
-    sequence = sponsorship.sponsor_events.count + 1
-    self.slug = "#{sponsorship.organization.domain}-#{sequence}"
+    host = sponsorship
+    organization = host&.organization
+    return unless host && organization
+
+    sequence = host.sponsor_events.count + 1
+    self.slug = "#{organization.domain}-#{sequence}"
   end
 
+  #: () -> void
   private def validate_co_host_sponsorship_ids
     return if co_host_sponsorship_ids.blank?
 
@@ -83,6 +98,7 @@ class SponsorEvent < ApplicationRecord
     end
   end
 
+  #: () -> void
   private def validate_policy_acknowledged_on_create
     if policy_acknowledged_at.blank?
       errors.add(:policy_acknowledged_at, "must be acknowledged")

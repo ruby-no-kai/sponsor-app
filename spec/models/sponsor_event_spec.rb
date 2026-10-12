@@ -186,6 +186,11 @@ RSpec.describe SponsorEvent, type: :model do
       event = FactoryBot.create(:sponsor_event, sponsorship:)
       expect(event.all_host_sponsorships).not_to include(sponsorship)
     end
+
+    it 'raises Must::Violation without a sponsorship' do
+      event = described_class.new
+      expect { event.all_host_sponsorships }.to raise_error(Must::Violation)
+    end
   end
 
   describe 'editing history' do

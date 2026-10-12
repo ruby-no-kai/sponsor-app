@@ -1,4 +1,4 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class SponsorshipAssetFile < ApplicationRecord
@@ -16,7 +16,7 @@ class SponsorshipAssetFile < ApplicationRecord
     application/postscript
     application/illustrator
     application/octet-stream
-  ].freeze
+  ].freeze #: Array[String]
 
   belongs_to :sponsorship, optional: true
 
@@ -32,12 +32,14 @@ class SponsorshipAssetFile < ApplicationRecord
 
   validate :validate_ownership_not_changed
 
+  #: (conference: Conference) -> SponsorshipAssetFile
   def self.prepare(conference:)
     record = new
     record.prefix = "c-#{conference.id}/"
     record
   end
 
+  #: (Conference) -> SponsorshipAssetFile
   def copy_to!(conference)
     dst = self.class.prepare(conference:)
     dst.extension = extension
@@ -51,10 +53,12 @@ class SponsorshipAssetFile < ApplicationRecord
     dst
   end
 
+  #: () -> String
   def filename
     "S#{id}_#{sponsorship&.slug}.#{extension}"
   end
 
+  #: () -> void
   private def content_type_allowed
     return if content_type.blank?
     return if content_type.in?(ALLOWED_CONTENT_TYPES)
@@ -62,6 +66,7 @@ class SponsorshipAssetFile < ApplicationRecord
     errors.add(:content_type, "is not an allowed file type")
   end
 
+  #: () -> void
   private def validate_ownership_not_changed
     if sponsorship_id_changed? && !sponsorship_id_was.nil?
       errors.add :sponsorship_id, "cannot be changed"

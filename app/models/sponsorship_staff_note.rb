@@ -1,4 +1,4 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class SponsorshipStaffNote < ApplicationRecord
@@ -7,6 +7,7 @@ class SponsorshipStaffNote < ApplicationRecord
   belongs_to :sponsorship
   belongs_to :staff
 
+  #: () -> bool
   def pin?
     stickiness > 0
   end
