@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 require 'securerandom'
@@ -27,22 +27,27 @@ class SessionToken < ApplicationRecord
     self.expires_at = Time.zone.now + 3.months unless current_expires_at
   end
 
+  #: (?at: ActiveSupport::TimeWithZone) -> bool
   def expired?(at: Time.zone.now)
     expires_at < at
   end
 
+  #: () -> Contact::PrivateRelation
   def contacts
     email ? Contact.where(kind: :primary, email: email) : Contact.none
   end
 
+  #: () -> Array[Sponsorship]
   def sponsorships
     contacts.includes(:sponsorship).map { |contact| Must.because(contact.sponsorship) { "contacts.sponsorship_id is NOT NULL" } }.sort_by(&:id)
   end
 
+  #: () -> Array[Integer]
   def sponsorship_ids
     sponsorships.map(&:id)
   end
 
+  #: () -> String
   def to_param
     handle
   end
