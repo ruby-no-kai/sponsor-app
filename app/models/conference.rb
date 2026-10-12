@@ -78,7 +78,7 @@ class Conference < ApplicationRecord
   def github_repo
     ghr = read_attribute(:github_repo)
     if @github_repo&.raw != ghr
-      m = ghr.match(/^(.+?)(?:@(.+?))?(?::(.+?))$/)
+      m = ghr&.match(/^(.+?)(?:@(.+?))?(?::(.+?))$/)
       @github_repo = m && GithubRepo.new(
         raw: ghr,
         name: m[1],
