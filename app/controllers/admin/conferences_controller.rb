@@ -2,7 +2,7 @@
 
 module Admin
   class ConferencesController < Admin::ApplicationController
-    before_action :require_unrestricted_staff, only: [:index, :new, :create]
+    before_action :require_unrestricted_staff, only: [:index, :new, :create, :destroy]
     before_action :set_conference, only: [:show, :edit, :update, :destroy, :attendees_keeper, :sponsors_yml, :sponsors_json, :asset_urls, :table_view]
 
     def index
