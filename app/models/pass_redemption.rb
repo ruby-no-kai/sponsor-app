@@ -36,7 +36,7 @@ class PassRedemption
 
   class Collection
     def self.from_tito_registration_list(tito_registration_list, sponsorship: nil, conference: sponsorship&.conference)
-      if (tito_registration_list.dig('meta', 'total_pages') || 0) > 1
+      if (tito_registration_list.dig(:meta, :total_pages) || 0) > 1
         raise PaginationNotSupported
       end
 
