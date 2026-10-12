@@ -203,6 +203,19 @@ RSpec.describe TitoTicketRetraction, type: :model do
       end
     end
 
+    context 'when sponsorship is nil' do
+      let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :with_tito_registration, sponsorship: nil, conference:) }
+
+      it 'reports no valid discount codes instead of raising' do
+        expect(retraction.preconditions).to include(valid_discount_code_used: false)
+        expect(retraction).not_to be_retractable
+      end
+
+      it 'fails validation on create' do
+        expect(retraction).not_to be_valid
+      end
+    end
+
     context 'with valid registration data' do
       let!(:tito_discount_code) { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') } # rubocop:disable RSpec/LetSetup
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :with_tito_registration, sponsorship:) }

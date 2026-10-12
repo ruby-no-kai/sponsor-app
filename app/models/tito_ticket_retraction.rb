@@ -28,7 +28,7 @@ class TitoTicketRetraction < ApplicationRecord
 
   def preconditions
     reg = tito_registration or return
-    valid_discount_codes = sponsorship&.tito_discount_codes&.pluck(:code)
+    valid_discount_codes = sponsorship&.tito_discount_codes&.pluck(:code) || []
     discount_codes_used = reg.fetch('tickets').map { |t| t.fetch('discount_code_used') }.uniq
     {
       free: reg.fetch('free'),
@@ -40,7 +40,7 @@ class TitoTicketRetraction < ApplicationRecord
       ticket_discount_code_count: reg.fetch('tickets').group_by { |t| t.fetch('discount_code_used') }.size,
       discount_codes_used:,
       invalid_discount_codes: discount_codes_used - valid_discount_codes,
-      valid_discount_code_used: reg.fetch('tickets').all? { |t| valid_discount_codes&.include?(t.fetch('discount_code_used')) },
+      valid_discount_code_used: reg.fetch('tickets').all? { |t| valid_discount_codes.include?(t.fetch('discount_code_used')) },
     }
   end
 
