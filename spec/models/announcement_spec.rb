@@ -16,6 +16,12 @@ RSpec.describe Announcement, type: :model do
       announcement = FactoryBot.create(:announcement, staff:, conference:, issue: 'custom')
       expect(announcement.issue).to eq('custom')
     end
+
+    it 'reports missing conference as a validation error' do
+      announcement = FactoryBot.build(:announcement, staff:, conference: nil, issue: 'custom')
+      expect(announcement).not_to be_valid
+      expect(announcement.errors[:conference]).to be_present
+    end
   end
 
   describe 'scopes' do

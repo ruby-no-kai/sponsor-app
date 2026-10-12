@@ -35,6 +35,8 @@ class Announcement < ApplicationRecord
   end
 
   def bump_revision
+    return unless conference
+
     unless will_save_change_to_revision?
       self.revision = latest_revision
     end
