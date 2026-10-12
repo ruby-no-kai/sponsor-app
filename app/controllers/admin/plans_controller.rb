@@ -59,6 +59,7 @@ module Admin
         :booth_size,
         :words_limit,
         :auto_acceptance,
+        :talkable,
         :closes_at,
       )
     end
