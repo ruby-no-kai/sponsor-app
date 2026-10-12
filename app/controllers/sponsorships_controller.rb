@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 class SponsorshipsController < ApplicationController
@@ -31,7 +31,7 @@ class SponsorshipsController < ApplicationController
 
     @conference = Conference.find_by!(slug: params[:conference_slug])
     return render(plain: '404', status: :not_found) unless @conference.verify_invite_code(params[:invite_code])
-    return render(:closed, status: :forbidden) if !@conference&.application_open? && !current_staff
+    return render(:closed, status: :forbidden) if !@conference.application_open? && !current_staff
 
     @affiliated_organization = Organization.find_by(affiliation_code: params[:affiliation])
 
@@ -45,7 +45,7 @@ class SponsorshipsController < ApplicationController
 
     @conference = Conference.find_by!(slug: params[:conference_slug])
     return render(plain: '404', status: :not_found) unless @conference.verify_invite_code(params[:invite_code])
-    return render(:closed, status: :forbidden) if !@conference&.application_open? && !current_staff
+    return render(:closed, status: :forbidden) if !@conference.application_open? && !current_staff
 
     @sponsorship = Sponsorship.new(sponsorship_params.except(:asset_file_id))
 

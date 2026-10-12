@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
@@ -37,7 +37,7 @@ class SessionsController < ApplicationController
     set_back_to
 
     @sponsorships = @session_token.sponsorships.reject(&:withdrawn?)
-    @sponsorship = @sponsorships&.last
+    @sponsorship = @sponsorships.last
     if @sponsorship
       redirect_to session.delete(:back_to) || user_conference_sponsorship_path(@sponsorship.conference)
     else

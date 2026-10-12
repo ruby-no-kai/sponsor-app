@@ -1,8 +1,9 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 require 'active_support/concern'
 
+# @requires_ancestor: ApplicationController
 module AssetFileSessionable
   extend ActiveSupport::Concern
 
