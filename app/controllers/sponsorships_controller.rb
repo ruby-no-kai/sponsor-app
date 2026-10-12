@@ -117,6 +117,7 @@ class SponsorshipsController < ApplicationController
       :booth_requested,
       :fallback_option,
       :number_of_additional_attendees,
+      :policy_agreement,
       contact_attributes: %i(id email email_cc address organization unit name),
       alternate_billing_contact_attributes: %i(_keep id email address organization unit name),
       billing_request_attributes: %i(id body),
