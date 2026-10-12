@@ -21,6 +21,11 @@ RSpec.describe TitoApi do
   end
 
   describe 'requests' do
+    it 'refuses an endpoint that is not an HTTP(S) URL' do
+      api = described_class.new(token: 'secret', endpoint: 'ftp://tito.example.invalid/v3')
+      expect { api.list_releases('rubykaigi/2025') }.to raise_error(ArgumentError, /not an HTTP\(S\) URL/)
+    end
+
     it 'authenticates with the Tito token scheme and parses JSON with symbol keys' do
       stub = stub_request(:get, "#{endpoint}/rubykaigi/2025/registrations/reg_1")
         .with(headers: {'Authorization' => 'Token token=secret', 'Accept' => 'application/json'}, query: {'expand' => 'tickets'})
