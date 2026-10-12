@@ -15,7 +15,7 @@ module CommandRunner
     $stdout.puts "RUNCMD #{context.aws_request_id} #{JSON.generate(cmd)}"
     t = Time.now.utc
     cmd = Array(cmd)
-    raise "invalid argument" unless cmd[1..].all? { |e| e.is_a?(String) }
+    raise "invalid argument" if cmd.empty? || !cmd.drop(1).all? { |e| e.is_a?(String) }
 
     $stdout.sync = true
     buf = +''
