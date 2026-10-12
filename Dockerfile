@@ -53,6 +53,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,t
 WORKDIR /app
 COPY Gemfile /app/
 COPY Gemfile.lock /app/
+COPY gen/proto/ruby/sponsor_app-proto.gemspec /app/gen/proto/ruby/
 
 RUN bundle config set deployment true \
  && bundle config set without development:test \

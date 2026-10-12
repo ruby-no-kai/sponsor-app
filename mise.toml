@@ -1,5 +1,9 @@
 [tools]
 hk = "latest"
+buf = "1.73.0"
+# The protobuf release that google-protobuf in Gemfile.lock is built from. Another
+# release emits different code.
+"aqua:protocolbuffers/protobuf/protoc" = "36.2"
 
 [env]
 # sorbet-static ships only precompiled platform gems, which a `ruby` lockfile
@@ -18,4 +22,41 @@ run = [
   "bundle exec tapioca gem --all",
   "bundle exec tapioca annotations",
   "bundle exec tapioca dsl",
+]
+
+[tasks.gen]
+description = "Run every generator whose output is checked into git"
+depends = ["gen:proto", "gen:rbi"]
+
+[tasks."gen:proto"]
+description = "Generate Ruby and RBS for proto/ into gen/proto/ruby"
+sources = ["proto/**/*.proto", "buf.gen.yaml", "buf.yaml"]
+outputs = { auto = true }
+run = '''
+set -eu
+
+# A .proto that fails to compile must leave gen/ untouched.
+buf build
+
+find gen/proto/ruby \( -path 'gen/proto/ruby/lib/*_pb.rb' -o -path 'gen/proto/ruby/sig/*_pb.rbs' \) -delete
+buf generate
+'''
+
+# `--only` skips tapioca's stale RBI removal, so the message RBIs are rebuilt
+# from scratch.
+[tasks."gen:rbi"]
+description = "Regenerate Sorbet RBIs for the generated protobuf messages (boots Rails, needs no database)"
+depends = ["gen:proto"]
+sources = ["gen/proto/ruby/lib/**/*.rb", "Gemfile.lock"]
+outputs = { auto = true }
+run = [
+  "rm -rf third_party/sorbet/rbi/dsl/rk/sponsor_app",
+  "bundle exec tapioca dsl --only=Protobuf",
+]
+
+[tasks."lint:proto"]
+description = "Lint proto/ and check its formatting"
+run = [
+  "buf lint",
+  "buf format --diff --exit-code",
 ]

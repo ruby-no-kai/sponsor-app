@@ -1,0 +1,8 @@
+version: v2
+# gen/proto/ruby also holds hand-written files, so `clean: true` must stay off.
+plugins:
+  - protoc_builtin: ruby
+    out: gen/proto/ruby/lib
+  # Needs protoc 34 or later.
+  - protoc_builtin: rbs
+    out: gen/proto/ruby/sig

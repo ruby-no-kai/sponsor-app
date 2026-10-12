@@ -13,7 +13,7 @@ The app typechecks with [Sorbet](https://sorbet.org/) using inline RBS comments 
 | `sorbet/rbi/shims/` | hand-written RBIs for what tapioca cannot see | no |
 | `sorbet/rbi/shims/<concern>.rbi` | columns and readers a concern reads from its including classes | no |
 | `third_party/sorbet/rbi/gems/` | gem RBIs from `tapioca gem` | yes |
-| `third_party/sorbet/rbi/dsl/` | Rails DSL RBIs (models, associations, routes) from `tapioca dsl` | yes |
+| `third_party/sorbet/rbi/dsl/` | Rails and protobuf DSL RBIs (models, associations, routes, messages) from `tapioca dsl` | yes |
 | `app/models/must.rb` | `Must`, the runtime counterpart of `T.must` | no |
 
 ## Commands
@@ -25,14 +25,15 @@ The app typechecks with [Sorbet](https://sorbet.org/) using inline RBS comments 
 | `mise run tapioca` | regenerates gem, annotation and DSL RBIs, skipping the gems excluded in `sorbet/tapioca/config.yml` |
 | `bundle exec tapioca gem` | gem RBIs, after `Gemfile.lock` changes |
 | `bundle exec tapioca dsl` | DSL RBIs, after adding a model, column, association or route |
+| `mise run gen` | `gen/` and the protobuf message RBIs from tapioca's Protobuf compiler, after a `.proto` change |
 | `bundle exec tapioca annotations` | community annotations |
 | `bin/check-strict-sigils BASE` | fails when a Ruby file added since `BASE` is below `strict` |
 
 Run `bundle` under the mise environment (`mise x -- bundle ...`, or a shell with mise activated). `sorbet-static` ships only platform gems, so `Gemfile.lock` has no `ruby` platform and `BUNDLE_FORCE_RUBY_PLATFORM` must be false.
 
-`tapioca dsl` boots Rails against the development database. Bring it up with `docker compose up -d db` first.
+`tapioca dsl` boots Rails against the development database. Bring it up with `docker compose up -d db` first. `mise run gen` needs no database.
 
-Nothing detects stale RBIs. Regenerate them in the same change that moves `Gemfile.lock` or the schema.
+Nothing detects stale RBIs. Regenerate them in the same change that moves `Gemfile.lock`, the database schema or a `.proto` file.
 
 ## Writing types
 
@@ -108,6 +109,7 @@ To raise an older file, `bundle exec spoom srb bump --from false --to true` find
 - Tapioca emits no instance variables. One that a gem assigns and a patch reads is declared with `T.let` in an `initialize` body in the gem's shim, as in `sorbet/rbi/shims/aws-sdk-s3.rbi`.
 - Files evaluated in another tool's DSL and unable to resolve, such as `config/ci.rb`, are `typed: ignore`.
 - A spec whose anonymous class defines `initialize` or `self.name` leaks those definitions into `Object` for the whole project. Such a spec is `typed: ignore`.
+- Sorbet does not read the `.rbs` that protoc writes into `gen/`. Tapioca's Protobuf DSL compiler types the generated messages instead.
 
 ## References
 

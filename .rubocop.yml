@@ -1,6 +1,10 @@
 inherit_gem:
   rubocop-shopify: rubocop.yml
 
+AllCops:
+  Exclude:
+    - gen/**/*
+
 plugins:
   - rubocop-factory_bot
   - rubocop-rails

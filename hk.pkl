@@ -1,6 +1,9 @@
 amends "package://github.com/jdx/hk/releases/download/v2.0.1/hk@2.0.1#/Config.pkl"
 import "package://github.com/jdx/hk/releases/download/v2.0.1/hk@2.0.1#/Builtins.pkl"
 
+// Holds buf output, which formatters must not rewrite.
+local generated = List("gen/**")
+
 local linters = new Mapping<String, Step> {
   ["rubocop"] {
     workspace_indicator = ".rubocop.yml"
@@ -14,7 +17,9 @@ local linters = new Mapping<String, Step> {
     check = "bundle exec srb tc"
   }
   ["actionlint"] = Builtins.actionlint
-  ["newlines"] = Builtins.newlines
+  ["newlines"] = (Builtins.newlines) {
+    exclude = generated
+  }
 
   ["oxfmt"] {
     workspace_indicator = "pnpm-lock.yaml"
@@ -23,10 +28,6 @@ local linters = new Mapping<String, Step> {
     check_list_files = "cd {{workspace}} && npx oxfmt --list-different {{ workspace_files }}"
     fix = "cd {{workspace}} && npx oxfmt --write {{ workspace_files }}"
     batch = true
-  }
-  ["crossbar-protoc"] {
-    glob = "proto/**/*"
-    check_diff = "mise run protoc && mise run openapi"
   }
 }
 
