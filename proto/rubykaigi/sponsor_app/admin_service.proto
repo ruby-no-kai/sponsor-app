@@ -31,7 +31,7 @@ service AdminService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // Returns one conference by its slug.
+  // Returns one conference by its slug, with its plans and sponsorships.
   rpc GetConference(AdminServiceGetConferenceRequest) returns (AdminServiceGetConferenceResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }

@@ -6,18 +6,52 @@
 
 
 class Rk::SponsorApp::AdminServiceGetConferenceResponse < Google::Protobuf::AbstractMessage
-  sig { params(conference: T.nilable(Rk::SponsorApp::Conference)).void }
-  def initialize(conference: nil); end
+  sig do
+    params(
+      conference: T.nilable(Rk::SponsorApp::AdminConference),
+      form_description_locales: T.nilable(T::Array[String]),
+      plans: T.nilable(T::Array[Rk::SponsorApp::PlanSummary]),
+      sponsorships: T.nilable(T::Array[Rk::SponsorApp::SponsorshipSummary])
+    ).void
+  end
+  def initialize(conference: nil, form_description_locales: T.unsafe(nil), plans: T.unsafe(nil), sponsorships: T.unsafe(nil)); end
 
   sig { void }
   def clear_conference; end
 
-  sig { returns(T.nilable(Rk::SponsorApp::Conference)) }
+  sig { void }
+  def clear_form_description_locales; end
+
+  sig { void }
+  def clear_plans; end
+
+  sig { void }
+  def clear_sponsorships; end
+
+  sig { returns(T.nilable(Rk::SponsorApp::AdminConference)) }
   def conference; end
 
-  sig { params(value: T.nilable(Rk::SponsorApp::Conference)).void }
+  sig { params(value: T.nilable(Rk::SponsorApp::AdminConference)).void }
   def conference=(value); end
+
+  sig { returns(Google::Protobuf::RepeatedField[String]) }
+  def form_description_locales; end
+
+  sig { params(value: Google::Protobuf::RepeatedField[String]).void }
+  def form_description_locales=(value); end
 
   sig { returns(Object) }
   def has_conference?; end
+
+  sig { returns(Google::Protobuf::RepeatedField[Rk::SponsorApp::PlanSummary]) }
+  def plans; end
+
+  sig { params(value: Google::Protobuf::RepeatedField[Rk::SponsorApp::PlanSummary]).void }
+  def plans=(value); end
+
+  sig { returns(Google::Protobuf::RepeatedField[Rk::SponsorApp::SponsorshipSummary]) }
+  def sponsorships; end
+
+  sig { params(value: Google::Protobuf::RepeatedField[Rk::SponsorApp::SponsorshipSummary]).void }
+  def sponsorships=(value); end
 end
