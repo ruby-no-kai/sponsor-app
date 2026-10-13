@@ -6,6 +6,7 @@ import "rubykaigi/sponsor_app/sponsor_applications.proto";
 import "rubykaigi/sponsor_app/sponsor_broadcasts.proto";
 import "rubykaigi/sponsor_app/sponsor_events.proto";
 import "rubykaigi/sponsor_app/sponsor_exhibitions.proto";
+import "rubykaigi/sponsor_app/sponsor_expense_reports.proto";
 import "rubykaigi/sponsor_app/sponsor_passes.proto";
 import "rubykaigi/sponsor_app/sponsor_shell.proto";
 import "rubykaigi/sponsor_app/sponsor_viewer.proto";
@@ -176,6 +177,24 @@ service SponsorService {
   rpc CreatePassRetraction(SponsorServiceCreatePassRetractionRequest) returns (SponsorServiceCreatePassRetractionResponse);
 
   // Expense reports
+
+  // Every RPC here needs a sponsorship with a confirmed custom package, and answers
+  // `permission_denied` for any other.
+
+  // Returns the sponsorship's expense report with its line items, uploaded files and latest
+  // review. A sponsorship that has not started one is answered `not_found`.
+  rpc GetExpenseReport(SponsorServiceGetExpenseReportRequest) returns (SponsorServiceGetExpenseReportResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns the tax rates, rounding and fees the sponsorship's expense report is weighed against.
+  // The fee is 0 while the plan is undetermined.
+  rpc CalculateExpenseReport(SponsorServiceCalculateExpenseReportRequest) returns (SponsorServiceCalculateExpenseReportResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Starts the sponsorship's expense report. Calling again answers the report it has, unchanged.
+  rpc CreateExpenseReport(SponsorServiceCreateExpenseReportRequest) returns (SponsorServiceCreateExpenseReportResponse);
 
   // Viewer
 
