@@ -2,27 +2,6 @@
 # frozen_string_literal: true
 
 class ExpenseReport < ApplicationRecord
-  #: type snapshot_line_item = {
-  #|   id: Integer,
-  #|   title: String,
-  #|   notes: String?,
-  #|   amount: String,
-  #|   tax_rate: String?,
-  #|   tax_amount: String,
-  #|   preliminal: bool,
-  #|   position: Integer,
-  #|   file_ids: Array[Integer],
-  #| }
-
-  #: type snapshot = {
-  #|   id: Integer,
-  #|   status: String,
-  #|   total_amount: String,
-  #|   total_tax_amount: String,
-  #|   revision: Integer,
-  #|   line_items: Array[snapshot_line_item],
-  #| }
-
   belongs_to :sponsorship
   has_many :line_items, -> { order(:position) }, class_name: 'ExpenseLineItem', inverse_of: :expense_report, dependent: :destroy
   has_many :submissions, class_name: 'ExpenseReportSubmission', dependent: :destroy
@@ -66,16 +45,16 @@ class ExpenseReport < ApplicationRecord
     self.status = 'draft' if status == 'rejected'
   end
 
-  #: () -> snapshot
+  #: () -> Rk::SponsorApp::Internal::ExpenseReportSnapshot
   def build_snapshot_data
-    {
+    Rk::SponsorApp::Internal::ExpenseReportSnapshot.new(
       id:,
       status:,
       total_amount: total_amount.to_s,
       total_tax_amount: total_tax_amount.to_s,
       revision:,
       line_items: line_items.order(:position).map do |li|
-        {
+        Rk::SponsorApp::Internal::ExpenseReportSnapshot::LineItem.new(
           id: li.id,
           title: li.title,
           notes: li.notes,
@@ -85,9 +64,9 @@ class ExpenseReport < ApplicationRecord
           preliminal: li.preliminal,
           position: li.position,
           file_ids: li.expense_file_ids,
-        }
+        )
       end,
-    }
+    )
   end
 
   #: () -> void

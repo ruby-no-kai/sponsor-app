@@ -111,6 +111,7 @@ To raise an older file, `bundle exec spoom srb bump --from false --to true` find
 - Files evaluated in another tool's DSL and unable to resolve, such as `config/ci.rb`, are `typed: ignore`.
 - A spec whose anonymous class defines `initialize` or `self.name` leaks those definitions into `Object` for the whole project. Such a spec is `typed: ignore`.
 - Sorbet does not read the `.rbs` that protoc writes into `gen/`. Tapioca's Protobuf DSL compiler types the generated messages instead.
+- Tapioca types an attribute declared with `Protobufable::JsonType` untyped, as the type has no signature it can read. Declare the reader in `sorbet/rbi/shims/<model>.rbi`, as `sorbet/rbi/shims/expense_report_submission.rbi` does.
 
 ## References
 

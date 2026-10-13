@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app.internal;
+
+option ruby_package = "Rk::SponsorApp::Internal";
+
+// The expense report under review, stored in expense_report_submissions.data and rewritten on each edit while the report stays submitted.
+// Amounts and rates are decimal strings.
+message ExpenseReportSnapshot {
+  int64 id = 1;
+
+  // ExpenseReport#status when the snapshot was taken, such as "submitted".
+  // A string rather than an enum, so rows stored before this message existed keep decoding.
+  string status = 2;
+
+  string total_amount = 3;
+  string total_tax_amount = 4;
+  int32 revision = 5;
+
+  // Ordered by position.
+  repeated LineItem line_items = 6;
+
+  // An ExpenseLineItem of the report.
+  message LineItem {
+    int64 id = 1;
+    string title = 2;
+    optional string notes = 3;
+    string amount = 4;
+
+    // Absent when the tax amount was entered by hand.
+    optional string tax_rate = 5;
+
+    string tax_amount = 6;
+    bool preliminal = 7;
+    int32 position = 8;
+
+    // ExpenseFile ids attached to the item.
+    repeated int64 file_ids = 9;
+  }
+}
