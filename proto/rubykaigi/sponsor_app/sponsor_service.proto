@@ -64,4 +64,8 @@ service SponsorService {
   rpc GetViewer(SponsorServiceGetViewerRequest) returns (SponsorServiceGetViewerResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Signs the sponsor contact out of this browser. A staff session in the same browser stays
+  // signed in. Answers without a session too.
+  rpc SignOut(SponsorServiceSignOutRequest) returns (SponsorServiceSignOutResponse);
 }

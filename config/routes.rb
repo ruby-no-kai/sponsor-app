@@ -219,6 +219,7 @@ Rails.application.routes.draw do
 
       # Viewer
       rpc 'GetViewer' => 'api/sponsor/viewer'
+      rpc 'SignOut' => 'api/sponsor/viewer'
     end
   end
 

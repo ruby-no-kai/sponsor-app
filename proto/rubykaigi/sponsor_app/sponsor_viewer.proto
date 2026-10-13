@@ -46,3 +46,9 @@ message SponsorViewer {
   // parameter, then remembered in a cookie.
   string locale = 4;
 }
+
+// Request for SponsorService.SignOut.
+message SponsorServiceSignOutRequest {}
+
+// Response for SponsorService.SignOut.
+message SponsorServiceSignOutResponse {}

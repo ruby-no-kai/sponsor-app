@@ -17,6 +17,15 @@ module Api
 
         Rk::SponsorApp::SponsorServiceGetViewerResponse.new(viewer: Api::SponsorViewerResource.new(viewer).as_protobuf)
       end
+
+      # A staff session in the same cookie stays, as AdminService.SignOut keeps this one. The email
+      # and the logos uploaded before applying belong to the contact, so they go too.
+      authorize :public
+      #: () -> Rk::SponsorApp::SponsorServiceSignOutResponse
+      def sign_out
+        [:sponsorship_ids, :sponsorship_id, :session_token_id, :email, :asset_file_ids].each { session.delete(it) }
+        Rk::SponsorApp::SponsorServiceSignOutResponse.new
+      end
     end
   end
 end
