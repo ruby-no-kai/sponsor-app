@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+option ruby_package = "Rk::SponsorApp";
+
+// The expense report of a custom package in brief, weighed against the sponsorship fee it is
+// offset against.
+//
+// Amounts are decimal strings, which keep the digits a double would lose, given to the digits the
+// fee is settled in, such as "1500000".
+message ExpenseReportSummary {
+  // Where the report stands.
+  enum Status {
+    // The zero value proto3 requires. Never returned.
+    STATUS_UNSPECIFIED = 0;
+
+    // Being written by the sponsor.
+    STATUS_DRAFT = 1;
+
+    // Submitted and awaiting review.
+    STATUS_SUBMITTED = 2;
+
+    // Approved by the organizers.
+    STATUS_APPROVED = 3;
+
+    // Returned to the sponsor for changes.
+    STATUS_REJECTED = 4;
+  }
+
+  // Where the report stands.
+  Status status = 1;
+
+  // Sum of the line items before tax.
+  string total_amount = 2;
+
+  // The sponsorship fee: the plan's price, plus its booth price when a booth is assigned. Absent
+  // while the plan is undetermined.
+  optional string fee = 3;
+
+  // fee less total_amount, negative when the expenses exceed the fee. Absent while the plan is
+  // undetermined.
+  optional string remaining = 4;
+}

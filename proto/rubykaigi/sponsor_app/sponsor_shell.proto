@@ -3,7 +3,13 @@ syntax = "proto3";
 package rubykaigi.sponsor_app;
 
 import "buf/validate/validate.proto";
+import "rubykaigi/sponsor_app/announcement.proto";
 import "rubykaigi/sponsor_app/conference.proto";
+import "rubykaigi/sponsor_app/exhibition.proto";
+import "rubykaigi/sponsor_app/expense_report_summary.proto";
+import "rubykaigi/sponsor_app/sponsor_event_summary.proto";
+import "rubykaigi/sponsor_app/sponsorship.proto";
+import "rubykaigi/sponsor_app/tito_discount_code.proto";
 
 option ruby_package = "Rk::SponsorApp";
 
@@ -47,4 +53,72 @@ message SponsorServiceListOpenConferencesRequest {}
 message SponsorServiceListOpenConferencesResponse {
   // Conferences taking applications now, oldest first.
   repeated Conference conferences = 1;
+}
+
+// Request for SponsorService.GetSponsorship.
+message SponsorServiceGetSponsorshipRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for SponsorService.GetSponsorship: the sponsorship and everything its dashboard shows.
+//
+// A field the dashboard shows only in some states is absent, or empty, outside them, so a client
+// decides nothing from the conference's dates itself.
+message SponsorServiceGetSponsorshipResponse {
+  // The events a sponsor hosts, as the dashboard lists them.
+  message SponsorEvents {
+    // Events, earliest first. Withdrawn and rejected ones are included.
+    repeated SponsorEventSummary events = 1;
+  }
+
+  // The tickets a sponsorship includes, as the dashboard links them.
+  message Tickets {
+    // Codes to claim the tickets with, one per kind created so far. Empty when tickets_on_tito is
+    // false.
+    repeated TitoDiscountCode discount_codes = 1;
+  }
+
+  // The conference sponsored.
+  Conference conference = 1;
+
+  // The signed-in contact's sponsorship of the conference.
+  Sponsorship sponsorship = 2;
+
+  // Whether the sponsor can still edit its application.
+  bool amendment_open = 3;
+
+  // Whether accepted sponsors can submit the events they host.
+  bool event_submission_open = 4;
+
+  // Whether sponsors can claim the tickets their sponsorship includes.
+  bool distributing_tickets = 5;
+
+  // Whether the conference's tickets are claimed through the ticketing service that
+  // TitoDiscountCode links to.
+  bool tickets_on_tito = 6;
+
+  // What the sponsor will exhibit. Absent unless a booth is assigned and the sponsor has described
+  // its exhibit.
+  optional Exhibition exhibition = 7;
+
+  // Events the sponsor hosts. Absent unless the sponsorship is accepted and either
+  // event_submission_open is true or the sponsor has submitted an event.
+  optional SponsorEvents sponsor_events = 8;
+
+  // The expense report of the custom package. Absent unless sponsorship.customized is true and the
+  // sponsor has started a report. The report's own pages also take a sponsorship whose package is
+  // confirmed but not yet named, which the dashboard does not show.
+  optional ExpenseReportSummary expense_report = 9;
+
+  // Tickets the sponsorship includes. Absent unless distributing_tickets is true and the
+  // sponsorship includes a booth or conference tickets.
+  optional Tickets tickets = 10;
+
+  // Announcements published in the locale the area is shown in, pinned ones first, then newest
+  // first. Announcements for exhibitors only are left out unless a booth is assigned.
+  repeated Announcement announcements = 11;
 }

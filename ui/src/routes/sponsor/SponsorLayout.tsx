@@ -1,5 +1,5 @@
 import { Badge, Button, DropdownMenu, Link, LinkButton, Loader } from "@cloudflare/kumo";
-import { ListIcon, TranslateIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, ListIcon, TranslateIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo } from "react";
 import { Outlet, useLocation, useSearchParams } from "react-router";
 import { SWRConfig, useSWRConfig } from "swr";
@@ -18,6 +18,7 @@ import {
 import { AppNameContext } from "../../lib/title.ts";
 import { notifyError } from "../../lib/toast.ts";
 import { paths } from "../paths.ts";
+import { dashboardPath } from "./shellRedirects.ts";
 import { notifyFailure } from "./SponsorRouteError.tsx";
 
 // The locales SetLocale takes, each named in its own language by the translations.
@@ -181,6 +182,18 @@ function NavBar() {
           <LinkButton href={paths.sponsorConferences} variant="ghost">
             {t("layouts.application.conferences")}
           </LinkButton>
+          {sponsorships !== undefined && sponsorships.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenu.Trigger>
+                <Button variant="ghost">
+                  {t("layouts.application.sponsorships_switch")} <CaretDownIcon />
+                </Button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content>
+                <SponsorshipItems sponsorships={sponsorships} />
+              </DropdownMenu.Content>
+            </DropdownMenu>
+          )}
           <div className="flex-1" />
           <DropdownMenu>
             <DropdownMenu.Trigger>
@@ -230,6 +243,12 @@ function CompactMenu({ sponsorships, staff, changeLocale, signIn }: NavActions) 
         <DropdownMenu.Item onClick={() => goTo(paths.sponsorConferences)}>
           {t("layouts.application.conferences")}
         </DropdownMenu.Item>
+        {sponsorships !== undefined && sponsorships.length > 0 && (
+          <DropdownMenu.Group>
+            <DropdownMenu.Label>{t("layouts.application.sponsorships_switch")}</DropdownMenu.Label>
+            <SponsorshipItems sponsorships={sponsorships} />
+          </DropdownMenu.Group>
+        )}
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
           <DropdownMenu.Label>{t("sponsor_ui.shell.language")}</DropdownMenu.Label>
@@ -246,6 +265,17 @@ function CompactMenu({ sponsorships, staff, changeLocale, signIn }: NavActions) 
         )}
       </DropdownMenu.Content>
     </DropdownMenu>
+  );
+}
+
+function SponsorshipItems({ sponsorships }: { sponsorships: SponsorViewer_Sponsorship[] }) {
+  const goTo = useGoTo();
+  return sponsorships.map(({ id, conference }) =>
+    conference === undefined ? null : (
+      <DropdownMenu.Item key={id.toString()} onClick={() => goTo(dashboardPath(conference.slug))}>
+        {conference.name}
+      </DropdownMenu.Item>
+    ),
   );
 }
 

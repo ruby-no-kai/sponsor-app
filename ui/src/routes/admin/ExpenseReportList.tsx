@@ -3,12 +3,13 @@ import { ReceiptIcon } from "@phosphor-icons/react";
 import { generatePath, useParams } from "react-router";
 import type { ExpenseReportTableRow } from "../../gen/rubykaigi/sponsor_app/admin_expense_reports_pb.ts";
 import { AdminService } from "../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
+import { formatAmount } from "../../lib/display.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
 import { useRpc } from "../../lib/rpc.ts";
 import { paths } from "../paths.ts";
 import { useConferenceName, useConferenceTitle } from "./conferenceTitle.ts";
 import { EXPENSE_REPORT_STATUS_LABELS } from "./expense_report/reportView.ts";
-import { formatAmount, labelOf } from "./sponsorshipView.ts";
+import { labelOf } from "./sponsorshipView.ts";
 
 export default function ExpenseReportList() {
   const { slug = "" } = useParams();

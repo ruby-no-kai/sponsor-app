@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "google/protobuf/timestamp.proto";
+import "rubykaigi/sponsor_app/sponsor_event_status.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// An event a sponsor hosts, such as a party or a meetup, in brief.
+message SponsorEventSummary {
+  // Event ID.
+  int64 id = 1;
+
+  // Title of the event.
+  string title = 2;
+
+  // Where the organizers' review of the event stands.
+  SponsorEventStatus status = 3;
+
+  // When the event starts, as the local time at the venue. The Timestamp carries that wall clock as
+  // the same reading in UTC.
+  google.protobuf.Timestamp starts_at = 4;
+}

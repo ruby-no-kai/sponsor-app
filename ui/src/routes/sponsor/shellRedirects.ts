@@ -1,13 +1,13 @@
 import { generatePath } from "react-router";
 import type { Conference } from "../../gen/rubykaigi/sponsor_app/conference_pb.ts";
 import type { SponsorViewer } from "../../gen/rubykaigi/sponsor_app/sponsor_viewer_pb.ts";
+import { signInUrl } from "../../lib/rpc.ts";
 import { paths } from "../paths.ts";
 
-type Viewer = Pick<SponsorViewer, "sponsorships">;
+type Viewer = Pick<SponsorViewer, "sponsorships" | "email" | "staff">;
 
-// The dashboard, which HAML still renders.
 export function dashboardPath(slug: string): string {
-  return generatePath("/conferences/:slug/sponsorship", { slug });
+  return generatePath(paths.sponsorDashboard, { slug });
 }
 
 // The application form, which HAML still renders.
@@ -32,4 +32,22 @@ export function pickerRedirect(
   const latest = viewer.sponsorships[0]?.conference;
   if (conferences.length === 0 && latest !== undefined) return dashboardPath(latest.slug);
   return undefined;
+}
+
+// Where the dashboard sends a viewer with no sponsorship of the conference. A visitor who is not
+// signed in goes to sign in, as a bookmark of the dashboard is the page of a returning sponsor,
+// and comes back afterwards. Anyone else goes to the application form, keeping the query, which
+// can carry an invitation code.
+export function dashboardRedirect(
+  viewer: Viewer,
+  slug: string,
+  search: string,
+): string | undefined {
+  if (viewer.sponsorships.some((sponsorship) => sponsorship.conference?.slug === slug)) {
+    return undefined;
+  }
+  if (viewer.email === undefined && !viewer.staff) {
+    return signInUrl({ pathname: dashboardPath(slug), search });
+  }
+  return applicationPath(slug) + search;
 }

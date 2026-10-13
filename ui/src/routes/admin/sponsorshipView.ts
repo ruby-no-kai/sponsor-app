@@ -1,15 +1,6 @@
 import { AdminSponsorship_TitoDiscountCode_Kind } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 import type { AdminSponsorship } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 
-// Whether a sponsor-supplied URL is safe to link to: http or https, never javascript: and the like.
-export function isWebUrl(url: string): boolean {
-  try {
-    return ["http:", "https:"].includes(new URL(url).protocol);
-  } catch {
-    return false;
-  }
-}
-
 // Kumo Badge variants this page uses.
 export type Tone = "success" | "info" | "warning" | "error" | "outline";
 
@@ -73,11 +64,4 @@ export function titoKindLabel(kind: AdminSponsorship_TitoDiscountCode_Kind): str
 // Looks a label up for an enum value the generated code may not know yet.
 export function labelOf<K extends number>(labels: Readonly<Record<K, Label>>, value: K): Label {
   return labels[value] ?? { text: String(value), tone: "outline" };
-}
-
-// A decimal string such as "120000.0" with thousands separators, as the HAML page shows totals.
-export function formatAmount(amount: string): string {
-  const [integer = "", fraction] = amount.split(".");
-  const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return fraction === undefined || /^0*$/.test(fraction) ? grouped : `${grouped}.${fraction}`;
 }

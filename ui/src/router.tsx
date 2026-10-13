@@ -318,6 +318,12 @@ export const router = createBrowserRouter([
                     (await import("./routes/sponsor/ConferencePicker.tsx")).default,
                 },
               },
+              {
+                path: paths.sponsorDashboard,
+                lazy: {
+                  Component: async () => (await import("./routes/sponsor/Dashboard.tsx")).default,
+                },
+              },
 
               // Sponsor: Applications
 

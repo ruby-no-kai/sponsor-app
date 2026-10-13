@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "rubykaigi/sponsor_app/sponsorship_summary.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// A sponsorship as its sponsor sees it: the application and the terms granted so far.
+//
+// Sponsor-facing, so it leaves out what only organizers see, such as their notes or a custom
+// package they have not confirmed.
+message Sponsorship {
+  // Sponsorship ID.
+  int64 id = 1;
+
+  // Name the sponsor is listed under.
+  string name = 2;
+
+  // URL of the sponsor's website, as published.
+  string url = 3;
+
+  // The sponsor's introduction, as published.
+  string profile = 4;
+
+  // Locale the sponsor applied in, such as "en", which emails to the sponsor are written in.
+  string locale = 5;
+
+  // Where the sponsorship stands. SponsorService never returns a withdrawn one.
+  SponsorshipState state = 6;
+
+  // Name of the plan sponsored. Absent while the plan is undetermined.
+  optional string plan_name = 7;
+
+  // Whether the organizers have confirmed a custom package for the sponsor, which replaces the
+  // plan's terms.
+  bool customized = 8;
+
+  // Name of the custom package. Absent unless customized is true.
+  optional string customization_name = 9;
+
+  // Whether the sponsorship includes a sponsor talk. A custom package leaves the plan's talk out.
+  bool sponsor_talk = 10;
+
+  // Whether the sponsor asked for a booth.
+  bool booth_requested = 11;
+
+  // Whether the sponsor has been assigned a booth.
+  bool booth_assigned = 12;
+
+  // Whether the plan comes with a booth. False while the plan is undetermined.
+  bool booth_eligible = 13;
+}

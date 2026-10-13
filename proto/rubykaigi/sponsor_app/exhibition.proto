@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+option ruby_package = "Rk::SponsorApp";
+
+// What a sponsor will exhibit at the booth it is assigned.
+message Exhibition {
+  // The exhibit as the sponsor describes it, in plain text with line breaks.
+  string description = 1;
+}

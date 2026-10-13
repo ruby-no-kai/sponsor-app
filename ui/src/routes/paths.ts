@@ -64,6 +64,7 @@ export const paths = {
   // Sponsor: Shell
   sponsorLanding: "/",
   sponsorConferences: "/conferences",
+  sponsorDashboard: "/conferences/:slug/sponsorship",
 
   // Sponsor: Applications
 

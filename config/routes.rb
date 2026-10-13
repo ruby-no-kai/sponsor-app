@@ -207,6 +207,7 @@ Rails.application.routes.draw do
       rpc 'GetTranslations' => 'api/sponsor/locale'
       rpc 'SetLocale' => 'api/sponsor/locale'
       rpc 'ListOpenConferences' => 'api/sponsor/conferences'
+      rpc 'GetSponsorship' => 'api/sponsor/sponsorships'
 
       # Applications
 

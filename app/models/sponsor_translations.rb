@@ -13,6 +13,7 @@ module SponsorTranslations
     'sponsorships.show',
     'activerecord.attributes.expense_report/status',
     'sponsor_ui.shell',
+    'sponsor_ui.dashboard',
 
     # Applications
 

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "google/protobuf/timestamp.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// An announcement the organizers publish to a conference's sponsors.
+message Announcement {
+  // Identifier the announcement keeps across its locales and revisions, such as "q2YzxLsC8Nw".
+  // Unique within the conference.
+  string issue = 1;
+
+  // Title.
+  string title = 2;
+
+  // Body as HTML, rendered from the organizers' Markdown. Organizers may write raw HTML in it, so
+  // a client renders it in a sandbox.
+  string body_html = 3;
+
+  // When the announcement was published.
+  google.protobuf.Timestamp published_at = 4;
+}

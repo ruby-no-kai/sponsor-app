@@ -301,6 +301,7 @@ To add an SPA screen:
 - A screen showing what a background job moves on, such as a broadcast's status, passes `useRpc` a `refreshInterval` function that polls until the job is done (`refreshIntervalFor` in `ui/src/routes/admin/broadcastView.ts`).
 - A group of fields two forms share is one form field holding an object, rendered by a controlled component that reads the errors below it with `errorsUnder` from `ui/src/lib/fieldErrors.ts` and sets `data-field` on each input (`ui/src/routes/admin/RecipientFilterFields.tsx`).
 - Navigate from code with `useGoTo()` from `ui/src/lib/navigation.ts`. It navigates in place only to a path in `paths.ts` and loads any other as a page, where the router would render its NotFound instead of the HAML page.
+- `ui/src/lib/SandboxedHtml.tsx` renders staff-authored HTML, such as announcements and notes, in a frame that runs no script.
 - Code imported by a `*.test.ts` must be erasable TypeScript with `.ts` import extensions, as Node strips the types without compiling. tsconfig's `erasableSyntaxOnly` enforces the former; a missing `.ts` extension surfaces only when `mise run ui:test` loads the module.
 
 #### Sponsor screens in the sponsor's language

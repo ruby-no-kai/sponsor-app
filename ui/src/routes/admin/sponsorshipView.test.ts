@@ -10,9 +10,7 @@ import { EXPENSE_REPORT_STATUS_LABELS } from "./expense_report/reportView.ts";
 import {
   boothStatus,
   customizationStatus,
-  formatAmount,
   isOverWordLimit,
-  isWebUrl,
   labelOf,
   titoKindLabel,
   wordCountText,
@@ -62,15 +60,6 @@ describe("wordCountText and isOverWordLimit", () => {
   });
 });
 
-describe("isWebUrl", () => {
-  it("accepts http and https only", () => {
-    assert.equal(isWebUrl("https://example.invalid"), true);
-    assert.equal(isWebUrl("http://example.invalid/path"), true);
-    assert.equal(isWebUrl("javascript:alert(1)"), false);
-    assert.equal(isWebUrl("example.invalid"), false);
-  });
-});
-
 describe("labels", () => {
   it("name every known value and survive an unknown one", () => {
     assert.equal(
@@ -85,10 +74,3 @@ describe("labels", () => {
   });
 });
 
-describe("formatAmount", () => {
-  it("groups thousands and drops a zero fraction", () => {
-    assert.equal(formatAmount("1200000.0"), "1,200,000");
-    assert.equal(formatAmount("1234.5"), "1,234.5");
-    assert.equal(formatAmount("0.0"), "0");
-  });
-});

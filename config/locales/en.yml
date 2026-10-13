@@ -518,6 +518,7 @@ en:
         en: 'English'
         ja: '日本語'
       staff_mode: 'STAFF MODE'
+      expense_report_not_created: 'No expense report has been created yet.'
       not_found:
         title: 'Page not found'
         description: 'Nothing lives at this address.'
@@ -526,6 +527,46 @@ en:
         description: 'Please try again later. If this keeps happening, contact the organizers with the request ID under Details.'
         details: 'Details'
         request_id: 'Request ID: %{request_id}'
+
+    # Dashboard
+    dashboard:
+      todo:
+        title: 'To do'
+        booth_details: 'Send your booth details'
+        booth_details_action: 'Send booth details'
+        expense_draft: 'Submit your expense report'
+        expense_rejected: 'Your expense report was returned'
+        expense_action: 'Open expense report'
+        event_changes: 'The organizers asked for changes to "%{title}"'
+        event_action: 'Open event'
+        not_confirmed: 'Your application is not confirmed yet'
+        not_confirmed_action: 'Edit application'
+      confirmed: 'Confirmed'
+      edit_application: 'Edit application'
+      booth:
+        title: 'Booth details'
+        not_submitted: 'Not submitted'
+        send: 'Send booth details'
+        edit: 'Edit booth details'
+        assigned: 'Booth assigned'
+        requested: 'Booth requested'
+        none: 'No booth'
+      events:
+        title: 'Sponsor-hosted events'
+        submit_new: 'Submit an event'
+      tickets:
+        title: 'Invitation and passes'
+        copy: 'Copy URL'
+        about: 'How to use this URL'
+        view_passes: 'View passes'
+      expense_report:
+        open: 'Open expense report'
+      broadcasts:
+        title: 'Email announcements'
+        view_all: 'View all emails'
+      older_announcements:
+        one: 'Show 1 older announcement'
+        other: 'Show %{count} older announcements'
 
     # Applications
 
