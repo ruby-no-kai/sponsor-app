@@ -41,14 +41,21 @@ module Api
       #: () -> void
       private def authorize_conference!
         slug = connect_request.conference_slug #: String
+        conference = accessible_conference!(slug)
+        @conference = conference #: Conference?
+        set_sentry_conference(conference)
+      end
+
+      # The conference a slug names, provided the staff member may manage it.
+      #: (String) -> Conference
+      private def accessible_conference!(slug)
         conference = Conference.find_by(slug:)
         raise Errors::NotFound.new(detail: "No conference has the slug #{slug.inspect}.") unless conference
         unless current_staff.conference_accessible?(conference)
           raise Errors::PermissionDenied.new(detail: "Your staff access does not cover the conference #{slug.inspect}.")
         end
 
-        @conference = conference #: Conference?
-        set_sentry_conference(conference)
+        conference
       end
     end
   end

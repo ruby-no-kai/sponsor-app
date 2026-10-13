@@ -11,11 +11,12 @@ class Rk::SponsorApp::AdminBroadcastDelivery < Google::Protobuf::AbstractMessage
       cc_emails: T.nilable(T::Array[String]),
       email: T.nilable(String),
       id: T.nilable(Integer),
+      removable: T.nilable(T::Boolean),
       sponsorship: T.nilable(Rk::SponsorApp::AdminBroadcastDelivery::Sponsorship),
       status: T.nilable(T.any(Symbol, Integer))
     ).void
   end
-  def initialize(cc_emails: T.unsafe(nil), email: nil, id: nil, sponsorship: nil, status: nil); end
+  def initialize(cc_emails: T.unsafe(nil), email: nil, id: nil, removable: nil, sponsorship: nil, status: nil); end
 
   sig { returns(T.nilable(Symbol)) }
   def _sponsorship; end
@@ -34,6 +35,9 @@ class Rk::SponsorApp::AdminBroadcastDelivery < Google::Protobuf::AbstractMessage
 
   sig { void }
   def clear_id; end
+
+  sig { void }
+  def clear_removable; end
 
   sig { void }
   def clear_sponsorship; end
@@ -55,6 +59,12 @@ class Rk::SponsorApp::AdminBroadcastDelivery < Google::Protobuf::AbstractMessage
 
   sig { params(value: Integer).void }
   def id=(value); end
+
+  sig { returns(T::Boolean) }
+  def removable; end
+
+  sig { params(value: T::Boolean).void }
+  def removable=(value); end
 
   sig { returns(T.nilable(Rk::SponsorApp::AdminBroadcastDelivery::Sponsorship)) }
   def sponsorship; end

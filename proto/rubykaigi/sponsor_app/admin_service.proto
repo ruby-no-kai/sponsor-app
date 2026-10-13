@@ -243,13 +243,21 @@ service AdminService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // Creates a broadcast without recipients, signed by the staff member signed in. It becomes ready
-  // in the background, and nothing is sent until it is dispatched.
+  // Creates a broadcast, signed by the staff member signed in, and starts collecting its first
+  // recipients in the background. Nothing is sent until DispatchBroadcast.
   rpc CreateBroadcast(AdminServiceCreateBroadcastRequest) returns (AdminServiceCreateBroadcastResponse);
 
   // Replaces every writable field of a broadcast. Once it is dispatched, its title and body can no
   // longer change.
   rpc UpdateBroadcast(AdminServiceUpdateBroadcastRequest) returns (AdminServiceUpdateBroadcastResponse);
+
+  // Adds recipients to a ready broadcast in the background. A broadcast in any other state is
+  // answered `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc AddBroadcastRecipients(AdminServiceAddBroadcastRecipientsRequest) returns (AdminServiceAddBroadcastRecipientsResponse);
+
+  // Removes a recipient from a ready broadcast. A broadcast or delivery that is not ready is
+  // answered `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc RemoveBroadcastDelivery(AdminServiceRemoveBroadcastDeliveryRequest) returns (AdminServiceRemoveBroadcastDeliveryResponse);
 
   // Expense reports
 

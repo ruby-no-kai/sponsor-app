@@ -5,6 +5,7 @@ module Api
   module Admin
     class BroadcastsController < Api::Admin::ApplicationController
       include Api::Admin::BroadcastLookup
+      include Api::Admin::BroadcastRecipientFilterArgument
 
       authorize :conference
       #: () -> Rk::SponsorApp::AdminServiceListBroadcastsResponse
@@ -32,10 +33,12 @@ module Api
       authorize :conference
       #: () -> Rk::SponsorApp::AdminServiceCreateBroadcastResponse
       def create_broadcast
+        filter = connect_request.recipient_filter #: Rk::SponsorApp::BroadcastRecipientFilter?
+        recipient_filters = filter ? [recipient_filter_argument(filter)] : []
         broadcast = conference.broadcasts.build(staff: current_staff, status: :created)
         save_input!(broadcast)
-        # Queued with no recipients to collect, as the job is what makes the broadcast ready.
-        CreateBroadcastDeliveriesJob.perform_later(broadcast, [])
+        # Queued without a filter too, as the job is what makes the broadcast ready.
+        CreateBroadcastDeliveriesJob.perform_later(broadcast, recipient_filters)
 
         Rk::SponsorApp::AdminServiceCreateBroadcastResponse.new(broadcast: broadcast_message(broadcast.reload))
       end

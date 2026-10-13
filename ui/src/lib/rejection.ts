@@ -5,11 +5,13 @@ import type { FormErrors } from "./errors.ts";
 // A save the server or the form refused: the values sent, and the errors they drew.
 export type Rejected = { values: unknown; errors: FormErrors };
 
-// The value at a TanStack field path, such as `fallbackOptions[1].value`.
+// The value at a TanStack field path, such as `fallbackOptions[1].value`. A path below a value the
+// form holds whole, such as `emails[1]` of addresses typed one per line, reaches that value.
 export function valueAt(values: unknown, path: string): unknown {
   let value = values;
   for (const [, name, index] of path.matchAll(/([^.[\]]+)|\[(\d+)\]/g)) {
-    if (value === null || typeof value !== "object") return undefined;
+    if (value === null || value === undefined) return undefined;
+    if (typeof value !== "object") return value;
     value = (value as Record<string, unknown>)[name ?? index ?? ""];
   }
   return value;

@@ -112,3 +112,38 @@ export function erroredFields(fieldMeta: FieldMetas, layout: FieldLayout): Field
   }
   return [...fields.values()];
 }
+
+// Field errors at a path and below it, by the rest of their path: "" for the path itself, and
+// such as `conditions[0].value` below `fallbackOptions[1]`.
+export function errorsUnder(fieldMeta: FieldMetas, path: string): Record<string, string[]> {
+  const errors: Record<string, string[]> = {};
+  for (const [name, meta] of Object.entries(fieldMeta)) {
+    const rest =
+      name === path ? "" : name.startsWith(`${path}.`) ? name.slice(path.length + 1) : undefined;
+    if (rest === undefined) continue;
+    const messages = (meta?.errors ?? []).filter(
+      (error): error is string => typeof error === "string",
+    );
+    if (messages.length > 0) errors[rest] = [...(errors[rest] ?? []), ...messages];
+  }
+  return errors;
+}
+
+// The messages at a list's path, then its elements' messages, each led by the element itself, as
+// the form shows the list by value rather than by position.
+export function messagesAt(
+  errors: Readonly<Record<string, readonly string[]>>,
+  path: string,
+  elements: readonly string[] = [],
+): string[] {
+  const own = errors[path] ?? [];
+  const items = Object.entries(errors).flatMap(([name, messages]) => {
+    if (!name.startsWith(`${path}[`) || !name.endsWith("]")) return [];
+    const digits = name.slice(path.length + 1, -1);
+    if (!/^\d+$/.test(digits)) return [];
+    const index = Number(digits);
+    const label = elements[index] ?? `#${index + 1}`;
+    return messages.map((message) => `${label}: ${message}`);
+  });
+  return [...own, ...items];
+}

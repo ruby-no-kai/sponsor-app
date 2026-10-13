@@ -4,7 +4,14 @@ import { create, toBinary } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 import { BadRequestSchema } from "../gen/google/rpc/error_details_pb.ts";
 import { fieldViolations } from "./errors.ts";
-import { erroredFields, errorsAt, fieldLabel, parentPath } from "./fieldErrors.ts";
+import {
+  erroredFields,
+  errorsAt,
+  errorsUnder,
+  fieldLabel,
+  messagesAt,
+  parentPath,
+} from "./fieldErrors.ts";
 
 describe("parentPath", () => {
   it("steps up one segment at a time", () => {
@@ -89,5 +96,40 @@ describe("errorsAt", () => {
       "#2: too long",
     ]);
     assert.deepEqual(errorsAt(metas, "fallbackOptions[0].priorityHuman"), ["too many"]);
+  });
+});
+
+describe("errorsUnder", () => {
+  it("collects the errors at and below a path by the rest of their path", () => {
+    const fieldMeta = {
+      recipientFilter: { errors: ["is required"] },
+      "recipientFilter.raw.emails[1]": { errors: ["value must be a valid email address", 1] },
+      "recipientFilter.raw.emails": { errors: [] },
+      recipientFilterExtra: { errors: ["elsewhere"] },
+      campaign: { errors: ["is required"] },
+    };
+
+    assert.deepEqual(errorsUnder(fieldMeta, "recipientFilter"), {
+      "": ["is required"],
+      "raw.emails[1]": ["value must be a valid email address"],
+    });
+  });
+});
+
+describe("messagesAt", () => {
+  it("leads each element's messages with the element, after the list's own", () => {
+    const errors = {
+      "raw.emails": ["repeated value must contain unique items"],
+      "raw.emails[1]": ["value must be a valid email address"],
+      "raw.emails[7]": ["value is too long"],
+      "raw.emailsExtra[0]": ["elsewhere"],
+      "raw.emails[]": ["malformed"],
+    };
+
+    assert.deepEqual(messagesAt(errors, "raw.emails", ["a@example.invalid", "nope"]), [
+      "repeated value must contain unique items",
+      "nope: value must be a valid email address",
+      "#8: value is too long",
+    ]);
   });
 });
