@@ -144,6 +144,290 @@ module Rk
       def []=:
           ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
     end
+
+    # Request for SponsorService.CreateExpenseLineItem.
+    class SponsorServiceCreateExpenseLineItemRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceCreateExpenseLineItemRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # The line item to add.
+      attr_accessor input(): ::Rk::SponsorApp::ExpenseLineItemInput?
+      def has_input?: () -> bool
+      def clear_input: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        input: (::Rk::SponsorApp::ExpenseLineItemInput | ::Rk::SponsorApp::ExpenseLineItemInput::init_map)?,
+        "input" => (::Rk::SponsorApp::ExpenseLineItemInput | ::Rk::SponsorApp::ExpenseLineItemInput::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("input" name) -> ::Rk::SponsorApp::ExpenseLineItemInput?
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("input" name, ::Rk::SponsorApp::ExpenseLineItemInput? value) -> void
+    end
+
+    # Response for SponsorService.CreateExpenseLineItem.
+    class SponsorServiceCreateExpenseLineItemResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceCreateExpenseLineItemResponse]
+
+      # The line item added.
+      attr_accessor line_item(): ::Rk::SponsorApp::ExpenseLineItem?
+      def has_line_item?: () -> bool
+      def clear_line_item: () -> void
+
+      # The report as changed, with its totals recalculated.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReport?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      type init_map = {
+        line_item: (::Rk::SponsorApp::ExpenseLineItem | ::Rk::SponsorApp::ExpenseLineItem::init_map)?,
+        "line_item" => (::Rk::SponsorApp::ExpenseLineItem | ::Rk::SponsorApp::ExpenseLineItem::init_map)?,
+        report: (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("line_item" name) -> ::Rk::SponsorApp::ExpenseLineItem?
+        | ("report" name) -> ::Rk::SponsorApp::ExpenseReport?
+
+      def []=:
+          ("line_item" name, ::Rk::SponsorApp::ExpenseLineItem? value) -> void
+        | ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
+    end
+
+    # Request for SponsorService.UpdateExpenseLineItem.
+    class SponsorServiceUpdateExpenseLineItemRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceUpdateExpenseLineItemRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a line item of the sponsorship's expense report.
+      attr_reader line_item_id(): ::Integer
+      attr_writer line_item_id(): ::Integer | ::Float
+      def clear_line_item_id: () -> void
+
+      # The line item's writable fields.
+      attr_accessor input(): ::Rk::SponsorApp::ExpenseLineItemInput?
+      def has_input?: () -> bool
+      def clear_input: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        line_item_id: (::Integer | ::Float)?,
+        "line_item_id" => (::Integer | ::Float)?,
+        input: (::Rk::SponsorApp::ExpenseLineItemInput | ::Rk::SponsorApp::ExpenseLineItemInput::init_map)?,
+        "input" => (::Rk::SponsorApp::ExpenseLineItemInput | ::Rk::SponsorApp::ExpenseLineItemInput::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("line_item_id" name) -> ::Integer
+        | ("input" name) -> ::Rk::SponsorApp::ExpenseLineItemInput?
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("line_item_id" name, (::Integer | ::Float) value) -> void
+        | ("input" name, ::Rk::SponsorApp::ExpenseLineItemInput? value) -> void
+    end
+
+    # Response for SponsorService.UpdateExpenseLineItem.
+    class SponsorServiceUpdateExpenseLineItemResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceUpdateExpenseLineItemResponse]
+
+      # The line item as updated.
+      attr_accessor line_item(): ::Rk::SponsorApp::ExpenseLineItem?
+      def has_line_item?: () -> bool
+      def clear_line_item: () -> void
+
+      # The report as changed, with its totals recalculated.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReport?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      type init_map = {
+        line_item: (::Rk::SponsorApp::ExpenseLineItem | ::Rk::SponsorApp::ExpenseLineItem::init_map)?,
+        "line_item" => (::Rk::SponsorApp::ExpenseLineItem | ::Rk::SponsorApp::ExpenseLineItem::init_map)?,
+        report: (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("line_item" name) -> ::Rk::SponsorApp::ExpenseLineItem?
+        | ("report" name) -> ::Rk::SponsorApp::ExpenseReport?
+
+      def []=:
+          ("line_item" name, ::Rk::SponsorApp::ExpenseLineItem? value) -> void
+        | ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
+    end
+
+    # Request for SponsorService.DeleteExpenseLineItem.
+    class SponsorServiceDeleteExpenseLineItemRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceDeleteExpenseLineItemRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a line item of the sponsorship's expense report.
+      attr_reader line_item_id(): ::Integer
+      attr_writer line_item_id(): ::Integer | ::Float
+      def clear_line_item_id: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        line_item_id: (::Integer | ::Float)?,
+        "line_item_id" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("line_item_id" name) -> ::Integer
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("line_item_id" name, (::Integer | ::Float) value) -> void
+    end
+
+    # Response for SponsorService.DeleteExpenseLineItem.
+    class SponsorServiceDeleteExpenseLineItemResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceDeleteExpenseLineItemResponse]
+
+      # The report as changed, with its totals recalculated.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReport?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      type init_map = {
+        report: (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("report" name) -> ::Rk::SponsorApp::ExpenseReport?
+
+      def []=:
+          ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
+    end
+
+    # Request for SponsorService.SubmitExpenseReport.
+    class SponsorServiceSubmitExpenseReportRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceSubmitExpenseReportRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+    end
+
+    # Response for SponsorService.SubmitExpenseReport.
+    class SponsorServiceSubmitExpenseReportResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceSubmitExpenseReportResponse]
+
+      # The report as submitted, with its revision counted up.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReport?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      type init_map = {
+        report: (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("report" name) -> ::Rk::SponsorApp::ExpenseReport?
+
+      def []=:
+          ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
+    end
+
+    # Request for SponsorService.WithdrawExpenseReportSubmission.
+    class SponsorServiceWithdrawExpenseReportSubmissionRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceWithdrawExpenseReportSubmissionRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+    end
+
+    # Response for SponsorService.WithdrawExpenseReportSubmission.
+    class SponsorServiceWithdrawExpenseReportSubmissionResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceWithdrawExpenseReportSubmissionResponse]
+
+      # The report back as a draft.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReport?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      type init_map = {
+        report: (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("report" name) -> ::Rk::SponsorApp::ExpenseReport?
+
+      def []=:
+          ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
+    end
   end
 end
 
@@ -157,6 +441,16 @@ module Google
         | ("rubykaigi.sponsor_app.SponsorServiceCalculateExpenseReportResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCalculateExpenseReportResponse)])
         | ("rubykaigi.sponsor_app.SponsorServiceCreateExpenseReportRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateExpenseReportRequest)])
         | ("rubykaigi.sponsor_app.SponsorServiceCreateExpenseReportResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateExpenseReportResponse)])
+        | ("rubykaigi.sponsor_app.SponsorServiceCreateExpenseLineItemRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateExpenseLineItemRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceCreateExpenseLineItemResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateExpenseLineItemResponse)])
+        | ("rubykaigi.sponsor_app.SponsorServiceUpdateExpenseLineItemRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceUpdateExpenseLineItemRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceUpdateExpenseLineItemResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceUpdateExpenseLineItemResponse)])
+        | ("rubykaigi.sponsor_app.SponsorServiceDeleteExpenseLineItemRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceDeleteExpenseLineItemRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceDeleteExpenseLineItemResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceDeleteExpenseLineItemResponse)])
+        | ("rubykaigi.sponsor_app.SponsorServiceSubmitExpenseReportRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceSubmitExpenseReportRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceSubmitExpenseReportResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceSubmitExpenseReportResponse)])
+        | ("rubykaigi.sponsor_app.SponsorServiceWithdrawExpenseReportSubmissionRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceWithdrawExpenseReportSubmissionRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceWithdrawExpenseReportSubmissionResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceWithdrawExpenseReportSubmissionResponse)])
         | ...
     end
   end
