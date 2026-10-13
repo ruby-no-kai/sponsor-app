@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+option ruby_package = "Rk::SponsorApp";
+
+// An upload of a file in progress: a presigned POST to the storage, valid for 15 minutes.
+//
+// POST a multipart form to `url` holding every entry of `fields`, then `x-amz-checksum-algorithm`
+// set to "SHA256" and `x-amz-checksum-sha256` to the base64 SHA-256 digest of the file, then
+// `Content-Type` when `fields` pins none, then the file itself as `file`. The storage refuses a
+// file larger than `max_size` or of another content type than the one pinned, and answers with
+// the version it stored in its `x-amz-version-id` header. Report the upload as complete afterwards.
+message AssetUpload {
+  // ID of the file being uploaded.
+  int64 file_id = 1;
+
+  // Where to POST the form.
+  string url = 2;
+
+  // Form fields to send ahead of the file, as given.
+  map<string, string> fields = 3;
+
+  // Largest file the storage accepts, in bytes.
+  int64 max_size = 4;
+}
