@@ -331,6 +331,7 @@ Models including `EditingHistoryTarget` concern automatically track all changes:
 - `staff` attribute should be set before save to track who made changes
 - History includes full snapshot via `to_h_for_history` method
 - `AdminService.ListSponsorshipEditingHistory` publishes each history as an `EditingHistoryEntry`, and each of its Hashdiff rows (read through `EditingHistoryChange`) as an `EditingHistoryEntry.Change` holding `google.protobuf.Value`s, as a snapshot has no fixed schema
+- `AdminService.UpdateBoothAssignment` (`BoothAssignment#assign!`) saves every sponsorship whose booth it changes in one transaction, and enqueues one `ProcessSponsorshipEditJob` per saved history only after it commits
 
 ## Deployment
 

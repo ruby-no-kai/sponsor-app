@@ -174,6 +174,13 @@ export const router = createBrowserRouter([
               },
 
               // Booth assignments
+              {
+                path: paths.boothAssignment,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/BoothAssignmentEditor.tsx")).default,
+                },
+              },
 
               // Sponsor events
 
