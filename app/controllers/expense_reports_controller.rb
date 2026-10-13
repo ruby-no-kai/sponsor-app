@@ -20,7 +20,7 @@ class ExpenseReportsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to user_conference_sponsorship_expense_report_path(conference) }
-      format.json { render json: report_json }
+      format.json { render json: expense_report.reload.to_resource.to_h }
     end
   end
 
@@ -28,7 +28,7 @@ class ExpenseReportsController < ApplicationController
   def show
     respond_to do |format|
       format.html
-      format.json { render json: report_json }
+      format.json { render json: expense_report.reload.to_resource.to_h }
     end
   end
 
@@ -39,7 +39,7 @@ class ExpenseReportsController < ApplicationController
     expense_report.refresh_submission_snapshot
     expense_report.save!
 
-    render json: report_json
+    render json: expense_report.reload.to_resource.to_h
   end
 
   #: () -> void
@@ -61,11 +61,6 @@ class ExpenseReportsController < ApplicationController
   private def set_expense_report
     @expense_report = current_sponsorship.expense_report #: ExpenseReport?
     raise ActiveRecord::RecordNotFound unless @expense_report
-  end
-
-  #: () -> Hash[String, untyped]
-  private def report_json
-    ExpenseReportResource.new(expense_report.reload).to_h
   end
 
   #: () -> Conference

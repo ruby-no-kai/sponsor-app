@@ -19,7 +19,7 @@ module Admin
     def show
       respond_to do |format|
         format.html
-        format.json { render json: report_json }
+        format.json { render json: expense_report.reload.to_resource.to_h }
       end
     end
 
@@ -29,7 +29,7 @@ module Admin
       expense_report.refresh_submission_snapshot
       expense_report.save!
 
-      render json: report_json
+      render json: expense_report.reload.to_resource.to_h
     end
 
     #: () -> void
@@ -62,10 +62,5 @@ module Admin
 
     #: () -> ExpenseReport
     private def expense_report = Must.because(@expense_report) { "set_expense_report runs before every action but index" }
-
-    #: () -> Hash[String, untyped]
-    private def report_json
-      ExpenseReportResource.new(expense_report.reload).to_h
-    end
   end
 end
