@@ -149,6 +149,21 @@ Rails.application.routes.draw do
       rpc 'GetViewer' => 'api/admin/viewer'
       rpc 'SignOut' => 'api/admin/viewer'
     end
+
+    connect_service 'rubykaigi.sponsor_app.SponsorService' do
+      # Translations
+
+      # Applications
+
+      # Exhibitions and events
+
+      # Broadcasts and passes
+
+      # Expense reports
+
+      # Viewer
+      rpc 'GetViewer' => 'api/sponsor/viewer'
+    end
   end
 
   get '/site/sha' => RevisionPlate::App.new(File.join(__dir__, '..', 'REVISION'))

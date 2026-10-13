@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Connect services' do # rubocop:disable RSpec/DescribeClass
   pool = Google::Protobuf::DescriptorPool.generated_pool
-  services = ['rubykaigi.sponsor_app.AdminService'].index_with do |name|
+  services = ['rubykaigi.sponsor_app.AdminService', 'rubykaigi.sponsor_app.SponsorService'].index_with do |name|
     pool.lookup(name)
   end
 
@@ -35,7 +35,7 @@ RSpec.describe 'Connect services' do # rubocop:disable RSpec/DescribeClass
           expect(policy).to be_present
         end
 
-        if policy == :conference
+        if [:conference, :sponsorship].include?(policy)
           it "takes conference_slug as field 1, which its #{policy.inspect} policy reads" do
             field = method.input_type.lookup('conference_slug')
             expect([field&.number, field&.type]).to eq([1, :string])
