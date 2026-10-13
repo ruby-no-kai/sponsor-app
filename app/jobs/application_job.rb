@@ -7,6 +7,6 @@ class ApplicationJob < ActiveJob::Base
 
   #: () -> { host: String?, protocol: String }
   def default_url_options
-    {host: Rails.application.config.x.public_url_host, protocol: 'https'}
+    {host: Rails.application.config.x.public_url_host, protocol: Rails.application.config.x.public_url_protocol}
   end
 end

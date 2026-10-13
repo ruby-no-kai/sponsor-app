@@ -20,7 +20,7 @@ bin/vite dev
 - `ORG_NAME` Your team name
 - `DEFAULT_EMAIL_ADDRESS` Default "From" address for outgoing emails
 - `DEFAULT_EMAIL_HOST` Message-ID host part for outgoing emails
-- `DEFAULT_URL_HOST` URL host used for outgoing emails
+- `DEFAULT_URL_HOST` URL host used for outgoing emails (development defaults to `sponsor-app.localhost:1355`)
 
 #### AWS
 
