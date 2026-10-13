@@ -56,6 +56,8 @@ jobs:
         with:
           bundler-cache: true
       - run: mise run lint:proto
+      # protoc-gen-es comes from node_modules.
+      - run: mise run js:install
       - run: mise run --force gen
       # Also catches generated files that were never committed.
       - name: Check generated files are committed

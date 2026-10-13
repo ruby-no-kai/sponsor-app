@@ -1,12 +1,13 @@
 import React, { useRef, useEffect } from "react";
-import type { ExpenseReport, ExpenseLineItem, CalculateResponse } from "./types";
+import type { ExpenseReportCalculation } from "../gen/rubykaigi/sponsor_app/expense_report_pb";
+import type { ExpenseReport, ExpenseLineItem } from "./types";
 import { useI18n } from "./I18nContext";
 import { formatAmount } from "./format";
 
 type SubmitReviewDialogProps = {
   open: boolean;
   report: ExpenseReport;
-  calcData: CalculateResponse;
+  calcData: ExpenseReportCalculation;
   onConfirm: () => void;
   onCancel: () => void;
   submitting: boolean;
@@ -90,7 +91,7 @@ export function SubmitReviewDialog({
 
   const { groups, unlinkedFiles } = groupLineItems(report);
   const d = calcData.decimal;
-  const fee = parseFloat(calcData.total_fee) || 0;
+  const fee = parseFloat(calcData.totalFee) || 0;
   const expense = parseFloat(report.total_amount) || 0;
   const remaining = fee - expense;
 
@@ -156,7 +157,7 @@ export function SubmitReviewDialog({
         <tbody>
           <tr>
             <td className="text-muted">{i18n.review_dialog_base_fee}</td>
-            <td className="text-right font-weight-bold">{formatAmount(calcData.total_fee, d)}</td>
+            <td className="text-right font-weight-bold">{formatAmount(calcData.totalFee, d)}</td>
           </tr>
           <tr>
             <td className="text-muted">{i18n.review_dialog_total_expense}</td>

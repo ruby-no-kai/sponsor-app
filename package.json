@@ -7,6 +7,7 @@
     "format": "prettier --write app/javascript/**/*.{ts,tsx,scss}"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "^2.16.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -27,6 +28,7 @@
     "util": "^0.12.4"
   },
   "devDependencies": {
+    "@bufbuild/protoc-gen-es": "^2.16.0",
     "@types/jquery": "^3.5.33",
     "oxfmt": "^0.41.0",
     "playwright": "^1.58.2",

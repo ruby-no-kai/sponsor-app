@@ -37,15 +37,6 @@ export type ExpenseReportReview = {
   created_at: string;
 };
 
-export type CalculateResponse = {
-  tax_rates: string[];
-  decimal: number;
-  plan_price: string;
-  plan_price_booth: string;
-  booth_assigned: boolean;
-  total_fee: string;
-};
-
 export type TaxMode = "exclude" | "include" | "exempt" | "manual";
 
 export type EditorRole = "sponsor" | "admin";

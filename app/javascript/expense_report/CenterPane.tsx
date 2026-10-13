@@ -1,5 +1,6 @@
 import type { RefObject } from "react";
-import type { ExpenseLineItem, ExpenseReport, CalculateResponse } from "./types";
+import type { ExpenseReportCalculation } from "../gen/rubykaigi/sponsor_app/expense_report_pb";
+import type { ExpenseLineItem, ExpenseReport } from "./types";
 import { DropZoneIndicator } from "./FileDropOverlay";
 import { useI18n, t } from "./I18nContext";
 import { LineItemForm } from "./LineItemForm";
@@ -9,7 +10,7 @@ type CenterPaneProps = {
   item: ExpenseLineItem | null;
   selectedFile: ExpenseReport["files"][number] | null;
   report: ExpenseReport;
-  calcData: CalculateResponse | null;
+  calcData: ExpenseReportCalculation | null;
   isReadOnly: boolean;
   lineItemsUrl: string;
   filesUrl: string;

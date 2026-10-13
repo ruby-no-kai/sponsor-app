@@ -1,4 +1,9 @@
-import type { ExpenseReport, CalculateResponse, ExpenseLineItem } from "./types";
+import { fromJson, type JsonValue } from "@bufbuild/protobuf";
+import type { ExpenseReport, ExpenseLineItem } from "./types";
+import {
+  ExpenseReportCalculationSchema,
+  type ExpenseReportCalculation,
+} from "../gen/rubykaigi/sponsor_app/expense_report_pb";
 import Rails from "@rails/ujs";
 
 async function request<T>(url: string, method: string, body?: Record<string, unknown>): Promise<T> {
@@ -25,8 +30,9 @@ export function fetchReport(url: string): Promise<ExpenseReport> {
   return request<ExpenseReport>(url, "GET");
 }
 
-export function fetchCalculate(url: string): Promise<CalculateResponse> {
-  return request<CalculateResponse>(url, "GET");
+export async function fetchCalculate(url: string): Promise<ExpenseReportCalculation> {
+  const json = await request<JsonValue>(url, "GET");
+  return fromJson(ExpenseReportCalculationSchema, json, { ignoreUnknownFields: true });
 }
 
 export function updateReport(url: string): Promise<ExpenseReport> {

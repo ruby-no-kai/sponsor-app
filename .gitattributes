@@ -2,3 +2,4 @@
 /gen/** linguist-generated=true
 /gen/proto/ruby/*.gemspec linguist-generated=false
 /gen/proto/ruby/lib/sponsor_app-proto.rb linguist-generated=false
+/app/javascript/gen/** linguist-generated=true

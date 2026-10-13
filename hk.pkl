@@ -2,7 +2,13 @@ amends "package://github.com/jdx/hk/releases/download/v2.0.1/hk@2.0.1#/Config.pk
 import "package://github.com/jdx/hk/releases/download/v2.0.1/hk@2.0.1#/Builtins.pkl"
 
 // Paths `mise run gen` writes into, which formatters must not rewrite.
-local generated = List("gen/**", "third_party/sorbet/rbi/dsl/rk/**", "third_party/sorbet/rbi/dsl/google/**")
+local generated = List(
+  "gen/**",
+  "third_party/sorbet/rbi/dsl/rk/**",
+  "third_party/sorbet/rbi/dsl/google/**",
+  "third_party/sorbet/rbi/dsl/protobufable/**",
+  "app/javascript/gen/**",
+)
 
 local linters = new Mapping<String, Step> {
   ["rubocop"] {
@@ -29,6 +35,7 @@ local linters = new Mapping<String, Step> {
   ["oxfmt"] {
     workspace_indicator = "pnpm-lock.yaml"
     glob = "**/*.{ts,tsx,js,jsx,css,sass,scss}"
+    exclude = generated
     check = "cd {{workspace}} && npx oxfmt --check {{ workspace_files }}"
     check_list_files = "cd {{workspace}} && npx oxfmt --list-different {{ workspace_files }}"
     fix = "cd {{workspace}} && npx oxfmt --write {{ workspace_files }}"
