@@ -69,6 +69,15 @@ service SponsorService {
   // organization lands first.
   rpc CreateSponsorship(SponsorServiceCreateSponsorshipRequest) returns (SponsorServiceCreateSponsorshipResponse);
 
+  // Returns the signed-in contact's application to a conference with its form, for editing.
+  rpc GetSponsorshipApplication(SponsorServiceGetSponsorshipApplicationRequest) returns (SponsorServiceGetSponsorshipApplicationResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Changes the signed-in contact's application to a conference. Answers `failed_precondition`
+  // once the conference stops taking amendments, for organizers too.
+  rpc UpdateSponsorship(SponsorServiceUpdateSponsorshipRequest) returns (SponsorServiceUpdateSponsorshipResponse);
+
   // Starts uploading a logo for a new application. Answers without a session too, keeping the file
   // for this browser until an application claims it. Answers `failed_precondition` when the
   // signed-in contact's sponsorship of the conference has a logo already, which
