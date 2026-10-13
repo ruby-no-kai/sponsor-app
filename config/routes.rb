@@ -223,6 +223,8 @@ Rails.application.routes.draw do
       # Broadcasts and passes
       rpc 'ListBroadcastDeliveries' => 'api/sponsor/broadcasts'
       rpc 'ListPassRedemptions' => 'api/sponsor/passes'
+      rpc 'GetPassRetraction' => 'api/sponsor/passes'
+      rpc 'CreatePassRetraction' => 'api/sponsor/passes'
 
       # Expense reports
 

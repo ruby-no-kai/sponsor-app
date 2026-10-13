@@ -50,6 +50,9 @@ en:
         policy_acknowledged_at: 'Policy Acknowledged At'
         policy_agreement: 'I agree to the event policy'
 
+      tito_ticket_retraction:
+        tito_registration: 'Registration'
+
       expense_report/status:
         draft: 'Draft'
         submitted: 'Submitted'
@@ -70,6 +73,10 @@ en:
               not_eligible: "is not eligible in your selected plan."
             profile:
               too_long: "is too long; maximum is about %{maximum} words on your selected plan"
+        tito_ticket_retraction:
+          attributes:
+            tito_registration:
+              unable_to_retract: 'cannot be voided automatically'
 
   helpers:
     download_previously_uploaded: '(Download previously uploaded file)'
@@ -630,6 +637,10 @@ en:
       back: 'Back to the sponsorship portal'
       intro: 'Announcements the organizers sent you by email, newest first. Their current status is on the %{link}.'
       portal: 'sponsorship portal'
+    passes:
+      reason_required: 'Enter the reason for cancellation.'
+      reason_too_long: 'Shorten the reason to %{count} characters or fewer.'
+      confirmation_required: 'Check the box to confirm that you understand the above.'
 
     # Expense reports
 

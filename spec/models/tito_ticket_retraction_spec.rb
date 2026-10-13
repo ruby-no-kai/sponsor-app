@@ -383,6 +383,49 @@ RSpec.describe TitoTicketRetraction, type: :model do
     end
   end
 
+  describe '#registered_through_sponsorship?' do
+    let(:registration) do
+      {
+        'id' => 101,
+        'source' => sponsorship.tito_source_code,
+        'discount_code' => 'SPONSOR2025',
+        'tickets' => [{'discount_code_used' => 'SPONSOR2025'}],
+      }
+    end
+
+    before { FactoryBot.create(:tito_discount_code, sponsorship:, code: 'SPONSOR2025') }
+
+    def retraction_of(registration)
+      described_class.new(sponsorship:, conference:, tito_registration_id: '101', tito_registration: registration)
+    end
+
+    it 'holds for a registration under the source, made with its codes' do
+      expect(retraction_of(registration)).to be_registered_through_sponsorship
+    end
+
+    it 'fails under another source' do
+      expect(retraction_of(registration.merge('source' => 'ss_0'))).not_to be_registered_through_sponsorship
+    end
+
+    it 'fails for a registration made with another code' do
+      expect(retraction_of(registration.merge('discount_code' => 'OTHER'))).not_to be_registered_through_sponsorship
+    end
+
+    it 'fails for a registration holding a ticket of another code' do
+      tickets = [*registration.fetch('tickets'), {'discount_code_used' => 'OTHER'}]
+
+      expect(retraction_of(registration.merge('tickets' => tickets))).not_to be_registered_through_sponsorship
+    end
+
+    it 'fails for a registration of another ID' do
+      expect(retraction_of(registration.merge('id' => 999))).not_to be_registered_through_sponsorship
+    end
+
+    it 'fails before the registration is loaded' do
+      expect(retraction_of(nil)).not_to be_registered_through_sponsorship
+    end
+  end
+
   describe '#order_reference' do
     context 'with tito_registration' do
       let(:retraction) { FactoryBot.build(:tito_ticket_retraction, :with_tito_registration, sponsorship:) }
@@ -494,6 +537,39 @@ RSpec.describe TitoTicketRetraction, type: :model do
       it 'returns array with nil' do
         expect(retraction.ticket_release_slugs).to eq([nil])
       end
+    end
+  end
+
+  describe '#registration_email' do
+    it 'returns the email of the stored registration' do
+      retraction = described_class.new(sponsorship:, conference:, tito_registration: {'email' => 'registrant@example.invalid'})
+
+      expect(retraction.registration_email).to eq('registrant@example.invalid')
+    end
+
+    it 'returns nil before the registration is loaded' do
+      expect(described_class.new(sponsorship:, conference:).registration_email).to be_nil
+    end
+  end
+
+  describe '#affected_tickets' do
+    before { FactoryBot.create(:tito_cached_release, conference:, tito_release_id: '11', tito_release_slug: 'sponsor') }
+
+    it 'returns each stored ticket with the slug of its cached release' do
+      tickets = [
+        {'reference' => 'T1', 'release_id' => 11, 'email' => 'one@example.invalid'},
+        {'reference' => 'T2', 'release_id' => 99},
+      ]
+      retraction = described_class.new(sponsorship:, conference:, tito_registration: {'tickets' => tickets})
+
+      expect(retraction.affected_tickets.map { [it.reference, it.release_slug, it.email] }).to eq([
+        ['T1', 'sponsor', 'one@example.invalid'],
+        ['T2', nil, nil],
+      ])
+    end
+
+    it 'returns none before the registration is loaded' do
+      expect(described_class.new(sponsorship:, conference:).affected_tickets).to eq([])
     end
   end
 end
