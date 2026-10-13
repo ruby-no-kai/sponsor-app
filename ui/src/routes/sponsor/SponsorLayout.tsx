@@ -173,11 +173,14 @@ function NavBar() {
   return (
     <header className="border-b border-kumo-line bg-kumo-base">
       <nav className="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3 md:px-6">
-        <LinkButton href="/" variant="ghost" className="font-semibold">
+        <LinkButton href={paths.sponsorLanding} variant="ghost" className="font-semibold">
           {t("layouts.application.brand")}
         </LinkButton>
 
         <div className="hidden flex-1 items-center gap-4 md:flex">
+          <LinkButton href={paths.sponsorConferences} variant="ghost">
+            {t("layouts.application.conferences")}
+          </LinkButton>
           <div className="flex-1" />
           <DropdownMenu>
             <DropdownMenu.Trigger>
@@ -224,6 +227,10 @@ function CompactMenu({ sponsorships, staff, changeLocale, signIn }: NavActions) 
         />
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
+        <DropdownMenu.Item onClick={() => goTo(paths.sponsorConferences)}>
+          {t("layouts.application.conferences")}
+        </DropdownMenu.Item>
+        <DropdownMenu.Separator />
         <DropdownMenu.Group>
           <DropdownMenu.Label>{t("sponsor_ui.shell.language")}</DropdownMenu.Label>
           <LocaleItems changeLocale={changeLocale} />

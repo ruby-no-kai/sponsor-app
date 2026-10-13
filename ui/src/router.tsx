@@ -305,6 +305,19 @@ export const router = createBrowserRouter([
             },
             children: [
               // Sponsor: Shell
+              {
+                path: paths.sponsorLanding,
+                lazy: {
+                  Component: async () => (await import("./routes/sponsor/Landing.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorConferences,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/sponsor/ConferencePicker.tsx")).default,
+                },
+              },
 
               // Sponsor: Applications
 

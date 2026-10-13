@@ -5,13 +5,15 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
+import type { Conference } from "./conference_pb.ts";
+import { file_rubykaigi_sponsor_app_conference } from "./conference_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file rubykaigi/sponsor_app/sponsor_shell.proto.
  */
 export const file_rubykaigi_sponsor_app_sponsor_shell: GenFile = /*@__PURE__*/
-  fileDesc("CilydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvc3BvbnNvcl9zaGVsbC5wcm90bxIVcnVieWthaWdpLnNwb25zb3JfYXBwIiYKJFNwb25zb3JTZXJ2aWNlR2V0VHJhbnNsYXRpb25zUmVxdWVzdCLkAQolU3BvbnNvclNlcnZpY2VHZXRUcmFuc2xhdGlvbnNSZXNwb25zZRIOCgZsb2NhbGUYASABKAkSZAoMdHJhbnNsYXRpb25zGAIgAygLMk4ucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlR2V0VHJhbnNsYXRpb25zUmVzcG9uc2UuVHJhbnNsYXRpb25zRW50cnkSEAoIb3JnX25hbWUYAyABKAkaMwoRVHJhbnNsYXRpb25zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASI/Ch5TcG9uc29yU2VydmljZVNldExvY2FsZVJlcXVlc3QSHQoGbG9jYWxlGAEgASgJQg26SApyCFICZW5SAmphIiEKH1Nwb25zb3JTZXJ2aWNlU2V0TG9jYWxlUmVzcG9uc2VCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_buf_validate_validate]);
+  fileDesc("CilydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvc3BvbnNvcl9zaGVsbC5wcm90bxIVcnVieWthaWdpLnNwb25zb3JfYXBwIiYKJFNwb25zb3JTZXJ2aWNlR2V0VHJhbnNsYXRpb25zUmVxdWVzdCLkAQolU3BvbnNvclNlcnZpY2VHZXRUcmFuc2xhdGlvbnNSZXNwb25zZRIOCgZsb2NhbGUYASABKAkSZAoMdHJhbnNsYXRpb25zGAIgAygLMk4ucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlR2V0VHJhbnNsYXRpb25zUmVzcG9uc2UuVHJhbnNsYXRpb25zRW50cnkSEAoIb3JnX25hbWUYAyABKAkaMwoRVHJhbnNsYXRpb25zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASI/Ch5TcG9uc29yU2VydmljZVNldExvY2FsZVJlcXVlc3QSHQoGbG9jYWxlGAEgASgJQg26SApyCFICZW5SAmphIiEKH1Nwb25zb3JTZXJ2aWNlU2V0TG9jYWxlUmVzcG9uc2UiKgooU3BvbnNvclNlcnZpY2VMaXN0T3BlbkNvbmZlcmVuY2VzUmVxdWVzdCJjCilTcG9uc29yU2VydmljZUxpc3RPcGVuQ29uZmVyZW5jZXNSZXNwb25zZRI2Cgtjb25mZXJlbmNlcxgBIAMoCzIhLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Db25mZXJlbmNlQhHqAg5Sazo6U3BvbnNvckFwcGIGcHJvdG8z", [file_buf_validate_validate, file_rubykaigi_sponsor_app_conference]);
 
 /**
  * Request for SponsorService.GetTranslations.
@@ -102,4 +104,40 @@ export type SponsorServiceSetLocaleResponse = Message<"rubykaigi.sponsor_app.Spo
  */
 export const SponsorServiceSetLocaleResponseSchema: GenMessage<SponsorServiceSetLocaleResponse> = /*@__PURE__*/
   messageDesc(file_rubykaigi_sponsor_app_sponsor_shell, 3);
+
+/**
+ * Request for SponsorService.ListOpenConferences.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorServiceListOpenConferencesRequest
+ */
+export type SponsorServiceListOpenConferencesRequest = Message<"rubykaigi.sponsor_app.SponsorServiceListOpenConferencesRequest"> & {
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorServiceListOpenConferencesRequest.
+ * Use `create(SponsorServiceListOpenConferencesRequestSchema)` to create a new message.
+ */
+export const SponsorServiceListOpenConferencesRequestSchema: GenMessage<SponsorServiceListOpenConferencesRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_shell, 4);
+
+/**
+ * Response for SponsorService.ListOpenConferences.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorServiceListOpenConferencesResponse
+ */
+export type SponsorServiceListOpenConferencesResponse = Message<"rubykaigi.sponsor_app.SponsorServiceListOpenConferencesResponse"> & {
+  /**
+   * Conferences taking applications now, oldest first.
+   *
+   * @generated from field: repeated rubykaigi.sponsor_app.Conference conferences = 1;
+   */
+  conferences: Conference[];
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorServiceListOpenConferencesResponse.
+ * Use `create(SponsorServiceListOpenConferencesResponseSchema)` to create a new message.
+ */
+export const SponsorServiceListOpenConferencesResponseSchema: GenMessage<SponsorServiceListOpenConferencesResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_shell, 5);
 
