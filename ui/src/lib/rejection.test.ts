@@ -10,6 +10,11 @@ describe("valueAt", () => {
     assert.deepEqual(valueAt(values, "options[1].plans"), ["Gold"]);
     assert.equal(valueAt(values, "options[2].value"), undefined);
   });
+
+  it("stops at a value the form holds whole", () => {
+    const values = { raw: { emails: "a@example.invalid\nb@example.invalid" } };
+    assert.equal(valueAt(values, "raw.emails[1]"), values.raw.emails);
+  });
 });
 
 describe("standingErrors", () => {

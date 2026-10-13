@@ -1,0 +1,463 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// An email organizers send to many recipients at once, such as an announcement to every sponsor
+// of a conference.
+//
+// Staff-only. SponsorService never returns it.
+message AdminBroadcast {
+  // Where a broadcast stands. Collecting recipients and sending run in the background, so a
+  // broadcast passes through the states between its writes on its own.
+  enum Status {
+    // The zero value proto3 requires. Never returned.
+    STATUS_UNSPECIFIED = 0;
+
+    // Saved, with its first recipients not yet being collected.
+    STATUS_CREATED = 1;
+
+    // Collecting its first recipients.
+    STATUS_PREPARING = 2;
+
+    // Adding recipients.
+    STATUS_MODIFYING = 3;
+
+    // Recipients collected. Recipients can be added and removed, and the broadcast dispatched.
+    STATUS_READY = 4;
+
+    // Dispatched, with no email sent yet. Title and body can no longer change.
+    STATUS_PENDING = 5;
+
+    // Sending its emails.
+    STATUS_SENDING = 6;
+
+    // Every email handed over for delivery or failed.
+    STATUS_SENT = 7;
+
+    // Failed as a whole. An email that fails to send shows on its delivery instead.
+    STATUS_FAILED = 8;
+  }
+
+  // Broadcast ID.
+  int64 id = 1;
+
+  // Name organizers know the broadcast by, unique within the conference. Recipients never see it.
+  string campaign = 2;
+
+  // Notes for organizers. Recipients never see it.
+  string description = 3;
+
+  // Subject of the email.
+  string title = 4;
+
+  // Text of the email in Markdown. "@LOGIN@" in it becomes a sign-in link for the recipient's
+  // sponsorship.
+  string body = 5;
+
+  // `body` rendered as HTML. Staff may embed raw HTML in the Markdown, which this holds as is.
+  string body_html = 6;
+
+  // Where the broadcast stands.
+  Status status = 7;
+
+  // When the broadcast was last dispatched. Absent until it is.
+  optional google.protobuf.Timestamp dispatched_at = 8;
+
+  // Whether the title and body are fixed, as they are from dispatch on.
+  bool content_locked = 9;
+}
+
+// A broadcast in brief, as the list of a conference's broadcasts shows it.
+message AdminBroadcastSummary {
+  // Broadcast ID.
+  int64 id = 1;
+
+  // Name organizers know the broadcast by, unique within the conference.
+  string campaign = 2;
+
+  // Subject of the email.
+  string title = 3;
+
+  // Where the broadcast stands.
+  AdminBroadcast.Status status = 4;
+
+  // When the broadcast was last dispatched. Absent until it is.
+  optional google.protobuf.Timestamp dispatched_at = 5;
+}
+
+// One recipient of a broadcast and where the email to them stands.
+message AdminBroadcastDelivery {
+  // Where an email stands. Past STATUS_SENT, the email service reports what became of it.
+  enum Status {
+    // The zero value proto3 requires. Never returned.
+    STATUS_UNSPECIFIED = 0;
+
+    // Recorded, not yet ready to send.
+    STATUS_CREATED = 1;
+
+    // Being prepared.
+    STATUS_PREPARING = 2;
+
+    // Waiting for the broadcast to be dispatched.
+    STATUS_READY = 3;
+
+    // Queued for sending.
+    STATUS_PENDING = 4;
+
+    // Being sent.
+    STATUS_SENDING = 5;
+
+    // Handed over to the email service.
+    STATUS_SENT = 6;
+
+    // Sending failed.
+    STATUS_FAILED = 7;
+
+    // The email service refused the email.
+    STATUS_REJECTED = 8;
+
+    // The email service accepted the email.
+    STATUS_ACCEPTED = 9;
+
+    // The recipient's server accepted the email.
+    STATUS_DELIVERED = 10;
+
+    // The recipient opened the email.
+    STATUS_OPENED = 11;
+
+    // The recipient clicked a link in the email.
+    STATUS_CLICKED = 12;
+  }
+
+  // The sponsorship an email is addressed to.
+  message Sponsorship {
+    // Sponsorship ID.
+    int64 id = 1;
+
+    // Name the sponsor is listed under.
+    string name = 2;
+
+    // Slug of the sponsorship's conference, which differs from the broadcast's for a past sponsor.
+    string conference_slug = 3;
+  }
+
+  // Delivery ID.
+  int64 id = 1;
+
+  // The sponsorship whose contact the email goes to. Absent for an address added as is.
+  optional Sponsorship sponsorship = 2;
+
+  // Address the email goes to.
+  string email = 3;
+
+  // Addresses the email is copied to.
+  repeated string cc_emails = 4;
+
+  // Where the email stands.
+  Status status = 5;
+
+  // Whether RemoveBroadcastDelivery can remove the delivery, which it can while both the delivery
+  // and its broadcast are ready.
+  bool removable = 6;
+}
+
+// The writable fields of a broadcast, taken by AdminService.CreateBroadcast and UpdateBroadcast.
+message BroadcastInput {
+  // Name organizers know the broadcast by. A campaign another broadcast of the conference has is
+  // answered with PROBLEM_TYPE_INVALID_RECORD.
+  string campaign = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).cel = {
+      id: "broadcast_input.campaign.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Notes for organizers. Blank leaves none.
+  string description = 2;
+
+  // Subject of the email. Once the broadcast is dispatched, a different title is answered with
+  // PROBLEM_TYPE_INVALID_RECORD.
+  string title = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).cel = {
+      id: "broadcast_input.title.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Text of the email in Markdown. "@LOGIN@" in it becomes a sign-in link for the recipient's
+  // sponsorship. Once the broadcast is dispatched, a different body is answered with
+  // PROBLEM_TYPE_INVALID_RECORD.
+  string body = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "broadcast_input.body.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+}
+
+// Which recipients to add to a broadcast, one kind of selection at a time. A sponsorship's email
+// goes to its contact, copying the addresses the contact lists. An address the broadcast already
+// has is skipped.
+message BroadcastRecipientFilter {
+  // Which sponsorships a filter picks by where they stand.
+  enum SponsorshipStatus {
+    // Every sponsorship, whatever its status.
+    SPONSORSHIP_STATUS_UNSPECIFIED = 0;
+
+    // Applied, neither accepted nor withdrawn.
+    SPONSORSHIP_STATUS_PENDING = 1;
+
+    // Accepted and not withdrawn.
+    SPONSORSHIP_STATUS_ACTIVE = 2;
+
+    // Not accepted, withdrawn ones included.
+    SPONSORSHIP_STATUS_NOT_ACCEPTED = 3;
+
+    // Accepted, withdrawn ones included.
+    SPONSORSHIP_STATUS_ACCEPTED = 4;
+
+    // Withdrawn.
+    SPONSORSHIP_STATUS_WITHDRAWN = 5;
+  }
+
+  // Sponsorships of the broadcast's conference.
+  message CurrentSponsors {
+    // Only sponsorships whose emails are written in this locale. Unset picks every locale.
+    optional string locale = 1 [(buf.validate.field).string = {
+      in: [
+        "en",
+        "ja"
+      ]
+    }];
+
+    // Only sponsorships assigned a booth.
+    bool exhibitors_only = 2;
+
+    // Only sponsorships on this plan of the conference. A plan of another conference is answered
+    // `not_found`. Unset picks every plan.
+    optional int64 plan_id = 3 [(buf.validate.field).int64.gt = 0];
+
+    // Only sponsorships of this status.
+    SponsorshipStatus status = 4 [(buf.validate.field).enum.defined_only = true];
+  }
+
+  // Sponsorships of a conference, usually a past one.
+  message PastSponsors {
+    // Slug of the conference, such as "rubykaigi2047". A conference the staff member may not
+    // manage is answered `permission_denied`.
+    string conference_slug = 1 [(buf.validate.field).string = {
+      min_len: 1
+      pattern: "^[a-z0-9][a-z0-9_-]*$"
+    }];
+
+    // Only sponsorships whose emails are written in this locale. Unset picks every locale.
+    optional string locale = 2 [(buf.validate.field).string = {
+      in: [
+        "en",
+        "ja"
+      ]
+    }];
+
+    // Meant to leave out organizations sponsoring the broadcast's conference. Not applied yet, so
+    // they are picked all the same.
+    bool exclude_current_sponsors = 3;
+
+    // Only sponsorships of this status.
+    SponsorshipStatus status = 4 [(buf.validate.field).enum.defined_only = true];
+  }
+
+  // Sponsorships of the broadcast's conference, picked one by one.
+  message Manual {
+    // IDs of sponsorships of the broadcast's conference. An ID of any other is answered
+    // `not_found`.
+    repeated int64 sponsorship_ids = 1 [(buf.validate.field).repeated = {
+      min_items: 1
+      max_items: 1000
+      unique: true
+      items: {
+        int64: {gt: 0}
+      }
+    }];
+  }
+
+  // Addresses that belong to no sponsorship.
+  message Raw {
+    // Email addresses, each once.
+    repeated string emails = 1 [(buf.validate.field).repeated = {
+      min_items: 1
+      max_items: 1000
+      unique: true
+      items: {
+        string: {email: true}
+      }
+    }];
+  }
+
+  // The selection. One is required.
+  oneof kind {
+    option (buf.validate.oneof).required = true;
+
+    // Sponsorships of the broadcast's conference, narrowed by locale, booth, plan and status.
+    CurrentSponsors current_sponsors = 1;
+
+    // Sponsorships of another conference, narrowed by locale and status.
+    PastSponsors past_sponsors = 2;
+
+    // Sponsorships of the broadcast's conference, picked one by one.
+    Manual manual = 3;
+
+    // Addresses that belong to no sponsorship.
+    Raw raw = 4;
+  }
+}
+
+// Request for AdminService.ListBroadcasts.
+message AdminServiceListBroadcastsRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for AdminService.ListBroadcasts.
+message AdminServiceListBroadcastsResponse {
+  // Every broadcast of the conference, most recently created first. Not paginated, as a conference
+  // has a few dozen.
+  repeated AdminBroadcastSummary broadcasts = 1;
+}
+
+// Request for AdminService.GetBroadcast.
+message AdminServiceGetBroadcastRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a broadcast of the conference.
+  int64 broadcast_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.GetBroadcast.
+message AdminServiceGetBroadcastResponse {
+  // The broadcast the request names.
+  AdminBroadcast broadcast = 1;
+
+  // Every recipient of the broadcast. Those of sponsorships come first by sponsor name, then the
+  // addresses added as is by address. Not paginated.
+  repeated AdminBroadcastDelivery deliveries = 2;
+}
+
+// Request for AdminService.CreateBroadcast.
+message AdminServiceCreateBroadcastRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // The broadcast to create, signed by the staff member signed in.
+  BroadcastInput input = 2 [(buf.validate.field).required = true];
+
+  // The first recipients. Absent adds none, and AddBroadcastRecipients adds them once the
+  // broadcast is ready.
+  optional BroadcastRecipientFilter recipient_filter = 3;
+}
+
+// Response for AdminService.CreateBroadcast.
+message AdminServiceCreateBroadcastResponse {
+  // The broadcast created. It is collecting its recipients, and becomes ready once it has.
+  AdminBroadcast broadcast = 1;
+}
+
+// Request for AdminService.UpdateBroadcast.
+message AdminServiceUpdateBroadcastRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a broadcast of the conference.
+  int64 broadcast_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // Every writable field, replacing what is stored.
+  BroadcastInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.UpdateBroadcast.
+message AdminServiceUpdateBroadcastResponse {
+  // The broadcast as updated.
+  AdminBroadcast broadcast = 1;
+}
+
+// Request for AdminService.AddBroadcastRecipients.
+message AdminServiceAddBroadcastRecipientsRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a ready broadcast of the conference.
+  int64 broadcast_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // The recipients to add.
+  BroadcastRecipientFilter recipient_filter = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.AddBroadcastRecipients.
+message AdminServiceAddBroadcastRecipientsResponse {
+  // The broadcast, adding the recipients. It becomes ready again once it has.
+  AdminBroadcast broadcast = 1;
+}
+
+// Request for AdminService.RemoveBroadcastDelivery.
+message AdminServiceRemoveBroadcastDeliveryRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a broadcast of the conference.
+  int64 broadcast_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // ID of a delivery of the broadcast.
+  int64 delivery_id = 3 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.RemoveBroadcastDelivery.
+message AdminServiceRemoveBroadcastDeliveryResponse {}
+
+// Request for AdminService.DispatchBroadcast.
+message AdminServiceDispatchBroadcastRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a ready broadcast of the conference.
+  int64 broadcast_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.DispatchBroadcast.
+message AdminServiceDispatchBroadcastResponse {
+  // The broadcast as dispatched, sending its emails.
+  AdminBroadcast broadcast = 1;
+}

@@ -6,8 +6,35 @@ RSpec.describe Broadcast, type: :model do
   let(:conference) { FactoryBot.create(:conference) }
   let(:staff) { FactoryBot.create(:staff) }
 
+  describe 'campaign' do
+    it 'is unique within a conference' do
+      FactoryBot.create(:broadcast, conference:, campaign: 'welcome')
+
+      duplicate = FactoryBot.build(:broadcast, conference:, campaign: 'welcome')
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors.details[:campaign]).to include(a_hash_including(error: :taken))
+      expect(FactoryBot.build(:broadcast, campaign: 'welcome')).to be_valid
+    end
+  end
+
   describe 'delivered content immutability' do
     let(:broadcast) { FactoryBot.create(:broadcast, staff:, conference:, status:) }
+
+    %i(pending sending failed).each do |dispatched|
+      context "when #{dispatched}" do
+        let(:status) { dispatched }
+
+        it 'forbids changing title and body' do
+          broadcast.assign_attributes(title: 'New title', body: 'New body')
+          expect(broadcast).not_to be_valid
+          expect(broadcast.errors.attribute_names).to contain_exactly(:title, :body)
+        end
+
+        it 'locks the content' do
+          expect(broadcast).to be_content_locked
+        end
+      end
+    end
 
     context 'when sent' do
       let(:status) { :sent }
@@ -36,6 +63,7 @@ RSpec.describe Broadcast, type: :model do
       it 'allows changing title and body' do
         broadcast.assign_attributes(title: 'New title', body: 'New body')
         expect(broadcast).to be_valid
+        expect(broadcast).not_to be_content_locked
       end
     end
   end

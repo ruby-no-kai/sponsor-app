@@ -45,6 +45,7 @@ The application is built around these key models:
 
 - **Broadcast**: Email campaigns to sponsors
   - Creates BroadcastDelivery records per recipient
+  - Status: created → preparing → ready as a job collects recipients, modifying while more are added, pending on dispatch, then sending → sent as delivery jobs run. Recipients change only while ready, and title and body are fixed from dispatch on
   - Tracks delivery status via Mailgun webhooks
 
 ### Authorization Pattern
@@ -296,6 +297,8 @@ To add an SPA screen:
 - An editor shows a rejected save beside its Save button and scrolls to the first field in error, as `ui/src/routes/admin/ConferenceEditor.tsx` does. It declares a `FieldLayout` labelling its fields in layout order (`CONFERENCE_LAYOUT`) and sets `data-field` to the field's path on each input or its wrapper. When the save fails it reveals the first of `erroredFields` from `ui/src/lib/fieldErrors.ts` with `useFieldReveal`, and the save area's `form.Subscribe` feeds the form's `errorMap.onChange`, those fields and the last save error to `SaveErrorBanner`, both from `ui/src/routes/admin/FormParts.tsx`. A field showing a list's errors, such as a tag input or multi-select, reads them with `errorsAt(fieldMeta, path, {items: true})` from `ui/src/lib/fieldErrors.ts`.
 - `ui/src/lib/forms.ts` converts between input values and message fields: int64 IDs, int32 numbers, `datetime-local` timestamps in the browser's time zone, and `optional` strings and int32s. An emptied required number is sent unset, as its Input declares the field `optional` and marked required, so the server reports it missing. A value no int32 can hold, such as 1.5, raises `RangeError`, which the form reports on that field without calling the server (`planInputFrom` in `ui/src/routes/admin/planForm.ts`). `idFromParam` reads a route's `:id`, giving undefined for a segment that is no ID so the screen can answer `NotFound`.
 - An RPC answering `unauthenticated` sends the browser to the Rails sign-in page, which brings it back afterwards. RPCs are same-origin and need no CSRF token.
+- A screen showing what a background job moves on, such as a broadcast's status, passes `useRpc` a `refreshInterval` function that polls until the job is done (`refreshIntervalFor` in `ui/src/routes/admin/broadcastView.ts`).
+- A group of fields two forms share is one form field holding an object, rendered by a controlled component that reads the errors below it with `errorsUnder` from `ui/src/lib/fieldErrors.ts` and sets `data-field` on each input (`ui/src/routes/admin/RecipientFilterFields.tsx`).
 - Code imported by a `*.test.ts` must be erasable TypeScript with `.ts` import extensions, as Node strips the types without compiling. tsconfig's `erasableSyntaxOnly` enforces the former; a missing `.ts` extension surfaces only when `mise run ui:test` loads the module.
 
 ## Development Notes

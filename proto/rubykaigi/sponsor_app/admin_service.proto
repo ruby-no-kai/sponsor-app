@@ -4,6 +4,7 @@ package rubykaigi.sponsor_app;
 
 import "rubykaigi/sponsor_app/admin_announcements.proto";
 import "rubykaigi/sponsor_app/admin_booth_assignments.proto";
+import "rubykaigi/sponsor_app/admin_broadcasts.proto";
 import "rubykaigi/sponsor_app/admin_conferences.proto";
 import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
 import "rubykaigi/sponsor_app/admin_organizations.proto";
@@ -230,6 +231,39 @@ service AdminService {
   rpc UpdateAnnouncement(AdminServiceUpdateAnnouncementRequest) returns (AdminServiceUpdateAnnouncementResponse);
 
   // Broadcasts
+
+  // Lists a conference's broadcasts, most recently created first.
+  rpc ListBroadcasts(AdminServiceListBroadcastsRequest) returns (AdminServiceListBroadcastsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one broadcast of a conference with every recipient. A broadcast of another conference
+  // is answered `not_found`.
+  rpc GetBroadcast(AdminServiceGetBroadcastRequest) returns (AdminServiceGetBroadcastResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Creates a broadcast, signed by the staff member signed in, and starts collecting its first
+  // recipients in the background. Nothing is sent until DispatchBroadcast.
+  rpc CreateBroadcast(AdminServiceCreateBroadcastRequest) returns (AdminServiceCreateBroadcastResponse);
+
+  // Replaces every writable field of a broadcast. Once it is dispatched, its title and body can no
+  // longer change.
+  rpc UpdateBroadcast(AdminServiceUpdateBroadcastRequest) returns (AdminServiceUpdateBroadcastResponse);
+
+  // Adds recipients to a ready broadcast in the background. A broadcast in any other state is
+  // answered `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc AddBroadcastRecipients(AdminServiceAddBroadcastRecipientsRequest) returns (AdminServiceAddBroadcastRecipientsResponse);
+
+  // Removes a recipient from a ready broadcast. A broadcast or delivery that is not ready is
+  // answered `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc RemoveBroadcastDelivery(AdminServiceRemoveBroadcastDeliveryRequest) returns (AdminServiceRemoveBroadcastDeliveryResponse);
+
+  // Sends a ready broadcast to every recipient, recording the staff member signed in as its
+  // sender. The emails go out in the background and cannot be recalled. A broadcast in any other
+  // state, such as one already dispatched, or one without recipients is answered
+  // `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc DispatchBroadcast(AdminServiceDispatchBroadcastRequest) returns (AdminServiceDispatchBroadcastResponse);
 
   // Expense reports
 
