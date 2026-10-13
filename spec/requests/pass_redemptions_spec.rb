@@ -39,6 +39,29 @@ RSpec.describe "Pass redemptions", type: :request do
     expect(response.body).not_to include('btn-outline-danger d-none')
   end
 
+  describe "the note on voiding" do
+    before do
+      conference.update!(contact_email_address: 'sponsors+<b>@example.invalid')
+      allow(PassRedemption).to receive(:list_for_sponsorship).and_return(PassRedemption::Collection.new(registrations: [], valid_discount_codes: []))
+    end
+
+    it "links the contact address, escaped, while voiding is enabled" do
+      get user_conference_sponsorship_pass_redemptions_path(conference)
+
+      expect(response.body).to include('<a href="mailto:sponsors+&lt;b&gt;@example.invalid">sponsors+&lt;b&gt;@example.invalid</a>')
+      expect(response.body).not_to include('<b>')
+    end
+
+    it "links the contact address, escaped, once voiding is disabled" do
+      conference.update!(pass_retraction_disables_at: 1.day.ago)
+
+      get user_conference_sponsorship_pass_redemptions_path(conference)
+
+      expect(response.body).to include('please contact <a href="mailto:sponsors+&lt;b&gt;@example.invalid">')
+      expect(response.body).not_to include('<b>')
+    end
+  end
+
   it "is not found before ticket distribution starts" do
     conference.update!(ticket_distribution_starts_at: 1.day.from_now)
 

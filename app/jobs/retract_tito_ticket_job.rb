@@ -16,7 +16,6 @@ class RetractTitoTicketJob < ApplicationJob
       retraction.refresh_tito_registration(api:)
       if retraction.registration.cancelled
         logger.info("RetractTitoTicketJob: registration already cancelled, marking retraction as completed")
-        retraction.restore_tito_registration!
         retraction.update!(completed: true)
         next
       end

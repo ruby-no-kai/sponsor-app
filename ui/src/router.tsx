@@ -344,6 +344,33 @@ export const router = createBrowserRouter([
               // Sponsor: Exhibitions and events
 
               // Sponsor: Broadcasts and passes
+              {
+                path: paths.sponsorBroadcasts,
+                lazy: {
+                  Component: async () => (await import("./routes/sponsor/Broadcasts.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorPassRedemptions,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/sponsor/PassRedemptions.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorPassRetractionNew,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/sponsor/PassRetractionForm.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorPassRetraction,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/sponsor/PassRetraction.tsx")).default,
+                },
+              },
 
               // Sponsor: Expense reports
 

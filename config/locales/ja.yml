@@ -50,6 +50,9 @@ ja:
         policy_acknowledged_at: 'ポリシー同意日時'
         policy_agreement: '上記ポリシーに同意する'
 
+      tito_ticket_retraction:
+        tito_registration: 'この登録'
+
       expense_report/status:
         draft: '下書き'
         submitted: '提出済み'
@@ -70,6 +73,10 @@ ja:
               not_eligible: "は選択されたスポンサープランでは対象外です"
             profile:
               too_long: "が長過ぎます。選択されたプランでは英文 %{maximum} ワード程度が上限となっています。"
+        tito_ticket_retraction:
+          attributes:
+            tito_registration:
+              unable_to_retract: 'は自動ではキャンセルできません'
 
   helpers:
     download_previously_uploaded: '(以前にアップロードしたファイルをダウンロードする)'
@@ -473,15 +480,15 @@ ja:
         registration_vs_ticket: 'チケット管理システム Tito は一度の登録 (購入) で複数のチケットを取得できます。また、それを登録者が一括して管理することができるようになっています。このページでは登録(購入)された単位を [登録]、それに紐つくチケットは [チケット] と表記しています。招待URLを利用しての登録は、URLを直接案内し複数に分けても構いませんし、担当者が一度にまとめて登録しチケットを Tito から参加者へ割り振ることもできます。'
         email_management: 'なお、Tito からのメールは @tito.io のメールアドレスから送信されます。登録に紐づく全てのチケットを管理するには ''Your %{conference_name} Confirmation'' という件名のメールをご確認ください。チケット割当先には ''Your %{conference_name} Ticket'' という件名のメールが送信され、こちらは割り当てられたチケットのみを管理できるようになっています。'
         reassignment: 'チケットの再割り当ては上記のメールから行うことができます。セキュリティ上の理由から、メールアドレスを誤登録した場合はチケットを無効化して再登録することをおすすめします。'
-        retraction_enabled: 'また、本ページでは登録のキャンセルができます。[取消] ボタンから手続きを行うと登録とそのチケットを無効にする代わりに、招待URLの利用回数を復旧できます。一部 [取消] ボタンが表示されない登録がありますが、その場合は <a href="mailto:%{contact_email}">%{contact_email}</a> までキャンセルしたいチケットと事情をご連絡ください。なお、有償ブースパスのキャンセル・返金はできませんのでご了承ください。'
-        retraction_disabled: 'カンファレンスが近いため、自動での取消機能を閉鎖しています。キャンセルや変更を行う場合は <a href="mailto:%{contact_email}">%{contact_email}</a> まで理由とチケット情報をご連絡ください。なお、有償ブースパスのキャンセル・返金はできませんのでご了承ください。'
+        retraction_enabled_html: 'また、本ページでは登録のキャンセルができます。[取消] ボタンから手続きを行うと登録とそのチケットを無効にする代わりに、招待URLの利用回数を復旧できます。一部 [取消] ボタンが表示されない登録がありますが、その場合は <a href="mailto:%{contact_email}">%{contact_email}</a> までキャンセルしたいチケットと事情をご連絡ください。なお、有償ブースパスのキャンセル・返金はできませんのでご了承ください。'
+        retraction_disabled_html: 'カンファレンスが近いため、自動での取消機能を閉鎖しています。キャンセルや変更を行う場合は <a href="mailto:%{contact_email}">%{contact_email}</a> まで理由とチケット情報をご連絡ください。なお、有償ブースパスのキャンセル・返金はできませんのでご了承ください。'
 
   pass_retractions:
     new:
       title: 取消申請
       header: '取消申請'
       description: '登録 %{reference} のキャンセル申請'
-      disabled_message: 'カンファレンスの開催が近いため、自動キャンセル機能を無効にしています。キャンセルや変更を行う場合は <a href="mailto:%{contact_email}">%{contact_email}</a> までご連絡いただき、手動での対応を依頼してください。'
+      disabled_message_html: 'カンファレンスの開催が近いため、自動キャンセル機能を無効にしています。キャンセルや変更を行う場合は <a href="mailto:%{contact_email}">%{contact_email}</a> までご連絡いただき、手動での対応を依頼してください。'
       affected_tickets: 'キャンセル対象のチケット'
       reason_label: 'キャンセル理由'
       reason_placeholder: 'キャンセルの理由を入力してください (簡潔で構いません/メールアドレス誤登録など)'
@@ -627,6 +634,14 @@ ja:
     # Exhibitions and events
 
     # Broadcasts and passes
+    broadcasts:
+      back: 'スポンサーポータルへ戻る'
+      intro: '運営チームからメールで配信したお知らせを新しい順に表示しています。最新の状況は%{link}をご確認ください。'
+      portal: 'スポンサーポータル'
+    passes:
+      reason_required: 'キャンセル理由を入力してください。'
+      reason_too_long: 'キャンセル理由は %{count} 文字以内で入力してください。'
+      confirmation_required: '上記の内容を確認し、チェックを入れてください。'
 
     # Expense reports
 

@@ -97,6 +97,6 @@
         %p= t('.notes.incomplete_status')
       %li
         - if @conference.pass_retraction_enabled?
-          %p= t('.notes.retraction_enabled', contact_email: @conference.contact_email_address).html_safe
+          %p= t('.notes.retraction_enabled_html', contact_email: @conference.contact_email_address)
         - else
-          %p= t('.notes.retraction_disabled', contact_email: @conference.contact_email_address).html_safe
+          %p= t('.notes.retraction_disabled_html', contact_email: @conference.contact_email_address)
