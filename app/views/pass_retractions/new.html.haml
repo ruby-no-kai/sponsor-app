@@ -8,7 +8,7 @@
   .card-body
     - if @pass_retraction_disabled
       .alert.alert-warning
-        = t('.disabled_message', contact_email: @conference.contact_email_address).html_safe
+        = t('.disabled_message_html', contact_email: @conference.contact_email_address)
 
     = render 'affected_tickets', retraction: @retraction
 
