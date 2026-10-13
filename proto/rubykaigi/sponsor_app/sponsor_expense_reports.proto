@@ -53,15 +53,104 @@ message SponsorServiceCreateExpenseReportResponse {
 }
 
 // Request for SponsorService.CreateExpenseLineItem.
+message SponsorServiceCreateExpenseLineItemRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // The line item to add.
+  ExpenseLineItemInput input = 2 [(buf.validate.field).required = true];
+}
+
 // Response for SponsorService.CreateExpenseLineItem.
+message SponsorServiceCreateExpenseLineItemResponse {
+  // The line item added.
+  ExpenseLineItem line_item = 1;
+
+  // The report as changed, with its totals recalculated.
+  ExpenseReport report = 2;
+}
+
 // Request for SponsorService.UpdateExpenseLineItem.
+message SponsorServiceUpdateExpenseLineItemRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a line item of the sponsorship's expense report.
+  int64 line_item_id = 2 [
+    jstype = JS_STRING,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  // The line item's writable fields.
+  ExpenseLineItemInput input = 3 [(buf.validate.field).required = true];
+}
+
 // Response for SponsorService.UpdateExpenseLineItem.
+message SponsorServiceUpdateExpenseLineItemResponse {
+  // The line item as updated.
+  ExpenseLineItem line_item = 1;
+
+  // The report as changed, with its totals recalculated.
+  ExpenseReport report = 2;
+}
+
 // Request for SponsorService.DeleteExpenseLineItem.
+message SponsorServiceDeleteExpenseLineItemRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a line item of the sponsorship's expense report.
+  int64 line_item_id = 2 [
+    jstype = JS_STRING,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
 // Response for SponsorService.DeleteExpenseLineItem.
+message SponsorServiceDeleteExpenseLineItemResponse {
+  // The report as changed, with its totals recalculated.
+  ExpenseReport report = 1;
+}
+
 // Request for SponsorService.SubmitExpenseReport.
+message SponsorServiceSubmitExpenseReportRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
 // Response for SponsorService.SubmitExpenseReport.
+message SponsorServiceSubmitExpenseReportResponse {
+  // The report as submitted, with its revision counted up.
+  ExpenseReport report = 1;
+}
+
 // Request for SponsorService.WithdrawExpenseReportSubmission.
+message SponsorServiceWithdrawExpenseReportSubmissionRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
 // Response for SponsorService.WithdrawExpenseReportSubmission.
+message SponsorServiceWithdrawExpenseReportSubmissionResponse {
+  // The report back as a draft.
+  ExpenseReport report = 1;
+}
+
 // Request for SponsorService.CreateExpenseFileUpload.
 // Response for SponsorService.CreateExpenseFileUpload.
 // Request for SponsorService.InitiateExpenseFileUpdate.

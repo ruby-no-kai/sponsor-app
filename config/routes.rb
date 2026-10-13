@@ -240,6 +240,11 @@ Rails.application.routes.draw do
       rpc 'GetExpenseReport' => 'api/sponsor/expense_reports'
       rpc 'CalculateExpenseReport' => 'api/sponsor/expense_reports'
       rpc 'CreateExpenseReport' => 'api/sponsor/expense_reports'
+      rpc 'SubmitExpenseReport' => 'api/sponsor/expense_report_submissions'
+      rpc 'WithdrawExpenseReportSubmission' => 'api/sponsor/expense_report_submissions'
+      rpc 'CreateExpenseLineItem' => 'api/sponsor/expense_line_items'
+      rpc 'UpdateExpenseLineItem' => 'api/sponsor/expense_line_items'
+      rpc 'DeleteExpenseLineItem' => 'api/sponsor/expense_line_items'
 
       # Viewer
       rpc 'GetViewer' => 'api/sponsor/viewer'

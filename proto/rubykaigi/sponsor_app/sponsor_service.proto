@@ -196,6 +196,30 @@ service SponsorService {
   // Starts the sponsorship's expense report. Calling again answers the report it has, unchanged.
   rpc CreateExpenseReport(SponsorServiceCreateExpenseReportRequest) returns (SponsorServiceCreateExpenseReportResponse);
 
+  // Adds a line item to the expense report and recalculates its totals. A report that is
+  // submitted or approved is answered `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  // A rejected one takes the change and becomes a draft again.
+  rpc CreateExpenseLineItem(SponsorServiceCreateExpenseLineItemRequest) returns (SponsorServiceCreateExpenseLineItemResponse);
+
+  // Replaces the writable fields of a line item, moving it when given a position, and
+  // recalculates the report as CreateExpenseLineItem does, answering as it does for the report's
+  // status.
+  rpc UpdateExpenseLineItem(SponsorServiceUpdateExpenseLineItemRequest) returns (SponsorServiceUpdateExpenseLineItemResponse);
+
+  // Deletes a line item, keeping its files, and recalculates the report as CreateExpenseLineItem
+  // does, answering as it does for the report's status.
+  rpc DeleteExpenseLineItem(SponsorServiceDeleteExpenseLineItemRequest) returns (SponsorServiceDeleteExpenseLineItemResponse);
+
+  // Submits the expense report for review and tells the organizers. Only a draft can be
+  // submitted. Any other status is answered `failed_precondition` with
+  // PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc SubmitExpenseReport(SponsorServiceSubmitExpenseReportRequest) returns (SponsorServiceSubmitExpenseReportResponse);
+
+  // Takes a submission back before it is reviewed, making the report a draft again. Only a
+  // submitted report can be withdrawn. Any other status is answered `failed_precondition` with
+  // PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc WithdrawExpenseReportSubmission(SponsorServiceWithdrawExpenseReportSubmissionRequest) returns (SponsorServiceWithdrawExpenseReportSubmissionResponse);
+
   // Viewer
 
   // Returns who is using the sponsor area. Answers without a session too, describing a visitor
