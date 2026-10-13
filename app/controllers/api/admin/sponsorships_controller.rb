@@ -5,6 +5,7 @@ module Api
   module Admin
     class SponsorshipsController < Api::Admin::ApplicationController
       include Api::Admin::SponsorshipLookup
+      include Api::SponsorshipInputAssignable
 
       RECENT_STAFF_NOTE_COUNT = 5 #: Integer
 
@@ -62,7 +63,7 @@ module Api
       #: (Sponsorship, Rk::SponsorApp::AdminSponsorshipInput) -> void
       private def assign_input(sponsorship, input)
         sponsorship.assign_attributes(
-          plan: input_plan(input),
+          plan: input_plan(conference, input),
           name: input.name,
           url: input.url,
           profile: input.profile,
@@ -75,60 +76,9 @@ module Api
           accepted: input.accepted,
           number_of_additional_attendees: (input.number_of_additional_attendees if input.has_number_of_additional_attendees?),
         )
-
-        contact = Must.because(input.contact) { 'buf.validate requires the contact' }
-        stored_contact = Must.because(sponsorship.contact) { 'a saved sponsorship validates the presence of its contact' }
-        stored_contact.assign_attributes(
-          email: contact.email,
-          email_cc: optional_string((contact.email_cc if contact.has_email_cc?), stored_contact.email_cc),
-          address: contact.address,
-          organization: contact.organization,
-          unit: optional_string((contact.unit if contact.has_unit?), stored_contact.unit),
-          name: contact.name,
-        )
-
-        if (billing_contact = input.alternate_billing_contact)
-          stored_billing = sponsorship.alternate_billing_contact || sponsorship.build_alternate_billing_contact
-          stored_billing.assign_attributes(
-            email: billing_contact.email,
-            address: billing_contact.address,
-            organization: billing_contact.organization,
-            unit: optional_string((billing_contact.unit if billing_contact.has_unit?), stored_billing.unit),
-            name: billing_contact.name,
-          )
-        else
-          sponsorship.alternate_billing_contact&.mark_for_destruction
-        end
-
-        assign_request(sponsorship.customization_request, input.customization_request) { sponsorship.build_customization_request }
-        assign_request(sponsorship.billing_request, input.billing_request) { sponsorship.build_billing_request }
-        assign_request(sponsorship.note, input.note) { sponsorship.build_note }
-      end
-
-      # The HAML forms store a blank optional string as "", so an absent one leaves a blank value as it is.
-      #: (String?, String?) -> String?
-      private def optional_string(given, stored)
-        given || (stored if stored.blank?)
-      end
-
-      #: (Rk::SponsorApp::AdminSponsorshipInput) -> Plan?
-      private def input_plan(input)
-        return unless input.has_plan_id?
-
-        plan_id = input.plan_id
-        conference.plans.find_by(id: plan_id) || raise(Errors::NotFound.new(
-          detail: "The conference #{conference.slug.inspect} has no plan #{plan_id}.",
-        ))
-      end
-
-      # A blank body removes the request, as the sponsor's own form does.
-      #: (SponsorshipRequest?, String) { () -> SponsorshipRequest } -> void
-      private def assign_request(request, body, &build)
-        if body.blank?
-          request&.mark_for_destruction
-        else
-          (request || build.call).body = body
-        end
+        assign_contact(sponsorship, Must.because(input.contact) { 'buf.validate requires the contact' })
+        assign_alternate_billing_contact(sponsorship, input.alternate_billing_contact)
+        assign_requests(sponsorship, input)
       end
 
       #: (Sponsorship) -> Array[Rk::SponsorApp::FallbackOption]

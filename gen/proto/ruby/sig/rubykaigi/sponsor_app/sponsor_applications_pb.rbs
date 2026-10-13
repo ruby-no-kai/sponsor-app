@@ -7,6 +7,166 @@
 
 module Rk
   module SponsorApp
+    # A plan as the application form offers it.
+    class ApplicationPlan < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::ApplicationPlan]
+
+      # Plan ID.
+      attr_reader id(): ::Integer
+      attr_writer id(): ::Integer | ::Float
+      def clear_id: () -> void
+
+      # Display name, such as "Ruby" or "Platinum". Fallback option conditions name plans by it.
+      attr_reader name(): ::String
+      attr_writer name(): ::String | ::Symbol
+      def clear_name: () -> void
+
+      # Price as the organizers word it. Empty when they give none.
+      attr_reader price_text(): ::String
+      attr_writer price_text(): ::String | ::Symbol
+      def clear_price_text: () -> void
+
+      # Conference tickets the plan includes.
+      attr_reader number_of_guests(): ::Integer
+      attr_writer number_of_guests(): ::Integer | ::Float
+      def clear_number_of_guests: () -> void
+
+      # Size of the booth the plan comes with. Zero when it comes with none.
+      attr_reader booth_size(): ::Integer
+      attr_writer booth_size(): ::Integer | ::Float
+      def clear_booth_size: () -> void
+
+      # Whether the plan comes with a booth, so that its applicants may request one.
+      attr_accessor booth_eligible(): bool
+      def clear_booth_eligible: () -> void
+
+      # Whether the plan includes a sponsor talk.
+      attr_accessor talkable(): bool
+      def clear_talkable: () -> void
+
+      # About how many words the sponsor's introduction may run to. An introduction more than a tenth
+      # longer is refused.
+      attr_reader words_limit(): ::Integer
+      attr_writer words_limit(): ::Integer | ::Float
+      def clear_words_limit: () -> void
+
+      # Whether an application for the plan is accepted as soon as it is submitted. Otherwise the
+      # organizers decide after applications close.
+      attr_accessor auto_acceptance(): bool
+      def clear_auto_acceptance: () -> void
+
+      # Whether the plan's active sponsorships fill its capacity.
+      attr_accessor sold_out(): bool
+      def clear_sold_out: () -> void
+
+      # Whether the plan has stopped taking applications.
+      attr_accessor closed(): bool
+      def clear_closed: () -> void
+
+      # Whether the plan takes applications, being neither sold out nor closed. An application keeps an
+      # unavailable plan it already has.
+      attr_accessor available(): bool
+      def clear_available: () -> void
+
+      type init_map = {
+        id: (::Integer | ::Float)?,
+        "id" => (::Integer | ::Float)?,
+        name: (::String | ::Symbol)?,
+        "name" => (::String | ::Symbol)?,
+        price_text: (::String | ::Symbol)?,
+        "price_text" => (::String | ::Symbol)?,
+        number_of_guests: (::Integer | ::Float)?,
+        "number_of_guests" => (::Integer | ::Float)?,
+        booth_size: (::Integer | ::Float)?,
+        "booth_size" => (::Integer | ::Float)?,
+        booth_eligible: bool?,
+        "booth_eligible" => bool?,
+        talkable: bool?,
+        "talkable" => bool?,
+        words_limit: (::Integer | ::Float)?,
+        "words_limit" => (::Integer | ::Float)?,
+        auto_acceptance: bool?,
+        "auto_acceptance" => bool?,
+        sold_out: bool?,
+        "sold_out" => bool?,
+        closed: bool?,
+        "closed" => bool?,
+        available: bool?,
+        "available" => bool?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("id" name) -> ::Integer
+        | ("name" name) -> ::String
+        | ("price_text" name) -> ::String
+        | ("number_of_guests" name) -> ::Integer
+        | ("booth_size" name) -> ::Integer
+        | ("booth_eligible" name) -> bool
+        | ("talkable" name) -> bool
+        | ("words_limit" name) -> ::Integer
+        | ("auto_acceptance" name) -> bool
+        | ("sold_out" name) -> bool
+        | ("closed" name) -> bool
+        | ("available" name) -> bool
+
+      def []=:
+          ("id" name, (::Integer | ::Float) value) -> void
+        | ("name" name, (::String | ::Symbol) value) -> void
+        | ("price_text" name, (::String | ::Symbol) value) -> void
+        | ("number_of_guests" name, (::Integer | ::Float) value) -> void
+        | ("booth_size" name, (::Integer | ::Float) value) -> void
+        | ("booth_eligible" name, bool value) -> void
+        | ("talkable" name, bool value) -> void
+        | ("words_limit" name, (::Integer | ::Float) value) -> void
+        | ("auto_acceptance" name, bool value) -> void
+        | ("sold_out" name, bool value) -> void
+        | ("closed" name, bool value) -> void
+        | ("available" name, bool value) -> void
+    end
+
+    # What a conference's application form shows besides the applicant's own answers.
+    class ApplicationForm < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::ApplicationForm]
+
+      # The conference applied to.
+      attr_accessor conference(): ::Rk::SponsorApp::Conference?
+      def has_conference?: () -> bool
+      def clear_conference: () -> void
+
+      # Every plan of the conference, lowest rank first.
+      attr_accessor plans(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::ApplicationPlan, ::Rk::SponsorApp::ApplicationPlan]
+      def clear_plans: () -> void
+
+      # The form's texts in the locale chosen for this browser, or in English when the form is not
+      # described in that locale.
+      attr_accessor description(): ::Rk::SponsorApp::FormDescription?
+      def has_description?: () -> bool
+      def clear_description: () -> void
+
+      type init_map = {
+        conference: (::Rk::SponsorApp::Conference | ::Rk::SponsorApp::Conference::init_map)?,
+        "conference" => (::Rk::SponsorApp::Conference | ::Rk::SponsorApp::Conference::init_map)?,
+        plans: ::Array[::Rk::SponsorApp::ApplicationPlan]?,
+        "plans" => ::Array[::Rk::SponsorApp::ApplicationPlan]?,
+        description: (::Rk::SponsorApp::FormDescription | ::Rk::SponsorApp::FormDescription::init_map)?,
+        "description" => (::Rk::SponsorApp::FormDescription | ::Rk::SponsorApp::FormDescription::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference" name) -> ::Rk::SponsorApp::Conference?
+        | ("plans" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::ApplicationPlan, ::Rk::SponsorApp::ApplicationPlan]
+        | ("description" name) -> ::Rk::SponsorApp::FormDescription?
+
+      def []=:
+          ("conference" name, ::Rk::SponsorApp::Conference? value) -> void
+        | ("plans" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::ApplicationPlan, ::Rk::SponsorApp::ApplicationPlan] value) -> void
+        | ("description" name, ::Rk::SponsorApp::FormDescription? value) -> void
+    end
+
     # A logo file uploaded for a sponsorship.
     # The sponsor area downloads it from `/conferences/{slug}/sponsorship_asset_files/{id}`, under the
     # conference it was uploaded for, which redirects to a short-lived link to the storage.
@@ -39,6 +199,825 @@ module Rk
       def []=:
           ("id" name, (::Integer | ::Float) value) -> void
         | ("extension" name, (::String | ::Symbol) value) -> void
+    end
+
+    # The answers of a sponsorship application, as its form shows them.
+    class SponsorshipApplication < ::Google::Protobuf::AbstractMessage
+      # Whom the organizers write to.
+      class Contact < ::Google::Protobuf::AbstractMessage
+        include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorshipApplication::Contact]
+
+        # Email address, which the contact signs in to the sponsor area with.
+        attr_reader email(): ::String
+        attr_writer email(): ::String | ::Symbol
+        def clear_email: () -> void
+
+        # Further addresses to copy, separated by commas or semicolons. Absent copies nobody.
+        attr_reader email_cc(): ::String
+        attr_writer email_cc(): ::String | ::Symbol
+        def has_email_cc?: () -> bool
+        def clear_email_cc: () -> void
+
+        # Postal address.
+        attr_reader address(): ::String
+        attr_writer address(): ::String | ::Symbol
+        def clear_address: () -> void
+
+        # Company name.
+        attr_reader organization(): ::String
+        attr_writer organization(): ::String | ::Symbol
+        def clear_organization: () -> void
+
+        # Department within the company. Absent names none.
+        attr_reader unit(): ::String
+        attr_writer unit(): ::String | ::Symbol
+        def has_unit?: () -> bool
+        def clear_unit: () -> void
+
+        # Person's name.
+        attr_reader name(): ::String
+        attr_writer name(): ::String | ::Symbol
+        def clear_name: () -> void
+
+        attr_reader _email_cc(): ::String?
+        def has__email_cc?: () -> bool
+        def clear__email_cc: () -> void
+
+        attr_reader _unit(): ::String?
+        def has__unit?: () -> bool
+        def clear__unit: () -> void
+
+        type init_map = {
+          email: (::String | ::Symbol)?,
+          "email" => (::String | ::Symbol)?,
+          email_cc: (::String | ::Symbol)?,
+          "email_cc" => (::String | ::Symbol)?,
+          address: (::String | ::Symbol)?,
+          "address" => (::String | ::Symbol)?,
+          organization: (::String | ::Symbol)?,
+          "organization" => (::String | ::Symbol)?,
+          unit: (::String | ::Symbol)?,
+          "unit" => (::String | ::Symbol)?,
+          name: (::String | ::Symbol)?,
+          "name" => (::String | ::Symbol)?,
+        }
+
+        def initialize: (?init_map initial_value) -> void
+
+        def []:
+            ("email" name) -> ::String
+          | ("email_cc" name) -> ::String
+          | ("address" name) -> ::String
+          | ("organization" name) -> ::String
+          | ("unit" name) -> ::String
+          | ("name" name) -> ::String
+
+        def []=:
+            ("email" name, (::String | ::Symbol) value) -> void
+          | ("email_cc" name, (::String | ::Symbol) value) -> void
+          | ("address" name, (::String | ::Symbol) value) -> void
+          | ("organization" name, (::String | ::Symbol) value) -> void
+          | ("unit" name, (::String | ::Symbol) value) -> void
+          | ("name" name, (::String | ::Symbol) value) -> void
+      end
+
+      # Whom invoices go to, when not to the contact.
+      class BillingContact < ::Google::Protobuf::AbstractMessage
+        include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorshipApplication::BillingContact]
+
+        # Email address.
+        attr_reader email(): ::String
+        attr_writer email(): ::String | ::Symbol
+        def clear_email: () -> void
+
+        # Postal address.
+        attr_reader address(): ::String
+        attr_writer address(): ::String | ::Symbol
+        def clear_address: () -> void
+
+        # Company name.
+        attr_reader organization(): ::String
+        attr_writer organization(): ::String | ::Symbol
+        def clear_organization: () -> void
+
+        # Department within the company. Absent names none.
+        attr_reader unit(): ::String
+        attr_writer unit(): ::String | ::Symbol
+        def has_unit?: () -> bool
+        def clear_unit: () -> void
+
+        # Person's name.
+        attr_reader name(): ::String
+        attr_writer name(): ::String | ::Symbol
+        def clear_name: () -> void
+
+        attr_reader _unit(): ::String?
+        def has__unit?: () -> bool
+        def clear__unit: () -> void
+
+        type init_map = {
+          email: (::String | ::Symbol)?,
+          "email" => (::String | ::Symbol)?,
+          address: (::String | ::Symbol)?,
+          "address" => (::String | ::Symbol)?,
+          organization: (::String | ::Symbol)?,
+          "organization" => (::String | ::Symbol)?,
+          unit: (::String | ::Symbol)?,
+          "unit" => (::String | ::Symbol)?,
+          name: (::String | ::Symbol)?,
+          "name" => (::String | ::Symbol)?,
+        }
+
+        def initialize: (?init_map initial_value) -> void
+
+        def []:
+            ("email" name) -> ::String
+          | ("address" name) -> ::String
+          | ("organization" name) -> ::String
+          | ("unit" name) -> ::String
+          | ("name" name) -> ::String
+
+        def []=:
+            ("email" name, (::String | ::Symbol) value) -> void
+          | ("address" name, (::String | ::Symbol) value) -> void
+          | ("organization" name, (::String | ::Symbol) value) -> void
+          | ("unit" name, (::String | ::Symbol) value) -> void
+          | ("name" name, (::String | ::Symbol) value) -> void
+      end
+
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorshipApplication]
+
+      # ID of the plan applied for. Absent while it is undetermined, which the form calls "Other".
+      attr_reader plan_id(): ::Integer
+      attr_writer plan_id(): ::Integer | ::Float
+      def has_plan_id?: () -> bool
+      def clear_plan_id: () -> void
+
+      # Name the sponsor is listed under.
+      attr_reader name(): ::String
+      attr_writer name(): ::String | ::Symbol
+      def clear_name: () -> void
+
+      # URL of the sponsor's website.
+      attr_reader url(): ::String
+      attr_writer url(): ::String | ::Symbol
+      def clear_url: () -> void
+
+      # The sponsor's introduction.
+      attr_reader profile(): ::String
+      attr_writer profile(): ::String | ::Symbol
+      def clear_profile: () -> void
+
+      # Whether the sponsor asked for a booth.
+      attr_accessor booth_requested(): bool
+      def clear_booth_requested: () -> void
+
+      # The fallback option picked, as its value. Empty when none is.
+      attr_reader fallback_option(): ::String
+      attr_writer fallback_option(): ::String | ::Symbol
+      def clear_fallback_option: () -> void
+
+      # Conference tickets asked for beyond the plan's. Absent when none are.
+      attr_reader number_of_additional_attendees(): ::Integer
+      attr_writer number_of_additional_attendees(): ::Integer | ::Float
+      def has_number_of_additional_attendees?: () -> bool
+      def clear_number_of_additional_attendees: () -> void
+
+      # Whom the organizers write to.
+      attr_accessor contact(): ::Rk::SponsorApp::SponsorshipApplication::Contact?
+      def has_contact?: () -> bool
+      def clear_contact: () -> void
+
+      # Whom invoices go to. Absent sends them to contact.
+      attr_accessor alternate_billing_contact(): ::Rk::SponsorApp::SponsorshipApplication::BillingContact?
+      def has_alternate_billing_contact?: () -> bool
+      def clear_alternate_billing_contact: () -> void
+
+      # What the sponsor asked of billing. Empty when nothing is.
+      attr_reader billing_request(): ::String
+      attr_writer billing_request(): ::String | ::Symbol
+      def clear_billing_request: () -> void
+
+      # What the sponsor asked of the plan. Empty when nothing is.
+      attr_reader customization_request(): ::String
+      attr_writer customization_request(): ::String | ::Symbol
+      def clear_customization_request: () -> void
+
+      # Anything else the sponsor told the organizers. Empty when nothing is.
+      attr_reader note(): ::String
+      attr_writer note(): ::String | ::Symbol
+      def clear_note: () -> void
+
+      # The sponsor's logo.
+      attr_accessor asset_file(): ::Rk::SponsorApp::SponsorshipAssetFile?
+      def has_asset_file?: () -> bool
+      def clear_asset_file: () -> void
+
+      attr_reader _plan_id(): ::Integer?
+      def has__plan_id?: () -> bool
+      def clear__plan_id: () -> void
+
+      attr_reader _number_of_additional_attendees(): ::Integer?
+      def has__number_of_additional_attendees?: () -> bool
+      def clear__number_of_additional_attendees: () -> void
+
+      attr_reader _alternate_billing_contact(): ::Rk::SponsorApp::SponsorshipApplication::BillingContact?
+      def has__alternate_billing_contact?: () -> bool
+      def clear__alternate_billing_contact: () -> void
+
+      attr_reader _asset_file(): ::Rk::SponsorApp::SponsorshipAssetFile?
+      def has__asset_file?: () -> bool
+      def clear__asset_file: () -> void
+
+      type init_map = {
+        plan_id: (::Integer | ::Float)?,
+        "plan_id" => (::Integer | ::Float)?,
+        name: (::String | ::Symbol)?,
+        "name" => (::String | ::Symbol)?,
+        url: (::String | ::Symbol)?,
+        "url" => (::String | ::Symbol)?,
+        profile: (::String | ::Symbol)?,
+        "profile" => (::String | ::Symbol)?,
+        booth_requested: bool?,
+        "booth_requested" => bool?,
+        fallback_option: (::String | ::Symbol)?,
+        "fallback_option" => (::String | ::Symbol)?,
+        number_of_additional_attendees: (::Integer | ::Float)?,
+        "number_of_additional_attendees" => (::Integer | ::Float)?,
+        contact: (::Rk::SponsorApp::SponsorshipApplication::Contact | ::Rk::SponsorApp::SponsorshipApplication::Contact::init_map)?,
+        "contact" => (::Rk::SponsorApp::SponsorshipApplication::Contact | ::Rk::SponsorApp::SponsorshipApplication::Contact::init_map)?,
+        alternate_billing_contact: (::Rk::SponsorApp::SponsorshipApplication::BillingContact | ::Rk::SponsorApp::SponsorshipApplication::BillingContact::init_map)?,
+        "alternate_billing_contact" => (::Rk::SponsorApp::SponsorshipApplication::BillingContact | ::Rk::SponsorApp::SponsorshipApplication::BillingContact::init_map)?,
+        billing_request: (::String | ::Symbol)?,
+        "billing_request" => (::String | ::Symbol)?,
+        customization_request: (::String | ::Symbol)?,
+        "customization_request" => (::String | ::Symbol)?,
+        note: (::String | ::Symbol)?,
+        "note" => (::String | ::Symbol)?,
+        asset_file: (::Rk::SponsorApp::SponsorshipAssetFile | ::Rk::SponsorApp::SponsorshipAssetFile::init_map)?,
+        "asset_file" => (::Rk::SponsorApp::SponsorshipAssetFile | ::Rk::SponsorApp::SponsorshipAssetFile::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("plan_id" name) -> ::Integer
+        | ("name" name) -> ::String
+        | ("url" name) -> ::String
+        | ("profile" name) -> ::String
+        | ("booth_requested" name) -> bool
+        | ("fallback_option" name) -> ::String
+        | ("number_of_additional_attendees" name) -> ::Integer
+        | ("contact" name) -> ::Rk::SponsorApp::SponsorshipApplication::Contact?
+        | ("alternate_billing_contact" name) -> ::Rk::SponsorApp::SponsorshipApplication::BillingContact?
+        | ("billing_request" name) -> ::String
+        | ("customization_request" name) -> ::String
+        | ("note" name) -> ::String
+        | ("asset_file" name) -> ::Rk::SponsorApp::SponsorshipAssetFile?
+
+      def []=:
+          ("plan_id" name, (::Integer | ::Float) value) -> void
+        | ("name" name, (::String | ::Symbol) value) -> void
+        | ("url" name, (::String | ::Symbol) value) -> void
+        | ("profile" name, (::String | ::Symbol) value) -> void
+        | ("booth_requested" name, bool value) -> void
+        | ("fallback_option" name, (::String | ::Symbol) value) -> void
+        | ("number_of_additional_attendees" name, (::Integer | ::Float) value) -> void
+        | ("contact" name, ::Rk::SponsorApp::SponsorshipApplication::Contact? value) -> void
+        | ("alternate_billing_contact" name, ::Rk::SponsorApp::SponsorshipApplication::BillingContact? value) -> void
+        | ("billing_request" name, (::String | ::Symbol) value) -> void
+        | ("customization_request" name, (::String | ::Symbol) value) -> void
+        | ("note" name, (::String | ::Symbol) value) -> void
+        | ("asset_file" name, ::Rk::SponsorApp::SponsorshipAssetFile? value) -> void
+    end
+
+    # The answers of a sponsorship application, taken by SponsorService.CreateSponsorship and
+    # UpdateSponsorship. Every field replaces what is stored.
+    class SponsorshipInput < ::Google::Protobuf::AbstractMessage
+      # Whom the organizers write to.
+      class Contact < ::Google::Protobuf::AbstractMessage
+        include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorshipInput::Contact]
+
+        # Email address, which the contact signs in to the sponsor area with. Its domain names the
+        # sponsoring organization, unless the application is affiliated with one.
+        attr_reader email(): ::String
+        attr_writer email(): ::String | ::Symbol
+        def clear_email: () -> void
+
+        # Further addresses to copy, separated by commas or semicolons. They cannot sign in. Absent or
+        # empty copies nobody.
+        attr_reader email_cc(): ::String
+        attr_writer email_cc(): ::String | ::Symbol
+        def has_email_cc?: () -> bool
+        def clear_email_cc: () -> void
+
+        # Postal address.
+        attr_reader address(): ::String
+        attr_writer address(): ::String | ::Symbol
+        def clear_address: () -> void
+
+        # Company name.
+        attr_reader organization(): ::String
+        attr_writer organization(): ::String | ::Symbol
+        def clear_organization: () -> void
+
+        # Department within the company. Absent or empty names none.
+        attr_reader unit(): ::String
+        attr_writer unit(): ::String | ::Symbol
+        def has_unit?: () -> bool
+        def clear_unit: () -> void
+
+        # Person's name.
+        attr_reader name(): ::String
+        attr_writer name(): ::String | ::Symbol
+        def clear_name: () -> void
+
+        attr_reader _email_cc(): ::String?
+        def has__email_cc?: () -> bool
+        def clear__email_cc: () -> void
+
+        attr_reader _unit(): ::String?
+        def has__unit?: () -> bool
+        def clear__unit: () -> void
+
+        type init_map = {
+          email: (::String | ::Symbol)?,
+          "email" => (::String | ::Symbol)?,
+          email_cc: (::String | ::Symbol)?,
+          "email_cc" => (::String | ::Symbol)?,
+          address: (::String | ::Symbol)?,
+          "address" => (::String | ::Symbol)?,
+          organization: (::String | ::Symbol)?,
+          "organization" => (::String | ::Symbol)?,
+          unit: (::String | ::Symbol)?,
+          "unit" => (::String | ::Symbol)?,
+          name: (::String | ::Symbol)?,
+          "name" => (::String | ::Symbol)?,
+        }
+
+        def initialize: (?init_map initial_value) -> void
+
+        def []:
+            ("email" name) -> ::String
+          | ("email_cc" name) -> ::String
+          | ("address" name) -> ::String
+          | ("organization" name) -> ::String
+          | ("unit" name) -> ::String
+          | ("name" name) -> ::String
+
+        def []=:
+            ("email" name, (::String | ::Symbol) value) -> void
+          | ("email_cc" name, (::String | ::Symbol) value) -> void
+          | ("address" name, (::String | ::Symbol) value) -> void
+          | ("organization" name, (::String | ::Symbol) value) -> void
+          | ("unit" name, (::String | ::Symbol) value) -> void
+          | ("name" name, (::String | ::Symbol) value) -> void
+      end
+
+      # Whom invoices go to, when not to the contact.
+      class BillingContact < ::Google::Protobuf::AbstractMessage
+        include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorshipInput::BillingContact]
+
+        # Email address.
+        attr_reader email(): ::String
+        attr_writer email(): ::String | ::Symbol
+        def clear_email: () -> void
+
+        # Postal address.
+        attr_reader address(): ::String
+        attr_writer address(): ::String | ::Symbol
+        def clear_address: () -> void
+
+        # Company name.
+        attr_reader organization(): ::String
+        attr_writer organization(): ::String | ::Symbol
+        def clear_organization: () -> void
+
+        # Department within the company. Absent or empty names none.
+        attr_reader unit(): ::String
+        attr_writer unit(): ::String | ::Symbol
+        def has_unit?: () -> bool
+        def clear_unit: () -> void
+
+        # Person's name.
+        attr_reader name(): ::String
+        attr_writer name(): ::String | ::Symbol
+        def clear_name: () -> void
+
+        attr_reader _unit(): ::String?
+        def has__unit?: () -> bool
+        def clear__unit: () -> void
+
+        type init_map = {
+          email: (::String | ::Symbol)?,
+          "email" => (::String | ::Symbol)?,
+          address: (::String | ::Symbol)?,
+          "address" => (::String | ::Symbol)?,
+          organization: (::String | ::Symbol)?,
+          "organization" => (::String | ::Symbol)?,
+          unit: (::String | ::Symbol)?,
+          "unit" => (::String | ::Symbol)?,
+          name: (::String | ::Symbol)?,
+          "name" => (::String | ::Symbol)?,
+        }
+
+        def initialize: (?init_map initial_value) -> void
+
+        def []:
+            ("email" name) -> ::String
+          | ("address" name) -> ::String
+          | ("organization" name) -> ::String
+          | ("unit" name) -> ::String
+          | ("name" name) -> ::String
+
+        def []=:
+            ("email" name, (::String | ::Symbol) value) -> void
+          | ("address" name, (::String | ::Symbol) value) -> void
+          | ("organization" name, (::String | ::Symbol) value) -> void
+          | ("unit" name, (::String | ::Symbol) value) -> void
+          | ("name" name, (::String | ::Symbol) value) -> void
+      end
+
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorshipInput]
+
+      # ID of the plan applied for, one of the conference's plans that is available. Absent applies for
+      # none, "Other", which only a conference allowing no plan accepts. A plan of another conference is
+      # answered `not_found`. Once the application is accepted, the plan cannot change.
+      attr_reader plan_id(): ::Integer
+      attr_writer plan_id(): ::Integer | ::Float
+      def has_plan_id?: () -> bool
+      def clear_plan_id: () -> void
+
+      # Name to list the sponsor under, in English.
+      attr_reader name(): ::String
+      attr_writer name(): ::String | ::Symbol
+      def clear_name: () -> void
+
+      # URL of the sponsor's website.
+      attr_reader url(): ::String
+      attr_writer url(): ::String | ::Symbol
+      def clear_url: () -> void
+
+      # The sponsor's introduction, in English, of about the plan's words_limit words at most.
+      attr_reader profile(): ::String
+      attr_writer profile(): ::String | ::Symbol
+      def clear_profile: () -> void
+
+      # Whether the sponsor asks for a booth, which only a plan with a booth takes.
+      attr_accessor booth_requested(): bool
+      def clear_booth_requested: () -> void
+
+      # Alternative in case the plan applied for cannot be granted, as the value of a fallback option
+      # the form offers. Empty picks none.
+      attr_reader fallback_option(): ::String
+      attr_writer fallback_option(): ::String | ::Symbol
+      def clear_fallback_option: () -> void
+
+      # Conference tickets asked for beyond the plan's. Absent asks for none.
+      attr_reader number_of_additional_attendees(): ::Integer
+      attr_writer number_of_additional_attendees(): ::Integer | ::Float
+      def has_number_of_additional_attendees?: () -> bool
+      def clear_number_of_additional_attendees: () -> void
+
+      # Whom the organizers write to.
+      attr_accessor contact(): ::Rk::SponsorApp::SponsorshipInput::Contact?
+      def has_contact?: () -> bool
+      def clear_contact: () -> void
+
+      # Whom invoices go to. Absent sends them to contact, removing any billing contact stored.
+      attr_accessor alternate_billing_contact(): ::Rk::SponsorApp::SponsorshipInput::BillingContact?
+      def has_alternate_billing_contact?: () -> bool
+      def clear_alternate_billing_contact: () -> void
+
+      # What the sponsor asks of billing, such as a contract to sign. Empty removes the request.
+      attr_reader billing_request(): ::String
+      attr_writer billing_request(): ::String | ::Symbol
+      def clear_billing_request: () -> void
+
+      # What the sponsor asks of the plan. Empty removes the request.
+      attr_reader customization_request(): ::String
+      attr_writer customization_request(): ::String | ::Symbol
+      def clear_customization_request: () -> void
+
+      # Anything else the sponsor tells the organizers. Empty removes it.
+      attr_reader note(): ::String
+      attr_writer note(): ::String | ::Symbol
+      def clear_note: () -> void
+
+      # ID of the logo file: one uploaded in this browser through CreateSponsorshipAssetUpload, or, on
+      # a new application, the logo of another sponsorship the signed-in contact manages, which is
+      # copied. Any other file is answered `not_found`. UpdateSponsorship ignores it while the
+      # sponsorship has a logo, which InitiateSponsorshipAssetUpdate replaces in place.
+      attr_reader asset_file_id(): ::Integer
+      attr_writer asset_file_id(): ::Integer | ::Float
+      def has_asset_file_id?: () -> bool
+      def clear_asset_file_id: () -> void
+
+      attr_reader _plan_id(): ::Integer?
+      def has__plan_id?: () -> bool
+      def clear__plan_id: () -> void
+
+      attr_reader _number_of_additional_attendees(): ::Integer?
+      def has__number_of_additional_attendees?: () -> bool
+      def clear__number_of_additional_attendees: () -> void
+
+      attr_reader _alternate_billing_contact(): ::Rk::SponsorApp::SponsorshipInput::BillingContact?
+      def has__alternate_billing_contact?: () -> bool
+      def clear__alternate_billing_contact: () -> void
+
+      attr_reader _asset_file_id(): ::Integer?
+      def has__asset_file_id?: () -> bool
+      def clear__asset_file_id: () -> void
+
+      type init_map = {
+        plan_id: (::Integer | ::Float)?,
+        "plan_id" => (::Integer | ::Float)?,
+        name: (::String | ::Symbol)?,
+        "name" => (::String | ::Symbol)?,
+        url: (::String | ::Symbol)?,
+        "url" => (::String | ::Symbol)?,
+        profile: (::String | ::Symbol)?,
+        "profile" => (::String | ::Symbol)?,
+        booth_requested: bool?,
+        "booth_requested" => bool?,
+        fallback_option: (::String | ::Symbol)?,
+        "fallback_option" => (::String | ::Symbol)?,
+        number_of_additional_attendees: (::Integer | ::Float)?,
+        "number_of_additional_attendees" => (::Integer | ::Float)?,
+        contact: (::Rk::SponsorApp::SponsorshipInput::Contact | ::Rk::SponsorApp::SponsorshipInput::Contact::init_map)?,
+        "contact" => (::Rk::SponsorApp::SponsorshipInput::Contact | ::Rk::SponsorApp::SponsorshipInput::Contact::init_map)?,
+        alternate_billing_contact: (::Rk::SponsorApp::SponsorshipInput::BillingContact | ::Rk::SponsorApp::SponsorshipInput::BillingContact::init_map)?,
+        "alternate_billing_contact" => (::Rk::SponsorApp::SponsorshipInput::BillingContact | ::Rk::SponsorApp::SponsorshipInput::BillingContact::init_map)?,
+        billing_request: (::String | ::Symbol)?,
+        "billing_request" => (::String | ::Symbol)?,
+        customization_request: (::String | ::Symbol)?,
+        "customization_request" => (::String | ::Symbol)?,
+        note: (::String | ::Symbol)?,
+        "note" => (::String | ::Symbol)?,
+        asset_file_id: (::Integer | ::Float)?,
+        "asset_file_id" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("plan_id" name) -> ::Integer
+        | ("name" name) -> ::String
+        | ("url" name) -> ::String
+        | ("profile" name) -> ::String
+        | ("booth_requested" name) -> bool
+        | ("fallback_option" name) -> ::String
+        | ("number_of_additional_attendees" name) -> ::Integer
+        | ("contact" name) -> ::Rk::SponsorApp::SponsorshipInput::Contact?
+        | ("alternate_billing_contact" name) -> ::Rk::SponsorApp::SponsorshipInput::BillingContact?
+        | ("billing_request" name) -> ::String
+        | ("customization_request" name) -> ::String
+        | ("note" name) -> ::String
+        | ("asset_file_id" name) -> ::Integer
+
+      def []=:
+          ("plan_id" name, (::Integer | ::Float) value) -> void
+        | ("name" name, (::String | ::Symbol) value) -> void
+        | ("url" name, (::String | ::Symbol) value) -> void
+        | ("profile" name, (::String | ::Symbol) value) -> void
+        | ("booth_requested" name, bool value) -> void
+        | ("fallback_option" name, (::String | ::Symbol) value) -> void
+        | ("number_of_additional_attendees" name, (::Integer | ::Float) value) -> void
+        | ("contact" name, ::Rk::SponsorApp::SponsorshipInput::Contact? value) -> void
+        | ("alternate_billing_contact" name, ::Rk::SponsorApp::SponsorshipInput::BillingContact? value) -> void
+        | ("billing_request" name, (::String | ::Symbol) value) -> void
+        | ("customization_request" name, (::String | ::Symbol) value) -> void
+        | ("note" name, (::String | ::Symbol) value) -> void
+        | ("asset_file_id" name, (::Integer | ::Float) value) -> void
+    end
+
+    # Request for SponsorService.GetApplicationForm.
+    class SponsorServiceGetApplicationFormRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceGetApplicationFormRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # Invitation code of a hidden conference, which its invitation link carries in `invite_code`.
+      # Ignored for a conference that is not hidden.
+      attr_reader invite_code(): ::String
+      attr_writer invite_code(): ::String | ::Symbol
+      def clear_invite_code: () -> void
+
+      # Affiliation code of an organization to apply as, which its affiliation link carries in
+      # `affiliation`. Empty applies as the organization the contact's email domain names.
+      attr_reader affiliation(): ::String
+      attr_writer affiliation(): ::String | ::Symbol
+      def clear_affiliation: () -> void
+
+      # ID of a sponsorship the signed-in contact manages, whose answers fill the form in. Absent fills
+      # nothing in.
+      attr_reader sponsorship_id_to_copy(): ::Integer
+      attr_writer sponsorship_id_to_copy(): ::Integer | ::Float
+      def has_sponsorship_id_to_copy?: () -> bool
+      def clear_sponsorship_id_to_copy: () -> void
+
+      attr_reader _sponsorship_id_to_copy(): ::Integer?
+      def has__sponsorship_id_to_copy?: () -> bool
+      def clear__sponsorship_id_to_copy: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        invite_code: (::String | ::Symbol)?,
+        "invite_code" => (::String | ::Symbol)?,
+        affiliation: (::String | ::Symbol)?,
+        "affiliation" => (::String | ::Symbol)?,
+        sponsorship_id_to_copy: (::Integer | ::Float)?,
+        "sponsorship_id_to_copy" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("invite_code" name) -> ::String
+        | ("affiliation" name) -> ::String
+        | ("sponsorship_id_to_copy" name) -> ::Integer
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("invite_code" name, (::String | ::Symbol) value) -> void
+        | ("affiliation" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id_to_copy" name, (::Integer | ::Float) value) -> void
+    end
+
+    # Response for SponsorService.GetApplicationForm.
+    class SponsorServiceGetApplicationFormResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceGetApplicationFormResponse]
+
+      # The form. Only its conference is set while the conference takes no applications, unless
+      # staff_override is true.
+      attr_accessor form(): ::Rk::SponsorApp::ApplicationForm?
+      def has_form?: () -> bool
+      def clear_form: () -> void
+
+      # Whether the conference takes applications now.
+      attr_accessor application_open(): bool
+      def clear_application_open: () -> void
+
+      # Whether this browser may apply although application_open is false, as it is signed in to the
+      # staff area too.
+      attr_accessor staff_override(): bool
+      def clear_staff_override: () -> void
+
+      # Whether the signed-in contact has applied to the conference already. Their application then
+      # has a page of its own, and CreateSponsorship refuses another.
+      attr_accessor already_applied(): bool
+      def clear_already_applied: () -> void
+
+      # Name of the organization the affiliation code names. Absent without a code, or when the code
+      # names none.
+      attr_reader affiliated_organization_name(): ::String
+      attr_writer affiliated_organization_name(): ::String | ::Symbol
+      def has_affiliated_organization_name?: () -> bool
+      def clear_affiliated_organization_name: () -> void
+
+      # Sponsorships the signed-in contact manages, whose answers can fill the form in, most recently
+      # applied first. Withdrawn ones are left out. Empty when no sponsor contact is signed in.
+      attr_accessor copy_sources(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorViewer::Sponsorship, ::Rk::SponsorApp::SponsorViewer::Sponsorship]
+      def clear_copy_sources: () -> void
+
+      # The answers of the sponsorship sponsorship_id_to_copy names that carry over to a new
+      # application: the listing, logo, contacts and billing request. Absent without one, when it is
+      # not among copy_sources, or while the form has only its conference.
+      attr_accessor copied_application(): ::Rk::SponsorApp::SponsorshipApplication?
+      def has_copied_application?: () -> bool
+      def clear_copied_application: () -> void
+
+      attr_reader _affiliated_organization_name(): ::String?
+      def has__affiliated_organization_name?: () -> bool
+      def clear__affiliated_organization_name: () -> void
+
+      attr_reader _copied_application(): ::Rk::SponsorApp::SponsorshipApplication?
+      def has__copied_application?: () -> bool
+      def clear__copied_application: () -> void
+
+      type init_map = {
+        form: (::Rk::SponsorApp::ApplicationForm | ::Rk::SponsorApp::ApplicationForm::init_map)?,
+        "form" => (::Rk::SponsorApp::ApplicationForm | ::Rk::SponsorApp::ApplicationForm::init_map)?,
+        application_open: bool?,
+        "application_open" => bool?,
+        staff_override: bool?,
+        "staff_override" => bool?,
+        already_applied: bool?,
+        "already_applied" => bool?,
+        affiliated_organization_name: (::String | ::Symbol)?,
+        "affiliated_organization_name" => (::String | ::Symbol)?,
+        copy_sources: ::Array[::Rk::SponsorApp::SponsorViewer::Sponsorship]?,
+        "copy_sources" => ::Array[::Rk::SponsorApp::SponsorViewer::Sponsorship]?,
+        copied_application: (::Rk::SponsorApp::SponsorshipApplication | ::Rk::SponsorApp::SponsorshipApplication::init_map)?,
+        "copied_application" => (::Rk::SponsorApp::SponsorshipApplication | ::Rk::SponsorApp::SponsorshipApplication::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("form" name) -> ::Rk::SponsorApp::ApplicationForm?
+        | ("application_open" name) -> bool
+        | ("staff_override" name) -> bool
+        | ("already_applied" name) -> bool
+        | ("affiliated_organization_name" name) -> ::String
+        | ("copy_sources" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorViewer::Sponsorship, ::Rk::SponsorApp::SponsorViewer::Sponsorship]
+        | ("copied_application" name) -> ::Rk::SponsorApp::SponsorshipApplication?
+
+      def []=:
+          ("form" name, ::Rk::SponsorApp::ApplicationForm? value) -> void
+        | ("application_open" name, bool value) -> void
+        | ("staff_override" name, bool value) -> void
+        | ("already_applied" name, bool value) -> void
+        | ("affiliated_organization_name" name, (::String | ::Symbol) value) -> void
+        | ("copy_sources" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorViewer::Sponsorship, ::Rk::SponsorApp::SponsorViewer::Sponsorship] value) -> void
+        | ("copied_application" name, ::Rk::SponsorApp::SponsorshipApplication? value) -> void
+    end
+
+    # Request for SponsorService.CreateSponsorship.
+    class SponsorServiceCreateSponsorshipRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceCreateSponsorshipRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # Invitation code of a hidden conference, as GetApplicationForm takes it.
+      attr_reader invite_code(): ::String
+      attr_writer invite_code(): ::String | ::Symbol
+      def clear_invite_code: () -> void
+
+      # Affiliation code of an organization to apply as, as GetApplicationForm takes it.
+      attr_reader affiliation(): ::String
+      attr_writer affiliation(): ::String | ::Symbol
+      def clear_affiliation: () -> void
+
+      # The answers. A new application carries a logo.
+      attr_accessor input(): ::Rk::SponsorApp::SponsorshipInput?
+      def has_input?: () -> bool
+      def clear_input: () -> void
+
+      # Whether the applicant agrees to the policies the form shows, which they must.
+      attr_accessor policy_agreement(): bool
+      def clear_policy_agreement: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        invite_code: (::String | ::Symbol)?,
+        "invite_code" => (::String | ::Symbol)?,
+        affiliation: (::String | ::Symbol)?,
+        "affiliation" => (::String | ::Symbol)?,
+        input: (::Rk::SponsorApp::SponsorshipInput | ::Rk::SponsorApp::SponsorshipInput::init_map)?,
+        "input" => (::Rk::SponsorApp::SponsorshipInput | ::Rk::SponsorApp::SponsorshipInput::init_map)?,
+        policy_agreement: bool?,
+        "policy_agreement" => bool?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("invite_code" name) -> ::String
+        | ("affiliation" name) -> ::String
+        | ("input" name) -> ::Rk::SponsorApp::SponsorshipInput?
+        | ("policy_agreement" name) -> bool
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("invite_code" name, (::String | ::Symbol) value) -> void
+        | ("affiliation" name, (::String | ::Symbol) value) -> void
+        | ("input" name, ::Rk::SponsorApp::SponsorshipInput? value) -> void
+        | ("policy_agreement" name, bool value) -> void
+    end
+
+    # Response for SponsorService.CreateSponsorship.
+    class SponsorServiceCreateSponsorshipResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceCreateSponsorshipResponse]
+
+      # The sponsorship applied for. It is accepted already when its plan accepts applications as they
+      # come.
+      attr_accessor sponsorship(): ::Rk::SponsorApp::Sponsorship?
+      def has_sponsorship?: () -> bool
+      def clear_sponsorship: () -> void
+
+      type init_map = {
+        sponsorship: (::Rk::SponsorApp::Sponsorship | ::Rk::SponsorApp::Sponsorship::init_map)?,
+        "sponsorship" => (::Rk::SponsorApp::Sponsorship | ::Rk::SponsorApp::Sponsorship::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("sponsorship" name) -> ::Rk::SponsorApp::Sponsorship?
+
+      def []=:
+          ("sponsorship" name, ::Rk::SponsorApp::Sponsorship? value) -> void
     end
 
     # Request for SponsorService.CreateSponsorshipAssetUpload.
@@ -262,7 +1241,19 @@ module Google
   module Protobuf
     class DescriptorPool
       def lookup:
-          ("rubykaigi.sponsor_app.SponsorshipAssetFile" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorshipAssetFile)])
+          ("rubykaigi.sponsor_app.ApplicationPlan" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ApplicationPlan)])
+        | ("rubykaigi.sponsor_app.ApplicationForm" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ApplicationForm)])
+        | ("rubykaigi.sponsor_app.SponsorshipAssetFile" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorshipAssetFile)])
+        | ("rubykaigi.sponsor_app.SponsorshipApplication" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorshipApplication)])
+        | ("rubykaigi.sponsor_app.SponsorshipApplication.Contact" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorshipApplication::Contact)])
+        | ("rubykaigi.sponsor_app.SponsorshipApplication.BillingContact" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorshipApplication::BillingContact)])
+        | ("rubykaigi.sponsor_app.SponsorshipInput" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorshipInput)])
+        | ("rubykaigi.sponsor_app.SponsorshipInput.Contact" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorshipInput::Contact)])
+        | ("rubykaigi.sponsor_app.SponsorshipInput.BillingContact" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorshipInput::BillingContact)])
+        | ("rubykaigi.sponsor_app.SponsorServiceGetApplicationFormRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceGetApplicationFormRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceGetApplicationFormResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceGetApplicationFormResponse)])
+        | ("rubykaigi.sponsor_app.SponsorServiceCreateSponsorshipRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateSponsorshipRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceCreateSponsorshipResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateSponsorshipResponse)])
         | ("rubykaigi.sponsor_app.SponsorServiceCreateSponsorshipAssetUploadRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateSponsorshipAssetUploadRequest)])
         | ("rubykaigi.sponsor_app.SponsorServiceCreateSponsorshipAssetUploadResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateSponsorshipAssetUploadResponse)])
         | ("rubykaigi.sponsor_app.SponsorServiceInitiateSponsorshipAssetUpdateRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceInitiateSponsorshipAssetUpdateRequest)])
