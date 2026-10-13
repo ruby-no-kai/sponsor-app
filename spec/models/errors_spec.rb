@@ -107,6 +107,17 @@ RSpec.describe Errors do
       expect(violations(error)).to eq([['input.priceText', 'INVALID', 'is invalid']])
     end
 
+    it 'names the ID field of an association the Input names by ID' do
+      sponsorship = Sponsorship.new.tap do |record|
+        record.errors.add(:plan, :unavailable)
+        record.errors.add(:asset_file, :blank)
+        record.errors.add(:organization, :taken)
+      end
+      error = described_class.new(record: sponsorship, input_class: Rk::SponsorApp::SponsorshipInput, field_prefix: 'input', json_names: true)
+
+      expect(violations(error).map(&:first)).to eq(['input.planId', 'input.assetFileId', ''])
+    end
+
     it 'names no field without an Input' do
       expect(violations(described_class.new(record:)).map(&:first)).to all(eq(''))
     end
