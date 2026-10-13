@@ -18,11 +18,11 @@
 
   .form-group
     = form.label :title
-    = form.text_field :title, class: 'form-control', placeholder: 'Email Title', disabled: broadcast.sent?
+    = form.text_field :title, class: 'form-control', placeholder: 'Email Title', disabled: broadcast.content_locked?
 
   .form-group
     = form.label :body
-    = form.text_area :body, class: 'form-control', placeholder: '(Markdown)', style: 'height: 20rem', disabled: broadcast.sent?
+    = form.text_area :body, class: 'form-control', placeholder: '(Markdown)', style: 'height: 20rem', disabled: broadcast.content_locked?
     %small.form-text
       You can use
       %code @LOGIN@

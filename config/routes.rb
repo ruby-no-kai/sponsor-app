@@ -176,6 +176,10 @@ Rails.application.routes.draw do
       rpc 'UpdateAnnouncement' => 'api/admin/announcements'
 
       # Broadcasts
+      rpc 'ListBroadcasts' => 'api/admin/broadcasts'
+      rpc 'GetBroadcast' => 'api/admin/broadcasts'
+      rpc 'CreateBroadcast' => 'api/admin/broadcasts'
+      rpc 'UpdateBroadcast' => 'api/admin/broadcasts'
 
       # Expense reports
 

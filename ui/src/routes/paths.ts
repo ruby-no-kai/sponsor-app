@@ -52,6 +52,10 @@ export const paths = {
   announcementEdit: "/admin/conferences/:slug/announcements/:id/edit",
 
   // Broadcasts
+  broadcasts: "/admin/conferences/:slug/broadcasts",
+  broadcastNew: "/admin/conferences/:slug/broadcasts/new",
+  broadcast: "/admin/conferences/:slug/broadcasts/:id",
+  broadcastEdit: "/admin/conferences/:slug/broadcasts/:id/edit",
 
   // Expense reports
 

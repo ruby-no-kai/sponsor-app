@@ -78,6 +78,15 @@ describe("isSpaPathname", () => {
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/announcements/Hx3k_2Lp0aQ:ja"));
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/announcements/Hx3k_2Lp0aQ:ja/edit"));
   });
+
+  it("matches the broadcast pages but leaves their form posts to Rails", () => {
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/broadcasts"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/broadcasts/new"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/broadcasts/7"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/broadcasts/7/edit"));
+    assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/broadcasts/7/deliveries"));
+    assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/broadcasts/7/dispatch_delivery"));
+  });
 });
 
 describe("matchSpaPath", () => {
