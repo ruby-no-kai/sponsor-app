@@ -77,6 +77,35 @@ RSpec.describe "Admin Sponsorships", type: :request do
       expect(history.staff).to eq(staff)
       expect(ProcessSponsorshipEditJob).to have_received(:perform_later).with(history)
     end
+
+    context "when optional fields are left empty" do
+      let(:empty_fields) do
+        {
+          name: 'Renamed',
+          contact_attributes: {id: sponsorship.contact.id, unit: '', email_cc: ''},
+          billing_request_attributes: {body: ''},
+          customization_request_attributes: {body: ''},
+          note_attributes: {body: ''},
+        }
+      end
+
+      it "creates no request and records no change for them" do
+        patch conference_sponsorship_path(conference, sponsorship), params: {sponsorship: empty_fields}
+
+        expect(response).to redirect_to(conference_sponsorship_path(conference, sponsorship))
+        expect(SponsorshipRequest.where(sponsorship:)).to be_empty
+        expect(sponsorship.contact.reload.unit).to be_nil
+        expect(sponsorship.contact.email_cc).to be_nil
+        paths = sponsorship.editing_histories.reorder(:id).last.diff.map { |_op, path, *| path }
+        expect(paths).to eq(['name'])
+      end
+    end
+
+    it "saves a request with a body" do
+      patch conference_sponsorship_path(conference, sponsorship), params: {sponsorship: {note_attributes: {body: 'Call first'}}}
+
+      expect(sponsorship.reload.note.body).to eq('Call first')
+    end
   end
 
   describe "DELETE destroy" do

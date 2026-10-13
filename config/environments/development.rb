@@ -4,7 +4,8 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
-  config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST', 'localhost:3000')
+  config.x.public_url_host = ENV.fetch('DEFAULT_URL_HOST', 'sponsor-app.localhost:1355')
+  config.x.public_url_protocol = 'http'
 
   config.x.asset_file_uploadable.region = ENV['S3_FILES_REGION']
   config.x.asset_file_uploadable.bucket = ENV['S3_FILES_BUCKET']
@@ -63,7 +64,7 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
 
   # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = {host: config.x.public_url_host, protocol: 'https'}
+  config.action_mailer.default_url_options = {host: config.x.public_url_host, protocol: config.x.public_url_protocol}
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

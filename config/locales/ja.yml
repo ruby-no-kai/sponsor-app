@@ -104,7 +104,7 @@ ja:
   sessions:
     new:
       title: ログイン
-      header: Log in
+      header: ログイン
       description: "スポンサーシップ申し込みで利用したメールアドレスを入力してください。"
       email_address: "Eメールアドレス"
       submit: "進む"
@@ -506,4 +506,3 @@ ja:
       reason: '理由'
       registration_reference: '登録'
       back: '利用状況へ戻る'
-

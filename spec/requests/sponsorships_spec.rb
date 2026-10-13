@@ -72,5 +72,28 @@ RSpec.describe "Sponsorships", type: :request do
       expect(sponsorship.reload.name).to eq('Renamed')
       expect(sponsorship.locale).to eq('ja')
     end
+
+    it "creates no request from an empty body and stores blank contact strings as null" do
+      patch user_conference_sponsorship_path(conference), params: {
+        sponsorship: {
+          name: 'Renamed',
+          contact_attributes: {id: sponsorship.contact.id, unit: '', email_cc: ''},
+          billing_request_attributes: {body: ''},
+          customization_request_attributes: {body: ''},
+          note_attributes: {body: ''},
+        },
+      }
+
+      expect(sponsorship.reload.name).to eq('Renamed')
+      expect(SponsorshipRequest.where(sponsorship:)).to be_empty
+      expect(sponsorship.contact.unit).to be_nil
+      expect(sponsorship.contact.email_cc).to be_nil
+    end
+
+    it "saves a request with a body" do
+      patch user_conference_sponsorship_path(conference), params: {sponsorship: {customization_request_attributes: {body: 'Banner'}}}
+
+      expect(sponsorship.reload.customization_request.body).to eq('Banner')
+    end
   end
 end
