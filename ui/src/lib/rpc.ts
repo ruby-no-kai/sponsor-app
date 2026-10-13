@@ -124,13 +124,21 @@ export function isRetryable(error: unknown): boolean {
 // only those failures need a toast: a page with nothing to show renders the error itself.
 const loadedKeys = new Set<string>();
 
+// An SWR onError that reports a failed revalidation through notify. A tree in another language
+// passes its own in a nested SWRConfig.
+export function revalidationErrorReporter(
+  notify: (error: unknown) => void,
+): (error: unknown, key: string) => void {
+  return (error, key) => {
+    if (isSigningIn(error)) return;
+    if (loadedKeys.has(key)) notify(error);
+  };
+}
+
 export const swrConfig: SWRConfiguration = {
   shouldRetryOnError: isRetryable,
   onSuccess(_data: unknown, key: string) {
     loadedKeys.add(key);
   },
-  onError(error: unknown, key: string) {
-    if (isSigningIn(error)) return;
-    if (loadedKeys.has(key)) notifyError(error);
-  },
+  onError: revalidationErrorReporter(notifyError),
 };

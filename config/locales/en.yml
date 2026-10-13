@@ -506,6 +506,35 @@ en:
       registration_reference: 'Registration'
       back: 'Back to Pass Redemptions'
 
+  # Texts only the sponsor area's SPA (ui/) shows. SponsorTranslations::SCOPES serves them.
+  sponsor_ui:
+    # Shell
+    shell:
+      site_name: '%{org_name} Sponsorships Portal'
+      menu: 'Menu'
+      back_to_portal: 'Back to the sponsorship portal'
+      language: 'Language'
+      language_names:
+        en: 'English'
+        ja: '日本語'
+      staff_mode: 'STAFF MODE'
+      not_found:
+        title: 'Page not found'
+        description: 'Nothing lives at this address.'
+      error:
+        title: 'Something went wrong'
+        description: 'Please try again later. If this keeps happening, contact the organizers with the request ID under Details.'
+        details: 'Details'
+        request_id: 'Request ID: %{request_id}'
+
+    # Applications
+
+    # Exhibitions and events
+
+    # Broadcasts and passes
+
+    # Expense reports
+
   admin:
     sessions:
       new:

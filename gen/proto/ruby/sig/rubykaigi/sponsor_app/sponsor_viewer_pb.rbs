@@ -102,8 +102,8 @@ module Rk
       attr_accessor sponsorships(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorViewer::Sponsorship, ::Rk::SponsorApp::SponsorViewer::Sponsorship]
       def clear_sponsorships: () -> void
 
-      # Locale the sponsor area is shown in, "en" or "ja". Chosen with the `hl` query parameter,
-      # then remembered in a cookie.
+      # Locale the sponsor area is shown in, "en" or "ja". Chosen with SetLocale or the `hl` query
+      # parameter, then remembered in a cookie.
       attr_reader locale(): ::String
       attr_writer locale(): ::String | ::Symbol
       def clear_locale: () -> void

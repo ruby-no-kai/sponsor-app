@@ -4,6 +4,8 @@
 
 import type { GenFile, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { SponsorServiceGetTranslationsRequestSchema, SponsorServiceGetTranslationsResponseSchema, SponsorServiceSetLocaleRequestSchema, SponsorServiceSetLocaleResponseSchema } from "./sponsor_shell_pb.ts";
+import { file_rubykaigi_sponsor_app_sponsor_shell } from "./sponsor_shell_pb.ts";
 import type { SponsorServiceGetViewerRequestSchema, SponsorServiceGetViewerResponseSchema } from "./sponsor_viewer_pb.ts";
 import { file_rubykaigi_sponsor_app_sponsor_viewer } from "./sponsor_viewer_pb.ts";
 
@@ -11,7 +13,7 @@ import { file_rubykaigi_sponsor_app_sponsor_viewer } from "./sponsor_viewer_pb.t
  * Describes the file rubykaigi/sponsor_app/sponsor_service.proto.
  */
 export const file_rubykaigi_sponsor_app_sponsor_service: GenFile = /*@__PURE__*/
-  fileDesc("CitydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvc3BvbnNvcl9zZXJ2aWNlLnByb3RvEhVydWJ5a2FpZ2kuc3BvbnNvcl9hcHAykQEKDlNwb25zb3JTZXJ2aWNlEn8KCUdldFZpZXdlchI1LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUdldFZpZXdlclJlcXVlc3QaNi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VHZXRWaWV3ZXJSZXNwb25zZSIDkAIBQhHqAg5Sazo6U3BvbnNvckFwcGIGcHJvdG8z", [file_rubykaigi_sponsor_app_sponsor_viewer]);
+  fileDesc("CitydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvc3BvbnNvcl9zZXJ2aWNlLnByb3RvEhVydWJ5a2FpZ2kuc3BvbnNvcl9hcHAyoQMKDlNwb25zb3JTZXJ2aWNlEpEBCg9HZXRUcmFuc2xhdGlvbnMSOy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VHZXRUcmFuc2xhdGlvbnNSZXF1ZXN0GjwucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlR2V0VHJhbnNsYXRpb25zUmVzcG9uc2UiA5ACARJ6CglTZXRMb2NhbGUSNS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VTZXRMb2NhbGVSZXF1ZXN0GjYucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlU2V0TG9jYWxlUmVzcG9uc2USfwoJR2V0Vmlld2VyEjUucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlR2V0Vmlld2VyUmVxdWVzdBo2LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUdldFZpZXdlclJlc3BvbnNlIgOQAgFCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_rubykaigi_sponsor_app_sponsor_shell, file_rubykaigi_sponsor_app_sponsor_viewer]);
 
 /**
  * The sponsor area: applying for a sponsorship and managing it afterwards.
@@ -31,11 +33,33 @@ export const file_rubykaigi_sponsor_app_sponsor_service: GenFile = /*@__PURE__*/
  * outright, such as a GET of an RPC with side effects (405), an unsupported Content-Type (415) or
  * an unknown RPC (404), is answered with a plain-text body instead.
  *
- * Translations
+ * Shell
  *
  * @generated from service rubykaigi.sponsor_app.SponsorService
  */
 export const SponsorService: GenService<{
+  /**
+   * Returns the texts the sponsor area shows, in the locale chosen for this browser. Answers
+   * without a session too.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.SponsorService.GetTranslations
+   */
+  getTranslations: {
+    methodKind: "unary";
+    input: typeof SponsorServiceGetTranslationsRequestSchema;
+    output: typeof SponsorServiceGetTranslationsResponseSchema;
+  },
+  /**
+   * Chooses the locale the sponsor area is shown in, and remembers it for this browser in a
+   * cookie. Answers without a session too.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.SponsorService.SetLocale
+   */
+  setLocale: {
+    methodKind: "unary";
+    input: typeof SponsorServiceSetLocaleRequestSchema;
+    output: typeof SponsorServiceSetLocaleResponseSchema;
+  },
   /**
    * Returns who is using the sponsor area. Answers without a session too, describing a visitor
    * who is not signed in.

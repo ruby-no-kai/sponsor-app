@@ -2,7 +2,14 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { Code, ConnectError } from "@connectrpc/connect";
 import { AdminService } from "../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
-import { isRetryable, isRpcKeyOf, rpcKey, signInUrl } from "./rpc.ts";
+import {
+  isRetryable,
+  isRpcKeyOf,
+  revalidationErrorReporter,
+  rpcKey,
+  signInUrl,
+  swrConfig,
+} from "./rpc.ts";
 
 describe("signInUrl", () => {
   it("sends staff pages to the staff sign-in, coming back to the same page", () => {
@@ -54,5 +61,20 @@ describe("isRetryable", () => {
     assert.ok(!isRetryable(new ConnectError("x", Code.InvalidArgument)));
     assert.ok(isRetryable(new ConnectError("x", Code.Unavailable)));
     assert.ok(isRetryable(new TypeError("Failed to fetch")));
+  });
+});
+
+describe("revalidationErrorReporter", () => {
+  it("reports a failure of a key that loaded before, and never a lost session", () => {
+    const reported: unknown[] = [];
+    const report = revalidationErrorReporter((error) => reported.push(error));
+    const failure = new ConnectError("x", Code.Unavailable);
+
+    report(failure, "never-loaded");
+    swrConfig.onSuccess?.({}, "loaded", {} as never);
+    report(failure, "loaded");
+    report(new ConnectError("x", Code.Unauthenticated), "loaded");
+
+    assert.deepEqual(reported, [failure]);
   });
 });

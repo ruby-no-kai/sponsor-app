@@ -26,7 +26,7 @@ module Api
     rescue_from ActiveRecord::RecordInvalid, with: :render_invalid_record
 
     before_action :verify_connect_request_origin!
-    before_action :set_locale
+    before_action :select_locale
     before_action :populate_sentry_scope
     before_action :authenticate_rpc!
     # Moves behind MessageValidatable's check whenever an RPC is defined, see .method_added.

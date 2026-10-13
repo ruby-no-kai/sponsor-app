@@ -203,7 +203,9 @@ Rails.application.routes.draw do
     end
 
     connect_service 'rubykaigi.sponsor_app.SponsorService' do
-      # Translations
+      # Shell
+      rpc 'GetTranslations' => 'api/sponsor/locale'
+      rpc 'SetLocale' => 'api/sponsor/locale'
 
       # Applications
 

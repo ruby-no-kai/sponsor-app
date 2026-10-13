@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// Request for SponsorService.GetTranslations.
+message SponsorServiceGetTranslationsRequest {}
+
+// Response for SponsorService.GetTranslations.
+message SponsorServiceGetTranslationsResponse {
+  // Locale the texts are in, "en" or "ja", as chosen with SetLocale or the `hl` query parameter and
+  // remembered in a cookie.
+  string locale = 1;
+
+  // Texts by dotted key, such as "layouts.application.login". A text the locale lacks is given in
+  // English. A text that varies with a count is split into keys ending in ".zero", ".one" and
+  // ".other", of which ".zero" is optional. A text names its variables as `%{name}`, and only a
+  // key ending in "_html" holds markup.
+  map<string, string> translations = 2;
+
+  // Name of the organization running the conferences, which texts take as `%{org_name}`.
+  string org_name = 3;
+}
+
+// Request for SponsorService.SetLocale.
+message SponsorServiceSetLocaleRequest {
+  // Locale to show the sponsor area in.
+  string locale = 1 [(buf.validate.field).string = {
+    in: [
+      "en",
+      "ja"
+    ]
+  }];
+}
+
+// Response for SponsorService.SetLocale.
+message SponsorServiceSetLocaleResponse {}

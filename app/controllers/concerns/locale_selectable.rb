@@ -9,7 +9,7 @@
 # @requires_ancestor: ActionController::StrongParameters
 module LocaleSelectable
   #: () -> void
-  private def set_locale
+  private def select_locale
     locale_cookie_name = Rails.application.config.x.locale_cookie_name #: String
 
     case
