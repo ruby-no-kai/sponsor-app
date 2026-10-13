@@ -213,6 +213,34 @@ export const router = createBrowserRouter([
               },
 
               // Announcements
+              {
+                path: paths.announcements,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/AnnouncementList.tsx")).default,
+                },
+              },
+              {
+                path: paths.announcementNew,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/AnnouncementEditor.tsx")).default,
+                },
+              },
+              {
+                path: paths.announcement,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/AnnouncementDetail.tsx")).default,
+                },
+              },
+              {
+                path: paths.announcementEdit,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/AnnouncementEditor.tsx")).default,
+                },
+              },
 
               // Broadcasts
 
