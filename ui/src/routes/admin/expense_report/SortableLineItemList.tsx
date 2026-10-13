@@ -4,7 +4,7 @@ import type { DragEvent, KeyboardEvent } from "react";
 import type { ExpenseLineItem } from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
 import { formatAmountAt } from "./amounts.ts";
 
-// A drag of a line item carries this type, so the list takes no other drag.
+// A drag of a line item carries this type, which the file drop zones ignore.
 const LINE_ITEM_TYPE = "application/x-sponsor-app-expense-line-item";
 
 // Line items in their order. A drag, or Alt+Up and Alt+Down on a focused row, moves one onto

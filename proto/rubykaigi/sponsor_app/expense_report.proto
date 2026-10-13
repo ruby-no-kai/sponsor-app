@@ -214,3 +214,44 @@ message ExpenseLineItemInput {
     (buf.validate.field).repeated.items.int64.gt = 0
   ];
 }
+
+// A receipt or invoice to upload, taken by AdminService.CreateExpenseFileUpload.
+message ExpenseFileUploadInput {
+  // Name of the file, as the uploader's computer calls it.
+  string filename = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255
+  ];
+
+  // MIME type of the file: a JPEG, PNG, GIF or WebP image, or a PDF.
+  string content_type = 2 [(buf.validate.field).string = {
+    in: [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "application/pdf"
+    ]
+  }];
+}
+
+// An upload of an expense file in progress: a presigned POST to the storage, valid for 15
+// minutes.
+//
+// POST a multipart form to `url` holding every entry of `fields`, then `x-amz-checksum-algorithm`
+// set to "SHA256" and `x-amz-checksum-sha256` to the base64 SHA-256 digest of the file, then the
+// file itself as `file`. The storage refuses a file larger than `max_size` or of another content
+// type than the one declared. Report the upload as complete afterwards.
+message ExpenseFileUpload {
+  // ID of the ExpenseFile being uploaded.
+  int64 file_id = 1 [jstype = JS_STRING];
+
+  // Where to POST the form.
+  string url = 2;
+
+  // Form fields to send ahead of the file, as given.
+  map<string, string> fields = 3;
+
+  // Largest file the storage accepts, in bytes.
+  int64 max_size = 4;
+}

@@ -108,6 +108,7 @@ To raise an older file, `bundle exec spoom srb bump --from false --to true` find
 - A splat of an array whose size is not known statically is error 7019 at every level above `false`. `config/lambda_runner.rb` stays at `false` for this.
 - A `Hash` keyword splat into a method with required keywords is error 7019, and `Data#to_h` returns an untyped `Hash`. Spell the keywords out, as `EnsureSponsorshipTitoDiscountCodeJob` does for `TitoApi`.
 - Tapioca emits no instance variables. One that a gem assigns and a patch reads is declared with `T.let` in an `initialize` body in the gem's shim, as in `sorbet/rbi/shims/aws-sdk-s3.rbi`.
+- The AWS SDK defines an error class for a response without a body, such as `Aws::S3::Errors::NotFound` from HeadObject, on first reference. The ones the app rescues are declared in the gem's shim.
 - Files evaluated in another tool's DSL and unable to resolve, such as `config/ci.rb`, are `typed: ignore`.
 - A spec whose anonymous class defines `initialize` or `self.name` leaks those definitions into `Object` for the whole project. Such a spec is `typed: ignore`.
 - Sorbet does not read the `.rbs` that protoc writes into `gen/`. Tapioca's Protobuf DSL compiler types the generated messages instead.

@@ -9,3 +9,7 @@ class Aws::S3::PresignedPost
     @accelerate = T.let(T.unsafe(nil), T::Boolean)
   end
 end
+
+# Defined on first reference by Aws::Errors::DynamicErrors, for an error answered with no body,
+# such as a HeadObject of a missing key.
+class Aws::S3::Errors::NotFound < Aws::S3::Errors::ServiceError; end

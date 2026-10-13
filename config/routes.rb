@@ -192,6 +192,10 @@ Rails.application.routes.draw do
       rpc 'UpdateExpenseLineItem' => 'api/admin/expense_line_items'
       rpc 'DeleteExpenseLineItem' => 'api/admin/expense_line_items'
       rpc 'CreateExpenseReportReview' => 'api/admin/expense_report_reviews'
+      rpc 'CreateExpenseFileUpload' => 'api/admin/expense_files'
+      rpc 'InitiateExpenseFileUpdate' => 'api/admin/expense_files'
+      rpc 'CompleteExpenseFileUpload' => 'api/admin/expense_files'
+      rpc 'DeleteExpenseFile' => 'api/admin/expense_files'
 
       # Viewer
       rpc 'GetViewer' => 'api/admin/viewer'
