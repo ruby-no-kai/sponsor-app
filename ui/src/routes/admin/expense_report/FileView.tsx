@@ -5,7 +5,7 @@ import { AdminService } from "../../../gen/rubykaigi/sponsor_app/admin_service_p
 import type { ExpenseFile } from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
 import { useRpcMutation } from "../../../lib/rpc.ts";
 import { notifyError } from "../../../lib/toast.ts";
-import { ConfirmButton } from "../ConfirmButton.tsx";
+import { ConfirmAction } from "./ConfirmAction.tsx";
 import { useEditor } from "./EditorContext.ts";
 import { newLineItemInput } from "./lineItemForm.ts";
 import { fileName } from "./reportView.ts";
@@ -78,7 +78,7 @@ export function FileView({
   }
 
   return (
-    <div className="flex flex-col items-center gap-3 p-4 text-center">
+    <div className="flex flex-col items-center gap-3 px-4 py-3 text-center">
       <Text size="sm">{fileName(file)}</Text>
       {isMobile && (
         <Button
@@ -104,9 +104,9 @@ export function FileView({
             <Text bold size="sm">
               Link to existing line items
             </Text>
-            <ul className="flex max-h-52 flex-col gap-1 overflow-auto rounded-md border border-kumo-line p-2">
+            <ul className="flex max-h-52 flex-col overflow-auto rounded-lg border border-kumo-line p-1">
               {linkable.map((item) => (
-                <li key={item.id.toString()}>
+                <li key={item.id.toString()} className="rounded-sm px-2 py-1 hover:bg-kumo-tint">
                   <Checkbox
                     label={item.title}
                     checked={chosenIds.has(item.id)}
@@ -133,7 +133,7 @@ export function FileView({
         ))}
 
       <hr className="w-full border-kumo-line" />
-      <ConfirmButton
+      <ConfirmAction
         label="Delete this file"
         icon={TrashIcon}
         size="sm"

@@ -2,10 +2,50 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { create } from "@bufbuild/protobuf";
 import {
+  ExpenseReportReviewSchema,
+  ExpenseReportReview_Action,
   ExpenseReportSchema,
   ExpenseReport_Status,
 } from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
-import { fileName, hashOf, isReadOnly, selectionFromHash, unlinkedFiles } from "./reportView.ts";
+import {
+  fileName,
+  hashOf,
+  isReadOnly,
+  selectionFromHash,
+  unlinkedFiles,
+  verdictOf,
+} from "./reportView.ts";
+
+describe("verdictOf", () => {
+  const approve = create(ExpenseReportReviewSchema, { action: ExpenseReportReview_Action.APPROVE });
+  const reject = create(ExpenseReportReviewSchema, {
+    action: ExpenseReportReview_Action.REJECT,
+    comment: "Attach the invoice",
+  });
+
+  it("is the latest review while the report stands as it left", () => {
+    assert.deepEqual(verdictOf({ status: ExpenseReport_Status.APPROVED, latestReview: approve }), {
+      kind: "approved",
+      at: undefined,
+    });
+    assert.deepEqual(verdictOf({ status: ExpenseReport_Status.REJECTED, latestReview: reject }), {
+      kind: "rejected",
+      comment: "Attach the invoice",
+    });
+  });
+
+  it("is none once the report has moved on", () => {
+    assert.equal(
+      verdictOf({ status: ExpenseReport_Status.DRAFT, latestReview: reject }),
+      undefined,
+    );
+    assert.equal(
+      verdictOf({ status: ExpenseReport_Status.SUBMITTED, latestReview: approve }),
+      undefined,
+    );
+    assert.equal(verdictOf({ status: ExpenseReport_Status.APPROVED }), undefined);
+  });
+});
 
 describe("isReadOnly", () => {
   it("holds for an approved report only", () => {

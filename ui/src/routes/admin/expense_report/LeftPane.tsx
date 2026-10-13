@@ -67,23 +67,22 @@ export function LeftPane({
   return (
     <div
       data-drop-zone="unlinked"
-      className={`relative flex min-h-0 flex-col overflow-auto ${isMobile ? "flex-1" : "w-64 shrink-0 border-r border-kumo-line"}`}
+      className={`relative flex min-w-0 flex-col ${isMobile ? "" : "border-r border-kumo-line"}`}
     >
       <PaneHeader title="Line items">
         {!readOnly && (
           <Button
             variant="secondary"
             size="sm"
-            shape="square"
             icon={PlusIcon}
-            title="Add line item"
-            aria-label="Add line item"
             loading={createLineItem.isMutating}
             onClick={() => void handleAdd()}
-          />
+          >
+            Add item
+          </Button>
         )}
       </PaneHeader>
-      <div className="min-h-20 flex-1 overflow-auto">
+      <div>
         <SortableLineItemList
           items={report.lineItems}
           decimal={rounding.decimal}
@@ -93,7 +92,7 @@ export function LeftPane({
           disabled={readOnly || isMobile}
         />
         {report.lineItems.length === 0 && (
-          <div className="p-3">
+          <div className="px-3 py-2">
             <Text variant="secondary" size="sm">
               No line items yet
             </Text>
@@ -102,7 +101,7 @@ export function LeftPane({
       </div>
 
       <PaneHeader title="Other files" />
-      <ul className="max-h-[40%] overflow-auto">
+      <ul>
         {unlinkedFiles(report).map((file) => (
           <li key={file.id.toString()}>
             <button

@@ -1,4 +1,5 @@
-import { InputArea } from "@cloudflare/kumo";
+import { timestampDate } from "@bufbuild/protobuf/wkt";
+import { InputArea, Text } from "@cloudflare/kumo";
 import { CheckIcon, XIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
@@ -12,9 +13,10 @@ import { optionalFromInput } from "../../../lib/forms.ts";
 import { useSaveRejection } from "../../../lib/rejection.ts";
 import { useRpcMutation } from "../../../lib/rpc.ts";
 import { toastManager } from "../../../lib/toast.ts";
-import { ConfirmButton } from "../ConfirmButton.tsx";
-import { ErrorList, joined, SaveErrorBanner, Section, useFieldReveal } from "../FormParts.tsx";
+import { ErrorList, joined, SaveErrorBanner, useFieldReveal } from "../FormParts.tsx";
+import { ConfirmAction } from "./ConfirmAction.tsx";
 import { useEditor } from "./EditorContext.ts";
+import { verdictOf } from "./reportView.ts";
 
 // Named after ExpenseReportReviewInput's JSON fields.
 type ReviewValues = { action: "approve" | "reject"; comment: string };
@@ -23,31 +25,26 @@ const INITIAL: ReviewValues = { action: "approve", comment: "" };
 
 const REVIEW_LAYOUT: FieldLayout = { labels: { comment: "Comment", action: "Verdict" } };
 
-const VERDICTS = {
-  approve: {
-    action: ExpenseReportReview_Action.APPROVE,
-    label: "Approve",
-    question: "Approve this expense report?",
-    consequence: "Its line items and files can no longer be changed.",
-    done: "Approved",
-  },
-  reject: {
-    action: ExpenseReportReview_Action.REJECT,
-    label: "Reject",
-    question: "Reject this expense report?",
-    consequence: "The report goes back to the sponsor with the comment.",
-    done: "Rejected",
-  },
+const VERDICT_ACTIONS = {
+  approve: ExpenseReportReview_Action.APPROVE,
+  reject: ExpenseReportReview_Action.REJECT,
 } as const;
 
-// Approves or rejects the latest submission. The server requires a comment on a rejection.
+// A day without its year or time, which the report's own dates are never far from.
+const dayFormat = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" });
+
+// Approves or rejects the latest submission, or replaces the verdict already given. The server
+// requires a comment on a rejection.
 export function ReviewForm() {
-  const { target, applyReport } = useEditor();
+  const { target, report, applyReport } = useEditor();
   const createReview = useRpcMutation(AdminService.method.createExpenseReportReview);
   // The error of the last save, for its code and request ID.
   const [saveError, setSaveError] = useState<unknown>();
+  // Set when Reject is pressed without a comment, so no dialog asks about a save that cannot work.
+  const [missingComment, setMissingComment] = useState(false);
   const { formRef, reveal } = useFieldReveal();
   const rejection = useSaveRejection();
+  const verdict = verdictOf(report);
 
   const form = useForm({
     defaultValues: INITIAL,
@@ -58,7 +55,7 @@ export function ReviewForm() {
         const response = await createReview.trigger({
           ...target,
           input: {
-            action: VERDICTS[value.action].action,
+            action: VERDICT_ACTIONS[value.action],
             comment: optionalFromInput(value.comment.trim()),
           },
         });
@@ -73,7 +70,10 @@ export function ReviewForm() {
       setSaveError(undefined);
       toastManager.add({
         variant: "success",
-        title: `${VERDICTS[value.action].done} the expense report`,
+        title:
+          value.action === "approve"
+            ? "Approved the expense report"
+            : "Rejected the expense report",
       });
       applyReport(result);
       formApi.reset();
@@ -89,64 +89,90 @@ export function ReviewForm() {
     <form
       ref={formRef}
       noValidate
+      className="flex w-full flex-col gap-2"
       onSubmit={(event) => {
         event.preventDefault();
       }}
     >
-      <Section title="Review">
-        <form.Field name="comment">
-          {(field) => (
-            <InputArea
-              label="Comment (required for rejection)"
-              data-field={field.name}
-              rows={3}
-              placeholder="Feedback for the sponsor…"
-              value={field.state.value}
-              onChange={(event) => field.handleChange(event.target.value)}
-              onBlur={field.handleBlur}
-              error={joined(field.state.meta.errors)}
+      {verdict !== undefined && (
+        <div className="flex flex-col gap-0.5">
+          <Text bold>
+            {verdict.kind === "approved"
+              ? `Approved ${verdict.at === undefined ? "" : dayFormat.format(timestampDate(verdict.at))}`.trim()
+              : `Rejected: ${verdict.comment}`}
+          </Text>
+          <Text variant="secondary">Change the verdict</Text>
+        </div>
+      )}
+      <form.Subscribe
+        selector={(state) => ({
+          formError: state.errorMap.onChange,
+          errored: erroredFields(state.fieldMeta, REVIEW_LAYOUT),
+          actionErrors: state.fieldMeta.action?.errors ?? [],
+        })}
+      >
+        {({ formError, errored, actionErrors }) => (
+          <>
+            <SaveErrorBanner
+              formError={formError}
+              errored={errored}
+              error={saveError}
+              onShow={reveal}
             />
-          )}
-        </form.Field>
-        <form.Subscribe
-          selector={(state) => ({
-            formError: state.errorMap.onChange,
-            errored: erroredFields(state.fieldMeta, REVIEW_LAYOUT),
-            actionErrors: state.fieldMeta.action?.errors ?? [],
-          })}
-        >
-          {({ formError, errored, actionErrors }) => (
-            <div className="flex flex-col gap-3">
-              <SaveErrorBanner
-                formError={formError}
-                errored={errored}
-                error={saveError}
-                onShow={reveal}
+            <div className="flex flex-wrap items-end gap-2" data-field="action">
+              <form.Field name="comment">
+                {(field) => (
+                  <div className="min-w-48 flex-1">
+                    <InputArea
+                      aria-label="Comment (required to reject)"
+                      data-field={field.name}
+                      rows={1}
+                      placeholder="Comment (required to reject)"
+                      value={field.state.value}
+                      onChange={(event) => {
+                        setMissingComment(false);
+                        field.handleChange(event.target.value);
+                      }}
+                      onBlur={field.handleBlur}
+                      error={
+                        joined(field.state.meta.errors) ??
+                        (missingComment
+                          ? "Write a comment for the sponsor to reject this report."
+                          : undefined)
+                      }
+                    />
+                  </div>
+                )}
+              </form.Field>
+              <ConfirmAction
+                label="Reject"
+                icon={XIcon}
+                variant="secondary-destructive"
+                title="Reject this expense report?"
+                description="The report goes back to the sponsor with the comment."
+                confirmLabel="Reject"
+                beforeOpen={() => {
+                  const hasComment = form.getFieldValue("comment").trim() !== "";
+                  setMissingComment(!hasComment);
+                  return hasComment;
+                }}
+                onConfirm={() => submit("reject")}
               />
-              <div className="flex flex-wrap gap-2" data-field="action">
-                <ConfirmButton
-                  label={VERDICTS.approve.label}
-                  icon={CheckIcon}
-                  variant="primary"
-                  title={VERDICTS.approve.question}
-                  description={VERDICTS.approve.consequence}
-                  confirmLabel={VERDICTS.approve.label}
-                  onConfirm={() => submit("approve")}
-                />
-                <ConfirmButton
-                  label={VERDICTS.reject.label}
-                  icon={XIcon}
-                  title={VERDICTS.reject.question}
-                  description={VERDICTS.reject.consequence}
-                  confirmLabel={VERDICTS.reject.label}
-                  onConfirm={() => submit("reject")}
-                />
-              </div>
-              <ErrorList errors={actionErrors} />
+              <ConfirmAction
+                label="Approve"
+                icon={CheckIcon}
+                variant="primary"
+                confirmVariant="primary"
+                title="Approve this expense report?"
+                description="Its line items and files can no longer be changed."
+                confirmLabel="Approve"
+                onConfirm={() => submit("approve")}
+              />
             </div>
-          )}
-        </form.Subscribe>
-      </Section>
+            <ErrorList errors={actionErrors} />
+          </>
+        )}
+      </form.Subscribe>
     </form>
   );
 }

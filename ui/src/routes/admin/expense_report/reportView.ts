@@ -1,4 +1,8 @@
-import { ExpenseReport_Status } from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import {
+  ExpenseReport_Status,
+  ExpenseReportReview_Action,
+} from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
 import type {
   ExpenseFile,
   ExpenseReport,
@@ -12,6 +16,32 @@ export const EXPENSE_REPORT_STATUS_LABELS: Readonly<Record<ExpenseReport_Status,
   [ExpenseReport_Status.APPROVED]: { text: "approved", tone: "success" },
   [ExpenseReport_Status.REJECTED]: { text: "rejected", tone: "error" },
 };
+
+// What the organizers decided, while the report stands as they left it. A report sent back to
+// draft or submitted again has no verdict.
+export type Verdict =
+  | { kind: "approved"; at: Timestamp | undefined }
+  | { kind: "rejected"; comment: string };
+
+export function verdictOf(
+  report: Pick<ExpenseReport, "status" | "latestReview">,
+): Verdict | undefined {
+  const review = report.latestReview;
+  if (review === undefined) return undefined;
+  if (
+    report.status === ExpenseReport_Status.APPROVED &&
+    review.action === ExpenseReportReview_Action.APPROVE
+  ) {
+    return { kind: "approved", at: review.createdAt };
+  }
+  if (
+    report.status === ExpenseReport_Status.REJECTED &&
+    review.action === ExpenseReportReview_Action.REJECT
+  ) {
+    return { kind: "rejected", comment: review.comment ?? "" };
+  }
+  return undefined;
+}
 
 // Staff may change anything but an approved report, which the server refuses to change.
 export function isReadOnly(report: Pick<ExpenseReport, "status">): boolean {

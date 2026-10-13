@@ -85,7 +85,7 @@ export function SortableLineItemList({
               onKeyDown={(event) => handleKeyDown(event, index)}
               onClick={() => onSelect(item.id)}
               aria-current={isSelected ? "true" : undefined}
-              className={`flex w-full flex-col items-start gap-0.5 border-y-2 px-3 py-2 text-left ${borders} ${
+              className={`flex w-full flex-col items-start gap-0.5 border-y-2 px-3 py-2 text-left text-sm ${borders} ${
                 isSelected ? "bg-kumo-info-tint" : "hover:bg-kumo-tint"
               } ${item.id === draggedId ? "opacity-50" : ""} ${disabled ? "" : "cursor-grab"}`}
             >
@@ -93,9 +93,11 @@ export function SortableLineItemList({
                 {item.title}
               </Text>
               <span className="flex flex-wrap items-center gap-1">
-                <Text size="sm">{formatAmountAt(item.amount, decimal)}</Text>
-                {item.preliminal && <Badge variant="warning">preliminal</Badge>}
-                {item.fileIds.length === 0 && <Badge variant="error">no file</Badge>}
+                <span className="font-mono text-[0.9em]">
+                  {formatAmountAt(item.amount, decimal)}
+                </span>
+                {item.preliminal && <Badge variant="warning">preliminary</Badge>}
+                {item.fileIds.length === 0 && <Badge variant="secondary">no file</Badge>}
               </span>
             </button>
           </li>
