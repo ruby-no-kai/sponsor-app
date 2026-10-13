@@ -65,6 +65,26 @@ RSpec.describe EditingHistory do
     end
   end
 
+  describe '#diff_changes' do
+    it 'reads each row of the diff' do
+      history = SponsorshipEditingHistory.new(sponsorship:, raw: {})
+      history.diff = [
+        ['~', 'name', 'Old Name', 'New Name'],
+        ['-', 'withdrawn_at', '2026-06-01T09:00:00.000Z'],
+      ]
+
+      expect(history.diff_changes).to contain_exactly(
+        have_attributes(operation: '~', path: 'name', old_value: 'Old Name', new_value: 'New Name'),
+        have_attributes(operation: '-', path: 'withdrawn_at', old_value: '2026-06-01T09:00:00.000Z', new_value?: false),
+      )
+    end
+
+    it 'raises before the diff is calculated' do
+      history = SponsorshipEditingHistory.new(sponsorship:, raw: {name: 'Test'})
+      expect { history.diff_changes }.to raise_error(Must::Violation)
+    end
+  end
+
   describe '#diff_summary' do
     it 'returns formatted summary of changes' do
       history = SponsorshipEditingHistory.new(sponsorship:, raw: {})

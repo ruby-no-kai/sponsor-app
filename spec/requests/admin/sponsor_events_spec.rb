@@ -34,6 +34,23 @@ RSpec.describe "Admin Sponsor Events", type: :request do
       get conference_sponsor_event_editing_histories_path(conference, sponsor_event)
       expect(response).to have_http_status(:ok)
     end
+
+    it "shows the new value of a change or an addition, and the old value of a removal" do
+      SponsorEventEditingHistory.create!(
+        sponsor_event:,
+        raw: {'title' => 'New'},
+        diff: [['~', 'title', 'Old', 'New'], ['+', 'link_name', 'Join'], ['-', 'withdrawn_at', '2026-06-01T09:00:00.000Z']],
+      )
+
+      get conference_sponsor_event_editing_histories_path(conference, sponsor_event)
+
+      rows = Nokogiri::HTML(response.body).css('tbody tr').map { |tr| tr.css('td').map(&:text) }
+      expect(rows).to include(
+        ['~', '"title"', '"New"'],
+        ['+', '"link_name"', '"Join"'],
+        ['-', '"withdrawn_at"', '"2026-06-01T09:00:00.000Z"'],
+      )
+    end
   end
 
   describe "GET download_asset" do

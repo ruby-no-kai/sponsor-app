@@ -30,10 +30,7 @@ class ProcessSponsorEventEditJob < ApplicationJob
 
   #: (SponsorEventEditingHistory) -> bool
   private def status_changed_in_edit?(edit)
-    diff = edit.diff
-    return false unless diff
-
-    diff.any? { |change| change[1] == 'status' }
+    edit.diff_changes.any? { it.path == 'status' }
   end
 
   #: (SponsorEventEditingHistory) -> bool
@@ -43,21 +40,15 @@ class ProcessSponsorEventEditJob < ApplicationJob
 
     return true if status_changed_to_accepted_in_edit?(edit)
 
-    diff = edit.diff
-    return false unless diff
-
-    diff.any? do |change|
-      (change[1] == 'asset_file_id' || change[1] == 'asset_file_checksum_sha256') &&
-        change.last.present?
+    edit.diff_changes.any? do |change|
+      (change.path == 'asset_file_id' || change.path == 'asset_file_checksum_sha256') &&
+        change.new_value? && change.new_value.present?
     end
   end
 
   #: (SponsorEventEditingHistory) -> bool
   private def status_changed_to_accepted_in_edit?(edit)
-    diff = edit.diff
-    return false unless diff
-
-    diff.any? { |change| change[1] == 'status' && change.last == 'accepted' }
+    edit.diff_changes.any? { |change| change.path == 'status' && change.new_value? && change.new_value == 'accepted' }
   end
 
   #: () -> SponsorEvent
