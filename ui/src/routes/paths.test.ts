@@ -71,6 +71,13 @@ describe("isSpaPathname", () => {
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/events/42/editing_history"));
     assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/events/42/download_asset"));
   });
+
+  it("matches the announcement pages at the issue:locale IDs HAML links to", () => {
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/announcements"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/announcements/new"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/announcements/Hx3k_2Lp0aQ:ja"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/announcements/Hx3k_2Lp0aQ:ja/edit"));
+  });
 });
 
 describe("matchSpaPath", () => {
