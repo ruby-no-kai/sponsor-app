@@ -555,4 +555,26 @@ RSpec.describe Sponsorship, type: :model do
       end
     end
   end
+
+  describe 'request nested attributes' do
+    let(:sponsorship) { FactoryBot.create(:sponsorship, conference:, plan:) }
+
+    it 'builds no request from a blank body' do
+      sponsorship.assign_attributes(note_attributes: {body: ''}, billing_request_attributes: {body: nil})
+      expect(sponsorship.note).to be_nil
+      expect(sponsorship.billing_request).to be_nil
+    end
+
+    it 'builds a request from a body' do
+      sponsorship.assign_attributes(note_attributes: {body: 'Hello'})
+      expect(sponsorship.note.body).to eq('Hello')
+    end
+
+    it 'updates an existing request to a blank body' do
+      note = SponsorshipRequest.create!(sponsorship:, kind: :note, body: 'Hello')
+      sponsorship.reload
+      sponsorship.assign_attributes(note_attributes: {id: note.id, body: ''})
+      expect(sponsorship.note.body).to eq('')
+    end
+  end
 end

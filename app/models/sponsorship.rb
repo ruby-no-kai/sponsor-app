@@ -99,9 +99,11 @@ class Sponsorship < ApplicationRecord
   accepts_nested_attributes_for :contact, allow_destroy: true, reject_if: ->(attrs) { attrs['kind'].present? }
   accepts_nested_attributes_for :alternate_billing_contact, allow_destroy: true, reject_if: ->(attrs) { attrs['kind'].present? }
 
-  accepts_nested_attributes_for :billing_request, reject_if: ->(attrs) { attrs['kind'].present? }
-  accepts_nested_attributes_for :customization_request, reject_if: ->(attrs) { attrs['kind'].present? }
-  accepts_nested_attributes_for :note, reject_if: ->(attrs) { attrs['kind'].present? }
+  REJECT_BLANK_NEW_REQUEST = ->(attrs) { attrs['kind'].present? || (attrs['id'].blank? && attrs['body'].blank?) } #: ^(Hash[String, untyped]) -> bool
+
+  accepts_nested_attributes_for :billing_request, reject_if: REJECT_BLANK_NEW_REQUEST
+  accepts_nested_attributes_for :customization_request, reject_if: REJECT_BLANK_NEW_REQUEST
+  accepts_nested_attributes_for :note, reject_if: REJECT_BLANK_NEW_REQUEST
 
   before_validation :generate_ticket_key
 

@@ -6,6 +6,8 @@ class Contact < ApplicationRecord
   belongs_to :sponsorship, optional: true
   enum :kind, {primary: 0, billing: 1}
 
+  normalizes :unit, :email_cc, with: ->(value) { value.presence }
+
   validates :kind, presence: true
   validates :email, presence: true
   validates :address, presence: true

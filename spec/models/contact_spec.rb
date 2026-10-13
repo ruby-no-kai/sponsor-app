@@ -5,6 +5,20 @@ require 'rails_helper'
 RSpec.describe Contact, type: :model do
   let(:sponsorship) { FactoryBot.create(:sponsorship) }
 
+  describe 'normalization' do
+    it 'stores blank unit and email_cc as null' do
+      contact = FactoryBot.build(:contact, unit: '', email_cc: '')
+      expect(contact.unit).to be_nil
+      expect(contact.email_cc).to be_nil
+    end
+
+    it 'keeps non-blank values' do
+      contact = FactoryBot.build(:contact, unit: 'Dev', email_cc: 'cc@example.com')
+      expect(contact.unit).to eq('Dev')
+      expect(contact.email_cc).to eq('cc@example.com')
+    end
+  end
+
   describe 'validations' do
     describe 'email_cc format validation' do
       it 'accepts blank email_cc' do
