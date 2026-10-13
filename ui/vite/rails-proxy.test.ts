@@ -64,7 +64,7 @@ describe("destinationOf", () => {
       "/admin/conferences/rubykaigi2048/sponsors_yml",
       "/admin/session/new?back_to=%2Fadmin",
       "/auth/github/callback",
-      "/conferences/rubykaigi2048/sponsorship/new",
+      "/conferences/rubykaigi2048/sponsorship_asset_files/42",
       "/session/new",
       "/letter_opener",
       "/vite-dev/@vite/client",

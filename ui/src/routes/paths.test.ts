@@ -13,12 +13,16 @@ describe("isSpaPathname", () => {
     assert.ok(!isSpaPathname("/session/new"));
   });
 
-  it("matches the sponsor shell but leaves the application form to Rails", () => {
+  it("matches the sponsor shell", () => {
     assert.ok(isSpaPathname("/"));
     assert.ok(isSpaPathname("/conferences"));
     assert.ok(isSpaPathname("/conferences/rubykaigi2048/sponsorship"));
-    assert.ok(!isSpaPathname("/conferences/rubykaigi2048/sponsorship/new"));
-    assert.ok(!isSpaPathname("/conferences/rubykaigi2048/sponsorship/edit"));
+  });
+
+  it("matches the application pages but leaves logo downloads to Rails", () => {
+    assert.ok(isSpaPathname("/conferences/rubykaigi2048/sponsorship/new"));
+    assert.ok(isSpaPathname("/conferences/rubykaigi2048/sponsorship/edit"));
+    assert.ok(!isSpaPathname("/conferences/rubykaigi2048/sponsorship_asset_files/42"));
   });
 
   it("matches the conference pages HAML has at the same paths", () => {

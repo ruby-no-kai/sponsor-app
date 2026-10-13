@@ -16,6 +16,19 @@ module SponsorTranslations
     'sponsor_ui.dashboard',
 
     # Applications
+    'sponsorships.new',
+    'sponsorships.edit',
+    'sponsorships.form',
+    'sponsorships.closed',
+    'sponsorships.create',
+    'activerecord.attributes.sponsorship',
+    'activerecord.attributes.sponsorship/note',
+    'activerecord.attributes.sponsorship/customization_request',
+    'activerecord.attributes.sponsorship/billing_request',
+    'activerecord.attributes.contact',
+    'helpers.label.sponsorship',
+    'sponsor_ui.applications',
+    'sponsor_ui.files',
 
     # Exhibitions and events
 

@@ -572,6 +572,56 @@ en:
         other: 'Show %{count} older announcements'
 
     # Applications
+    applications:
+      other_plan: 'Other'
+      staff_preview: "Applications are not open. You see this form as you are signed in as staff."
+      opens_at: 'Applications open at %{ts}.'
+      amendment_closed: 'Your application can no longer be changed. Contact the organizers for any change.'
+      updated: 'Your application was successfully updated.'
+      back_to_portal: 'Back to the sponsorship portal'
+      cancel: 'Cancel'
+      sections:
+        title: 'Sections'
+        contact: 'Point of contact'
+        billing: 'Billing information'
+        plan: 'Sponsorship package'
+        booth: 'Sponsor booth'
+        fallback_option: 'Alternative plan preferences'
+        company: 'Sponsor information'
+        logo: 'Logo'
+        tickets: 'Conference tickets'
+        note: 'Others'
+        policies: 'Policies'
+      not_saved: 'Your application was not saved.'
+      fields_need_attention:
+        one: '%{field}: %{message}'
+        other: '%{count} fields need attention, starting with %{field}: %{message}'
+      show: 'Show'
+      billing_contact: 'Billing contact'
+      asset_file:
+        replace: 'Replace'
+        cancel: 'Cancel'
+        download: 'Download the current file (.%{extension})'
+        copied: 'The logo of your application to %{conference} will be copied.'
+        uploading: 'Uploading the logo'
+        too_large: '%{file} is larger than %{size} MB, so it was not uploaded. Choose a smaller file and save again.'
+        unsupported_type: '%{file} is not a type we accept, so it was not uploaded. Choose an .ai, .eps, .svg, .pdf or .zip file and save again.'
+        upload_failed: '%{file} could not be sent to our file storage. Your other answers are kept. Check your connection, choose the file again and save.'
+        service_failed: 'The logo upload could not start because our service had a problem. Your other answers are kept. Choose %{file} again and save, and contact the organizers if this keeps happening.'
+      errors:
+        required: 'This field is required'
+        choose_plan: 'Pick a plan'
+        email: 'Enter an email address'
+        url: 'Enter a URL starting with http:// or https://'
+        whole_number: 'Enter a whole number of 0 or more'
+        choose_file: 'Choose a file to upload'
+        acknowledge: 'Check the box in the notice above to confirm it, then submit'
+        agree: 'Agree to the policies to submit'
+
+    # Choosing a file
+    files:
+      choose: 'Choose file'
+      remove: 'Remove'
 
     # Exhibitions and events
 

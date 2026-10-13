@@ -1,31 +1,13 @@
-import { Button, InputGroup, LayerCard, Text } from "@cloudflare/kumo";
+import { Button, InputGroup, Text } from "@cloudflare/kumo";
 import { ConnectError } from "@connectrpc/connect";
 import { ClockIcon, WarningIcon, XIcon } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
-import type { ReactNode, RefObject } from "react";
+import type { ReactNode } from "react";
 import { Disclosure } from "../../lib/Disclosure.tsx";
-import { parentPath } from "../../lib/fieldErrors.ts";
+import { joined } from "../../lib/FormParts.tsx";
+import type { FieldOf } from "../../lib/FormParts.tsx";
 import type { FieldError } from "../../lib/fieldErrors.ts";
 import { nowInput } from "../../lib/forms.ts";
 import { RpcErrorDetails } from "../RouteError.tsx";
-
-function messagesOf(errors: readonly unknown[]): string[] {
-  return errors.filter((error): error is string => typeof error === "string");
-}
-
-// For an input's `error` prop, which takes one message.
-export function joined(errors: readonly unknown[]): string | undefined {
-  const messages = messagesOf(errors);
-  return messages.length === 0 ? undefined : messages.join("; ");
-}
-
-// What a field render prop receives, as far as these inputs read it.
-export type FieldOf<T> = {
-  name: string;
-  state: { value: T; meta: { errors: readonly unknown[] } };
-  handleChange: (value: T) => void;
-  handleBlur: () => void;
-};
 
 // A datetime-local input in minutes, in the browser's time zone, with buttons for now and for none. Kumo reads
 // the input's own name rather than the group's label, hence the aria-label.
@@ -83,29 +65,6 @@ export function DateTimeInput({
         </InputGroup.Button>
       </InputGroup.Addon>
     </InputGroup>
-  );
-}
-
-export function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <LayerCard>
-      <LayerCard.Secondary>{title}</LayerCard.Secondary>
-      <LayerCard.Primary className="flex flex-col gap-4">{children}</LayerCard.Primary>
-    </LayerCard>
-  );
-}
-
-// A field's errors as a list, for a field whose input shows none. `field` marks it for
-// useFieldReveal.
-export function ErrorList({ field, errors }: { field?: string; errors: readonly unknown[] }) {
-  const messages = messagesOf(errors);
-  if (messages.length === 0) return null;
-  return (
-    <ul className="list-inside list-disc text-kumo-danger" data-field={field}>
-      {messages.map((message) => (
-        <li key={message}>{message}</li>
-      ))}
-    </ul>
   );
 }
 
@@ -185,30 +144,5 @@ export function SaveBar({
   );
 }
 
-// Scrolls the form to the field a path names, found by its data-field attribute, once the form
-// has rendered the errors that may add it.
-export function useFieldReveal(): {
-  formRef: RefObject<HTMLFormElement | null>;
-  reveal: (path: string) => void;
-} {
-  const formRef = useRef<HTMLFormElement>(null);
-  // A fresh object per call, so the same field is scrolled to again.
-  const [target, setTarget] = useState<{ path: string }>();
-
-  useEffect(() => {
-    if (target !== undefined) revealField(formRef.current, target.path);
-  }, [target]);
-
-  return { formRef, reveal: (path) => setTarget({ path }) };
-}
-
-// Scrolls to the field at a path, or else the nearest one enclosing it, and focuses a text field.
-function revealField(form: HTMLFormElement | null, path: string): void {
-  for (let at: string | undefined = path; at !== undefined; at = parentPath(at)) {
-    const element = form?.querySelector<HTMLElement>(`[data-field="${CSS.escape(at)}"]`);
-    if (element === null || element === undefined) continue;
-    element.scrollIntoView({ behavior: "smooth", block: "center" });
-    if (element.matches("input, textarea")) element.focus({ preventScroll: true });
-    return;
-  }
-}
+export { ErrorList, joined, Section, useFieldReveal } from "../../lib/FormParts.tsx";
+export type { FieldOf } from "../../lib/FormParts.tsx";

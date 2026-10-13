@@ -22,6 +22,9 @@ RSpec.describe 'SponsorService locale', type: :request do
         'sponsorships.show.tickets.quantity.other' => '%{count} passes',
         'activerecord.attributes.expense_report/status.draft' => 'Draft',
         'sponsor_ui.shell.site_name' => '%{org_name} Sponsorships Portal',
+        'sponsorships.form.plan_explanation.guests.other' => '%{count} guests',
+        'activerecord.attributes.contact.email' => 'Email Address',
+        'helpers.label.sponsorship.booth_requested' => 'Request a Booth',
       )
     end
 

@@ -573,6 +573,56 @@ ja:
         other: '過去のお知らせ %{count} 件を表示'
 
     # Applications
+    applications:
+      other_plan: 'その他'
+      staff_preview: '申込の受付期間外です。スタッフとしてログインしているため、このフォームが表示されています。'
+      opens_at: '申込受付開始: %{ts}'
+      amendment_closed: '申込内容の修正受付は終了しました。変更が必要な場合は運営チームへお問い合わせください。'
+      updated: '申込内容を更新しました。'
+      back_to_portal: 'スポンサーポータルへ戻る'
+      cancel: 'キャンセル'
+      sections:
+        title: 'セクション'
+        contact: '連絡先'
+        billing: '請求情報'
+        plan: 'スポンサープラン'
+        booth: 'スポンサーブース'
+        fallback_option: '代替の希望プランを設定する'
+        company: 'サイト掲載情報'
+        logo: 'ロゴ'
+        tickets: 'チケット'
+        note: 'その他の連絡事項'
+        policies: 'ポリシー'
+      not_saved: '申込内容は保存されていません。'
+      fields_need_attention:
+        one: '%{field}: %{message}'
+        other: '%{count} 件の項目を確認してください。最初の項目は %{field}: %{message}'
+      show: '表示'
+      billing_contact: '請求先'
+      asset_file:
+        replace: '差し替える'
+        cancel: 'キャンセル'
+        download: '現在のファイルをダウンロード (.%{extension})'
+        copied: '%{conference} の申込のロゴを引き継ぎます。'
+        uploading: 'ロゴをアップロードしています'
+        too_large: '%{file} は %{size} MB を超えているためアップロードしていません。より小さいファイルを選択して、もう一度保存してください。'
+        unsupported_type: '%{file} は受け付けていない形式のためアップロードしていません。.ai, .eps, .svg, .pdf, .zip のいずれかを選択して、もう一度保存してください。'
+        upload_failed: '%{file} をファイルストレージへ送信できませんでした。入力内容は保持されています。通信環境を確認し、ファイルを選び直してから保存してください。'
+        service_failed: 'サービス側の問題でロゴのアップロードを開始できませんでした。入力内容は保持されています。%{file} を選び直して保存してください。解決しない場合は運営チームへお問い合わせください。'
+      errors:
+        required: '入力してください'
+        choose_plan: 'プランを選択してください'
+        email: 'メールアドレスを入力してください'
+        url: 'http:// または https:// で始まる URL を入力してください'
+        whole_number: '0 以上の整数を入力してください'
+        choose_file: 'アップロードするファイルを選択してください'
+        acknowledge: '上の注意書きの内容を確認してチェックしてから送信してください'
+        agree: '送信するにはポリシーへの同意が必要です'
+
+    # ファイル選択
+    files:
+      choose: 'ファイルを選択'
+      remove: '削除'
 
     # Exhibitions and events
 
