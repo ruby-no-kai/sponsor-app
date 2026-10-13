@@ -6,6 +6,7 @@ import "rubykaigi/sponsor_app/admin_announcements.proto";
 import "rubykaigi/sponsor_app/admin_booth_assignments.proto";
 import "rubykaigi/sponsor_app/admin_broadcasts.proto";
 import "rubykaigi/sponsor_app/admin_conferences.proto";
+import "rubykaigi/sponsor_app/admin_expense_reports.proto";
 import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
 import "rubykaigi/sponsor_app/admin_organizations.proto";
 import "rubykaigi/sponsor_app/admin_plans.proto";
@@ -266,6 +267,63 @@ service AdminService {
   rpc DispatchBroadcast(AdminServiceDispatchBroadcastRequest) returns (AdminServiceDispatchBroadcastResponse);
 
   // Expense reports
+
+  // Lists the sponsorships of a conference with a confirmed custom package, each with its expense
+  // report in brief and the fee its expenses are offset against.
+  rpc ListExpenseReports(AdminServiceListExpenseReportsRequest) returns (AdminServiceListExpenseReportsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns a sponsorship's expense report with its line items, uploaded files and latest review.
+  // A sponsorship without a report is answered `not_found`, as only its sponsor can start one.
+  rpc GetExpenseReport(AdminServiceGetExpenseReportRequest) returns (AdminServiceGetExpenseReportResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns the tax rates, rounding and fees a sponsorship's expense report is weighed against.
+  rpc CalculateExpenseReport(AdminServiceCalculateExpenseReportRequest) returns (AdminServiceCalculateExpenseReportResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Adds a line item to a sponsorship's expense report and recalculates its totals, rewriting the
+  // snapshot under review while the report is submitted. An approved report is answered
+  // `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc CreateExpenseLineItem(AdminServiceCreateExpenseLineItemRequest) returns (AdminServiceCreateExpenseLineItemResponse);
+
+  // Replaces the writable fields of a line item, moving it when given a position, and
+  // recalculates the report as CreateExpenseLineItem does. An approved report is answered
+  // `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc UpdateExpenseLineItem(AdminServiceUpdateExpenseLineItemRequest) returns (AdminServiceUpdateExpenseLineItemResponse);
+
+  // Deletes a line item, keeping its files, and recalculates the report as CreateExpenseLineItem
+  // does. An approved report is answered `failed_precondition` with
+  // PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc DeleteExpenseLineItem(AdminServiceDeleteExpenseLineItemRequest) returns (AdminServiceDeleteExpenseLineItemResponse);
+
+  // Approves or rejects the latest submission of an expense report, replacing any verdict given
+  // on it before, and sets the report's status to match. A report never submitted is answered
+  // `not_found`, and a draft, such as one whose submission was withdrawn, `failed_precondition`.
+  rpc CreateExpenseReportReview(AdminServiceCreateExpenseReportReviewRequest) returns (AdminServiceCreateExpenseReportReviewResponse);
+
+  // Starts uploading an expense file for a sponsorship: records the file, then returns a presigned
+  // POST to the storage for the browser to send it with. CompleteExpenseFileUpload lists the file
+  // once the upload is done. A sponsorship whose expense report is approved is answered
+  // `failed_precondition`.
+  rpc CreateExpenseFileUpload(AdminServiceCreateExpenseFileUploadRequest) returns (AdminServiceCreateExpenseFileUploadResponse);
+
+  // Returns a fresh presigned POST for an expense file, to retry its upload or replace its
+  // contents. A sponsorship whose expense report is approved is answered `failed_precondition`.
+  rpc InitiateExpenseFileUpdate(AdminServiceInitiateExpenseFileUpdateRequest) returns (AdminServiceInitiateExpenseFileUpdateResponse);
+
+  // Records that an expense file's upload is done, taking its version, checksum and content type
+  // from the storage. A file the storage does not hold yet is answered `failed_precondition`, and
+  // so is a sponsorship whose expense report is approved.
+  rpc CompleteExpenseFileUpload(AdminServiceCompleteExpenseFileUploadRequest) returns (AdminServiceCompleteExpenseFileUploadResponse);
+
+  // Deletes an expense file from the storage, detaching it from every line item and rewriting the
+  // snapshot under review while the report is submitted. A sponsorship whose expense report is
+  // approved is answered `failed_precondition`.
+  rpc DeleteExpenseFile(AdminServiceDeleteExpenseFileRequest) returns (AdminServiceDeleteExpenseFileResponse);
 
   // Viewer
 

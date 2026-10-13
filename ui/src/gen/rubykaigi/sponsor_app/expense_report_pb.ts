@@ -13,7 +13,270 @@ import type { Message, UnknownEnum } from "@bufbuild/protobuf";
  * Describes the file rubykaigi/sponsor_app/expense_report.proto.
  */
 export const file_rubykaigi_sponsor_app_expense_report: GenFile = /*@__PURE__*/
-  fileDesc("CipydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvZXhwZW5zZV9yZXBvcnQucHJvdG8SFXJ1YnlrYWlnaS5zcG9uc29yX2FwcCLzAQoTRXhwZW5zZVJlcG9ydFJldmlldxJBCgZhY3Rpb24YASABKA4yMS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZVJlcG9ydFJldmlldy5BY3Rpb24SFAoHY29tbWVudBgCIAEoCUgAiAEBEi4KCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIkcKBkFjdGlvbhIWChJBQ1RJT05fVU5TUEVDSUZJRUQQABISCg5BQ1RJT05fQVBQUk9WRRABEhEKDUFDVElPTl9SRUpFQ1QQAkIKCghfY29tbWVudCLFAQoYRXhwZW5zZVJlcG9ydENhbGN1bGF0aW9uEhEKCXRheF9yYXRlcxgBIAMoCRIPCgdkZWNpbWFsGAIgASgFEhcKCnBsYW5fcHJpY2UYAyABKAlIAIgBARIdChBwbGFuX3ByaWNlX2Jvb3RoGAQgASgJSAGIAQESFgoOYm9vdGhfYXNzaWduZWQYBSABKAgSEQoJdG90YWxfZmVlGAYgASgJQg0KC19wbGFuX3ByaWNlQhMKEV9wbGFuX3ByaWNlX2Jvb3RoIu0FChRFeHBlbnNlTGluZUl0ZW1JbnB1dBJtCgV0aXRsZRgBIAEoCUJeukhbugFVCidleHBlbnNlX2xpbmVfaXRlbV9pbnB1dC50aXRsZS5ub3RfYmxhbmsSF3ZhbHVlIG11c3Qgbm90IGJlIGJsYW5rGhF0aGlzLnRyaW0oKSAhPSAnJ8gBARISCgVub3RlcxgCIAEoCUgAiAEBEpoBCgZhbW91bnQYAyABKAlCiQG6SIUBugGBAQolZXhwZW5zZV9saW5lX2l0ZW1faW5wdXQuYW1vdW50LmZvcm1hdBIpbXVzdCBiZSBhbiBhbW91bnQgc3VjaCBhcyAxMDAwIG9yIDEwMDAuNTAaLXRoaXMubWF0Y2hlcygnXlswLTldezEsMTB9KFsuXVswLTldezEsMn0pPyQnKRKTAQoIdGF4X3JhdGUYBCABKAlCfLpIeboBdgonZXhwZW5zZV9saW5lX2l0ZW1faW5wdXQudGF4X3JhdGUuZm9ybWF0EiJtdXN0IGJlIGEgcmF0ZSBzdWNoIGFzIDAuMSBvciAwLjA4Gid0aGlzLm1hdGNoZXMoJ15bMC05XShbLl1bMC05XXsxLDR9KT8kJylIAYgBARKiAQoKdGF4X2Ftb3VudBgFIAEoCUKNAbpIiQG6AYUBCilleHBlbnNlX2xpbmVfaXRlbV9pbnB1dC50YXhfYW1vdW50LmZvcm1hdBIpbXVzdCBiZSBhbiBhbW91bnQgc3VjaCBhcyAxMDAwIG9yIDEwMDAuNTAaLXRoaXMubWF0Y2hlcygnXlswLTldezEsMTB9KFsuXVswLTldezEsMn0pPyQnKRISCgpwcmVsaW1pbmFsGAYgASgIEh4KCHBvc2l0aW9uGAcgASgFQge6SAQaAiAASAKIAQESIgoIZmlsZV9pZHMYCCADKANCEDABukgLkgEIGAEiBCICIABCCAoGX25vdGVzQgsKCV90YXhfcmF0ZUILCglfcG9zaXRpb25CEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_buf_validate_validate, file_google_protobuf_timestamp]);
+  fileDesc("CipydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvZXhwZW5zZV9yZXBvcnQucHJvdG8SFXJ1YnlrYWlnaS5zcG9uc29yX2FwcCK7BAoNRXhwZW5zZVJlcG9ydBIOCgJpZBgBIAEoA0ICMAESOwoGc3RhdHVzGAIgASgOMisucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQuU3RhdHVzEhQKDHRvdGFsX2Ftb3VudBgDIAEoCRIYChB0b3RhbF90YXhfYW1vdW50GAQgASgJEhAKCHJldmlzaW9uGAUgASgFEjoKCmxpbmVfaXRlbXMYBiADKAsyJi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZUxpbmVJdGVtEjEKBWZpbGVzGAcgAygLMiIucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VGaWxlEkYKDWxhdGVzdF9yZXZpZXcYCCABKAsyKi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZVJlcG9ydFJldmlld0gAiAEBEi4KCmNyZWF0ZWRfYXQYCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYCiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wInIKBlN0YXR1cxIWChJTVEFUVVNfVU5TUEVDSUZJRUQQABIQCgxTVEFUVVNfRFJBRlQQARIUChBTVEFUVVNfU1VCTUlUVEVEEAISEwoPU1RBVFVTX0FQUFJPVkVEEAMSEwoPU1RBVFVTX1JFSkVDVEVEEARCEAoOX2xhdGVzdF9yZXZpZXci0gEKD0V4cGVuc2VMaW5lSXRlbRIOCgJpZBgBIAEoA0ICMAESDQoFdGl0bGUYAiABKAkSEgoFbm90ZXMYAyABKAlIAIgBARIOCgZhbW91bnQYBCABKAkSFQoIdGF4X3JhdGUYBSABKAlIAYgBARISCgp0YXhfYW1vdW50GAYgASgJEhIKCnByZWxpbWluYWwYByABKAgSEAoIcG9zaXRpb24YCCABKAUSFAoIZmlsZV9pZHMYCSADKANCAjABQggKBl9ub3Rlc0ILCglfdGF4X3JhdGUihwEKC0V4cGVuc2VGaWxlEg4KAmlkGAEgASgDQgIwARIVCghmaWxlbmFtZRgCIAEoCUgAiAEBEhQKDGNvbnRlbnRfdHlwZRgDIAEoCRIuCgpjcmVhdGVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEILCglfZmlsZW5hbWUi8wEKE0V4cGVuc2VSZXBvcnRSZXZpZXcSQQoGYWN0aW9uGAEgASgOMjEucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRSZXZpZXcuQWN0aW9uEhQKB2NvbW1lbnQYAiABKAlIAIgBARIuCgpjcmVhdGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJHCgZBY3Rpb24SFgoSQUNUSU9OX1VOU1BFQ0lGSUVEEAASEgoOQUNUSU9OX0FQUFJPVkUQARIRCg1BQ1RJT05fUkVKRUNUEAJCCgoIX2NvbW1lbnQixQEKGEV4cGVuc2VSZXBvcnRDYWxjdWxhdGlvbhIRCgl0YXhfcmF0ZXMYASADKAkSDwoHZGVjaW1hbBgCIAEoBRIXCgpwbGFuX3ByaWNlGAMgASgJSACIAQESHQoQcGxhbl9wcmljZV9ib290aBgEIAEoCUgBiAEBEhYKDmJvb3RoX2Fzc2lnbmVkGAUgASgIEhEKCXRvdGFsX2ZlZRgGIAEoCUINCgtfcGxhbl9wcmljZUITChFfcGxhbl9wcmljZV9ib290aCLtBQoURXhwZW5zZUxpbmVJdGVtSW5wdXQSbQoFdGl0bGUYASABKAlCXrpIW7oBVQonZXhwZW5zZV9saW5lX2l0ZW1faW5wdXQudGl0bGUubm90X2JsYW5rEhd2YWx1ZSBtdXN0IG5vdCBiZSBibGFuaxoRdGhpcy50cmltKCkgIT0gJyfIAQESEgoFbm90ZXMYAiABKAlIAIgBARKaAQoGYW1vdW50GAMgASgJQokBukiFAboBgQEKJWV4cGVuc2VfbGluZV9pdGVtX2lucHV0LmFtb3VudC5mb3JtYXQSKW11c3QgYmUgYW4gYW1vdW50IHN1Y2ggYXMgMTAwMCBvciAxMDAwLjUwGi10aGlzLm1hdGNoZXMoJ15bMC05XXsxLDEwfShbLl1bMC05XXsxLDJ9KT8kJykSkwEKCHRheF9yYXRlGAQgASgJQny6SHm6AXYKJ2V4cGVuc2VfbGluZV9pdGVtX2lucHV0LnRheF9yYXRlLmZvcm1hdBIibXVzdCBiZSBhIHJhdGUgc3VjaCBhcyAwLjEgb3IgMC4wOBondGhpcy5tYXRjaGVzKCdeWzAtOV0oWy5dWzAtOV17MSw0fSk/JCcpSAGIAQESogEKCnRheF9hbW91bnQYBSABKAlCjQG6SIkBugGFAQopZXhwZW5zZV9saW5lX2l0ZW1faW5wdXQudGF4X2Ftb3VudC5mb3JtYXQSKW11c3QgYmUgYW4gYW1vdW50IHN1Y2ggYXMgMTAwMCBvciAxMDAwLjUwGi10aGlzLm1hdGNoZXMoJ15bMC05XXsxLDEwfShbLl1bMC05XXsxLDJ9KT8kJykSEgoKcHJlbGltaW5hbBgGIAEoCBIeCghwb3NpdGlvbhgHIAEoBUIHukgEGgIgAEgCiAEBEiIKCGZpbGVfaWRzGAggAygDQhAwAbpIC5IBCBgBIgQiAiAAQggKBl9ub3Rlc0ILCglfdGF4X3JhdGVCCwoJX3Bvc2l0aW9uIpMBChZFeHBlbnNlRmlsZVVwbG9hZElucHV0Eh0KCGZpbGVuYW1lGAEgASgJQgu6SAjIAQFyAxj/ARJaCgxjb250ZW50X3R5cGUYAiABKAlCRLpIQXI/UgppbWFnZS9qcGVnUglpbWFnZS9wbmdSCWltYWdlL2dpZlIKaW1hZ2Uvd2VicFIPYXBwbGljYXRpb24vcGRmIrwBChFFeHBlbnNlRmlsZVVwbG9hZBITCgdmaWxlX2lkGAEgASgDQgIwARILCgN1cmwYAiABKAkSRAoGZmllbGRzGAMgAygLMjQucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VGaWxlVXBsb2FkLkZpZWxkc0VudHJ5EhAKCG1heF9zaXplGAQgASgDGi0KC0ZpZWxkc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_buf_validate_validate, file_google_protobuf_timestamp]);
+
+/**
+ * The expenses a sponsor spent on a custom package, which the organizers offset against the
+ * sponsorship fee once they approve them. A sponsorship has at most one.
+ *
+ * Amounts, rates and totals are decimal strings, such as "120000.0", as a double would round them.
+ *
+ * @generated from message rubykaigi.sponsor_app.ExpenseReport
+ */
+export type ExpenseReport = Message<"rubykaigi.sponsor_app.ExpenseReport"> & {
+  /**
+   * Expense report ID.
+   *
+   * @generated from field: int64 id = 1 [jstype = JS_STRING];
+   */
+  id: string;
+
+  /**
+   * Where the report stands.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseReport.Status status = 2;
+   */
+  status: ExpenseReport_Status;
+
+  /**
+   * Sum of the line items' amounts before tax.
+   *
+   * @generated from field: string total_amount = 3;
+   */
+  totalAmount: string;
+
+  /**
+   * Sum of the line items' tax.
+   *
+   * @generated from field: string total_tax_amount = 4;
+   */
+  totalTaxAmount: string;
+
+  /**
+   * How many times the report has been submitted. 0 until the first submission.
+   *
+   * @generated from field: int32 revision = 5;
+   */
+  revision: number;
+
+  /**
+   * Every line item, in the order the sponsor arranged them.
+   *
+   * @generated from field: repeated rubykaigi.sponsor_app.ExpenseLineItem line_items = 6;
+   */
+  lineItems: ExpenseLineItem[];
+
+  /**
+   * Every file uploaded for the sponsorship's expenses, whether a line item attaches it or not.
+   * A file still being uploaded is left out.
+   *
+   * @generated from field: repeated rubykaigi.sponsor_app.ExpenseFile files = 7;
+   */
+  files: ExpenseFile[];
+
+  /**
+   * The organizers' verdict on the latest submission. Absent until they review it.
+   *
+   * @generated from field: optional rubykaigi.sponsor_app.ExpenseReportReview latest_review = 8;
+   */
+  latestReview?: ExpenseReportReview | undefined;
+
+  /**
+   * When the sponsor started the report.
+   *
+   * @generated from field: google.protobuf.Timestamp created_at = 9;
+   */
+  createdAt?: Timestamp | undefined;
+
+  /**
+   * When the report or its totals last changed.
+   *
+   * @generated from field: google.protobuf.Timestamp updated_at = 10;
+   */
+  updatedAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.ExpenseReport.
+ * Use `create(ExpenseReportSchema)` to create a new message.
+ */
+export const ExpenseReportSchema: GenMessage<ExpenseReport> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_expense_report, 0);
+
+/**
+ * Where the report stands.
+ *
+ * @generated from enum rubykaigi.sponsor_app.ExpenseReport.Status
+ */
+export const ExpenseReport_Status = {
+  /**
+   * The zero value proto3 requires. Never returned.
+   *
+   * @generated from enum value: STATUS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED: 0,
+
+  /**
+   * Being written by the sponsor.
+   *
+   * @generated from enum value: STATUS_DRAFT = 1;
+   */
+  DRAFT: 1,
+
+  /**
+   * Submitted and awaiting review.
+   *
+   * @generated from enum value: STATUS_SUBMITTED = 2;
+   */
+  SUBMITTED: 2,
+
+  /**
+   * Approved by the organizers. An approved report takes no further changes.
+   *
+   * @generated from enum value: STATUS_APPROVED = 3;
+   */
+  APPROVED: 3,
+
+  /**
+   * Returned to the sponsor for changes, with the review saying why.
+   *
+   * @generated from enum value: STATUS_REJECTED = 4;
+   */
+  REJECTED: 4,
+} as const;
+
+/**
+ * Where the report stands.
+ *
+ * @generated from enum rubykaigi.sponsor_app.ExpenseReport.Status
+ */
+export type ExpenseReport_Status = (typeof ExpenseReport_Status)[keyof typeof ExpenseReport_Status] | UnknownEnum;
+
+/**
+ * Describes the enum rubykaigi.sponsor_app.ExpenseReport.Status.
+ */
+export const ExpenseReport_StatusSchema: GenEnum<ExpenseReport_Status> = /*@__PURE__*/
+  enumDesc(file_rubykaigi_sponsor_app_expense_report, 0, 0);
+
+/**
+ * One expense of a report, such as a venue rental.
+ *
+ * @generated from message rubykaigi.sponsor_app.ExpenseLineItem
+ */
+export type ExpenseLineItem = Message<"rubykaigi.sponsor_app.ExpenseLineItem"> & {
+  /**
+   * Line item ID.
+   *
+   * @generated from field: int64 id = 1 [jstype = JS_STRING];
+   */
+  id: string;
+
+  /**
+   * What the expense was for.
+   *
+   * @generated from field: string title = 2;
+   */
+  title: string;
+
+  /**
+   * Anything the sponsor adds about the expense. Absent when there is nothing.
+   *
+   * @generated from field: optional string notes = 3;
+   */
+  notes?: string | undefined;
+
+  /**
+   * Amount before tax.
+   *
+   * @generated from field: string amount = 4;
+   */
+  amount: string;
+
+  /**
+   * Tax rate the tax was calculated at, such as "0.1". Absent when the tax amount was entered by
+   * hand.
+   *
+   * @generated from field: optional string tax_rate = 5;
+   */
+  taxRate?: string | undefined;
+
+  /**
+   * Tax on the amount.
+   *
+   * @generated from field: string tax_amount = 6;
+   */
+  taxAmount: string;
+
+  /**
+   * Whether the amount is a planned budget rather than a final figure.
+   *
+   * @generated from field: bool preliminal = 7;
+   */
+  preliminal: boolean;
+
+  /**
+   * Sort key among the report's line items, lowest first. Positions may skip numbers.
+   *
+   * @generated from field: int32 position = 8;
+   */
+  position: number;
+
+  /**
+   * IDs of the ExpenseFile receipts and invoices attached, in the order they were attached.
+   *
+   * @generated from field: repeated int64 file_ids = 9 [jstype = JS_STRING];
+   */
+  fileIds: string[];
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.ExpenseLineItem.
+ * Use `create(ExpenseLineItemSchema)` to create a new message.
+ */
+export const ExpenseLineItemSchema: GenMessage<ExpenseLineItem> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_expense_report, 1);
+
+/**
+ * A receipt or invoice uploaded for a sponsorship's expenses.
+ *
+ * @generated from message rubykaigi.sponsor_app.ExpenseFile
+ */
+export type ExpenseFile = Message<"rubykaigi.sponsor_app.ExpenseFile"> & {
+  /**
+   * Expense file ID.
+   *
+   * @generated from field: int64 id = 1 [jstype = JS_STRING];
+   */
+  id: string;
+
+  /**
+   * Name of the file as uploaded. Absent when the uploader gave none.
+   *
+   * @generated from field: optional string filename = 2;
+   */
+  filename?: string | undefined;
+
+  /**
+   * MIME type the storage recorded for the upload, such as "application/pdf".
+   *
+   * @generated from field: string content_type = 3;
+   */
+  contentType: string;
+
+  /**
+   * When the upload began.
+   *
+   * @generated from field: google.protobuf.Timestamp created_at = 4;
+   */
+  createdAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.ExpenseFile.
+ * Use `create(ExpenseFileSchema)` to create a new message.
+ */
+export const ExpenseFileSchema: GenMessage<ExpenseFile> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_expense_report, 2);
 
 /**
  * The organizers' verdict on a submission of an expense report.
@@ -48,7 +311,7 @@ export type ExpenseReportReview = Message<"rubykaigi.sponsor_app.ExpenseReportRe
  * Use `create(ExpenseReportReviewSchema)` to create a new message.
  */
 export const ExpenseReportReviewSchema: GenMessage<ExpenseReportReview> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_expense_report, 0);
+  messageDesc(file_rubykaigi_sponsor_app_expense_report, 3);
 
 /**
  * The verdict.
@@ -89,7 +352,7 @@ export type ExpenseReportReview_Action = (typeof ExpenseReportReview_Action)[key
  * Describes the enum rubykaigi.sponsor_app.ExpenseReportReview.Action.
  */
 export const ExpenseReportReview_ActionSchema: GenEnum<ExpenseReportReview_Action> = /*@__PURE__*/
-  enumDesc(file_rubykaigi_sponsor_app_expense_report, 0, 0);
+  enumDesc(file_rubykaigi_sponsor_app_expense_report, 3, 0);
 
 /**
  * The figures an expense report is weighed against, which its editor shows beside it.
@@ -148,7 +411,7 @@ export type ExpenseReportCalculation = Message<"rubykaigi.sponsor_app.ExpenseRep
  * Use `create(ExpenseReportCalculationSchema)` to create a new message.
  */
 export const ExpenseReportCalculationSchema: GenMessage<ExpenseReportCalculation> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_expense_report, 1);
+  messageDesc(file_rubykaigi_sponsor_app_expense_report, 4);
 
 /**
  * The writable fields of a line item, taken by AdminService.CreateExpenseLineItem and
@@ -227,5 +490,81 @@ export type ExpenseLineItemInput = Message<"rubykaigi.sponsor_app.ExpenseLineIte
  * Use `create(ExpenseLineItemInputSchema)` to create a new message.
  */
 export const ExpenseLineItemInputSchema: GenMessage<ExpenseLineItemInput> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_expense_report, 2);
+  messageDesc(file_rubykaigi_sponsor_app_expense_report, 5);
+
+/**
+ * A receipt or invoice to upload, taken by AdminService.CreateExpenseFileUpload.
+ *
+ * @generated from message rubykaigi.sponsor_app.ExpenseFileUploadInput
+ */
+export type ExpenseFileUploadInput = Message<"rubykaigi.sponsor_app.ExpenseFileUploadInput"> & {
+  /**
+   * Name of the file, as the uploader's computer calls it.
+   *
+   * @generated from field: string filename = 1;
+   */
+  filename: string;
+
+  /**
+   * MIME type of the file: a JPEG, PNG, GIF or WebP image, or a PDF.
+   *
+   * @generated from field: string content_type = 2;
+   */
+  contentType: string;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.ExpenseFileUploadInput.
+ * Use `create(ExpenseFileUploadInputSchema)` to create a new message.
+ */
+export const ExpenseFileUploadInputSchema: GenMessage<ExpenseFileUploadInput> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_expense_report, 6);
+
+/**
+ * An upload of an expense file in progress: a presigned POST to the storage, valid for 15
+ * minutes.
+ *
+ * POST a multipart form to `url` holding every entry of `fields`, then `x-amz-checksum-algorithm`
+ * set to "SHA256" and `x-amz-checksum-sha256` to the base64 SHA-256 digest of the file, then the
+ * file itself as `file`. The storage refuses a file larger than `max_size` or of another content
+ * type than the one declared. Report the upload as complete afterwards.
+ *
+ * @generated from message rubykaigi.sponsor_app.ExpenseFileUpload
+ */
+export type ExpenseFileUpload = Message<"rubykaigi.sponsor_app.ExpenseFileUpload"> & {
+  /**
+   * ID of the ExpenseFile being uploaded.
+   *
+   * @generated from field: int64 file_id = 1 [jstype = JS_STRING];
+   */
+  fileId: string;
+
+  /**
+   * Where to POST the form.
+   *
+   * @generated from field: string url = 2;
+   */
+  url: string;
+
+  /**
+   * Form fields to send ahead of the file, as given.
+   *
+   * @generated from field: map<string, string> fields = 3;
+   */
+  fields: { [key: string]: string };
+
+  /**
+   * Largest file the storage accepts, in bytes.
+   *
+   * @generated from field: int64 max_size = 4;
+   */
+  maxSize: bigint;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.ExpenseFileUpload.
+ * Use `create(ExpenseFileUploadSchema)` to create a new message.
+ */
+export const ExpenseFileUploadSchema: GenMessage<ExpenseFileUpload> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_expense_report, 7);
 

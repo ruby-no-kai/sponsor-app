@@ -7,6 +7,121 @@
 
 module Rk
   module SponsorApp
+    # A custom sponsorship with its expense report in brief, as the list of a conference's expense
+    # reports shows it.
+    class ExpenseReportTableRow < ::Google::Protobuf::AbstractMessage
+      # An expense report in brief.
+      class Report < ::Google::Protobuf::AbstractMessage
+        include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::ExpenseReportTableRow::Report]
+
+        # Where the report stands.
+        attr_reader status(): ::Rk::SponsorApp::ExpenseReport::Status::names | ::Integer
+        attr_writer status(): ::Rk::SponsorApp::ExpenseReport::Status::names | ::Rk::SponsorApp::ExpenseReport::Status::strings | ::Integer | ::Float
+        attr_reader status_const(): ::Integer
+        def clear_status: () -> void
+
+        # Sum of the line items' amounts before tax, as a decimal such as "120000.0".
+        attr_reader total_amount(): ::String
+        attr_writer total_amount(): ::String | ::Symbol
+        def clear_total_amount: () -> void
+
+        # Sum of the line items' tax, as a decimal.
+        attr_reader total_tax_amount(): ::String
+        attr_writer total_tax_amount(): ::String | ::Symbol
+        def clear_total_tax_amount: () -> void
+
+        # total_fee less total_amount: what remains to be billed, as a decimal. Negative when the
+        # expenses exceed the fee.
+        attr_reader offset(): ::String
+        attr_writer offset(): ::String | ::Symbol
+        def clear_offset: () -> void
+
+        type init_map = {
+          status: (::Rk::SponsorApp::ExpenseReport::Status::names | ::Rk::SponsorApp::ExpenseReport::Status::strings | ::Integer | ::Float)?,
+          "status" => (::Rk::SponsorApp::ExpenseReport::Status::names | ::Rk::SponsorApp::ExpenseReport::Status::strings | ::Integer | ::Float)?,
+          total_amount: (::String | ::Symbol)?,
+          "total_amount" => (::String | ::Symbol)?,
+          total_tax_amount: (::String | ::Symbol)?,
+          "total_tax_amount" => (::String | ::Symbol)?,
+          offset: (::String | ::Symbol)?,
+          "offset" => (::String | ::Symbol)?,
+        }
+
+        def initialize: (?init_map initial_value) -> void
+
+        def []:
+            ("status" name) -> (::Rk::SponsorApp::ExpenseReport::Status::names | ::Integer)
+          | ("total_amount" name) -> ::String
+          | ("total_tax_amount" name) -> ::String
+          | ("offset" name) -> ::String
+
+        def []=:
+            ("status" name, (::Rk::SponsorApp::ExpenseReport::Status::names | ::Rk::SponsorApp::ExpenseReport::Status::strings | ::Integer | ::Float) value) -> void
+          | ("total_amount" name, (::String | ::Symbol) value) -> void
+          | ("total_tax_amount" name, (::String | ::Symbol) value) -> void
+          | ("offset" name, (::String | ::Symbol) value) -> void
+      end
+
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::ExpenseReportTableRow]
+
+      # The sponsorship.
+      attr_accessor sponsorship(): ::Rk::SponsorApp::SponsorshipSummary?
+      def has_sponsorship?: () -> bool
+      def clear_sponsorship: () -> void
+
+      # Name the sponsor is published under: the custom package's name once it is confirmed,
+      # otherwise the plan's. Absent while the plan is undetermined and no custom package is
+      # confirmed.
+      attr_reader displayed_plan_name(): ::String
+      attr_writer displayed_plan_name(): ::String | ::Symbol
+      def has_displayed_plan_name?: () -> bool
+      def clear_displayed_plan_name: () -> void
+
+      # The fee the expenses are offset against, as a decimal: the plan's fee, plus its booth fee when
+      # a booth is assigned. "0" while the plan is undetermined.
+      attr_reader total_fee(): ::String
+      attr_writer total_fee(): ::String | ::Symbol
+      def clear_total_fee: () -> void
+
+      # The sponsorship's expense report. Absent until the sponsor starts one.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReportTableRow::Report?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      attr_reader _displayed_plan_name(): ::String?
+      def has__displayed_plan_name?: () -> bool
+      def clear__displayed_plan_name: () -> void
+
+      attr_reader _report(): ::Rk::SponsorApp::ExpenseReportTableRow::Report?
+      def has__report?: () -> bool
+      def clear__report: () -> void
+
+      type init_map = {
+        sponsorship: (::Rk::SponsorApp::SponsorshipSummary | ::Rk::SponsorApp::SponsorshipSummary::init_map)?,
+        "sponsorship" => (::Rk::SponsorApp::SponsorshipSummary | ::Rk::SponsorApp::SponsorshipSummary::init_map)?,
+        displayed_plan_name: (::String | ::Symbol)?,
+        "displayed_plan_name" => (::String | ::Symbol)?,
+        total_fee: (::String | ::Symbol)?,
+        "total_fee" => (::String | ::Symbol)?,
+        report: (::Rk::SponsorApp::ExpenseReportTableRow::Report | ::Rk::SponsorApp::ExpenseReportTableRow::Report::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReportTableRow::Report | ::Rk::SponsorApp::ExpenseReportTableRow::Report::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("sponsorship" name) -> ::Rk::SponsorApp::SponsorshipSummary?
+        | ("displayed_plan_name" name) -> ::String
+        | ("total_fee" name) -> ::String
+        | ("report" name) -> ::Rk::SponsorApp::ExpenseReportTableRow::Report?
+
+      def []=:
+          ("sponsorship" name, ::Rk::SponsorApp::SponsorshipSummary? value) -> void
+        | ("displayed_plan_name" name, (::String | ::Symbol) value) -> void
+        | ("total_fee" name, (::String | ::Symbol) value) -> void
+        | ("report" name, ::Rk::SponsorApp::ExpenseReportTableRow::Report? value) -> void
+    end
+
     # The verdict on an expense report's latest submission, taken by
     # AdminService.CreateExpenseReportReview.
     class ExpenseReportReviewInput < ::Google::Protobuf::AbstractMessage
@@ -46,6 +161,746 @@ module Rk
           ("action" name, (::Rk::SponsorApp::ExpenseReportReview::Action::names | ::Rk::SponsorApp::ExpenseReportReview::Action::strings | ::Integer | ::Float) value) -> void
         | ("comment" name, (::String | ::Symbol) value) -> void
     end
+
+    # Request for AdminService.ListExpenseReports.
+    class AdminServiceListExpenseReportsRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceListExpenseReportsRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+    end
+
+    # Response for AdminService.ListExpenseReports.
+    class AdminServiceListExpenseReportsResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceListExpenseReportsResponse]
+
+      # Every sponsorship of the conference with a confirmed custom package, withdrawn ones included,
+      # by name. Not paginated.
+      attr_accessor rows(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::ExpenseReportTableRow, ::Rk::SponsorApp::ExpenseReportTableRow]
+      def clear_rows: () -> void
+
+      type init_map = {
+        rows: ::Array[::Rk::SponsorApp::ExpenseReportTableRow]?,
+        "rows" => ::Array[::Rk::SponsorApp::ExpenseReportTableRow]?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("rows" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::ExpenseReportTableRow, ::Rk::SponsorApp::ExpenseReportTableRow]
+
+      def []=:
+          ("rows" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::ExpenseReportTableRow, ::Rk::SponsorApp::ExpenseReportTableRow] value) -> void
+    end
+
+    # Request for AdminService.GetExpenseReport.
+    class AdminServiceGetExpenseReportRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceGetExpenseReportRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference that has an expense report.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+    end
+
+    # Response for AdminService.GetExpenseReport.
+    class AdminServiceGetExpenseReportResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceGetExpenseReportResponse]
+
+      # The sponsorship's expense report.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReport?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      # The sponsorship the report belongs to.
+      attr_accessor sponsorship(): ::Rk::SponsorApp::SponsorshipSummary?
+      def has_sponsorship?: () -> bool
+      def clear_sponsorship: () -> void
+
+      type init_map = {
+        report: (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        sponsorship: (::Rk::SponsorApp::SponsorshipSummary | ::Rk::SponsorApp::SponsorshipSummary::init_map)?,
+        "sponsorship" => (::Rk::SponsorApp::SponsorshipSummary | ::Rk::SponsorApp::SponsorshipSummary::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("report" name) -> ::Rk::SponsorApp::ExpenseReport?
+        | ("sponsorship" name) -> ::Rk::SponsorApp::SponsorshipSummary?
+
+      def []=:
+          ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
+        | ("sponsorship" name, ::Rk::SponsorApp::SponsorshipSummary? value) -> void
+    end
+
+    # Request for AdminService.CalculateExpenseReport.
+    class AdminServiceCalculateExpenseReportRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCalculateExpenseReportRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+    end
+
+    # Response for AdminService.CalculateExpenseReport.
+    class AdminServiceCalculateExpenseReportResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCalculateExpenseReportResponse]
+
+      # The figures the sponsorship's expenses are weighed against.
+      attr_accessor calculation(): ::Rk::SponsorApp::ExpenseReportCalculation?
+      def has_calculation?: () -> bool
+      def clear_calculation: () -> void
+
+      type init_map = {
+        calculation: (::Rk::SponsorApp::ExpenseReportCalculation | ::Rk::SponsorApp::ExpenseReportCalculation::init_map)?,
+        "calculation" => (::Rk::SponsorApp::ExpenseReportCalculation | ::Rk::SponsorApp::ExpenseReportCalculation::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("calculation" name) -> ::Rk::SponsorApp::ExpenseReportCalculation?
+
+      def []=:
+          ("calculation" name, ::Rk::SponsorApp::ExpenseReportCalculation? value) -> void
+    end
+
+    # Request for AdminService.CreateExpenseLineItem.
+    class AdminServiceCreateExpenseLineItemRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCreateExpenseLineItemRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference that has an expense report.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      # The line item to add.
+      attr_accessor input(): ::Rk::SponsorApp::ExpenseLineItemInput?
+      def has_input?: () -> bool
+      def clear_input: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+        input: (::Rk::SponsorApp::ExpenseLineItemInput | ::Rk::SponsorApp::ExpenseLineItemInput::init_map)?,
+        "input" => (::Rk::SponsorApp::ExpenseLineItemInput | ::Rk::SponsorApp::ExpenseLineItemInput::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+        | ("input" name) -> ::Rk::SponsorApp::ExpenseLineItemInput?
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+        | ("input" name, ::Rk::SponsorApp::ExpenseLineItemInput? value) -> void
+    end
+
+    # Response for AdminService.CreateExpenseLineItem.
+    class AdminServiceCreateExpenseLineItemResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCreateExpenseLineItemResponse]
+
+      # The line item added.
+      attr_accessor line_item(): ::Rk::SponsorApp::ExpenseLineItem?
+      def has_line_item?: () -> bool
+      def clear_line_item: () -> void
+
+      # The report as changed, with its totals recalculated.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReport?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      type init_map = {
+        line_item: (::Rk::SponsorApp::ExpenseLineItem | ::Rk::SponsorApp::ExpenseLineItem::init_map)?,
+        "line_item" => (::Rk::SponsorApp::ExpenseLineItem | ::Rk::SponsorApp::ExpenseLineItem::init_map)?,
+        report: (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("line_item" name) -> ::Rk::SponsorApp::ExpenseLineItem?
+        | ("report" name) -> ::Rk::SponsorApp::ExpenseReport?
+
+      def []=:
+          ("line_item" name, ::Rk::SponsorApp::ExpenseLineItem? value) -> void
+        | ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
+    end
+
+    # Request for AdminService.UpdateExpenseLineItem.
+    class AdminServiceUpdateExpenseLineItemRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceUpdateExpenseLineItemRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference that has an expense report.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      # ID of a line item of the sponsorship's expense report.
+      attr_reader line_item_id(): ::Integer
+      attr_writer line_item_id(): ::Integer | ::Float
+      def clear_line_item_id: () -> void
+
+      # The line item's writable fields.
+      attr_accessor input(): ::Rk::SponsorApp::ExpenseLineItemInput?
+      def has_input?: () -> bool
+      def clear_input: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+        line_item_id: (::Integer | ::Float)?,
+        "line_item_id" => (::Integer | ::Float)?,
+        input: (::Rk::SponsorApp::ExpenseLineItemInput | ::Rk::SponsorApp::ExpenseLineItemInput::init_map)?,
+        "input" => (::Rk::SponsorApp::ExpenseLineItemInput | ::Rk::SponsorApp::ExpenseLineItemInput::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+        | ("line_item_id" name) -> ::Integer
+        | ("input" name) -> ::Rk::SponsorApp::ExpenseLineItemInput?
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+        | ("line_item_id" name, (::Integer | ::Float) value) -> void
+        | ("input" name, ::Rk::SponsorApp::ExpenseLineItemInput? value) -> void
+    end
+
+    # Response for AdminService.UpdateExpenseLineItem.
+    class AdminServiceUpdateExpenseLineItemResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceUpdateExpenseLineItemResponse]
+
+      # The line item as updated.
+      attr_accessor line_item(): ::Rk::SponsorApp::ExpenseLineItem?
+      def has_line_item?: () -> bool
+      def clear_line_item: () -> void
+
+      # The report as changed, with its totals recalculated.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReport?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      type init_map = {
+        line_item: (::Rk::SponsorApp::ExpenseLineItem | ::Rk::SponsorApp::ExpenseLineItem::init_map)?,
+        "line_item" => (::Rk::SponsorApp::ExpenseLineItem | ::Rk::SponsorApp::ExpenseLineItem::init_map)?,
+        report: (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("line_item" name) -> ::Rk::SponsorApp::ExpenseLineItem?
+        | ("report" name) -> ::Rk::SponsorApp::ExpenseReport?
+
+      def []=:
+          ("line_item" name, ::Rk::SponsorApp::ExpenseLineItem? value) -> void
+        | ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
+    end
+
+    # Request for AdminService.DeleteExpenseLineItem.
+    class AdminServiceDeleteExpenseLineItemRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceDeleteExpenseLineItemRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference that has an expense report.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      # ID of a line item of the sponsorship's expense report.
+      attr_reader line_item_id(): ::Integer
+      attr_writer line_item_id(): ::Integer | ::Float
+      def clear_line_item_id: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+        line_item_id: (::Integer | ::Float)?,
+        "line_item_id" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+        | ("line_item_id" name) -> ::Integer
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+        | ("line_item_id" name, (::Integer | ::Float) value) -> void
+    end
+
+    # Response for AdminService.DeleteExpenseLineItem.
+    class AdminServiceDeleteExpenseLineItemResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceDeleteExpenseLineItemResponse]
+
+      # The report as changed, with its totals recalculated.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReport?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      type init_map = {
+        report: (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("report" name) -> ::Rk::SponsorApp::ExpenseReport?
+
+      def []=:
+          ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
+    end
+
+    # Request for AdminService.CreateExpenseReportReview.
+    class AdminServiceCreateExpenseReportReviewRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCreateExpenseReportReviewRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference whose expense report has been submitted.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      # The verdict, signed by the staff member signed in.
+      attr_accessor input(): ::Rk::SponsorApp::ExpenseReportReviewInput?
+      def has_input?: () -> bool
+      def clear_input: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+        input: (::Rk::SponsorApp::ExpenseReportReviewInput | ::Rk::SponsorApp::ExpenseReportReviewInput::init_map)?,
+        "input" => (::Rk::SponsorApp::ExpenseReportReviewInput | ::Rk::SponsorApp::ExpenseReportReviewInput::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+        | ("input" name) -> ::Rk::SponsorApp::ExpenseReportReviewInput?
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+        | ("input" name, ::Rk::SponsorApp::ExpenseReportReviewInput? value) -> void
+    end
+
+    # Response for AdminService.CreateExpenseReportReview.
+    class AdminServiceCreateExpenseReportReviewResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCreateExpenseReportReviewResponse]
+
+      # The report as reviewed, carrying the review as latest_review.
+      attr_accessor report(): ::Rk::SponsorApp::ExpenseReport?
+      def has_report?: () -> bool
+      def clear_report: () -> void
+
+      type init_map = {
+        report: (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+        "report" => (::Rk::SponsorApp::ExpenseReport | ::Rk::SponsorApp::ExpenseReport::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("report" name) -> ::Rk::SponsorApp::ExpenseReport?
+
+      def []=:
+          ("report" name, ::Rk::SponsorApp::ExpenseReport? value) -> void
+    end
+
+    # Request for AdminService.CreateExpenseFileUpload.
+    class AdminServiceCreateExpenseFileUploadRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCreateExpenseFileUploadRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      # The file to upload.
+      attr_accessor input(): ::Rk::SponsorApp::ExpenseFileUploadInput?
+      def has_input?: () -> bool
+      def clear_input: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+        input: (::Rk::SponsorApp::ExpenseFileUploadInput | ::Rk::SponsorApp::ExpenseFileUploadInput::init_map)?,
+        "input" => (::Rk::SponsorApp::ExpenseFileUploadInput | ::Rk::SponsorApp::ExpenseFileUploadInput::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+        | ("input" name) -> ::Rk::SponsorApp::ExpenseFileUploadInput?
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+        | ("input" name, ::Rk::SponsorApp::ExpenseFileUploadInput? value) -> void
+    end
+
+    # Response for AdminService.CreateExpenseFileUpload.
+    class AdminServiceCreateExpenseFileUploadResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCreateExpenseFileUploadResponse]
+
+      # Where and how to upload the file.
+      attr_accessor upload(): ::Rk::SponsorApp::ExpenseFileUpload?
+      def has_upload?: () -> bool
+      def clear_upload: () -> void
+
+      type init_map = {
+        upload: (::Rk::SponsorApp::ExpenseFileUpload | ::Rk::SponsorApp::ExpenseFileUpload::init_map)?,
+        "upload" => (::Rk::SponsorApp::ExpenseFileUpload | ::Rk::SponsorApp::ExpenseFileUpload::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("upload" name) -> ::Rk::SponsorApp::ExpenseFileUpload?
+
+      def []=:
+          ("upload" name, ::Rk::SponsorApp::ExpenseFileUpload? value) -> void
+    end
+
+    # Request for AdminService.InitiateExpenseFileUpdate.
+    class AdminServiceInitiateExpenseFileUpdateRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceInitiateExpenseFileUpdateRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      # ID of an expense file of the sponsorship.
+      attr_reader file_id(): ::Integer
+      attr_writer file_id(): ::Integer | ::Float
+      def clear_file_id: () -> void
+
+      # MIME type of the file to upload, as ExpenseFileUploadInput.content_type. Absent keeps the
+      # one declared when the upload was created.
+      attr_reader content_type(): ::String
+      attr_writer content_type(): ::String | ::Symbol
+      def has_content_type?: () -> bool
+      def clear_content_type: () -> void
+
+      attr_reader _content_type(): ::String?
+      def has__content_type?: () -> bool
+      def clear__content_type: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+        file_id: (::Integer | ::Float)?,
+        "file_id" => (::Integer | ::Float)?,
+        content_type: (::String | ::Symbol)?,
+        "content_type" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+        | ("file_id" name) -> ::Integer
+        | ("content_type" name) -> ::String
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+        | ("file_id" name, (::Integer | ::Float) value) -> void
+        | ("content_type" name, (::String | ::Symbol) value) -> void
+    end
+
+    # Response for AdminService.InitiateExpenseFileUpdate.
+    class AdminServiceInitiateExpenseFileUpdateResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceInitiateExpenseFileUpdateResponse]
+
+      # Where and how to upload the file.
+      attr_accessor upload(): ::Rk::SponsorApp::ExpenseFileUpload?
+      def has_upload?: () -> bool
+      def clear_upload: () -> void
+
+      type init_map = {
+        upload: (::Rk::SponsorApp::ExpenseFileUpload | ::Rk::SponsorApp::ExpenseFileUpload::init_map)?,
+        "upload" => (::Rk::SponsorApp::ExpenseFileUpload | ::Rk::SponsorApp::ExpenseFileUpload::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("upload" name) -> ::Rk::SponsorApp::ExpenseFileUpload?
+
+      def []=:
+          ("upload" name, ::Rk::SponsorApp::ExpenseFileUpload? value) -> void
+    end
+
+    # Request for AdminService.CompleteExpenseFileUpload.
+    class AdminServiceCompleteExpenseFileUploadRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCompleteExpenseFileUploadRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      # ID of an expense file of the sponsorship.
+      attr_reader file_id(): ::Integer
+      attr_writer file_id(): ::Integer | ::Float
+      def clear_file_id: () -> void
+
+      # Name to give the file. Absent keeps the name given when the upload was created.
+      attr_reader filename(): ::String
+      attr_writer filename(): ::String | ::Symbol
+      def has_filename?: () -> bool
+      def clear_filename: () -> void
+
+      # Version the storage answered the upload with, in its `x-amz-version-id` header. Empty when it
+      # answered none.
+      attr_reader version_id(): ::String
+      attr_writer version_id(): ::String | ::Symbol
+      def clear_version_id: () -> void
+
+      # Extension of the file's name, such as "pdf". Letters and digits only are kept, in lower
+      # case. Empty records "unknown".
+      attr_reader extension(): ::String
+      attr_writer extension(): ::String | ::Symbol
+      def clear_extension: () -> void
+
+      attr_reader _filename(): ::String?
+      def has__filename?: () -> bool
+      def clear__filename: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+        file_id: (::Integer | ::Float)?,
+        "file_id" => (::Integer | ::Float)?,
+        filename: (::String | ::Symbol)?,
+        "filename" => (::String | ::Symbol)?,
+        version_id: (::String | ::Symbol)?,
+        "version_id" => (::String | ::Symbol)?,
+        extension: (::String | ::Symbol)?,
+        "extension" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+        | ("file_id" name) -> ::Integer
+        | ("filename" name) -> ::String
+        | ("version_id" name) -> ::String
+        | ("extension" name) -> ::String
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+        | ("file_id" name, (::Integer | ::Float) value) -> void
+        | ("filename" name, (::String | ::Symbol) value) -> void
+        | ("version_id" name, (::String | ::Symbol) value) -> void
+        | ("extension" name, (::String | ::Symbol) value) -> void
+    end
+
+    # Response for AdminService.CompleteExpenseFileUpload.
+    class AdminServiceCompleteExpenseFileUploadResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCompleteExpenseFileUploadResponse]
+
+      # The file as uploaded, with the content type the storage recorded.
+      attr_accessor file(): ::Rk::SponsorApp::ExpenseFile?
+      def has_file?: () -> bool
+      def clear_file: () -> void
+
+      type init_map = {
+        file: (::Rk::SponsorApp::ExpenseFile | ::Rk::SponsorApp::ExpenseFile::init_map)?,
+        "file" => (::Rk::SponsorApp::ExpenseFile | ::Rk::SponsorApp::ExpenseFile::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("file" name) -> ::Rk::SponsorApp::ExpenseFile?
+
+      def []=:
+          ("file" name, ::Rk::SponsorApp::ExpenseFile? value) -> void
+    end
+
+    # Request for AdminService.DeleteExpenseFile.
+    class AdminServiceDeleteExpenseFileRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceDeleteExpenseFileRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a sponsorship of the conference.
+      attr_reader sponsorship_id(): ::Integer
+      attr_writer sponsorship_id(): ::Integer | ::Float
+      def clear_sponsorship_id: () -> void
+
+      # ID of an expense file of the sponsorship.
+      attr_reader file_id(): ::Integer
+      attr_writer file_id(): ::Integer | ::Float
+      def clear_file_id: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        sponsorship_id: (::Integer | ::Float)?,
+        "sponsorship_id" => (::Integer | ::Float)?,
+        file_id: (::Integer | ::Float)?,
+        "file_id" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("sponsorship_id" name) -> ::Integer
+        | ("file_id" name) -> ::Integer
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("sponsorship_id" name, (::Integer | ::Float) value) -> void
+        | ("file_id" name, (::Integer | ::Float) value) -> void
+    end
+
+    # Response for AdminService.DeleteExpenseFile.
+    class AdminServiceDeleteExpenseFileResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceDeleteExpenseFileResponse]
+
+      type init_map = {
+      }
+
+      def initialize: (?init_map initial_value) -> void
+    end
   end
 end
 
@@ -53,7 +908,31 @@ module Google
   module Protobuf
     class DescriptorPool
       def lookup:
-          ("rubykaigi.sponsor_app.ExpenseReportReviewInput" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ExpenseReportReviewInput)])
+          ("rubykaigi.sponsor_app.ExpenseReportTableRow" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ExpenseReportTableRow)])
+        | ("rubykaigi.sponsor_app.ExpenseReportTableRow.Report" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ExpenseReportTableRow::Report)])
+        | ("rubykaigi.sponsor_app.ExpenseReportReviewInput" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ExpenseReportReviewInput)])
+        | ("rubykaigi.sponsor_app.AdminServiceListExpenseReportsRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceListExpenseReportsRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceListExpenseReportsResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceListExpenseReportsResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceGetExpenseReportRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceGetExpenseReportRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceGetExpenseReportResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceGetExpenseReportResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceCalculateExpenseReportRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCalculateExpenseReportRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceCalculateExpenseReportResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCalculateExpenseReportResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceCreateExpenseLineItemRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCreateExpenseLineItemRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceCreateExpenseLineItemResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCreateExpenseLineItemResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceUpdateExpenseLineItemRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceUpdateExpenseLineItemRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceUpdateExpenseLineItemResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceUpdateExpenseLineItemResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceDeleteExpenseLineItemRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceDeleteExpenseLineItemRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceDeleteExpenseLineItemResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceDeleteExpenseLineItemResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceCreateExpenseReportReviewRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCreateExpenseReportReviewRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceCreateExpenseReportReviewResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCreateExpenseReportReviewResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceCreateExpenseFileUploadRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCreateExpenseFileUploadRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceCreateExpenseFileUploadResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCreateExpenseFileUploadResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceInitiateExpenseFileUpdateRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceInitiateExpenseFileUpdateRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceInitiateExpenseFileUpdateResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceInitiateExpenseFileUpdateResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceCompleteExpenseFileUploadRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCompleteExpenseFileUploadRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceCompleteExpenseFileUploadResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCompleteExpenseFileUploadResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceDeleteExpenseFileRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceDeleteExpenseFileRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceDeleteExpenseFileResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceDeleteExpenseFileResponse)])
         | ...
     end
   end

@@ -76,7 +76,6 @@ type Section = { label: string; icon: Icon; path: string };
 
 // AppLink decides per path whether a section opens in the SPA or as its HAML page.
 function conferenceSections(slug: string, { isEditable }: { isEditable: boolean }): Section[] {
-  const base = `/admin/conferences/${encodeURIComponent(slug)}`;
   return [
     { label: "Overview", icon: PresentationIcon, path: generatePath(paths.conference, { slug }) },
     { label: "Plans", icon: CoinsIcon, path: generatePath(paths.plans, { slug }) },
@@ -100,7 +99,11 @@ function conferenceSections(slug: string, { isEditable }: { isEditable: boolean 
       icon: EnvelopeSimpleIcon,
       path: generatePath(paths.broadcasts, { slug }),
     },
-    { label: "Expense reports", icon: ReceiptIcon, path: `${base}/expense_reports` },
+    {
+      label: "Expense reports",
+      icon: ReceiptIcon,
+      path: generatePath(paths.expenseReports, { slug }),
+    },
     {
       label: "Attendees",
       icon: ListChecksIcon,
