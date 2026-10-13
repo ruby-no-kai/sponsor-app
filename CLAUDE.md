@@ -182,6 +182,21 @@ Sorbet with inline RBS comments (`#:`); see `docs/type-checking.md`.
 - Never write `sig`, `T.let`, `T.must` or other `T.` forms in `.rb` files; `sorbet-runtime` is not loaded.
 - Run `bundle` commands under the mise environment (`mise x -- bundle ...`); the lockfile has no `ruby` platform.
 
+### Protocol Buffers
+
+`proto/` is the schema of record (package `org.rubykaigi.sponsor_app`, Ruby namespace `Rk::SponsorApp`). buf generates Ruby and RBS from it into `gen/proto/ruby/`, the `sponsor_app-proto` path gem that Bundler loads at boot. Generated files are committed.
+
+```bash
+mise run gen            # Run every generator: gen/ from proto/, then the message RBIs (boots Rails, needs no database)
+mise run gen:proto      # Regenerate gen/ only
+mise run lint:proto     # buf lint and buf format check
+```
+
+- Never edit generated files under `gen/`. Edit `proto/`, run `mise run gen`, and commit its output with the `.proto` change. hk's pre-commit hook regenerates and stages it, and CI fails when it is stale.
+- `gen/proto/ruby/` also holds hand-written files the generator keeps: the gemspec and `lib/sponsor_app-proto.rb`.
+- Message classes cannot be reloaded, as google-protobuf raises when a descriptor is registered twice. The Procfile's `proto` process regenerates `gen/` on `.proto` edits, and its `web` process restarts Rails when `gen/proto/ruby/` changes.
+- Sorbet ignores the generated `.rbs`. Message types come from tapioca's Protobuf DSL compiler.
+
 ## Development Notes
 
 ### Authentication Backdoor

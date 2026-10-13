@@ -43,3 +43,26 @@ jobs:
       - run: bundle exec srb tc
       - if: "${{ github.event_name == 'pull_request' }}"
         run: bin/check-strict-sigils HEAD^1
+
+  gen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+      # The message RBI generator boots Rails.
+      - uses: ruby/setup-ruby@09a7688d3b55cf0e976497ff046b70949eeaccfd # v1.288.0
+        with:
+          bundler-cache: true
+      - run: mise run lint:proto
+      - run: mise run --force gen
+      # Also catches generated files that were never committed.
+      - name: Check generated files are committed
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git status --porcelain
+            git diff
+            echo "::error::Generated files are stale. Run 'mise run gen' and commit the result."
+            exit 1
+          fi

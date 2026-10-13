@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package org.rubykaigi.sponsor_app;
+
+import "google/protobuf/timestamp.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// A conference that takes sponsors, with the details its sponsors and applicants can see.
+//
+// The server enforces the windows below against its own clock.
+message Conference {
+  // Identifier used in URLs and in requests that name a conference, such as "rubykaigi2026".
+  // Unique across conferences.
+  string slug = 1;
+
+  // Display name, such as "RubyKaigi 2026".
+  string name = 2;
+
+  // Email address where sponsors reach the organizers.
+  string contact_email_address = 3;
+
+  // When sponsors can start applying. Absent while no application period is scheduled, and no
+  // application is accepted until it is set.
+  optional google.protobuf.Timestamp application_opens_at = 4;
+
+  // When applications stop being accepted. Absent means they stay open once
+  // application_opens_at has passed.
+  optional google.protobuf.Timestamp application_closes_at = 5;
+
+  // When sponsors can no longer edit their application. Editing opens together with
+  // application_opens_at. Absent means editing has no deadline.
+  optional google.protobuf.Timestamp amendment_closes_at = 6;
+
+  // When accepted sponsors can start submitting sponsor-hosted events. Absent means event
+  // submission has not opened.
+  optional google.protobuf.Timestamp event_submission_starts_at = 7;
+
+  // When accepted sponsors can start claiming the conference invitations and booth passes their
+  // sponsorship includes. Absent means they are not distributed yet.
+  optional google.protobuf.Timestamp ticket_distribution_starts_at = 8;
+
+  // When sponsors can no longer void a redeemed pass themselves. Absent means voiding stays
+  // available.
+  optional google.protobuf.Timestamp pass_retraction_disables_at = 9;
+
+  // Whether an application may be submitted without choosing a plan.
+  bool no_plan_allowed = 10;
+
+  // Whether the conference offers sponsor booths. Applications are expected to request a booth
+  // only when this is true.
+  bool booths_offered = 11;
+
+  // Whether sponsors are invited to request conference tickets beyond those their plan includes.
+  bool additional_attendees_registration_open = 12;
+}

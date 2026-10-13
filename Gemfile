@@ -29,6 +29,9 @@ gem 'jsonnet', require: false
 gem 'shoryuken'
 gem 'lambdakiq'
 
+gem 'google-protobuf'
+gem 'sponsor_app-proto', path: 'gen/proto/ruby'
+
 gem 'alba'
 gem 'jbuilder', '~> 2.9'
 gem 'haml'

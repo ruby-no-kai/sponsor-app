@@ -1,0 +1,13 @@
+version: v2
+modules:
+  - path: proto
+lint:
+  use:
+    - STANDARD
+  except:
+    # STANDARD wants a versioned package such as org.rubykaigi.sponsor_app.v1.
+    # The API and its clients ship together from this repository, so the package stays unversioned.
+    - PACKAGE_VERSION_SUFFIX
+breaking:
+  use:
+    - FILE
