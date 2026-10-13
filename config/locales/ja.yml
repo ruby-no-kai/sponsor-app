@@ -131,6 +131,7 @@ ja:
       title: スポンサー申込
     edit:
       title: 申込内容の編集
+      amendment_availability: "%{ts} まで修正することができます。"
     form:
       optional: '(任意)'
       header: '%{name} スポンサーシップ申込フォーム'
@@ -189,6 +190,10 @@ ja:
         複数ファイルになる場合、zip 形式で圧縮ください (ロゴのガイドラインがある場合や、RGB/CMYK 両方のカラーモードでの提供を希望する場合など)。ファイルを1つのみ提出される場合は RGB カラーモードのファイルをご提出ください。
       others_help: |
         その他に連絡事項があれば下記へご記入ください。
+      tickets: 'チケット'
+      tickets_included_in_plan: 'プランに含まれる枚数'
+      tickets_additionally_request: '追加で希望する枚数'
+      tickets_total: '合計'
       note: 'その他の連絡事項'
       policies: 'ポリシー'
       submit: '送信'
@@ -274,8 +279,6 @@ ja:
         description: 'その他、メールにて配信された過去のアナウンスを確認できます。'
         view_all: '全てのメールを見る'
       announcements: 'お知らせ'
-    edit:
-      amendment_availability: "%{ts} まで修正することができます。"
   expense_reports:
     show:
       title: 経費報告

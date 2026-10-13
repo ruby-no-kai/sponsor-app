@@ -61,6 +61,34 @@ RSpec.describe "Sponsorships", type: :request do
         ['withdraw', nil, nil],
       ])
     end
+
+    it "labels the ticket fields in every locale" do
+      conference.update!(additional_attendees_registration_open: true)
+
+      %w(en ja).each do |hl|
+        get new_user_conference_sponsorship_path(conference, hl:)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).not_to include('translation missing')
+        expect(response.body).to include(I18n.t('sponsorships.form.tickets_total', locale: hl))
+      end
+    end
+  end
+
+  describe "GET edit" do
+    let(:sponsorship) { FactoryBot.create(:sponsorship, conference:, plan:) }
+
+    it "titles the page and tells until when the application can be amended" do
+      conference.update!(amendment_closes_at: 1.week.from_now)
+      get claim_user_session_path(FactoryBot.create(:session_token, email: sponsorship.contact.email).handle)
+
+      get edit_user_conference_sponsorship_path(conference)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('translation missing')
+      expect(Nokogiri::HTML(response.body).at_css('title').text).to start_with('Edit Application |')
+      expect(response.body).to include('You can amend your application until')
+    end
   end
 
   describe "GET show" do

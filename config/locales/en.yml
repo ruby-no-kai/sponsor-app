@@ -131,6 +131,7 @@ en:
       title: Apply
     edit:
       title: Edit Application
+      amendment_availability: "You can amend your application until %{ts}."
     form:
       optional: '(Optional)'
       header: '%{name} Sponsorship Application Form'
@@ -188,6 +189,10 @@ en:
          If you have multiple files, archive all files in .zip file; This is useful in case you want us to follow a guideline, or use a separate file such as different color mode (RGB/CMYK) for website and printing purpose. If you submit a single file, please choose a one in RGB color mode.
       others_help: |
         Use the following field for anything you want let us know in advance.
+      tickets: 'Conference Tickets'
+      tickets_included_in_plan: 'Included in your plan'
+      tickets_additionally_request: 'Additional tickets'
+      tickets_total: 'Total'
       note: 'Others'
       policies: 'Policies'
       submit: 'Submit'
@@ -273,8 +278,6 @@ en:
         description: 'You can review past announcements sent to you via email, in addition to the latest informations shown above.'
         view_all: 'View All Emails'
       announcements: 'Announcements'
-    edit:
-      amendment_availability: "You can amend your application until %{ts}."
   expense_reports:
     show:
       title: Expense Report
