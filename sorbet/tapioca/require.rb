@@ -6,6 +6,7 @@
 # the constant, or because the entrypoint is an optional integration the gem
 # never requires itself.
 
+require "connect_rpc_rails/protovalidate"
 require "protobufable/alba_binding"
 require "protobufable/protovalidate"
 require "protobufable/connect"

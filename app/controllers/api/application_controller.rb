@@ -1,6 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
+require 'connect_rpc_rails/protovalidate'
 require 'protobufable/connect'
 
 module Api
@@ -10,6 +11,7 @@ module Api
   # the policies its service's base controller enforces. Calling an RPC that declares none raises.
   class ApplicationController < ActionController::API
     include ConnectRpcRails::Controller
+    include ConnectRpcRails::MessageValidatable
     include Protobufable::Connect::ProblemRescuable
     include ActionController::Cookies
     include ConnectForgeryProtection
@@ -25,6 +27,7 @@ module Api
     before_action :set_locale
     before_action :populate_sentry_scope
     before_action :authenticate_rpc!
+    # Moves behind MessageValidatable's check whenever an RPC is defined, see .method_added.
     before_action :authorize_rpc!
 
     @rpc_policies = nil #: Hash[String, Symbol]?
@@ -54,7 +57,9 @@ module Api
     #: () -> Hash[String, Symbol]
     def self.rpc_policies = (@rpc_policies ||= {})
 
-    # Binds the pending policy to the RPC just defined.
+    # Binds the pending policy to the RPC just defined. Authorization moves behind the request
+    # validation, which MessageValidatable's hook has just moved behind authentication, so a policy
+    # looking a resource up sees only valid requests.
     #: (Symbol) -> void
     def self.method_added(method_name)
       super
@@ -66,10 +71,12 @@ module Api
 
         return
       end
-      return unless policy
 
-      @pending_rpc_policy = nil
-      rpc_policies[action] = policy
+      if policy
+        @pending_rpc_policy = nil
+        rpc_policies[action] = policy
+      end
+      before_action :authorize_rpc!
     end
 
     # TODO: consolidate with root ApplicationController to eliminate duplicates
@@ -100,13 +107,15 @@ module Api
     #: () -> void
     private def authorize_rpc! = enforce_policy!(rpc_policy)
 
-    # Raises a problem when the policy needs a session this request lacks.
+    # Raises a problem when the policy needs a session this request lacks. Runs before the request
+    # message is validated.
     #: (Symbol?) -> void
     private def require_session!(_policy)
       raise NotImplementedError, "#{self.class.name} enforces no session requirement"
     end
 
-    # Raises a problem when the session may not run this RPC.
+    # Raises a problem when the session may not run this RPC. Runs after the request message is
+    # validated.
     #: (Symbol?) -> void
     private def enforce_policy!(_policy)
       raise NotImplementedError, "#{self.class.name} enforces no policy"
