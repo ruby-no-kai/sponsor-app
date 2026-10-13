@@ -7,6 +7,7 @@ import type {
   FormDescription,
 } from "../../gen/rubykaigi/sponsor_app/form_description_pb.ts";
 import type { FormErrors } from "../../lib/errors.ts";
+import type { FieldLayout, FieldMetas } from "../../lib/fieldErrors.ts";
 
 // FallbackOption.Condition's optional booth_request as a select value, where "any" is unset.
 export type BoothRequest = "any" | "requested" | "not_requested";
@@ -62,23 +63,20 @@ export const FIELD_LABELS = {
   priorityHuman: "Then, in order",
 } as const;
 
-// The names of field paths in the order the editor lays their fields out.
-const FIELD_ORDER: readonly string[] = [
-  "locale",
-  ...MARKDOWN_FIELDS.map(({ name }) => name),
-  "fallbackOptions",
-  "value",
-  "name",
-  "conditions",
-  "plans",
-  "boothRequest",
-  "priorityHuman",
-];
-
-// Lists whose elements the editor lays out as cards of fields, named by these.
-const ELEMENT_LABELS: Readonly<Record<string, string>> = {
-  fallbackOptions: "Option",
-  conditions: "Condition",
+// The editor's fields in the order it lays them out, and the lists it lays out as cards of fields.
+export const FORM_DESCRIPTION_LAYOUT: FieldLayout = {
+  labels: {
+    locale: FIELD_LABELS.locale,
+    ...Object.fromEntries(MARKDOWN_FIELDS.map(({ name, label }) => [name, label])),
+    fallbackOptions: FIELD_LABELS.fallbackOptions,
+    value: FIELD_LABELS.value,
+    name: FIELD_LABELS.name,
+    conditions: FIELD_LABELS.conditions,
+    plans: FIELD_LABELS.plans,
+    boothRequest: FIELD_LABELS.boothRequest,
+    priorityHuman: FIELD_LABELS.priorityHuman,
+  },
+  elements: { fallbackOptions: "Option", conditions: "Condition" },
 };
 
 // The locales FormDescriptionInput accepts, as its buf.validate rules list them.
@@ -177,8 +175,6 @@ export function movedIndex(from: number, offset: -1 | 1, length: number): number
   return to < 0 || to >= length ? undefined : to;
 }
 
-type FieldMetas = Readonly<Record<string, { errors: readonly unknown[] } | undefined>>;
-
 const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // Error messages on a path, and with items on the elements of the list it names, such as
@@ -197,94 +193,6 @@ export function errorsAt(
     const item = items ? itemPath.exec(name) : null;
     return item === null ? [] : messages.map((message) => `#${Number(item[1]) + 1}: ${message}`);
   });
-}
-
-type PathSegment = string | number;
-
-// `fallbackOptions[1].value` as ["fallbackOptions", 1, "value"].
-function pathSegments(path: string): PathSegment[] {
-  return Array.from(path.matchAll(/([^.[\]]+)|\[(\d+)\]/g), ([, name, index]) =>
-    index === undefined ? (name ?? "") : Number(index),
-  );
-}
-
-// The path one step up, such as `fallbackOptions[1]` for `fallbackOptions[1].value`.
-export function parentPath(path: string): string | undefined {
-  const at = Math.max(path.lastIndexOf("."), path.lastIndexOf("["));
-  return at <= 0 ? undefined : path.slice(0, at);
-}
-
-// The path of the field an error on `path` shows on. An element of a list of strings, such as
-// `priorityHuman[1]`, has no field of its own and shows on its list.
-export function errorAnchor(path: string): string {
-  const segments = pathSegments(path);
-  const [owner, last] = segments.slice(-2);
-  const ownsFields = typeof owner === "string" && Object.hasOwn(ELEMENT_LABELS, owner);
-  return typeof last === "number" && !ownsFields ? (parentPath(path) ?? path) : path;
-}
-
-const LABELS: Readonly<Record<string, string>> = {
-  ...Object.fromEntries(MARKDOWN_FIELDS.map(({ name, label }) => [name, label])),
-  ...FIELD_LABELS,
-};
-
-// What the editor calls the field at a path, such as "Option #2 › Value".
-export function fieldLabel(path: string): string {
-  const labels: string[] = [];
-  let owner: PathSegment | undefined;
-  for (const segment of pathSegments(path)) {
-    if (typeof segment === "string") {
-      labels.push(LABELS[segment] ?? segment);
-    } else {
-      const element = typeof owner === "string" ? ELEMENT_LABELS[owner] : undefined;
-      const last = labels.pop() ?? "";
-      labels.push(element === undefined ? `${last} #${segment + 1}` : `${element} #${segment + 1}`);
-    }
-    owner = segment;
-  }
-  return labels.join(" › ");
-}
-
-function orderOf(segment: PathSegment | undefined): number {
-  if (typeof segment !== "string") return -1;
-  const at = FIELD_ORDER.indexOf(segment);
-  return at === -1 ? FIELD_ORDER.length : at;
-}
-
-// Orders paths as the editor lays out their fields, a list's own errors before its elements'.
-function comparePaths(a: PathSegment[], b: PathSegment[]): number {
-  for (let at = 0; at < Math.min(a.length, b.length); at++) {
-    const [x, y] = [a[at], b[at]];
-    if (x === y) continue;
-    if (typeof x === "number" && typeof y === "number") return x - y;
-    return orderOf(x) - orderOf(y);
-  }
-  return a.length - b.length;
-}
-
-export type FieldError = { path: string; label: string; message: string };
-
-// The fields showing an error, in the order the editor lays them out, each with its first message.
-export function erroredFields(fieldMeta: FieldMetas): FieldError[] {
-  const messages = Object.entries(fieldMeta)
-    .flatMap(([name, meta]) => {
-      const message = meta?.errors.find((error): error is string => typeof error === "string");
-      return message === undefined ? [] : [{ name, segments: pathSegments(name), message }];
-    })
-    .sort((a, b) => comparePaths(a.segments, b.segments));
-
-  const fields = new Map<string, FieldError>();
-  for (const { name, segments, message } of messages) {
-    const path = errorAnchor(name);
-    if (fields.has(path)) continue;
-    const item = segments.at(-1);
-    fields.set(path, {
-      path,
-      label: fieldLabel(path),
-      message: path === name || typeof item !== "number" ? message : `#${item + 1}: ${message}`,
-    });
-  }
-  return [...fields.values()];
 }
 
 // Positions of the options that share a value and conditions, one list per group of them.

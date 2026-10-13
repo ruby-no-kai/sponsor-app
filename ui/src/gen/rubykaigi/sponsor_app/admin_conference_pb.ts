@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file rubykaigi/sponsor_app/admin_conference.proto.
  */
 export const file_rubykaigi_sponsor_app_admin_conference: GenFile = /*@__PURE__*/
-  fileDesc("CixydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fY29uZmVyZW5jZS5wcm90bxIVcnVieWthaWdpLnNwb25zb3JfYXBwIq8BCg9BZG1pbkNvbmZlcmVuY2USNQoKY29uZmVyZW5jZRgBIAEoCzIhLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Db25mZXJlbmNlEg4KBmhpZGRlbhgCIAEoCBIcChRhcHBsaWNhdGlvbl9mb3JtX3VybBgDIAEoCRIfChdhbGxvd19yZXN0cmljdGVkX2FjY2VzcxgEIAEoCBIWCg5ib290aF9jYXBhY2l0eRgFIAEoBUIR6gIOUms6OlNwb25zb3JBcHBiBnByb3RvMw", [file_rubykaigi_sponsor_app_conference]);
+  fileDesc("CixydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fY29uZmVyZW5jZS5wcm90bxIVcnVieWthaWdpLnNwb25zb3JfYXBwIu8CCg9BZG1pbkNvbmZlcmVuY2USNQoKY29uZmVyZW5jZRgBIAEoCzIhLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Db25mZXJlbmNlEg4KBmhpZGRlbhgCIAEoCBIcChRhcHBsaWNhdGlvbl9mb3JtX3VybBgDIAEoCRIfChdhbGxvd19yZXN0cmljdGVkX2FjY2VzcxgEIAEoCBIWCg5ib290aF9jYXBhY2l0eRgFIAEoBRIYCgtnaXRodWJfcmVwbxgGIAEoCUgAiAEBEiQKF2dpdGh1Yl9yZXBvX2ltYWdlc19wYXRoGAcgASgJSAGIAQESFgoJdGl0b19zbHVnGAggASgJSAKIAQESLAokdGl0b19ib290aF9wYWlkX2ZsYXRfZGlzY291bnRfYW1vdW50GAkgASgJQg4KDF9naXRodWJfcmVwb0IaChhfZ2l0aHViX3JlcG9faW1hZ2VzX3BhdGhCDAoKX3RpdG9fc2x1Z0IR6gIOUms6OlNwb25zb3JBcHBiBnByb3RvMw", [file_rubykaigi_sponsor_app_conference]);
 
 /**
  * A conference as organizers see it: what sponsors see, plus the settings only staff manage.
@@ -59,6 +59,39 @@ export type AdminConference = Message<"rubykaigi.sponsor_app.AdminConference"> &
    * @generated from field: int32 booth_capacity = 5;
    */
   boothCapacity: number;
+
+  /**
+   * Where the sponsor list is published, as "owner/repo@branch:path", such as
+   * "ruby-no-kai/rubykaigi.org@master:data/year_2026/sponsors.yml". The branch is optional. Absent
+   * when the sponsor list is not published.
+   *
+   * @generated from field: optional string github_repo = 6;
+   */
+  githubRepo?: string | undefined;
+
+  /**
+   * Directory of github_repo under which the images of accepted sponsor events are committed, such
+   * as "images". Absent when the images are not published.
+   *
+   * @generated from field: optional string github_repo_images_path = 7;
+   */
+  githubRepoImagesPath?: string | undefined;
+
+  /**
+   * Ti.to event that sponsors' tickets are issued through, as "account/event". Absent when tickets
+   * are not issued through Ti.to.
+   *
+   * @generated from field: optional string tito_slug = 8;
+   */
+  titoSlug?: string | undefined;
+
+  /**
+   * Amount taken off each booth staff ticket an exhibitor pays for, in the Ti.to event's currency,
+   * as a decimal such as "15000.0".
+   *
+   * @generated from field: string tito_booth_paid_flat_discount_amount = 9;
+   */
+  titoBoothPaidFlatDiscountAmount: string;
 };
 
 /**

@@ -75,7 +75,7 @@ function MobileHeader() {
 type Section = { label: string; icon: Icon; path: string };
 
 // AppLink decides per path whether a section opens in the SPA or as its HAML page.
-function conferenceSections(slug: string): Section[] {
+function conferenceSections(slug: string, { isEditable }: { isEditable: boolean }): Section[] {
   const base = `/admin/conferences/${encodeURIComponent(slug)}`;
   return [
     { label: "Overview", icon: PresentationIcon, path: generatePath(paths.conference, { slug }) },
@@ -85,9 +85,21 @@ function conferenceSections(slug: string): Section[] {
     { label: "Announcements", icon: MegaphoneIcon, path: `${base}/announcements` },
     { label: "Broadcasts", icon: EnvelopeSimpleIcon, path: `${base}/broadcasts` },
     { label: "Expense reports", icon: ReceiptIcon, path: `${base}/expense_reports` },
-    { label: "Check attendees", icon: ListChecksIcon, path: `${base}/attendees_keeper` },
-    { label: "Table view", icon: TableIcon, path: `${base}/table_view` },
-    { label: "Edit conference", icon: PencilSimpleIcon, path: `${base}/edit` },
+    {
+      label: "Attendees",
+      icon: ListChecksIcon,
+      path: generatePath(paths.attendeesKeeper, { slug }),
+    },
+    { label: "Table view", icon: TableIcon, path: generatePath(paths.sponsorshipTable, { slug }) },
+    ...(isEditable
+      ? [
+          {
+            label: "Edit conference",
+            icon: PencilSimpleIcon,
+            path: generatePath(paths.conferenceEdit, { slug }),
+          },
+        ]
+      : []),
   ];
 }
 
@@ -95,6 +107,7 @@ function conferenceSections(slug: string): Section[] {
 function ConferenceSections({ slug }: { slug: string }) {
   const { pathname } = useLocation();
   const { data } = useRpc(AdminService.method.listConferences, {});
+  const viewer = useRpc(AdminService.method.getViewer, {}).data?.staff;
   const conference = data?.conferences.find((entry) => entry.conference?.slug === slug)?.conference;
   if (conference === undefined) return null;
 
@@ -102,7 +115,9 @@ function ConferenceSections({ slug }: { slug: string }) {
     <Sidebar.Group>
       <Sidebar.GroupLabel>{conference.name}</Sidebar.GroupLabel>
       <Sidebar.Menu>
-        {conferenceSections(slug).map(({ label, icon, path }) => (
+        {conferenceSections(slug, {
+          isEditable: viewer !== undefined && !viewer.restricted,
+        }).map(({ label, icon, path }) => (
           <Sidebar.MenuButton
             key={path}
             icon={icon}

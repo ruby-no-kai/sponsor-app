@@ -35,10 +35,38 @@ export const router = createBrowserRouter([
                 },
               },
               {
+                path: paths.conferenceNew,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/ConferenceEditor.tsx")).default,
+                },
+              },
+              {
                 path: paths.conference,
                 lazy: {
                   Component: async () =>
                     (await import("./routes/admin/ConferenceOverview.tsx")).default,
+                },
+              },
+              {
+                path: paths.conferenceEdit,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/ConferenceEditor.tsx")).default,
+                },
+              },
+              {
+                path: paths.attendeesKeeper,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/AttendeesKeeper.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorshipTable,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorshipTable.tsx")).default,
                 },
               },
 

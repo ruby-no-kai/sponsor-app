@@ -126,6 +126,10 @@ Rails.application.routes.draw do
       # Conferences
       rpc 'ListConferences' => 'api/admin/conferences'
       rpc 'GetConference' => 'api/admin/conferences'
+      rpc 'CreateConference' => 'api/admin/conferences'
+      rpc 'UpdateConference' => 'api/admin/conferences'
+      rpc 'GetAttendeesKeeper' => 'api/admin/conferences'
+      rpc 'ListSponsorshipTableRows' => 'api/admin/conferences'
 
       # Form descriptions
       rpc 'GetFormDescription' => 'api/admin/form_descriptions'

@@ -22,6 +22,31 @@ export function optionalFromInput(value: string): string | undefined {
   return value === "" ? undefined : value;
 }
 
+const INT32_MIN = -(2 ** 31);
+const INT32_MAX = 2 ** 31 - 1;
+
+// int32 fields. A number input holds "" both when empty and when what was typed is no number.
+export function int32ToInput(value: number): string {
+  return String(value);
+}
+
+export function int32FromInput(value: string): number {
+  const trimmed = value.trim();
+  const number = Number(trimmed);
+  if (!/^-?\d+$/.test(trimmed) || number < INT32_MIN || number > INT32_MAX)
+    throw new RangeError(`not an int32: ${JSON.stringify(value)}`);
+  return number;
+}
+
+// An `optional` int32 field is unset rather than zero.
+export function optionalInt32ToInput(value: number | undefined): string {
+  return value === undefined ? "" : int32ToInput(value);
+}
+
+export function optionalInt32FromInput(value: string): number | undefined {
+  return value.trim() === "" ? undefined : int32FromInput(value);
+}
+
 const pad = (n: number) => String(n).padStart(2, "0");
 
 // The value of an <input type="datetime-local">, in the browser's time zone. Seconds appear only

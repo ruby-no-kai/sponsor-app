@@ -12,10 +12,23 @@ class Rk::SponsorApp::AdminConference < Google::Protobuf::AbstractMessage
       application_form_url: T.nilable(String),
       booth_capacity: T.nilable(Integer),
       conference: T.nilable(Rk::SponsorApp::Conference),
-      hidden: T.nilable(T::Boolean)
+      github_repo: T.nilable(String),
+      github_repo_images_path: T.nilable(String),
+      hidden: T.nilable(T::Boolean),
+      tito_booth_paid_flat_discount_amount: T.nilable(String),
+      tito_slug: T.nilable(String)
     ).void
   end
-  def initialize(allow_restricted_access: nil, application_form_url: nil, booth_capacity: nil, conference: nil, hidden: nil); end
+  def initialize(allow_restricted_access: nil, application_form_url: nil, booth_capacity: nil, conference: nil, github_repo: nil, github_repo_images_path: nil, hidden: nil, tito_booth_paid_flat_discount_amount: nil, tito_slug: nil); end
+
+  sig { returns(T.nilable(Symbol)) }
+  def _github_repo; end
+
+  sig { returns(T.nilable(Symbol)) }
+  def _github_repo_images_path; end
+
+  sig { returns(T.nilable(Symbol)) }
+  def _tito_slug; end
 
   sig { returns(T::Boolean) }
   def allow_restricted_access; end
@@ -48,7 +61,19 @@ class Rk::SponsorApp::AdminConference < Google::Protobuf::AbstractMessage
   def clear_conference; end
 
   sig { void }
+  def clear_github_repo; end
+
+  sig { void }
+  def clear_github_repo_images_path; end
+
+  sig { void }
   def clear_hidden; end
+
+  sig { void }
+  def clear_tito_booth_paid_flat_discount_amount; end
+
+  sig { void }
+  def clear_tito_slug; end
 
   sig { returns(T.nilable(Rk::SponsorApp::Conference)) }
   def conference; end
@@ -56,12 +81,45 @@ class Rk::SponsorApp::AdminConference < Google::Protobuf::AbstractMessage
   sig { params(value: T.nilable(Rk::SponsorApp::Conference)).void }
   def conference=(value); end
 
+  sig { returns(String) }
+  def github_repo; end
+
+  sig { params(value: String).void }
+  def github_repo=(value); end
+
+  sig { returns(String) }
+  def github_repo_images_path; end
+
+  sig { params(value: String).void }
+  def github_repo_images_path=(value); end
+
   sig { returns(Object) }
   def has_conference?; end
+
+  sig { returns(Object) }
+  def has_github_repo?; end
+
+  sig { returns(Object) }
+  def has_github_repo_images_path?; end
+
+  sig { returns(Object) }
+  def has_tito_slug?; end
 
   sig { returns(T::Boolean) }
   def hidden; end
 
   sig { params(value: T::Boolean).void }
   def hidden=(value); end
+
+  sig { returns(String) }
+  def tito_booth_paid_flat_discount_amount; end
+
+  sig { params(value: String).void }
+  def tito_booth_paid_flat_discount_amount=(value); end
+
+  sig { returns(String) }
+  def tito_slug; end
+
+  sig { params(value: String).void }
+  def tito_slug=(value); end
 end
