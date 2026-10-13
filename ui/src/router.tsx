@@ -94,6 +94,24 @@ export const router = createBrowserRouter([
               },
 
               // Plans
+              {
+                path: paths.plans,
+                lazy: {
+                  Component: async () => (await import("./routes/admin/PlanList.tsx")).default,
+                },
+              },
+              {
+                path: paths.planNew,
+                lazy: {
+                  Component: async () => (await import("./routes/admin/PlanEditor.tsx")).default,
+                },
+              },
+              {
+                path: paths.planEdit,
+                lazy: {
+                  Component: async () => (await import("./routes/admin/PlanEditor.tsx")).default,
+                },
+              },
 
               // Sponsorships
 

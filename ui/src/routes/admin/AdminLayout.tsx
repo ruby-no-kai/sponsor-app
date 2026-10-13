@@ -79,7 +79,7 @@ function conferenceSections(slug: string, { isEditable }: { isEditable: boolean 
   const base = `/admin/conferences/${encodeURIComponent(slug)}`;
   return [
     { label: "Overview", icon: PresentationIcon, path: generatePath(paths.conference, { slug }) },
-    { label: "Plans", icon: CoinsIcon, path: `${base}/plans` },
+    { label: "Plans", icon: CoinsIcon, path: generatePath(paths.plans, { slug }) },
     { label: "Booth assignment", icon: StorefrontIcon, path: `${base}/booth_assignment` },
     { label: "Events", icon: CalendarDotsIcon, path: `${base}/events` },
     { label: "Announcements", icon: MegaphoneIcon, path: `${base}/announcements` },

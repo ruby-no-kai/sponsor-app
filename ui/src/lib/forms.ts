@@ -13,6 +13,16 @@ export function idFromInput(value: string): bigint {
   return BigInt(value);
 }
 
+// The ID a route parameter names, or undefined when it can name none.
+export function idFromParam(param: string): bigint | undefined {
+  try {
+    return idFromInput(param);
+  } catch (error) {
+    if (error instanceof RangeError) return undefined;
+    throw error;
+  }
+}
+
 // An `optional` string field is unset rather than empty.
 export function optionalToInput(value: string | undefined): string {
   return value ?? "";
@@ -56,6 +66,13 @@ export function timestampToInput(timestamp: Timestamp | undefined): string {
   const date = timestampDate(timestamp);
   const minutes = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   return date.getSeconds() === 0 ? minutes : `${minutes}:${pad(date.getSeconds())}`;
+}
+
+// The value a "Now" button puts into a datetime-local input, to the minute.
+export function nowInput(now: Date = new Date()): string {
+  const minute = new Date(now);
+  minute.setSeconds(0, 0);
+  return timestampToInput(timestampFromDate(minute));
 }
 
 // ECMAScript reads a date-time without an offset as local time.

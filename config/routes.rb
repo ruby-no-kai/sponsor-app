@@ -137,6 +137,10 @@ Rails.application.routes.draw do
       rpc 'UpdateFormDescription' => 'api/admin/form_descriptions'
 
       # Plans
+      rpc 'ListPlans' => 'api/admin/plans'
+      rpc 'GetPlan' => 'api/admin/plans'
+      rpc 'CreatePlan' => 'api/admin/plans'
+      rpc 'UpdatePlan' => 'api/admin/plans'
 
       # Sponsorships
 

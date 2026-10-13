@@ -32,22 +32,6 @@ RSpec.describe 'AdminService conferences', type: :request do
     )
   end
 
-  def bad_request_of(error)
-    error.detail(Google::Rpc::BadRequest) ||
-      error.detail(Protobufable::ProblemDetails).information.map { it.unpack(Google::Rpc::BadRequest) }.compact.sole
-  end
-
-  def violations_of(error)
-    bad_request_of(error).field_violations.map { [it.field, it.reason] }
-  end
-
-  def query_count(&)
-    count = 0
-    counter = ->(*, payload) { count += 1 unless payload[:name] == 'SCHEMA' || payload[:cached] }
-    ActiveSupport::Notifications.subscribed(counter, 'sql.active_record', &)
-    count
-  end
-
   describe 'ListConferences' do
     let(:rpc) { connect_method('AdminService', 'ListConferences') }
     let(:request_message) { Rk::SponsorApp::AdminServiceListConferencesRequest.new }

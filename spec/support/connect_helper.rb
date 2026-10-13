@@ -75,6 +75,17 @@ module ConnectHelper
     ConnectError.new(status: response.status, code: body.fetch('code'), message: body['message'], details:)
   end
 
+  # The BadRequest of a ConnectError, whether sent as a detail of its own or inside the problem details.
+  def bad_request_of(error)
+    error.detail(Google::Rpc::BadRequest) ||
+      error.detail(Protobufable::ProblemDetails).information.map { it.unpack(Google::Rpc::BadRequest) }.compact.sole
+  end
+
+  # Each field violation of the error's BadRequest as `[field, reason]`.
+  def violations_of(error)
+    bad_request_of(error).field_violations.map { [it.field, it.reason] }
+  end
+
   def sign_in_staff(staff)
     get claim_user_session_path(FactoryBot.create(:session_token, staff:).handle)
   end
