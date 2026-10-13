@@ -3,7 +3,9 @@ syntax = "proto3";
 package rubykaigi.sponsor_app;
 
 import "buf/validate/validate.proto";
-import "rubykaigi/sponsor_app/conference.proto";
+import "rubykaigi/sponsor_app/admin_conference.proto";
+import "rubykaigi/sponsor_app/plan_summary.proto";
+import "rubykaigi/sponsor_app/sponsorship_summary.proto";
 
 option ruby_package = "Rk::SponsorApp";
 
@@ -13,8 +15,9 @@ message AdminServiceListConferencesRequest {}
 // Response for AdminService.ListConferences.
 message AdminServiceListConferencesResponse {
   // Every conference the signed-in staff member can manage, hidden ones included, most recently
-  // created first. Not paginated, as there is one conference a year.
-  repeated Conference conferences = 1;
+  // created first. Not paginated, as there is one conference a year. Each carries its staff-only
+  // settings, such as whether it is hidden.
+  repeated AdminConference conferences = 1;
 }
 
 // Request for AdminService.GetConference.
@@ -26,8 +29,19 @@ message AdminServiceGetConferenceRequest {
   }];
 }
 
-// Response for AdminService.GetConference.
+// Response for AdminService.GetConference: the conference with an overview of its plans and
+// sponsorships.
 message AdminServiceGetConferenceResponse {
   // The conference the request names.
-  Conference conference = 1;
+  AdminConference conference = 1;
+
+  // Locales the application form is described in, such as "en" and "ja", in the order they were
+  // added.
+  repeated string form_description_locales = 2;
+
+  // The conference's plans, lowest rank first.
+  repeated PlanSummary plans = 3;
+
+  // Every sponsorship of the conference, withdrawn ones included, oldest application first.
+  repeated SponsorshipSummary sponsorships = 4;
 }

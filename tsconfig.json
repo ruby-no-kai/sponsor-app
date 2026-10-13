@@ -21,5 +21,7 @@
     "allowSyntheticDefaultImports": true,
 
     "typeRoots": ["./node_modules/@types", "./types"]
-  }
+  },
+  /* The HAML assets' sources. ui/ is a project with a tsconfig of its own. */
+  "include": ["app/javascript", "types", "vite.config.mts"]
 }

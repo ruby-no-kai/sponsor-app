@@ -90,6 +90,7 @@ Uses Shoryuken (AWS SQS) for background processing:
 
 - Vite-based build via vite_rails gem
 - Bootstrap 4 for styling
+- `ui/`: a React SPA reimplementing the HAML screens on the Connect RPC API, development only (see "SPA (ui/)")
 
 ### External Integrations
 
@@ -112,6 +113,11 @@ Uses Shoryuken (AWS SQS) for background processing:
 ### Dev Server
 
 - Assume the dev server (Rails and Vite) is already up and running. Do not attempt to start them.
+- The `Procfile` runs, under overmind and [trustless](https://github.com/sorah/trustless):
+  - `web`: Rails on port 3000, at http://sponsor-app-rails.localhost:1355. Restarts when `gen/proto/ruby/` or `Gemfile.lock` changes.
+  - `vite`: `bin/vite dev`, the assets of the HAML pages.
+  - `ui`: the `ui/` Vite dev server, at http://sponsor-app.localhost:1355. It renders SPA paths and proxies every other request to Rails.
+  - `proto`: regenerates `gen/` and `ui/src/gen` when a `.proto` changes, which restarts Rails and hot-reloads the SPA.
 - If you encounter a connection error when accessing the dev server, halt and ask the human to check their server.
 - If you modify files under `config/` that are not auto-reloaded (e.g., `config/initializers/`, `config/boot.rb`, `config/environment.rb`, `config/environments/`, `config/application.rb`), remind the human to restart the Rails server for changes to take effect.
 
@@ -121,6 +127,7 @@ Uses Shoryuken (AWS SQS) for background processing:
 # Install dependencies
 bundle install
 pnpm install
+mise run ui:install    # ui/ is a pnpm project of its own
 
 # Setup database (requires Docker Compose for PostgreSQL)
 docker-compose up -d
@@ -146,6 +153,13 @@ rails db:reset                      # Drop, recreate, migrate, and seed
 rspec                               # Run all tests
 rspec spec/models/sponsorship_spec.rb  # Run specific test file
 rspec spec/models/sponsorship_spec.rb:42  # Run test at line 42
+```
+
+In a git worktree, `worktree:bootstrap` installs the root and `ui/` packages and the gems, and creates a test database of the worktree's own on the main checkout's compose db. Export the variables it prints:
+
+```bash
+mise trust && mise run worktree:bootstrap <slice>   # creates sponsor_app2_test_<slice>
+export COMPOSE_PROJECT_NAME=sponsor-app DATABASE_URL=postgres://...   # as printed
 ```
 
 ### Asset Management
@@ -184,15 +198,16 @@ Sorbet with inline RBS comments (`#:`); see `docs/type-checking.md`.
 
 ### Protocol Buffers
 
-`proto/` is the schema of record (package `rubykaigi.sponsor_app`, Ruby namespace `Rk::SponsorApp`). buf generates Ruby and RBS from it into `gen/proto/ruby/`, the `sponsor_app-proto` path gem that Bundler loads at boot. Generated files are committed.
+`proto/` is the schema of record (package `rubykaigi.sponsor_app`, Ruby namespace `Rk::SponsorApp`). buf generates Ruby and RBS from it into `gen/proto/ruby/`, the `sponsor_app-proto` path gem that Bundler loads at boot, and TypeScript into `ui/src/gen/` for the SPA. Generated files are committed.
 
 ```bash
-mise run gen            # Run every generator: gen/ from proto/, then the message RBIs (boots Rails, needs no database)
-mise run gen:proto      # Regenerate gen/ only
+mise run gen            # Run every generator: gen/ and ui/src/gen from proto/, then the message RBIs (boots Rails, needs no database)
+mise run gen:proto      # Regenerate gen/ and ui/src/gen only
 mise run lint:proto     # buf lint and buf format check
 ```
 
-- Never edit generated files under `gen/`. Edit `proto/`, run `mise run gen`, and commit its output with the `.proto` change. hk's pre-commit hook regenerates and stages it, and CI fails when it is stale.
+- Never edit generated files under `gen/` or `ui/src/gen/`. Edit `proto/`, run `mise run gen`, and commit its output with the `.proto` change. hk's pre-commit hook regenerates and stages it, and CI fails when it is stale.
+- `buf.gen.yaml` generates the Ruby, and `buf.gen.es.yaml` the TypeScript with protoc-gen-es from `ui/node_modules`, so `mise run gen` runs `ui:install` first. The TypeScript also covers `google/rpc/error_details.proto` for the SPA's error handling. No Ruby is generated for `google/`, `buf/validate/` or `protobufable/`, whose gems ship it.
 - `gen/proto/ruby/` also holds hand-written files the generator keeps: the gemspec and `lib/sponsor_app-proto.rb`.
 - Message classes cannot be reloaded, as google-protobuf raises when a descriptor is registered twice. The Procfile's `proto` process regenerates `gen/` on `.proto` edits, and its `web` process restarts Rails when `gen/proto/ruby/` changes.
 - Sorbet ignores the generated `.rbs`. Message types come from tapioca's Protobuf DSL compiler.
@@ -235,11 +250,39 @@ curl -b jar 'http://sponsor-app.localhost:1355/rubykaigi.sponsor_app.AdminServic
 
 An error is a JSON body `{"code", "message", "details"}`, each detail a protobuf message named by `type` and encoded in unpadded base64 under `value`.
 
+These recipes work on both hosts. A session cookie belongs to the host that set it, so http://sponsor-app.localhost:1355 and http://sponsor-app-rails.localhost:1355 each need their own sign-in.
+
+### SPA (ui/)
+
+`ui/` is a standalone pnpm project, not part of the root `package.json`: React, React Router (data mode), SWR, TanStack Form, [Kumo](https://github.com/cloudflare/kumo) on Tailwind CSS 4, and Connect-ES on the code generated into `ui/src/gen/`. It is development only. Production serves the HAML pages, and the Docker image leaves `ui/` out.
+
+The `ui` Vite dev server is the SPA's origin, http://sponsor-app.localhost:1355. Its own files live under `/_ui/`. A page load (`Sec-Fetch-Dest: document`) of a path listed in `ui/src/routes/paths.ts` gets the SPA. Every other request goes to Rails (`SPONSOR_APP_RAILS_URL`, default http://127.0.0.1:3000) with its `Host` untouched: RPCs, sign-in, `/vite-dev/`, downloads and each HAML page the SPA does not implement yet. http://sponsor-app-rails.localhost:1355 keeps serving every page as HAML.
+
+```bash
+mise run ui:install     # pnpm install --frozen-lockfile in ui/
+mise run ui:typecheck   # tsc --noEmit (TypeScript 7)
+mise run ui:test        # node:test suites (*.test.ts), run with Node's type stripping
+mise run ui:build       # vite build, to check the bundle
+cd ui && pnpm run format  # oxfmt
+```
+
+To add an SPA screen:
+
+1. Add its path pattern to its domain's section of `ui/src/routes/paths.ts`. Until a path is listed there, the dev server keeps sending it to Rails. A pattern ending in `:id` also matches a HAML `new` page beside it; list that page in `RAILS_PATHS` there until the SPA renders it.
+2. Add a route module under `ui/src/routes/` and wire it into its domain's section of `ui/src/router.tsx` with `lazy`, under the `/admin` tree or the sponsor tree.
+3. Fetch with `useRpc(AdminService.method.getConference, {conferenceSlug})` and mutate with `useRpcMutation` from `ui/src/lib/rpc.ts`. When there is no data, throw the error so the route's error boundary shows its Connect code, problem type and request ID.
+4. Link with Kumo's `Link`, `LinkButton` or `Sidebar.MenuButton` and an `href`. A path in `paths.ts` navigates in place, and any other is a full page load of the HAML page.
+
+- `ui/src/lib/errors.ts` reads Connect error details: `fieldViolations` turns a `google.rpc.BadRequest` into TanStack Form errors, `problemTypeOf` maps a problem back to `ProblemType`, `requestIdOf` reads `google.rpc.RequestInfo`.
+- `ui/src/lib/forms.ts` converts between input values and message fields: int64 IDs, `datetime-local` timestamps in the browser's time zone, and `optional` strings.
+- An RPC answering `unauthenticated` sends the browser to the Rails sign-in page, which brings it back afterwards. RPCs are same-origin and need no CSRF token.
+- Code imported by a `*.test.ts` must be erasable TypeScript with `.ts` import extensions, as Node strips the types without compiling. tsconfig's `erasableSyntaxOnly` enforces the former; a missing `.ts` extension surfaces only when `mise run ui:test` loads the module.
+
 ## Development Notes
 
 ### Authentication Backdoor
 
-In development, visit http://sponsor-app.localhost:1355/admin/session/new and use the "Development Backdoor" form to sign in without GitHub OAuth.
+In development, visit http://sponsor-app.localhost:1355/admin/session/new and use the "Development Backdoor" form to sign in without GitHub OAuth. It returns to the `back_to` path when there is one, as the SPA's sign-in redirect sets. Sign in on http://sponsor-app-rails.localhost:1355 separately to use the HAML pages there.
 
 ### Email Testing
 

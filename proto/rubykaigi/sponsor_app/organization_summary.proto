@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+option ruby_package = "Rk::SponsorApp";
+
+// A sponsoring company in brief. One organization can sponsor many conferences.
+message OrganizationSummary {
+  // Email domain that identifies the organization, such as "example.com". Unique across
+  // organizations.
+  string domain = 1;
+
+  // Display name.
+  string name = 2;
+}

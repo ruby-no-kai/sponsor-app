@@ -66,7 +66,7 @@ RSpec.describe 'Connect RPC policies', type: :request do
         authorize :sponsorship
         define_method(:get_conference) do
           Rk::SponsorApp::AdminServiceGetConferenceResponse.new(
-            conference: Rk::SponsorApp::Conference.new(name: current_sponsorship.name),
+            conference: Rk::SponsorApp::AdminConference.new(conference: Rk::SponsorApp::Conference.new(name: current_sponsorship.name)),
           )
         end
       end
@@ -76,7 +76,7 @@ RSpec.describe 'Connect RPC policies', type: :request do
       with_probe_routes('api/sponsor/policy_probe') do
         sign_in_sponsor(sponsorship.contact.email)
 
-        expect(connect_call(get_conference, conference_request(sponsorship.conference.slug)).conference.name)
+        expect(connect_call(get_conference, conference_request(sponsorship.conference.slug)).conference.conference.name)
           .to eq(sponsorship.name)
       end
     end

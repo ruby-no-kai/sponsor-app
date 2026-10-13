@@ -5,6 +5,7 @@
 --ignore=/storage/
 --ignore=/vendor/
 --ignore=/node_modules/
+--ignore=/ui/
 --ignore=/public/
 --ignore=/deploy/
 --ignore=/gen/

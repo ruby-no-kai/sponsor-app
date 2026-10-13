@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "rubykaigi/sponsor_app/conference.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// A conference as organizers see it: what sponsors see, plus the settings only staff manage.
+//
+// Staff-only. SponsorService never returns it.
+message AdminConference {
+  // The details sponsors and applicants see.
+  Conference conference = 1;
+
+  // Whether the conference is left out of the public conference list. Applying then needs the
+  // invite code that application_form_url carries.
+  bool hidden = 2;
+
+  // URL of the application form to hand to prospective sponsors, carrying the invite code when
+  // the conference has one. Built from the host the request reached.
+  string application_form_url = 3;
+
+  // Whether staff restricted to some conferences may manage this one. They also need read access
+  // to its GitHub repository.
+  bool allow_restricted_access = 4;
+
+  // Number of booths available to exhibitors. Zero when the conference offers no booths.
+  int32 booth_capacity = 5;
+}

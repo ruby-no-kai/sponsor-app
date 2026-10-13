@@ -5,10 +5,12 @@
 require 'google/protobuf'
 
 require 'buf/validate/validate_pb'
-require 'rubykaigi/sponsor_app/conference_pb'
+require 'rubykaigi/sponsor_app/admin_conference_pb'
+require 'rubykaigi/sponsor_app/plan_summary_pb'
+require 'rubykaigi/sponsor_app/sponsorship_summary_pb'
 
 
-descriptor_data = "\n-rubykaigi/sponsor_app/admin_conferences.proto\x12\x15rubykaigi.sponsor_app\x1a\x1b\x62uf/validate/validate.proto\x1a&rubykaigi/sponsor_app/conference.proto\"$\n\"AdminServiceListConferencesRequest\"j\n#AdminServiceListConferencesResponse\x12\x43\n\x0b\x63onferences\x18\x01 \x03(\x0b\x32!.rubykaigi.sponsor_app.ConferenceR\x0b\x63onferences\"k\n AdminServiceGetConferenceRequest\x12G\n\x0f\x63onference_slug\x18\x01 \x01(\tB\x1e\xbaH\x1br\x19\x10\x01\x32\x15^[a-z0-9][a-z0-9_-]*$R\x0e\x63onferenceSlug\"f\n!AdminServiceGetConferenceResponse\x12\x41\n\nconference\x18\x01 \x01(\x0b\x32!.rubykaigi.sponsor_app.ConferenceR\nconferenceB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
+descriptor_data = "\n-rubykaigi/sponsor_app/admin_conferences.proto\x12\x15rubykaigi.sponsor_app\x1a\x1b\x62uf/validate/validate.proto\x1a,rubykaigi/sponsor_app/admin_conference.proto\x1a(rubykaigi/sponsor_app/plan_summary.proto\x1a/rubykaigi/sponsor_app/sponsorship_summary.proto\"$\n\"AdminServiceListConferencesRequest\"o\n#AdminServiceListConferencesResponse\x12H\n\x0b\x63onferences\x18\x01 \x03(\x0b\x32&.rubykaigi.sponsor_app.AdminConferenceR\x0b\x63onferences\"k\n AdminServiceGetConferenceRequest\x12G\n\x0f\x63onference_slug\x18\x01 \x01(\tB\x1e\xbaH\x1br\x19\x10\x01\x32\x15^[a-z0-9][a-z0-9_-]*$R\x0e\x63onferenceSlug\"\xae\x02\n!AdminServiceGetConferenceResponse\x12\x46\n\nconference\x18\x01 \x01(\x0b\x32&.rubykaigi.sponsor_app.AdminConferenceR\nconference\x12\x38\n\x18\x66orm_description_locales\x18\x02 \x03(\tR\x16\x66ormDescriptionLocales\x12\x38\n\x05plans\x18\x03 \x03(\x0b\x32\".rubykaigi.sponsor_app.PlanSummaryR\x05plans\x12M\n\x0csponsorships\x18\x04 \x03(\x0b\x32).rubykaigi.sponsor_app.SponsorshipSummaryR\x0csponsorshipsB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)

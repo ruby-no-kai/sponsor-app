@@ -33,12 +33,12 @@ run = [
 description = "Run every generator whose output is checked into git"
 depends = ["gen:proto", "gen:rbi"]
 
-# protoc-gen-es comes from node_modules, hence js:install, and pnpm-lock.yaml picks the code it
-# emits.
+# protoc-gen-es comes from node_modules and ui/node_modules, hence js:install and ui:install. The
+# lockfiles pick the code it emits.
 [tasks."gen:proto"]
-description = "Generate Ruby and RBS into gen/proto/ruby, and TypeScript into app/javascript/gen"
-depends = ["js:install"]
-sources = ["proto/**/*.proto", "buf.gen.yaml", "buf.gen.javascript.yaml", "buf.yaml", "buf.lock", "pnpm-lock.yaml"]
+description = "Generate Ruby and RBS into gen/proto/ruby, and TypeScript into app/javascript/gen and ui/src/gen"
+depends = ["js:install", "ui:install"]
+sources = ["proto/**/*.proto", "buf.gen.yaml", "buf.gen.javascript.yaml", "buf.gen.es.yaml", "buf.yaml", "buf.lock", "pnpm-lock.yaml", "ui/pnpm-lock.yaml"]
 outputs = { auto = true }
 run = '''
 set -eu
@@ -46,9 +46,10 @@ set -eu
 # A .proto that fails to compile must leave gen/ untouched.
 buf build
 
-find gen/proto/ruby app/javascript/gen \( -path 'gen/proto/ruby/lib/*_pb.rb' -o -path 'gen/proto/ruby/sig/*_pb.rbs' -o -path 'app/javascript/gen/*_pb.ts' \) -delete
+find gen/proto/ruby app/javascript/gen ui/src/gen \( -path 'gen/proto/ruby/lib/*_pb.rb' -o -path 'gen/proto/ruby/sig/*_pb.rbs' -o -path 'app/javascript/gen/*_pb.ts' -o -path 'ui/src/gen/*_pb.ts' \) -delete
 buf generate
 buf generate --template buf.gen.javascript.yaml
+buf generate --template buf.gen.es.yaml
 '''
 
 # `--only` skips tapioca's stale RBI removal, so the message RBIs are rebuilt
@@ -79,7 +80,71 @@ run = "pnpm install --frozen-lockfile && touch node_modules/.pnpm/lock.yaml"
 sources = ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"]
 outputs = ["node_modules/.pnpm/lock.yaml"]
 
-# $PORT is the one trustless allocates, so the inner shell expands it.
+# The ui/ dev server proxies to Rails on port 3000. trustless passes the port in $PORT, which the
+# inner shell expands.
 [tasks.server]
 description = "Rails server behind trustless"
-run = "trustless exec sponsor-app bash -c 'bin/rails s --port $PORT'"
+run = "trustless exec --port 3000 sponsor-app-rails bash -c 'bin/rails s --port $PORT'"
+
+# mise skips this while node_modules/.pnpm/lock.yaml is newer than the sources. A no-op install
+# leaves that file as it is, hence the touch.
+[tasks."ui:install"]
+description = "Install ui/ dependencies from its lockfile"
+dir = "{{config_root}}/ui"
+run = "pnpm install --frozen-lockfile && touch node_modules/.pnpm/lock.yaml"
+sources = ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"]
+outputs = ["node_modules/.pnpm/lock.yaml"]
+
+[tasks."ui:typecheck"]
+description = "Typecheck ui/"
+depends = ["ui:install"]
+dir = "{{config_root}}/ui"
+run = "pnpm run typecheck"
+
+[tasks."ui:test"]
+description = "Run ui/ unit tests"
+depends = ["ui:install"]
+dir = "{{config_root}}/ui"
+run = "pnpm test"
+
+[tasks."ui:build"]
+description = "Build ui/ into ui/dist"
+depends = ["ui:install"]
+dir = "{{config_root}}/ui"
+run = "pnpm run build"
+
+# A worktree shares the main checkout's compose db, so each slice gets its own test database.
+# mise refuses to run tasks from an untrusted config, so `mise trust` comes first, by hand.
+[tasks."worktree:bootstrap"]
+description = "Prepare a git worktree: dependencies and a test database of its own"
+depends = ["ui:install"]
+usage = 'arg "<slice>" help="Slice name, used in the database name sponsor_app2_test_<slice>"'
+run = '''
+set -eu
+
+slice="${usage_slice?}"
+case "$slice" in
+  *[!a-z0-9_]*|"")
+    echo "worktree:bootstrap: the slice name may hold only a-z, 0-9 and _" >&2
+    exit 1
+    ;;
+esac
+
+# The HAML layouts' vite_ruby assets build from the root's node_modules in test.
+pnpm install --frozen-lockfile
+bundle install
+
+export COMPOSE_PROJECT_NAME=sponsor-app
+port="$(docker compose port db 5432 | cut -d: -f2)"
+if [ -z "$port" ]; then
+  echo "worktree:bootstrap: start the db first: COMPOSE_PROJECT_NAME=sponsor-app docker compose up -d db" >&2
+  exit 1
+fi
+database_url="postgres://sponsorapp:sponsorapp@127.0.0.1:$port/sponsor_app2_test_$slice"
+DATABASE_URL="$database_url" RAILS_ENV=test bin/rails db:create db:schema:load
+
+echo
+echo "Use this worktree's database in every shell:"
+echo "  export COMPOSE_PROJECT_NAME=sponsor-app"
+echo "  export DATABASE_URL=$database_url"
+'''
