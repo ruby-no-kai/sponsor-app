@@ -6,15 +6,24 @@ require 'google/protobuf'
 
 require 'buf/validate/validate_pb'
 require 'rubykaigi/sponsor_app/expense_report_pb'
+require 'rubykaigi/sponsor_app/sponsorship_summary_pb'
 
 
-descriptor_data = "\n1rubykaigi/sponsor_app/admin_expense_reports.proto\x12\x15rubykaigi.sponsor_app\x1a\x1b\x62uf/validate/validate.proto\x1a*rubykaigi/sponsor_app/expense_report.proto\"\x9d\x01\n\x18\x45xpenseReportReviewInput\x12V\n\x06\x61\x63tion\x18\x01 \x01(\x0e\x32\x31.rubykaigi.sponsor_app.ExpenseReportReview.ActionB\x0b\xbaH\x08\x82\x01\x02\x10\x01\xc8\x01\x01R\x06\x61\x63tion\x12\x1d\n\x07\x63omment\x18\x02 \x01(\tH\x00R\x07\x63omment\x88\x01\x01\x42\n\n\x08_commentB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
+descriptor_data = "\n1rubykaigi/sponsor_app/admin_expense_reports.proto\x12\x15rubykaigi.sponsor_app\x1a\x1b\x62uf/validate/validate.proto\x1a*rubykaigi/sponsor_app/expense_report.proto\x1a/rubykaigi/sponsor_app/sponsorship_summary.proto\"\xe0\x03\n\x15\x45xpenseReportTableRow\x12K\n\x0bsponsorship\x18\x01 \x01(\x0b\x32).rubykaigi.sponsor_app.SponsorshipSummaryR\x0bsponsorship\x12\x33\n\x13\x64isplayed_plan_name\x18\x02 \x01(\tH\x00R\x11\x64isplayedPlanName\x88\x01\x01\x12\x1b\n\ttotal_fee\x18\x03 \x01(\tR\x08totalFee\x12P\n\x06report\x18\x04 \x01(\x0b\x32\x33.rubykaigi.sponsor_app.ExpenseReportTableRow.ReportH\x01R\x06report\x88\x01\x01\x1a\xb2\x01\n\x06Report\x12\x43\n\x06status\x18\x01 \x01(\x0e\x32+.rubykaigi.sponsor_app.ExpenseReport.StatusR\x06status\x12!\n\x0ctotal_amount\x18\x02 \x01(\tR\x0btotalAmount\x12(\n\x10total_tax_amount\x18\x03 \x01(\tR\x0etotalTaxAmount\x12\x16\n\x06offset\x18\x04 \x01(\tR\x06offsetB\x16\n\x14_displayed_plan_nameB\t\n\x07_report\"\x9d\x01\n\x18\x45xpenseReportReviewInput\x12V\n\x06\x61\x63tion\x18\x01 \x01(\x0e\x32\x31.rubykaigi.sponsor_app.ExpenseReportReview.ActionB\x0b\xbaH\x08\x82\x01\x02\x10\x01\xc8\x01\x01R\x06\x61\x63tion\x12\x1d\n\x07\x63omment\x18\x02 \x01(\tH\x00R\x07\x63omment\x88\x01\x01\x42\n\n\x08_comment\"p\n%AdminServiceListExpenseReportsRequest\x12G\n\x0f\x63onference_slug\x18\x01 \x01(\tB\x1e\xbaH\x1br\x19\x10\x01\x32\x15^[a-z0-9][a-z0-9_-]*$R\x0e\x63onferenceSlug\"j\n&AdminServiceListExpenseReportsResponse\x12@\n\x04rows\x18\x01 \x03(\x0b\x32,.rubykaigi.sponsor_app.ExpenseReportTableRowR\x04rows\"\x9e\x01\n#AdminServiceGetExpenseReportRequest\x12G\n\x0f\x63onference_slug\x18\x01 \x01(\tB\x1e\xbaH\x1br\x19\x10\x01\x32\x15^[a-z0-9][a-z0-9_-]*$R\x0e\x63onferenceSlug\x12.\n\x0esponsorship_id\x18\x02 \x01(\x03\x42\x07\xbaH\x04\"\x02 \x00R\rsponsorshipId\"\xb1\x01\n$AdminServiceGetExpenseReportResponse\x12<\n\x06report\x18\x01 \x01(\x0b\x32$.rubykaigi.sponsor_app.ExpenseReportR\x06report\x12K\n\x0bsponsorship\x18\x02 \x01(\x0b\x32).rubykaigi.sponsor_app.SponsorshipSummaryR\x0bsponsorship\"\xa4\x01\n)AdminServiceCalculateExpenseReportRequest\x12G\n\x0f\x63onference_slug\x18\x01 \x01(\tB\x1e\xbaH\x1br\x19\x10\x01\x32\x15^[a-z0-9][a-z0-9_-]*$R\x0e\x63onferenceSlug\x12.\n\x0esponsorship_id\x18\x02 \x01(\x03\x42\x07\xbaH\x04\"\x02 \x00R\rsponsorshipId\"\x7f\n*AdminServiceCalculateExpenseReportResponse\x12Q\n\x0b\x63\x61lculation\x18\x01 \x01(\x0b\x32/.rubykaigi.sponsor_app.ExpenseReportCalculationR\x0b\x63\x61lculationB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
 
 module Rk
   module SponsorApp
+    ExpenseReportTableRow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.ExpenseReportTableRow").msgclass
+    ExpenseReportTableRow::Report = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.ExpenseReportTableRow.Report").msgclass
     ExpenseReportReviewInput = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.ExpenseReportReviewInput").msgclass
+    AdminServiceListExpenseReportsRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.AdminServiceListExpenseReportsRequest").msgclass
+    AdminServiceListExpenseReportsResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.AdminServiceListExpenseReportsResponse").msgclass
+    AdminServiceGetExpenseReportRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.AdminServiceGetExpenseReportRequest").msgclass
+    AdminServiceGetExpenseReportResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.AdminServiceGetExpenseReportResponse").msgclass
+    AdminServiceCalculateExpenseReportRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.AdminServiceCalculateExpenseReportRequest").msgclass
+    AdminServiceCalculateExpenseReportResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.AdminServiceCalculateExpenseReportResponse").msgclass
   end
 end

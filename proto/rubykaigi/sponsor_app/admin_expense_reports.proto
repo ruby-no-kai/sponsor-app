@@ -4,8 +4,44 @@ package rubykaigi.sponsor_app;
 
 import "buf/validate/validate.proto";
 import "rubykaigi/sponsor_app/expense_report.proto";
+import "rubykaigi/sponsor_app/sponsorship_summary.proto";
 
 option ruby_package = "Rk::SponsorApp";
+
+// A custom sponsorship with its expense report in brief, as the list of a conference's expense
+// reports shows it.
+message ExpenseReportTableRow {
+  // An expense report in brief.
+  message Report {
+    // Where the report stands.
+    ExpenseReport.Status status = 1;
+
+    // Sum of the line items' amounts before tax, as a decimal such as "120000.0".
+    string total_amount = 2;
+
+    // Sum of the line items' tax, as a decimal.
+    string total_tax_amount = 3;
+
+    // total_fee less total_amount: what remains to be billed, as a decimal. Negative when the
+    // expenses exceed the fee.
+    string offset = 4;
+  }
+
+  // The sponsorship.
+  SponsorshipSummary sponsorship = 1;
+
+  // Name the sponsor is published under: the custom package's name once it is confirmed,
+  // otherwise the plan's. Absent while the plan is undetermined and no custom package is
+  // confirmed.
+  optional string displayed_plan_name = 2;
+
+  // The fee the expenses are offset against, as a decimal: the plan's fee, plus its booth fee when
+  // a booth is assigned. "0" while the plan is undetermined.
+  string total_fee = 3;
+
+  // The sponsorship's expense report. Absent until the sponsor starts one.
+  optional Report report = 4;
+}
 
 // The verdict on an expense report's latest submission, taken by
 // AdminService.CreateExpenseReportReview.
@@ -19,4 +55,59 @@ message ExpenseReportReviewInput {
   // What to tell the sponsor. A rejection without one is answered `invalid_argument` with
   // PROBLEM_TYPE_INVALID_RECORD.
   optional string comment = 2;
+}
+
+// Request for AdminService.ListExpenseReports.
+message AdminServiceListExpenseReportsRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for AdminService.ListExpenseReports.
+message AdminServiceListExpenseReportsResponse {
+  // Every sponsorship of the conference with a confirmed custom package, withdrawn ones included,
+  // by name. Not paginated.
+  repeated ExpenseReportTableRow rows = 1;
+}
+
+// Request for AdminService.GetExpenseReport.
+message AdminServiceGetExpenseReportRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference that has an expense report.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.GetExpenseReport.
+message AdminServiceGetExpenseReportResponse {
+  // The sponsorship's expense report.
+  ExpenseReport report = 1;
+
+  // The sponsorship the report belongs to.
+  SponsorshipSummary sponsorship = 2;
+}
+
+// Request for AdminService.CalculateExpenseReport.
+message AdminServiceCalculateExpenseReportRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.CalculateExpenseReport.
+message AdminServiceCalculateExpenseReportResponse {
+  // The figures the sponsorship's expenses are weighed against.
+  ExpenseReportCalculation calculation = 1;
 }

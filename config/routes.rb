@@ -185,6 +185,9 @@ Rails.application.routes.draw do
       rpc 'DispatchBroadcast' => 'api/admin/broadcasts'
 
       # Expense reports
+      rpc 'ListExpenseReports' => 'api/admin/expense_reports'
+      rpc 'GetExpenseReport' => 'api/admin/expense_reports'
+      rpc 'CalculateExpenseReport' => 'api/admin/expense_reports'
 
       # Viewer
       rpc 'GetViewer' => 'api/admin/viewer'

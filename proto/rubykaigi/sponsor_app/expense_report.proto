@@ -7,6 +7,107 @@ import "google/protobuf/timestamp.proto";
 
 option ruby_package = "Rk::SponsorApp";
 
+// The expenses a sponsor spent on a custom package, which the organizers offset against the
+// sponsorship fee once they approve them. A sponsorship has at most one.
+//
+// Amounts, rates and totals are decimal strings, such as "120000.0", as a double would round them.
+message ExpenseReport {
+  // Where the report stands.
+  enum Status {
+    // The zero value proto3 requires. Never returned.
+    STATUS_UNSPECIFIED = 0;
+
+    // Being written by the sponsor.
+    STATUS_DRAFT = 1;
+
+    // Submitted and awaiting review.
+    STATUS_SUBMITTED = 2;
+
+    // Approved by the organizers. An approved report takes no further changes.
+    STATUS_APPROVED = 3;
+
+    // Returned to the sponsor for changes, with the review saying why.
+    STATUS_REJECTED = 4;
+  }
+
+  // Expense report ID.
+  int64 id = 1 [jstype = JS_STRING];
+
+  // Where the report stands.
+  Status status = 2;
+
+  // Sum of the line items' amounts before tax.
+  string total_amount = 3;
+
+  // Sum of the line items' tax.
+  string total_tax_amount = 4;
+
+  // How many times the report has been submitted. 0 until the first submission.
+  int32 revision = 5;
+
+  // Every line item, in the order the sponsor arranged them.
+  repeated ExpenseLineItem line_items = 6;
+
+  // Every file uploaded for the sponsorship's expenses, whether a line item attaches it or not.
+  // A file still being uploaded is left out.
+  repeated ExpenseFile files = 7;
+
+  // The organizers' verdict on the latest submission. Absent until they review it.
+  optional ExpenseReportReview latest_review = 8;
+
+  // When the sponsor started the report.
+  google.protobuf.Timestamp created_at = 9;
+
+  // When the report or its totals last changed.
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+// One expense of a report, such as a venue rental.
+message ExpenseLineItem {
+  // Line item ID.
+  int64 id = 1 [jstype = JS_STRING];
+
+  // What the expense was for.
+  string title = 2;
+
+  // Anything the sponsor adds about the expense. Absent when there is nothing.
+  optional string notes = 3;
+
+  // Amount before tax.
+  string amount = 4;
+
+  // Tax rate the tax was calculated at, such as "0.1". Absent when the tax amount was entered by
+  // hand.
+  optional string tax_rate = 5;
+
+  // Tax on the amount.
+  string tax_amount = 6;
+
+  // Whether the amount is a planned budget rather than a final figure.
+  bool preliminal = 7;
+
+  // Sort key among the report's line items, lowest first. Positions may skip numbers.
+  int32 position = 8;
+
+  // IDs of the ExpenseFile receipts and invoices attached, in the order they were attached.
+  repeated int64 file_ids = 9 [jstype = JS_STRING];
+}
+
+// A receipt or invoice uploaded for a sponsorship's expenses.
+message ExpenseFile {
+  // Expense file ID.
+  int64 id = 1 [jstype = JS_STRING];
+
+  // Name of the file as uploaded. Absent when the uploader gave none.
+  optional string filename = 2;
+
+  // MIME type the storage recorded for the upload, such as "application/pdf".
+  string content_type = 3;
+
+  // When the upload began.
+  google.protobuf.Timestamp created_at = 4;
+}
+
 // The organizers' verdict on a submission of an expense report.
 message ExpenseReportReview {
   // The verdict.

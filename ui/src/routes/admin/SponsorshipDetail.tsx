@@ -22,11 +22,11 @@ import { notifyError, toastManager } from "../../lib/toast.ts";
 import { NotFound } from "../RouteError.tsx";
 import { paths } from "../paths.ts";
 import { ConfirmButton } from "./ConfirmButton.tsx";
+import { EXPENSE_REPORT_STATUS_LABELS } from "./expense_report/reportView.ts";
 import { StaffNotes } from "./StaffNotes.tsx";
 import { useConferenceName, useConferenceTitle } from "./conferenceTitle.ts";
 import { SPONSOR_EVENT_STATUS_LABELS } from "./sponsorEventView.ts";
 import {
-  EXPENSE_REPORT_STATUS_LABELS,
   boothStatus,
   customizationStatus,
   formatAmount,

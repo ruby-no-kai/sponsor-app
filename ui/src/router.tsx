@@ -272,6 +272,13 @@ export const router = createBrowserRouter([
               },
 
               // Expense reports
+              {
+                path: paths.expenseReports,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/ExpenseReportList.tsx")).default,
+                },
+              },
 
               { path: "*", Component: NotFound },
             ],

@@ -1,7 +1,4 @@
-import {
-  AdminSponsorship_ExpenseReport_Status,
-  AdminSponsorship_TitoDiscountCode_Kind,
-} from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
+import { AdminSponsorship_TitoDiscountCode_Kind } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 import type { AdminSponsorship } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 
 // Whether a sponsor-supplied URL is safe to link to: http or https, never javascript: and the like.
@@ -72,16 +69,6 @@ export function titoKindLabel(kind: AdminSponsorship_TitoDiscountCode_Kind): str
       return `Kind ${kind}`;
   }
 }
-
-export const EXPENSE_REPORT_STATUS_LABELS: Readonly<
-  Record<AdminSponsorship_ExpenseReport_Status, Label>
-> = {
-  [AdminSponsorship_ExpenseReport_Status.UNSPECIFIED]: { text: "unknown", tone: "outline" },
-  [AdminSponsorship_ExpenseReport_Status.DRAFT]: { text: "draft", tone: "outline" },
-  [AdminSponsorship_ExpenseReport_Status.SUBMITTED]: { text: "submitted", tone: "info" },
-  [AdminSponsorship_ExpenseReport_Status.APPROVED]: { text: "approved", tone: "success" },
-  [AdminSponsorship_ExpenseReport_Status.REJECTED]: { text: "rejected", tone: "error" },
-};
 
 // Looks a label up for an enum value the generated code may not know yet.
 export function labelOf<K extends number>(labels: Readonly<Record<K, Label>>, value: K): Label {
