@@ -4,6 +4,7 @@ package rubykaigi.sponsor_app;
 
 import "rubykaigi/sponsor_app/sponsor_applications.proto";
 import "rubykaigi/sponsor_app/sponsor_broadcasts.proto";
+import "rubykaigi/sponsor_app/sponsor_exhibitions.proto";
 import "rubykaigi/sponsor_app/sponsor_passes.proto";
 import "rubykaigi/sponsor_app/sponsor_shell.proto";
 import "rubykaigi/sponsor_app/sponsor_viewer.proto";
@@ -97,6 +98,15 @@ service SponsorService {
   rpc CompleteSponsorshipAssetUpload(SponsorServiceCompleteSponsorshipAssetUploadRequest) returns (SponsorServiceCompleteSponsorshipAssetUploadResponse);
 
   // Exhibitions and events
+
+  // Submits what the sponsor will exhibit at its booth. Answers `failed_precondition` until a booth
+  // is assigned, and `aborted` when the sponsorship has booth details already, which
+  // UpdateExhibition changes. The booth details are on GetSponsorship.
+  rpc CreateExhibition(SponsorServiceCreateExhibitionRequest) returns (SponsorServiceCreateExhibitionResponse);
+
+  // Changes the booth details. Answers `not_found` before any are submitted and
+  // `failed_precondition` until a booth is assigned.
+  rpc UpdateExhibition(SponsorServiceUpdateExhibitionRequest) returns (SponsorServiceUpdateExhibitionResponse);
 
   // Broadcasts and passes
 

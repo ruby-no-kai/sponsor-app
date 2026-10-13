@@ -31,6 +31,9 @@ module SponsorTranslations
     'sponsor_ui.files',
 
     # Exhibitions and events
+    'exhibitions',
+    'activerecord.attributes.exhibition',
+    'sponsor_ui.events',
 
     # Broadcasts and passes
     'broadcasts',

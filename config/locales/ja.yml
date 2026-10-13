@@ -632,6 +632,13 @@ ja:
       remove: '削除'
 
     # Exhibitions and events
+    events:
+      back_to_portal: 'スポンサーポータルに戻る'
+      exhibition_not_saved: 'ブース詳細を保存できませんでした。'
+      exhibition_unavailable: 'ブース詳細は、スポンサーシップにブースが割り当てられた後に提出できます。'
+      exhibition_placeholder: '例: ブースの規模、電源の要否、飲食物の提供、デモの内容'
+      errors:
+        required: '入力してください'
 
     # Broadcasts and passes
     broadcasts:

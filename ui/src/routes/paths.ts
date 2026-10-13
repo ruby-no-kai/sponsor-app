@@ -71,6 +71,8 @@ export const paths = {
   sponsorApplicationEdit: "/conferences/:slug/sponsorship/edit",
 
   // Sponsor: Exhibitions and events
+  sponsorExhibitionNew: "/conferences/:slug/sponsorship/exhibition/new",
+  sponsorExhibitionEdit: "/conferences/:slug/sponsorship/exhibition/edit",
 
   // Sponsor: Broadcasts and passes
   sponsorBroadcasts: "/conferences/:slug/sponsorship/broadcasts",
