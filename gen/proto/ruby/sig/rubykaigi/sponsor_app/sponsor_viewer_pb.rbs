@@ -137,6 +137,26 @@ module Rk
         | ("sponsorships" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::SponsorViewer::Sponsorship, ::Rk::SponsorApp::SponsorViewer::Sponsorship] value) -> void
         | ("locale" name, (::String | ::Symbol) value) -> void
     end
+
+    # Request for SponsorService.SignOut.
+    class SponsorServiceSignOutRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceSignOutRequest]
+
+      type init_map = {
+      }
+
+      def initialize: (?init_map initial_value) -> void
+    end
+
+    # Response for SponsorService.SignOut.
+    class SponsorServiceSignOutResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceSignOutResponse]
+
+      type init_map = {
+      }
+
+      def initialize: (?init_map initial_value) -> void
+    end
   end
 end
 
@@ -148,6 +168,8 @@ module Google
         | ("rubykaigi.sponsor_app.SponsorServiceGetViewerResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceGetViewerResponse)])
         | ("rubykaigi.sponsor_app.SponsorViewer" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorViewer)])
         | ("rubykaigi.sponsor_app.SponsorViewer.Sponsorship" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorViewer::Sponsorship)])
+        | ("rubykaigi.sponsor_app.SponsorServiceSignOutRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceSignOutRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceSignOutResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceSignOutResponse)])
         | ...
     end
   end

@@ -2,7 +2,7 @@ import { Badge, Button, DropdownMenu, Link, LinkButton, Loader } from "@cloudfla
 import { CaretDownIcon, ListIcon, TranslateIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo } from "react";
 import { Outlet, useLocation, useSearchParams } from "react-router";
-import { SWRConfig, useSWRConfig } from "swr";
+import { SWRConfig, unload, useSWRConfig } from "swr";
 import { SponsorService } from "../../gen/rubykaigi/sponsor_app/sponsor_service_pb.ts";
 import type { SponsorViewer_Sponsorship } from "../../gen/rubykaigi/sponsor_app/sponsor_viewer_pb.ts";
 import { I18nProvider, useT } from "../../lib/i18n.tsx";
@@ -136,6 +136,7 @@ type NavActions = {
   staff: boolean;
   changeLocale(locale: Locale): void;
   signIn(): void;
+  signOut(): void;
 };
 
 function useNavActions(): NavActions {
@@ -144,6 +145,7 @@ function useNavActions(): NavActions {
   const { mutate } = useSWRConfig();
   const viewer = useRpc(SponsorService.method.getViewer, {}).data?.viewer;
   const setLocale = useRpcMutation(SponsorService.method.setLocale);
+  const signOut = useRpcMutation(SponsorService.method.signOut);
 
   return {
     sponsorships: viewer?.email === undefined ? undefined : viewer.sponsorships,
@@ -161,6 +163,18 @@ function useNavActions(): NavActions {
     },
     signIn() {
       window.location.assign(signInUrl(location));
+    },
+    signOut() {
+      void (async () => {
+        try {
+          await signOut.trigger({});
+        } catch (error) {
+          notifyFailure(t, error);
+          return;
+        }
+        unload({ revalidate: false });
+        window.location.assign(paths.sponsorLanding);
+      })();
     },
   };
 }
@@ -210,9 +224,13 @@ function NavBar() {
               <Badge variant="error">{t("sponsor_ui.shell.staff_mode")}</Badge>
             </Link>
           )}
-          {sponsorships === undefined && (
+          {sponsorships === undefined ? (
             <Button variant="ghost" onClick={actions.signIn}>
               {t("layouts.application.login")}
+            </Button>
+          ) : (
+            <Button variant="ghost" onClick={actions.signOut}>
+              {t("layouts.application.logout")}
             </Button>
           )}
         </div>
@@ -225,7 +243,7 @@ function NavBar() {
   );
 }
 
-function CompactMenu({ sponsorships, staff, changeLocale, signIn }: NavActions) {
+function CompactMenu({ sponsorships, staff, changeLocale, signIn, signOut }: NavActions) {
   const t = useT();
   const goTo = useGoTo();
 
@@ -260,8 +278,10 @@ function CompactMenu({ sponsorships, staff, changeLocale, signIn }: NavActions) 
             {t("sponsor_ui.shell.staff_mode")}
           </DropdownMenu.Item>
         )}
-        {sponsorships === undefined && (
+        {sponsorships === undefined ? (
           <DropdownMenu.Item onClick={signIn}>{t("layouts.application.login")}</DropdownMenu.Item>
+        ) : (
+          <DropdownMenu.Item onClick={signOut}>{t("layouts.application.logout")}</DropdownMenu.Item>
         )}
       </DropdownMenu.Content>
     </DropdownMenu>
