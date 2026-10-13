@@ -1,0 +1,102 @@
+# last_editing_history: 1000504, last_event_editing_history: 1000601
+---
+platinum:
+  :base_plan: platinum
+  :plans:
+    platinum:
+      :plan_name: Platinum
+      :sponsors:
+      - :id: 1000010
+        :asset_file_id: 1000110
+        :base_plan: platinum
+        :plan_name: Platinum
+        :slug: fabrikam.invalid
+        :name: Fabrikam Inc.
+        :url: https://fabrikam.invalid/
+        :profile: |-
+          Fabrikam builds things.
+
+          We: love "Ruby" & YAML!
+      - :id: 1000014
+        :asset_file_id:
+        :base_plan: platinum
+        :plan_name: Platinum
+        :slug: noasset.invalid
+        :name: Noasset Inc.
+        :url: https://noasset.invalid/
+        :profile: We are noasset.invalid.
+    platinum_lounge:
+      :plan_name: Platinum Lounge
+      :sponsors:
+      - :id: 1000012
+        :asset_file_id: 1000112
+        :base_plan: platinum
+        :plan_name: Platinum Lounge
+        :slug: lounge.invalid
+        :name: Lounge Inc.
+        :url: https://lounge.invalid/
+        :profile: We are lounge.invalid.
+ruby:
+  :base_plan: ruby
+  :plans:
+    ruby:
+      :plan_name: Ruby
+      :sponsors:
+      - :id: 1000011
+        :asset_file_id: 1000111
+        :base_plan: ruby
+        :plan_name: Ruby
+        :slug: contoso.invalid
+        :name: Contoso Inc.
+        :url: https://contoso.invalid/
+        :profile: We are contoso.invalid.
+gold_sponsor:
+  :base_plan: gold sponsor
+  :plans:
+    gold_sponsor:
+      :plan_name: Gold Sponsor
+      :sponsors:
+      - :id: 1000013
+        :asset_file_id: 1000113
+        :base_plan: gold sponsor
+        :plan_name: Gold Sponsor
+        :slug: planned.invalid
+        :name: Planned Inc.
+        :url: https://planned.invalid/
+        :profile: We are planned.invalid.
+_events:
+- :id: 1000051
+  :slug: lounge-meetup
+  :title: Lounge Meetup
+  :starts_at: '2026-05-10T12:00:00Z'
+  :url: https://events.invalid/1000051
+  :price: ''
+  :capacity: ''
+  :location_en: ''
+  :location_local: ''
+  :link_name: ''
+  :hosts:
+  - :slug: lounge.invalid
+    :name: Lounge Inc.
+    :url: https://lounge.invalid/
+- :id: 1000050
+  :slug: contoso-drinkup
+  :title: Contoso Drinkup
+  :starts_at: '2026-05-11T18:30:00Z'
+  :url: https://events.invalid/1000050
+  :price: Free
+  :capacity: 100 people
+  :location_en: Tokyo
+  :location_local: 東京
+  :link_name: Drinkup
+  :hosts:
+  - :slug: fabrikam.invalid
+    :name: Fabrikam Inc.
+    :url: "https://fabrikam.invalid/  \n"
+  - :slug: contoso.invalid
+    :name: Contoso Inc.
+    :url: https://contoso.invalid/
+  - :slug: planned.invalid
+    :name: Planned Inc.
+    :url: https://planned.invalid/
+

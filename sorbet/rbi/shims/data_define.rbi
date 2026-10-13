@@ -251,3 +251,11 @@ class EnsureSponsorshipTitoDiscountCodeJob::DiscountCodeAttributes
   sig { returns(String) }
   def description_for_organizer; end
 end
+
+class SponsorsFile::ApplicationResource::Group
+  sig { params(sponsors: T::Array[Sponsorship]).returns(T.attached_class) }
+  def self.new(sponsors:); end
+
+  sig { returns(T::Array[Sponsorship]) }
+  def sponsors; end
+end

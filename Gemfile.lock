@@ -1,3 +1,15 @@
+GIT
+  remote: https://github.com/sorah/protobufable.git
+  revision: f000d321a06633d8eff8b55f78b15069c02edc0c
+  ref: f000d321a06633d8eff8b55f78b15069c02edc0c
+  specs:
+    protobufable (0.1.0)
+      actionpack (>= 7.1)
+      activemodel (>= 7.1)
+      activerecord (>= 7.1)
+      activesupport (>= 7.1)
+      google-protobuf (~> 4.26)
+
 PATH
   remote: gen/proto/ruby
   specs:
@@ -589,6 +601,7 @@ DEPENDENCIES
   openssl
   pg (>= 0.18, < 2.0)
   premailer-rails
+  protobufable!
   puma
   rack-contrib
   rails (~> 8.1.0)

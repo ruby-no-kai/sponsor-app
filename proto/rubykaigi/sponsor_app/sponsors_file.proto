@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+option ruby_package = "Rk::SponsorApp";
+
+// The sponsors and sponsor events of a conference, which its website lists. This app commits the
+// file as YAML to the website's repository, at the path the conference's GitHub repo setting
+// names, and staff download it from the conference's admin pages as YAML, and its sponsors alone
+// as JSON.
+//
+// Neither document is ProtoJSON:
+//
+// - A message is a mapping of its field names in declaration order. The YAML writes each name as a
+//   Ruby symbol, such as `:base_plan:`.
+// - An unset optional field is written as null.
+// - A map field is a mapping in the order its comment gives.
+//
+// The YAML is the base_plans mapping with events under the key "_events". Its first line is a
+// comment, "# last_editing_history: N, last_event_editing_history: M", which this app reads back
+// and the website ignores. The JSON is the base_plans mapping alone.
+message SponsorsFile {
+  // Sponsors by base plan, the base plan of the earliest sponsorship first. Each key is the base
+  // plan's name in lowercase, each character other than a-z and 0-9 replaced by "_", such as
+  // "ruby" or "gold_sponsor". The website shows a section for each base plan it knows, looking it
+  // up by key.
+  map<string, BasePlan> base_plans = 1;
+
+  // Accepted sponsor events, the earliest start first. The website merges them into its own
+  // event schedule.
+  repeated Event events = 2;
+
+  // The sponsors of one plan, whether or not their sponsorship is customized.
+  message BasePlan {
+    // Name of the plan in lowercase, such as "gold sponsor". The website reads the key instead.
+    string base_plan = 1;
+
+    // Sponsors by the plan name they show, the plan name of the earliest sponsorship first. Each
+    // key is the plan name in lowercase, each character other than a-z and 0-9 replaced by "_",
+    // such as "platinum_lounge". The website puts a few keys it knows at fixed places and the
+    // rest in this order, showing the sponsors of each in turn.
+    map<string, Plan> plans = 2;
+  }
+
+  // The sponsors showing one plan name.
+  message Plan {
+    // The plan name, such as "Platinum Lounge". The website reads Sponsor.plan_name instead.
+    optional string plan_name = 1;
+
+    // The sponsors, earliest sponsorship first. The website shows each in turn.
+    repeated Sponsor sponsors = 2;
+  }
+
+  // A sponsor, as the website shows it.
+  message Sponsor {
+    // Sponsorship ID. The website anchors the sponsor's section at "sponsor-<id>".
+    int64 id = 1;
+
+    // ID of the logo the sponsor uploaded. The website shows the logo image named after it, which
+    // staff download from this app as "S<asset_file_id>_<slug>.<extension>". Null until a logo is
+    // uploaded.
+    optional int64 asset_file_id = 2;
+
+    // BasePlan.base_plan of the sponsor's plan.
+    string base_plan = 3;
+
+    // The plan name the sponsor shows: a customized sponsorship's own name, or else the plan's
+    // name. The website labels the sponsor with it when it differs from base_plan.
+    optional string plan_name = 4;
+
+    // Domain of the sponsoring organization, such as "example.com". The website does not read it.
+    optional string slug = 5;
+
+    // Sponsor name, which the website shows linked to url.
+    string name = 6;
+
+    // URL of the sponsor's website, without surrounding whitespace.
+    string url = 7;
+
+    // Sponsor profile as the sponsor wrote it, which may span lines. The website renders it as
+    // HTML, a blank line starting a paragraph.
+    string profile = 8;
+  }
+
+  // An event a sponsor hosts around the conference.
+  message Event {
+    // Sponsor event ID. The website shows the event image whose file name ends in "-<id>.webp".
+    int64 id = 1;
+
+    // Identifier of the event, unique within the conference. The website builds the ids of the
+    // event's elements from it.
+    string slug = 2;
+
+    // Event title, which the website shows as the event's heading.
+    string title = 3;
+
+    // When the event starts, in ISO 8601 and UTC, such as "2026-05-11T18:30:00Z". The website
+    // places the event on the conference day it falls on and shows its time in UTC.
+    string starts_at = 4;
+
+    // URL of the event's registration page. The website links it unless it is empty.
+    string url = 5;
+
+    // Entry fee as the host wrote it, such as "Free". Empty when not given, and the website shows
+    // it unless it is empty.
+    string price = 6;
+
+    // How many people the event takes, as the host wrote it. Empty when not given, and the
+    // website shows it unless it is empty.
+    string capacity = 7;
+
+    // Venue in English. Empty when not given, and the website shows it unless it is empty.
+    string location_en = 8;
+
+    // Venue in the local language. Empty when not given. The website shows it under location_en,
+    // and not at all when location_en is empty.
+    string location_local = 9;
+
+    // Label of the link to url. The website labels it "Registration" when this is empty.
+    string link_name = 10;
+
+    // The sponsors hosting the event, in order of sponsorship ID, leaving out a withdrawn co-host.
+    // The website lists each as a link.
+    repeated Host hosts = 11;
+  }
+
+  // A sponsor hosting an event.
+  message Host {
+    // Domain of the sponsoring organization, as Sponsor.slug. The website does not read it.
+    optional string slug = 1;
+
+    // Sponsor name, which the website shows as the label of the host's link.
+    string name = 2;
+
+    // URL of the sponsor's website, as the sponsor entered it. The website links name to it.
+    string url = 3;
+  }
+}

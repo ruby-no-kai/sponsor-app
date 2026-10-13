@@ -1,0 +1,18 @@
+# last_editing_history: 0, last_event_editing_history: 1000600
+---
+_events:
+- :id: 1000060
+  :slug: contoso-drinkup
+  :title: Contoso Drinkup
+  :starts_at: '2026-05-11T18:30:00Z'
+  :url: https://events.invalid/1000060
+  :price: ''
+  :capacity: ''
+  :location_en: ''
+  :location_local: ''
+  :link_name: ''
+  :hosts:
+  - :slug: contoso.invalid
+    :name: Contoso Inc.
+    :url: https://contoso.invalid/
+

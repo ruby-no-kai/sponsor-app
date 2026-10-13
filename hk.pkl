@@ -21,8 +21,9 @@ local linters = new Mapping<String, Step> {
   ["actionlint"] = Builtins.actionlint
   ["buf-format"] = Builtins.buf_format
   ["buf-lint"] = Builtins.buf_lint
+  // The sponsors_yaml goldens hold the job's output byte for byte, trailing blank line included.
   ["newlines"] = (Builtins.newlines) {
-    exclude = generated
+    exclude = generated + List("spec/fixtures/files/sponsors_yaml/**")
   }
 
   ["oxfmt"] {
