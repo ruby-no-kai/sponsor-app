@@ -167,7 +167,8 @@ function ConferencesGroup({ currentSlug }: { currentSlug: string | undefined }) 
         {viewer !== undefined && !viewer.restricted && (
           <Sidebar.MenuButton
             icon={BuildingsIcon}
-            href="/admin/organizations"
+            href={paths.organizations}
+            active={pathname === paths.organizations}
             tooltip="Organizations"
           >
             Organizations

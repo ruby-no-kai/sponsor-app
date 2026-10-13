@@ -144,6 +144,34 @@ export const router = createBrowserRouter([
               },
 
               // Organizations
+              {
+                path: paths.organizations,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/OrganizationList.tsx")).default,
+                },
+              },
+              {
+                path: paths.organizationNew,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/OrganizationEditor.tsx")).default,
+                },
+              },
+              {
+                path: paths.organization,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/OrganizationDetail.tsx")).default,
+                },
+              },
+              {
+                path: paths.organizationEdit,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/OrganizationEditor.tsx")).default,
+                },
+              },
 
               // Booth assignments
 
