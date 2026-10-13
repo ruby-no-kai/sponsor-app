@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "rubykaigi/sponsor_app/asset_upload.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// A logo file uploaded for a sponsorship.
+//
+// The sponsor area downloads it from `/conferences/{slug}/sponsorship_asset_files/{id}`, under the
+// conference it was uploaded for, which redirects to a short-lived link to the storage.
+message SponsorshipAssetFile {
+  // Asset file ID.
+  int64 id = 1;
+
+  // Extension of the file's name in lower case, such as "svg". "unknown" when it had none.
+  string extension = 2;
+}
+
+// Request for SponsorService.CreateSponsorshipAssetUpload.
+message SponsorServiceCreateSponsorshipAssetUploadRequest {
+  // Slug of the conference to upload the logo for, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Invitation code of a hidden conference, as GetApplicationForm takes it.
+  string invite_code = 2 [(buf.validate.field).string.max_len = 255];
+
+  // MIME type of the file: an image, SVG, PDF, ZIP archive or Illustrator or PostScript file. Absent
+  // when the browser cannot tell, which leaves the type to the storage, checked on completion.
+  optional string content_type = 3 [(buf.validate.field).string = {
+    in: [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+      "application/pdf",
+      "application/zip",
+      "application/x-zip-compressed",
+      "application/postscript",
+      "application/illustrator",
+      "application/octet-stream"
+    ]
+  }];
+}
+
+// Response for SponsorService.CreateSponsorshipAssetUpload.
+message SponsorServiceCreateSponsorshipAssetUploadResponse {
+  // Where and how to upload the file.
+  AssetUpload upload = 1;
+}
+
+// Request for SponsorService.InitiateSponsorshipAssetUpdate.
+message SponsorServiceInitiateSponsorshipAssetUpdateRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of the logo file to upload again: the logo of the signed-in contact's sponsorship of the
+  // conference, or one uploaded in this browser that no application has claimed.
+  int64 asset_file_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // MIME type of the file, as CreateSponsorshipAssetUpload takes it.
+  optional string content_type = 3 [(buf.validate.field).string = {
+    in: [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+      "application/pdf",
+      "application/zip",
+      "application/x-zip-compressed",
+      "application/postscript",
+      "application/illustrator",
+      "application/octet-stream"
+    ]
+  }];
+}
+
+// Response for SponsorService.InitiateSponsorshipAssetUpdate.
+message SponsorServiceInitiateSponsorshipAssetUpdateResponse {
+  // Where and how to upload the file.
+  AssetUpload upload = 1;
+}
+
+// Request for SponsorService.CompleteSponsorshipAssetUpload.
+message SponsorServiceCompleteSponsorshipAssetUploadRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of the logo file uploaded, as InitiateSponsorshipAssetUpdate takes it.
+  int64 asset_file_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // Version the storage answered the upload with, in its `x-amz-version-id` header. Empty when it
+  // answered none.
+  string version_id = 3 [(buf.validate.field).string.max_len = 1024];
+
+  // Extension of the file's name, such as "svg". Letters and digits only are kept, in lower case.
+  // Empty records "unknown".
+  string extension = 4 [(buf.validate.field).string.max_len = 255];
+}
+
+// Response for SponsorService.CompleteSponsorshipAssetUpload.
+message SponsorServiceCompleteSponsorshipAssetUploadResponse {
+  // The file as uploaded.
+  SponsorshipAssetFile asset_file = 1;
+}

@@ -35,9 +35,16 @@ class SponsorshipAssetFile < ApplicationRecord
   #: (conference: Conference) -> SponsorshipAssetFile
   def self.prepare(conference:)
     record = new
-    record.prefix = "c-#{conference.id}/"
+    record.prefix = prefix_for(conference)
     record
   end
+
+  #: (Conference) -> String
+  def self.prefix_for(conference) = "c-#{conference.id}/"
+
+  # Whether the file was prepared for the conference, as an upload or a copy.
+  #: (Conference) -> bool
+  def prepared_for?(conference) = prefix == self.class.prefix_for(conference)
 
   #: (Conference) -> SponsorshipAssetFile
   def copy_to!(conference)

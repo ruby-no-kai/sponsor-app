@@ -2,10 +2,11 @@ import { useRef, useState } from "react";
 import { AdminService } from "../../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
 import { callRpc } from "../../../lib/rpc.ts";
 import { notifyError, toastManager } from "../../../lib/toast.ts";
+import { extensionOf, postToStorage, sendToStorage } from "../../../lib/upload.ts";
 import type { Editor } from "./EditorContext.ts";
 import { newLineItemInput } from "./lineItemForm.ts";
 import type { Selection } from "./reportView.ts";
-import { extensionOf, isAllowedFile, postToStorage, sendToStorage } from "./upload.ts";
+import { isAllowedFile } from "./upload.ts";
 
 export type UploadEntry = {
   name: string;
