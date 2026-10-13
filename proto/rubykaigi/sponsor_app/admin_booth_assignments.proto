@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "rubykaigi/sponsor_app/sponsorship_summary.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// Which sponsorships of a conference hold a booth, and which could.
+//
+// Booth sizes are those of the sponsorships' plans, a plan without one counting as zero.
+message BoothAssignment {
+  // Active sponsorships that asked for a booth or hold one, which are the candidates.
+  int32 candidate_count = 1;
+
+  // Total booth size of the candidates.
+  int32 candidate_booth_size = 2;
+
+  // Sponsorships that asked for a booth and have not withdrawn, whether accepted or awaiting
+  // acceptance.
+  int32 requesting_count = 3;
+
+  // Candidates holding a booth.
+  int32 assigned_count = 4;
+
+  // Total booth size of the candidates holding a booth.
+  int32 assigned_booth_size = 5;
+
+  // The candidates, largest booth first, then by name.
+  repeated BoothAssignmentCandidate candidates = 6;
+}
+
+// An active sponsorship that asked for a booth or holds one.
+message BoothAssignmentCandidate {
+  // The sponsorship in brief. Its booth_assigned tells whether it holds a booth.
+  SponsorshipSummary sponsorship = 1;
+
+  // Name of the plan sponsored. Absent while the plan is undetermined.
+  optional string plan_name = 2;
+
+  // Size of the booth the plan includes. Zero when it includes none.
+  int32 booth_size = 3;
+
+  // Whether the sponsor asked for a booth. A candidate may hold one it did not ask for.
+  bool booth_requested = 4;
+}
+
+// The writable part of a booth assignment, taken by AdminService.UpdateBoothAssignment.
+message BoothAssignmentInput {
+  // IDs of every sponsorship of the conference that is to hold a booth, each listed once. Every
+  // other sponsorship of the conference loses its booth, so an empty list takes them all back.
+  repeated int64 assigned_sponsorship_ids = 1 [(buf.validate.field).repeated = {
+    unique: true
+    items: {
+      int64: {gt: 0}
+    }
+  }];
+}
+
+// Request for AdminService.GetBoothAssignment.
+message AdminServiceGetBoothAssignmentRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for AdminService.GetBoothAssignment.
+message AdminServiceGetBoothAssignmentResponse {
+  // The conference's booth assignment.
+  BoothAssignment booth_assignment = 1;
+}
+
+// Request for AdminService.UpdateBoothAssignment.
+message AdminServiceUpdateBoothAssignmentRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Which sponsorships hold a booth, replacing what is stored.
+  BoothAssignmentInput input = 2 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.UpdateBoothAssignment.
+message AdminServiceUpdateBoothAssignmentResponse {
+  // The conference's booth assignment as updated.
+  BoothAssignment booth_assignment = 1;
+}

@@ -160,6 +160,8 @@ Rails.application.routes.draw do
       rpc 'UpdateOrganization' => 'api/admin/organizations'
 
       # Booth assignments
+      rpc 'GetBoothAssignment' => 'api/admin/booth_assignments'
+      rpc 'UpdateBoothAssignment' => 'api/admin/booth_assignments'
 
       # Sponsor events
 

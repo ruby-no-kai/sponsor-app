@@ -80,7 +80,11 @@ function conferenceSections(slug: string, { isEditable }: { isEditable: boolean 
   return [
     { label: "Overview", icon: PresentationIcon, path: generatePath(paths.conference, { slug }) },
     { label: "Plans", icon: CoinsIcon, path: generatePath(paths.plans, { slug }) },
-    { label: "Booth assignment", icon: StorefrontIcon, path: `${base}/booth_assignment` },
+    {
+      label: "Booth assignment",
+      icon: StorefrontIcon,
+      path: generatePath(paths.boothAssignment, { slug }),
+    },
     { label: "Events", icon: CalendarDotsIcon, path: `${base}/events` },
     { label: "Announcements", icon: MegaphoneIcon, path: `${base}/announcements` },
     { label: "Broadcasts", icon: EnvelopeSimpleIcon, path: `${base}/broadcasts` },

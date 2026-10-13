@@ -59,6 +59,10 @@ describe("isSpaPathname", () => {
     assert.ok(isSpaPathname("/admin/organizations/contoso.example.co.invalid/edit"));
     assert.ok(!isSpaPathname("/admin/organizations/contoso.example.co.invalid/sponsorships"));
   });
+
+  it("matches the booth assignment page", () => {
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/booth_assignment"));
+  });
 });
 
 describe("matchSpaPath", () => {

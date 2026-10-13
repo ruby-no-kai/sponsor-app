@@ -36,6 +36,7 @@ export const paths = {
   organizationEdit: "/admin/organizations/:domain/edit",
 
   // Booth assignments
+  boothAssignment: "/admin/conferences/:slug/booth_assignment",
 
   // Sponsor events
 

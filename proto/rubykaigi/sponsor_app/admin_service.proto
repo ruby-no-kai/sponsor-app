@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package rubykaigi.sponsor_app;
 
+import "rubykaigi/sponsor_app/admin_booth_assignments.proto";
 import "rubykaigi/sponsor_app/admin_conferences.proto";
 import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
 import "rubykaigi/sponsor_app/admin_organizations.proto";
@@ -161,6 +162,19 @@ service AdminService {
   rpc UpdateOrganization(AdminServiceUpdateOrganizationRequest) returns (AdminServiceUpdateOrganizationResponse);
 
   // Booth assignments
+
+  // Returns which sponsorships of a conference hold a booth and which could.
+  rpc GetBoothAssignment(AdminServiceGetBoothAssignmentRequest) returns (AdminServiceGetBoothAssignmentResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Assigns booths to exactly the sponsorships listed, taking them back from every other
+  // sponsorship of the conference, all or nothing. Each sponsorship it changes records the
+  // signed-in staff member in its editing history and publishes the change as UpdateSponsorship
+  // does. A sponsorship ID the conference does not have is answered `not_found`. A booth for a
+  // sponsorship that has withdrawn or awaits acceptance, and holds none yet, is answered
+  // `failed_precondition`. Neither answer changes anything.
+  rpc UpdateBoothAssignment(AdminServiceUpdateBoothAssignmentRequest) returns (AdminServiceUpdateBoothAssignmentResponse);
 
   // Sponsor events
 
