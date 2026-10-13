@@ -14,3 +14,4 @@ inputs:
       - rubykaigi.sponsor_app.AssetFileUpload
       - rubykaigi.sponsor_app.ExpenseLineItemPatch
       - rubykaigi.sponsor_app.ExpenseReportCalculation
+      - rubykaigi.sponsor_app.ExpenseReportReviewInput

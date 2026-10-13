@@ -14,6 +14,7 @@ import {
   type ExpenseReportCalculation,
 } from "../gen/rubykaigi/sponsor_app/expense_report_pb";
 import { ExpenseLineItemPatchSchema } from "../gen/rubykaigi/sponsor_app/expense_line_item_patch_pb";
+import { ExpenseReportReviewInputSchema } from "../gen/rubykaigi/sponsor_app/admin_expense_reports_pb";
 import Rails from "@rails/ujs";
 
 async function request<T>(url: string, method: string, body?: JsonValue): Promise<T> {
@@ -119,9 +120,16 @@ export function withdrawSubmission(url: string): Promise<ExpenseReport> {
 
 export function createReview(
   url: string,
-  data: { action_type: string; comment?: string | null },
+  input: MessageInitShape<typeof ExpenseReportReviewInputSchema>,
 ): Promise<ExpenseReport> {
-  return request<ExpenseReport>(url, "POST", data);
+  const body = toJson(
+    ExpenseReportReviewInputSchema,
+    create(ExpenseReportReviewInputSchema, input),
+    {
+      useProtoFieldName: true,
+    },
+  );
+  return request<ExpenseReport>(url, "POST", body);
 }
 
 export function deleteFile(url: string, id: number): Promise<void> {

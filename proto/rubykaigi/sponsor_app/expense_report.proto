@@ -3,8 +3,33 @@ syntax = "proto3";
 package rubykaigi.sponsor_app;
 
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
 option ruby_package = "Rk::SponsorApp";
+
+// The organizers' verdict on a submission of an expense report.
+message ExpenseReportReview {
+  // The verdict.
+  enum Action {
+    // The zero value proto3 requires. Never returned.
+    ACTION_UNSPECIFIED = 0;
+
+    // The expenses are accepted as reported.
+    ACTION_APPROVE = 1;
+
+    // The report goes back to the sponsor for changes.
+    ACTION_REJECT = 2;
+  }
+
+  // The verdict.
+  Action action = 1;
+
+  // What the organizers told the sponsor. Always present on a rejection.
+  optional string comment = 2;
+
+  // When the organizers gave the verdict.
+  google.protobuf.Timestamp created_at = 3;
+}
 
 // The figures an expense report is weighed against, which its editor shows beside it.
 message ExpenseReportCalculation {
