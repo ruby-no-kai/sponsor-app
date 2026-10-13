@@ -67,6 +67,8 @@ export const paths = {
   sponsorDashboard: "/conferences/:slug/sponsorship",
 
   // Sponsor: Applications
+  sponsorApplicationNew: "/conferences/:slug/sponsorship/new",
+  sponsorApplicationEdit: "/conferences/:slug/sponsorship/edit",
 
   // Sponsor: Exhibitions and events
 

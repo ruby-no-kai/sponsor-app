@@ -10,9 +10,8 @@ export function dashboardPath(slug: string): string {
   return generatePath(paths.sponsorDashboard, { slug });
 }
 
-// The application form, which HAML still renders.
 export function applicationPath(slug: string): string {
-  return `${dashboardPath(slug)}/new`;
+  return generatePath(paths.sponsorApplicationNew, { slug });
 }
 
 // Where the landing page sends a signed-in contact: the conference picker.
