@@ -29,7 +29,8 @@ import {
   todoItems,
 } from "./dashboardView.ts";
 import type { TodoItem } from "./dashboardView.ts";
-import { dashboardPath, dashboardRedirect } from "./shellRedirects.ts";
+import { CreateExpenseReportButton } from "./CreateExpenseReportButton.tsx";
+import { dashboardPath, dashboardRedirect, expenseReportPath } from "./shellRedirects.ts";
 
 export default function Dashboard() {
   const { slug = "" } = useParams();
@@ -68,7 +69,7 @@ export default function Dashboard() {
       expenseReport: data.expenseReport,
       events: data.sponsorEvents?.events ?? [],
     },
-    { base, expenseReport: `${base}/expense_report` },
+    { base, expenseReport: expenseReportPath(slug) },
   );
 
   return (
@@ -115,7 +116,11 @@ export default function Dashboard() {
         )}
         {sponsorship.customized && (
           <Tile>
-            <ExpenseReportCard report={data.expenseReport} href={`${base}/expense_report`} />
+            <ExpenseReportCard
+              report={data.expenseReport}
+              slug={slug}
+              href={expenseReportPath(slug)}
+            />
           </Tile>
         )}
       </div>
@@ -362,9 +367,11 @@ function PlanCard({ sponsorship }: { sponsorship: Sponsorship }) {
 
 function ExpenseReportCard({
   report,
+  slug,
   href,
 }: {
   report: ExpenseReportSummary | undefined;
+  slug: string;
   href: string;
 }) {
   const t = useT();
@@ -372,6 +379,9 @@ function ExpenseReportCard({
     return (
       <Card title={t("sponsorships.show.expense_report.title")}>
         <Text variant="secondary">{t("sponsor_ui.shell.expense_report_not_created")}</Text>
+        <div>
+          <CreateExpenseReportButton slug={slug} />
+        </div>
       </Card>
     );
   }

@@ -6,6 +6,7 @@ import { Disclosure } from "../../lib/Disclosure.tsx";
 import { joined } from "../../lib/FormParts.tsx";
 import type { FieldOf } from "../../lib/FormParts.tsx";
 import type { FieldError } from "../../lib/fieldErrors.ts";
+import { requestIdOf } from "../../lib/errors.ts";
 import { nowInput } from "../../lib/forms.ts";
 import { RpcErrorDetails } from "../RouteError.tsx";
 
@@ -68,6 +69,16 @@ export function DateTimeInput({
   );
 }
 
+// The banner's words, for a form in a language other than English. They come with only the
+// request ID of an error, as the Connect code is for developers.
+export type SaveErrorMessages = {
+  title: string;
+  show: string;
+  details?: string;
+  fieldsNeedAttention: (count: number, field: string, message: string) => string;
+  requestId: (requestId: string) => string;
+};
+
 function fixFieldsText(count: number): string {
   return count === 1 ? "Fix 1 field to save." : `Fix ${count} fields to save.`;
 }
@@ -80,20 +91,32 @@ export function SaveErrorBanner({
   errored,
   error,
   onShow,
+  messages,
 }: {
   formError: unknown;
   errored: readonly FieldError[];
   error: unknown;
   onShow: (path: string) => void;
+  messages?: SaveErrorMessages;
 }) {
   const [first] = errored;
   if (typeof formError !== "string" && first === undefined) return null;
+  const requestId = error === undefined || messages === undefined ? undefined : requestIdOf(error);
   const lead =
-    first !== undefined
-      ? fixFieldsText(errored.length)
-      : typeof formError === "string"
-        ? formError
-        : "Not saved.";
+    messages !== undefined
+      ? messages.title
+      : first !== undefined
+        ? fixFieldsText(errored.length)
+        : typeof formError === "string"
+          ? formError
+          : "Not saved.";
+  const summary =
+    first === undefined
+      ? undefined
+      : messages !== undefined
+        ? messages.fieldsNeedAttention(errored.length, first.label, first.message)
+        : `${first.label} ${first.message}`;
+  const hasDetails = messages === undefined ? error !== undefined : requestId !== undefined;
   return (
     <div role="alert" className="flex flex-col gap-1 text-sm">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -101,17 +124,23 @@ export function SaveErrorBanner({
         <Text bold variant="error">
           {lead}
         </Text>
-        {first !== undefined && <Text>{`${first.label} ${first.message}`}</Text>}
+        {summary !== undefined && <Text>{summary}</Text>}
         {first !== undefined && (
           <Button variant="secondary" size="sm" onClick={() => onShow(first.path)}>
-            Show
+            {messages?.show ?? "Show"}
           </Button>
         )}
       </div>
-      {first !== undefined && typeof formError === "string" && <Text>{formError}</Text>}
-      {error !== undefined && (
-        <Disclosure label="Details">
-          <RpcErrorDetails error={ConnectError.from(error)} withCode />
+      {messages === undefined && typeof formError === "string" && first !== undefined && (
+        <Text>{formError}</Text>
+      )}
+      {hasDetails && (
+        <Disclosure label={messages?.details ?? "Details"}>
+          {messages === undefined && error !== undefined ? (
+            <RpcErrorDetails error={ConnectError.from(error)} withCode />
+          ) : (
+            requestId !== undefined && <Text variant="mono">{messages?.requestId(requestId)}</Text>
+          )}
         </Disclosure>
       )}
     </div>

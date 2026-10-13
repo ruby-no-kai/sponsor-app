@@ -7,6 +7,7 @@ import {
   XCircleIcon,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
+import { useEditor } from "./EditorContext.ts";
 import type { UploadEntry, UploadState } from "./useFileUpload.ts";
 
 const STATUS_ICONS: Readonly<Record<UploadEntry["status"], { icon: Icon; className: string }>> = {
@@ -27,6 +28,7 @@ export function UploadDialog({
   onRetry: () => void;
   onDiscard: () => void;
 }) {
+  const { text } = useEditor();
   const active = state.kind === "active" ? state : undefined;
   const percent =
     active === undefined || active.total === 0
@@ -37,9 +39,9 @@ export function UploadDialog({
     <Dialog.Root open={active !== undefined} onOpenChange={() => undefined}>
       <Dialog className="flex flex-col gap-4 px-6 py-5" size="sm">
         <Dialog.Title className="text-lg font-semibold">
-          {active?.failed ? "Upload failed" : "Uploading files"}
+          {active?.failed ? text("upload_failed") : text("uploading")}
         </Dialog.Title>
-        <Meter label="Progress" value={percent} showValue />
+        <Meter label={text("upload_progress")} value={percent} showValue />
         <ul className="flex max-h-52 flex-col gap-1 overflow-auto">
           {active?.entries.map((entry, index) => {
             const { icon: StatusIcon, className } = STATUS_ICONS[entry.status];
@@ -48,7 +50,7 @@ export function UploadDialog({
                 <StatusIcon
                   size={18}
                   className={`mt-0.5 shrink-0 ${className}`}
-                  aria-label={entry.status}
+                  aria-label={text(`upload_status_${entry.status}`)}
                 />
                 <Text size="sm">
                   {entry.name}
@@ -63,10 +65,10 @@ export function UploadDialog({
         {active?.failed && (
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={onDiscard}>
-              Discard
+              {text("discard")}
             </Button>
             <Button variant="primary" onClick={onRetry}>
-              Retry
+              {text("retry")}
             </Button>
           </div>
         )}

@@ -373,6 +373,25 @@ ja:
         review_dialog_remaining: "残額 (請求される金額)"
         review_dialog_overage_warning: "スポンサー費を超過した金額についての払い戻しはありません。"
         review_dialog_cancel: "キャンセル"
+        file_fallback_name: "ファイル #%{id}"
+        new_item_title: "新しい経費"
+        amount_label: "金額"
+        rate_not_offered: "%{rate} (選択肢にありません)"
+        saved: "%{title} を保存しました"
+        detach: "%{name} を外す"
+        not_saved: "保存されていません"
+        show: "表示"
+        fields_need_attention:
+          one: "%{field}: %{message}"
+          other: "%{count} 件の項目に問題があります。最初の項目 %{field}: %{message}"
+        request_id: "リクエスト ID: %{request_id}"
+        upload_progress: "進捗"
+        upload_status_waiting: "待機中"
+        upload_status_uploading: "アップロード中"
+        upload_status_done: "完了"
+        upload_status_failed: "失敗"
+        upload_status_discarded: "破棄"
+        supported_file_types: "JPEG、PNG、GIF、WebP の画像または PDF をアップロードしてください。"
   exhibitions:
     new:
       title: ブース詳細
@@ -671,6 +690,29 @@ ja:
       confirmation_required: '上記の内容を確認し、チェックを入れてください。'
 
     # Expense reports
+    expense_reports:
+      figure_fee: '協賛費'
+      figure_expense: '経費'
+      figure_tax: '税'
+      figure_remaining: '残額'
+      add_item: '明細を追加'
+      duplicate_keep_files: 'ファイルを引き継いで複製'
+      preliminal_label: '概算 (予算計画/未確定の場合)'
+      preliminal_badge: '概算'
+      withdraw: '提出を取り下げる'
+      verdict_approved: '%{date} に承認'
+      verdict_rejected: '差し戻し: %{comment}'
+      change_verdict: '判定を変更する'
+      comment_label: 'コメント (差し戻しには必須)'
+      comment_required: '差し戻すにはスポンサー向けのコメントを入力してください。'
+      approve: '承認'
+      reject: '差し戻し'
+      confirm_approve: 'この経費報告を承認しますか？'
+      confirm_reject: 'この経費報告を差し戻しますか？'
+      approve_consequence: '明細とファイルは変更できなくなります。'
+      reject_consequence: 'コメントを添えてスポンサーに戻ります。'
+      rejected_next_step: '明細を編集すると、この報告を再度提出できます'
+      approved_locked: 'この報告は承認済みのため、編集できません。'
 
   # Keyed by the identifier each ProblemType value publishes, with dashes as underscores.
   problem_details:

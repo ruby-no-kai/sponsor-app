@@ -372,6 +372,25 @@ en:
         review_dialog_remaining: "Remaining (amount to be billed)"
         review_dialog_overage_warning: "RubyKaigi does not reimburse the amount exceeding the base fee."
         review_dialog_cancel: "Cancel"
+        file_fallback_name: "File #%{id}"
+        new_item_title: "New expense"
+        amount_label: "Amount"
+        rate_not_offered: "%{rate} (not offered)"
+        saved: "Saved %{title}"
+        detach: "Detach %{name}"
+        not_saved: "Not saved"
+        show: "Show"
+        fields_need_attention:
+          one: "%{field}: %{message}"
+          other: "%{count} fields need attention, starting with %{field}: %{message}"
+        request_id: "Request ID: %{request_id}"
+        upload_progress: "Progress"
+        upload_status_waiting: "waiting"
+        upload_status_uploading: "uploading"
+        upload_status_done: "done"
+        upload_status_failed: "failed"
+        upload_status_discarded: "discarded"
+        supported_file_types: "Upload JPEG, PNG, GIF or WebP images, or PDFs."
   exhibitions:
     new:
       title: Booth Details
@@ -670,6 +689,29 @@ en:
       confirmation_required: 'Check the box to confirm that you understand the above.'
 
     # Expense reports
+    expense_reports:
+      figure_fee: 'Sponsorship fee'
+      figure_expense: 'Expense'
+      figure_tax: 'Tax'
+      figure_remaining: 'Remaining'
+      add_item: 'Add item'
+      duplicate_keep_files: 'Duplicate line, keep files'
+      preliminal_label: 'Preliminary (planned budget, not finalized)'
+      preliminal_badge: 'preliminary'
+      withdraw: 'Withdraw submission'
+      verdict_approved: 'Approved %{date}'
+      verdict_rejected: 'Rejected: %{comment}'
+      change_verdict: 'Change the verdict'
+      comment_label: 'Comment (required to reject)'
+      comment_required: 'Write a comment for the sponsor to reject this report.'
+      approve: 'Approve'
+      reject: 'Reject'
+      confirm_approve: 'Approve this expense report?'
+      confirm_reject: 'Reject this expense report?'
+      approve_consequence: 'Its line items and files can no longer be changed.'
+      reject_consequence: 'The report goes back to the sponsor with the comment.'
+      rejected_next_step: 'Edit an item to send this report again'
+      approved_locked: 'This report is approved and can no longer be edited.'
 
   admin:
     sessions:

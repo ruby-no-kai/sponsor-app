@@ -1,32 +1,22 @@
 import { toJsonString } from "@bufbuild/protobuf";
-import { Badge, Banner, Button, Loader, Text } from "@cloudflare/kumo";
+import { Badge, Banner, Button, Text } from "@cloudflare/kumo";
 import { ArrowLeftIcon, ChatTextIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { generatePath, useLocation, useNavigate, useParams } from "react-router";
-import { useSWRConfig } from "swr";
-import type { KeyedMutator } from "swr";
-import type { AdminServiceGetExpenseReportResponse } from "../../../gen/rubykaigi/sponsor_app/admin_expense_reports_pb.ts";
-import { AdminService } from "../../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
+import { useLocation, useNavigate } from "react-router";
 import {
   ExpenseLineItemSchema,
   ExpenseReportReview_Action,
-  ExpenseReport_Status,
-} from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
+} from "../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
 import type {
   ExpenseReport,
   ExpenseReportCalculation,
-} from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
-import { idFromParam } from "../../../lib/forms.ts";
-import { PageHeader } from "../../../lib/PageHeader.tsx";
-import { callRpc, isRpcKeyOf, useRpc } from "../../../lib/rpc.ts";
-import { NotFound } from "../../RouteError.tsx";
-import { paths } from "../../paths.ts";
-import { useConferenceTitle } from "../conferenceTitle.ts";
-import { labelOf } from "../sponsorshipView.ts";
+} from "../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
+import { labelOf } from "../admin/sponsorshipView.ts";
 import { formatAmountAt, subtractAmounts } from "./amounts.ts";
 import { EditorProvider } from "./EditorContext.ts";
 import type { Editor } from "./EditorContext.ts";
+import type { ExpenseRpc } from "./expenseRpc.ts";
 import { FileDropOverlay, DropZoneIndicator } from "./FileDropOverlay.tsx";
 import { FileView } from "./FileView.tsx";
 import { LeftPane } from "./LeftPane.tsx";
@@ -39,72 +29,50 @@ import {
   selectionFromHash,
   unlinkedFiles,
 } from "./reportView.ts";
-import type { Selection } from "./reportView.ts";
-import { ReviewForm } from "./ReviewForm.tsx";
+import type { Role, Selection } from "./reportView.ts";
 import { RightPane } from "./RightPane.tsx";
+import type { EditorText } from "./text.ts";
 import { UploadDialog } from "./UploadDialog.tsx";
 import { useFileUpload } from "./useFileUpload.ts";
 import type { UploadTarget } from "./useFileUpload.ts";
 import { useIsMobile } from "./useIsMobile.ts";
 
-export default function ExpenseReportEditor() {
-  const { slug = "", id = "" } = useParams();
-  const sponsorshipId = idFromParam(id);
-  if (sponsorshipId === undefined) return <NotFound />;
-  return <Report key={id} slug={slug} id={id} sponsorshipId={sponsorshipId} />;
-}
-
-function Report({ slug, id, sponsorshipId }: { slug: string; id: string; sponsorshipId: bigint }) {
-  const target = { conferenceSlug: slug, sponsorshipId };
-  const reportQuery = useRpc(AdminService.method.getExpenseReport, target);
-  const calculationQuery = useRpc(AdminService.method.calculateExpenseReport, target);
-  const conferenceName =
-    useRpc(AdminService.method.getConference, { conferenceSlug: slug }).data?.conference?.conference
-      ?.name ?? slug;
-  useConferenceTitle(slug, `Expense report: ${reportQuery.data?.sponsorship?.name ?? id}`);
-
-  for (const { data, error } of [reportQuery, calculationQuery]) {
-    if (error !== undefined && data === undefined) throw error;
-  }
-  const response = reportQuery.data;
-  const calculation = calculationQuery.data?.calculation;
-  if (response === undefined || calculationQuery.data === undefined) return <Loader size="lg" />;
-  if (response.report === undefined || calculation === undefined) {
-    throw new Error("The server returned no expense report or calculation");
-  }
-
-  return (
-    <ReportEditor
-      slug={slug}
-      conferenceName={conferenceName}
-      target={target}
-      response={response}
-      report={response.report}
-      calculation={calculation}
-      mutateReport={reportQuery.mutate}
-    />
-  );
-}
-
-function ReportEditor({
-  slug,
-  conferenceName,
-  target,
-  response,
-  report,
-  calculation,
-  mutateReport,
-}: {
-  slug: string;
-  conferenceName: string;
-  target: Editor["target"];
-  response: AdminServiceGetExpenseReportResponse;
+// What a role gives the editor: the RPCs it speaks, the words it says them in, and what shows
+// around the panes.
+export type ExpenseReportEditorProps = {
+  role: Role;
+  rpc: ExpenseRpc;
+  text: EditorText;
+  // Reports a failed action, in the language of text.
+  notify: (error: unknown) => void;
   report: ExpenseReport;
   calculation: ExpenseReportCalculation;
-  mutateReport: KeyedMutator<AdminServiceGetExpenseReportResponse>;
-}) {
+  // Shows a report as an RPC answered it.
+  onReport: (report: ExpenseReport) => void;
+  // Reads the report again, after an RPC that answers none.
+  onRefresh: () => Promise<void>;
+  // The page redirecting to a file in the storage, for previews and downloads.
+  fileUrl: (fileId: string) => string;
+  // Above the figures.
+  header: ReactNode;
+  // In the bar kept at the bottom of the window, beside the status.
+  actions?: ReactNode;
+};
+
+export function ExpenseReportEditor({
+  role,
+  rpc,
+  text,
+  notify,
+  report,
+  calculation,
+  onReport,
+  onRefresh,
+  fileUrl,
+  header,
+  actions,
+}: ExpenseReportEditorProps) {
   const isMobile = useIsMobile();
-  const { mutate } = useSWRConfig();
   const location = useLocation();
   const navigate = useNavigate();
   const selection = selectionFromHash(location.hash);
@@ -121,8 +89,7 @@ function ReportEditor({
     selection === undefined ? "list" : "detail",
   );
   const dirtyRef = useRef(false);
-  const readOnly = isReadOnly(report);
-  const sponsorshipId = target.sponsorshipId.toString();
+  const readOnly = isReadOnly(report, role);
 
   function select(next: Selection) {
     void navigate(
@@ -133,7 +100,7 @@ function ReportEditor({
 
   // Selecting another pane drops what the line item form holds, so a person is asked first.
   function confirmLeaving(): boolean {
-    return !dirtyRef.current || window.confirm("You have unsaved changes. Discard them?");
+    return !dirtyRef.current || window.confirm(text("confirm_discard"));
   }
 
   function showItem(id: string) {
@@ -169,44 +136,35 @@ function ReportEditor({
   }, [isMobile, hasSelection, firstItem?.id, firstFile?.id]);
 
   function applyReport(next: ExpenseReport | undefined) {
-    if (next === undefined) return;
-    void mutateReport((current) => current && { ...current, report: next }, {
-      revalidate: false,
-    });
-    void mutate(
-      (key) =>
-        isRpcKeyOf(key, AdminService.method.listExpenseReports) ||
-        isRpcKeyOf(key, AdminService.method.getSponsorship),
-    );
+    if (next !== undefined) onReport(next);
   }
 
   const editor: Editor = {
-    target,
+    role,
+    rpc,
+    text,
+    notify,
     report,
     rounding: calculation,
     readOnly,
     isMobile,
     applyReport,
-    async refreshReport() {
-      await mutateReport();
-    },
+    refreshReport: onRefresh,
     async updateLineItem(lineItemId, change) {
-      const { report: fresh } = await callRpc(AdminService.method.getExpenseReport, target);
+      const fresh = await rpc.readReport();
       const item = fresh?.lineItems.find((candidate) => candidate.id === lineItemId);
       if (item === undefined) {
         applyReport(fresh);
         return false;
       }
-      const response = await callRpc(AdminService.method.updateExpenseLineItem, {
-        ...target,
-        lineItemId,
-        input: { ...lineItemInputOf(item), ...change(item) },
+      const response = await rpc.updateLineItem(lineItemId, {
+        ...lineItemInputOf(item),
+        ...change(item),
       });
       applyReport(response.report);
       return true;
     },
-    fileUrl: (fileId) =>
-      `/admin/conferences/${encodeURIComponent(slug)}/sponsorships/${sponsorshipId}/expense_files/${fileId}`,
+    fileUrl,
   };
 
   const upload = useFileUpload({
@@ -223,12 +181,8 @@ function ReportEditor({
 
   const previewFile = report.files.find((file) => file.id === previewFileId);
   const review = report.latestReview;
-  const status = labelOf(EXPENSE_REPORT_STATUS_LABELS, report.status);
+  const statusTone = labelOf(EXPENSE_REPORT_STATUS_LABELS, report.status).tone;
   const remaining = subtractAmounts(calculation.totalFee, report.totalAmount);
-  const sponsorshipName = response.sponsorship?.name ?? sponsorshipId;
-  const negative = remaining?.startsWith("-") ?? false;
-  const remainingFigure =
-    remaining === undefined ? undefined : formatAmountAt(remaining, calculation.decimal);
 
   let center: ReactNode;
   if (selectedItem !== undefined) {
@@ -248,34 +202,37 @@ function ReportEditor({
   } else {
     center = (
       <div className="flex flex-1 items-center justify-center px-4 py-3">
-        <Text variant="secondary">Select a line item</Text>
+        <Text variant="secondary">{text("select_line_item")}</Text>
       </div>
     );
   }
 
+  const negative = remaining?.startsWith("-") ?? false;
+  const remainingFigure =
+    remaining === undefined ? undefined : formatAmountAt(remaining, calculation.decimal);
+
   return (
     <EditorProvider value={editor}>
       <div className="flex flex-col gap-4">
-        <PageHeader
-          crumbs={[
-            { label: conferenceName, href: generatePath(paths.conference, { slug }) },
-            { label: "Expense reports", href: generatePath(paths.expenseReports, { slug }) },
-            {
-              label: sponsorshipName,
-              href: generatePath(paths.sponsorship, { slug, id: sponsorshipId }),
-            },
-          ]}
-          title="Expense report"
-        />
+        {header}
 
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
-          <Badge variant={status.tone}>{status.text}</Badge>
-          <Figure label="Fee" value={formatAmountAt(calculation.totalFee, calculation.decimal)} />
-          <Figure label="Expense" value={formatAmountAt(report.totalAmount, calculation.decimal)} />
-          <Figure label="Tax" value={formatAmountAt(report.totalTaxAmount, calculation.decimal)} />
+          <Badge variant={statusTone}>{text.status(report.status)}</Badge>
+          <Figure
+            label={text("figure_fee")}
+            value={formatAmountAt(calculation.totalFee, calculation.decimal)}
+          />
+          <Figure
+            label={text("figure_expense")}
+            value={formatAmountAt(report.totalAmount, calculation.decimal)}
+          />
+          <Figure
+            label={text("figure_tax")}
+            value={formatAmountAt(report.totalTaxAmount, calculation.decimal)}
+          />
           {remainingFigure !== undefined && (
             <Figure
-              label="Remaining"
+              label={text("figure_remaining")}
               value={remainingFigure}
               className={negative ? "text-kumo-danger" : ""}
             />
@@ -286,7 +243,7 @@ function ReportEditor({
           <Banner
             variant="error"
             icon={<ChatTextIcon />}
-            title="Review feedback"
+            title={text("review_feedback")}
             description={<span className="whitespace-pre-wrap">{review.comment}</span>}
           />
         )}
@@ -318,7 +275,7 @@ function ReportEditor({
                     <DropZoneIndicator
                       visible={isDragging}
                       highlighted={hoverZone === "unlinked"}
-                      label="Add as a new file"
+                      label={text("drop_unlinked")}
                     />
                   }
                 />
@@ -337,7 +294,7 @@ function ReportEditor({
                           clearSelection();
                         }}
                       >
-                        Back
+                        {text("back")}
                       </Button>
                     </div>
                   )}
@@ -348,8 +305,8 @@ function ReportEditor({
                       highlighted={hoverZone === "linked"}
                       label={
                         selectedItem === undefined
-                          ? "Create new line item"
-                          : `Link to "${selectedItem.title}"`
+                          ? text("drop_create_item")
+                          : text("drop_link_to", { title: selectedItem.title })
                       }
                     />
                   </div>
@@ -372,17 +329,17 @@ function ReportEditor({
         </FileDropOverlay>
 
         <div className="sticky bottom-0 z-20 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-kumo-line bg-kumo-base py-3 text-sm">
-          <Badge variant={status.tone}>{status.text}</Badge>
+          <Badge variant={statusTone}>{text.status(report.status)}</Badge>
           {remainingFigure !== undefined && (
             <Figure
-              label="Remaining"
+              label={text("figure_remaining")}
               value={remainingFigure}
               className={negative ? "text-kumo-danger" : ""}
             />
           )}
-          {report.status !== ExpenseReport_Status.DRAFT && (
+          {actions !== undefined && (
             <div className="flex min-w-0 items-center gap-2 max-md:basis-full md:ml-auto md:flex-1 md:justify-end">
-              <ReviewForm />
+              {actions}
             </div>
           )}
         </div>

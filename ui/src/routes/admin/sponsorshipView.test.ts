@@ -6,7 +6,7 @@ import {
   AdminSponsorship_TitoDiscountCode_Kind,
 } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 import { ExpenseReport_Status } from "../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
-import { EXPENSE_REPORT_STATUS_LABELS } from "./expense_report/reportView.ts";
+import { EXPENSE_REPORT_STATUS_LABELS } from "../expense_report/reportView.ts";
 import {
   boothStatus,
   customizationStatus,
@@ -73,4 +73,3 @@ describe("labels", () => {
     assert.equal(labelOf(EXPENSE_REPORT_STATUS_LABELS, 99 as never).text, "99");
   });
 });
-

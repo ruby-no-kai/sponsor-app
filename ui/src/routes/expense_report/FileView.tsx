@@ -1,14 +1,12 @@
 import { Button, Checkbox, Text } from "@cloudflare/kumo";
 import { TrashIcon } from "@phosphor-icons/react";
 import { useState } from "react";
-import { AdminService } from "../../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
-import type { ExpenseFile } from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
-import { useRpcMutation } from "../../../lib/rpc.ts";
-import { notifyError } from "../../../lib/toast.ts";
+import type { ExpenseFile } from "../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
 import { ConfirmAction } from "./ConfirmAction.tsx";
 import { useEditor } from "./EditorContext.ts";
 import { newLineItemInput } from "./lineItemForm.ts";
 import { fileName } from "./reportView.ts";
+import { useAction } from "./useAction.ts";
 
 // What can be done with a file no line item attaches: make one of it, attach it, or delete it.
 export function FileView({
@@ -20,10 +18,18 @@ export function FileView({
   onSelectItem: (id: string) => void;
   onDeleted: () => void;
 }) {
-  const { target, report, isMobile, applyReport, refreshReport, updateLineItem, fileUrl } =
-    useEditor();
-  const createLineItem = useRpcMutation(AdminService.method.createExpenseLineItem);
-  const deleteFile = useRpcMutation(AdminService.method.deleteExpenseFile);
+  const {
+    rpc,
+    text,
+    notify,
+    report,
+    isMobile,
+    applyReport,
+    refreshReport,
+    updateLineItem,
+    fileUrl,
+  } = useEditor();
+  const createLineItem = useAction(rpc.createLineItem);
   const [chosenIds, setChosenIds] = useState<ReadonlySet<string>>(new Set());
   const [isLinking, setIsLinking] = useState(false);
   const [isChoosing, setIsChoosing] = useState(false);
@@ -31,14 +37,13 @@ export function FileView({
 
   async function handleCreate() {
     try {
-      const response = await createLineItem.trigger({
-        ...target,
-        input: newLineItemInput(file.filename ?? "New expense", [file.id]),
-      });
+      const response = await createLineItem.run(
+        newLineItemInput(file.filename ?? text("new_item_title"), [file.id]),
+      );
       applyReport(response.report);
       if (response.lineItem !== undefined) onSelectItem(response.lineItem.id);
     } catch (error) {
-      notifyError(error);
+      notify(error);
     }
   }
 
@@ -55,7 +60,7 @@ export function FileView({
       }
       if (firstLinked !== undefined) onSelectItem(firstLinked);
     } catch (error) {
-      notifyError(error);
+      notify(error);
       await refreshReport();
     } finally {
       setIsLinking(false);
@@ -63,7 +68,7 @@ export function FileView({
   }
 
   async function handleDelete() {
-    await deleteFile.trigger({ ...target, fileId: file.id });
+    await rpc.deleteFile(file.id);
     onDeleted();
     await refreshReport();
   }
@@ -79,30 +84,30 @@ export function FileView({
 
   return (
     <div className="flex flex-col items-center gap-3 px-4 py-3 text-center">
-      <Text size="sm">{fileName(file)}</Text>
+      <Text size="sm">{fileName(file, text)}</Text>
       {isMobile && (
         <Button
           variant="secondary"
           size="sm"
           onClick={() => window.open(fileUrl(file.id), "_blank", "noopener,noreferrer")}
         >
-          Preview file
+          {text("preview_file")}
         </Button>
       )}
       <Button
         variant="primary"
         size="sm"
-        loading={createLineItem.isMutating}
+        loading={createLineItem.isRunning}
         onClick={() => void handleCreate()}
       >
-        Create line item from this file
+        {text("create_from_file")}
       </Button>
 
       {linkable.length > 0 &&
         (isChoosing ? (
           <div className="flex w-full max-w-xs flex-col gap-2 text-left">
             <Text bold size="sm">
-              Link to existing line items
+              {text("link_to_existing_items")}
             </Text>
             <ul className="flex max-h-52 flex-col overflow-auto rounded-lg border border-kumo-line p-1">
               {linkable.map((item) => (
@@ -123,23 +128,25 @@ export function FileView({
               disabled={chosenIds.size === 0}
               onClick={() => void handleLink()}
             >
-              Link selected
+              {text("link_selected")}
             </Button>
           </div>
         ) : (
           <Button variant="secondary" size="sm" onClick={() => setIsChoosing(true)}>
-            Link to existing line items
+            {text("link_to_existing_items")}
           </Button>
         ))}
 
       <hr className="w-full border-kumo-line" />
       <ConfirmAction
-        label="Delete this file"
+        label={text("delete_file")}
         icon={TrashIcon}
         size="sm"
-        title="Delete this file?"
-        description={`${fileName(file)} is deleted from the storage.`}
-        confirmLabel="Delete"
+        title={text("confirm_delete_file")}
+        description={fileName(file, text)}
+        confirmLabel={text("delete")}
+        cancelLabel={text("review_dialog_cancel")}
+        onError={notify}
         onConfirm={handleDelete}
       />
     </div>

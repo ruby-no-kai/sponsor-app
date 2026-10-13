@@ -84,6 +84,7 @@ export const paths = {
   sponsorPassRetraction: "/conferences/:slug/sponsorship/pass_redemptions/:id/retraction",
 
   // Sponsor: Expense reports
+  sponsorExpenseReport: "/conferences/:slug/sponsorship/expense_report",
 } as const;
 
 const SPA_PATHS: readonly string[] = Object.values(paths);

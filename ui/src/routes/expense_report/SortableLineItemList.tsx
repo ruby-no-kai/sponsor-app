@@ -1,8 +1,9 @@
 import { Badge, Text } from "@cloudflare/kumo";
 import { useState } from "react";
 import type { DragEvent, KeyboardEvent } from "react";
-import type { ExpenseLineItem } from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
+import type { ExpenseLineItem } from "../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
 import { formatAmountAt } from "./amounts.ts";
+import { useEditor } from "./EditorContext.ts";
 
 // A drag of a line item carries this type, which the file drop zones ignore.
 const LINE_ITEM_TYPE = "application/x-sponsor-app-expense-line-item";
@@ -24,6 +25,7 @@ export function SortableLineItemList({
   onMove: (movedId: string, overId: string) => void;
   disabled: boolean;
 }) {
+  const { text } = useEditor();
   const [draggedId, setDraggedId] = useState<string>();
   const [overId, setOverId] = useState<string>();
 
@@ -96,8 +98,10 @@ export function SortableLineItemList({
                 <span className="font-mono text-[0.9em]">
                   {formatAmountAt(item.amount, decimal)}
                 </span>
-                {item.preliminal && <Badge variant="warning">preliminary</Badge>}
-                {item.fileIds.length === 0 && <Badge variant="secondary">no file</Badge>}
+                {item.preliminal && <Badge variant="warning">{text("preliminal_badge")}</Badge>}
+                {item.fileIds.length === 0 && (
+                  <Badge variant="secondary">{text("no_file_badge")}</Badge>
+                )}
               </span>
             </button>
           </li>

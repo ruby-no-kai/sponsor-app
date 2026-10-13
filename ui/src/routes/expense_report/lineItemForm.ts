@@ -2,10 +2,11 @@ import type { MessageInitShape } from "@bufbuild/protobuf";
 import type {
   ExpenseLineItem,
   ExpenseLineItemInputSchema,
-} from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
-import type { FieldLayout } from "../../../lib/fieldErrors.ts";
-import { optionalFromInput, optionalToInput } from "../../../lib/forms.ts";
+} from "../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
+import type { FieldLayout } from "../../lib/fieldErrors.ts";
+import { optionalFromInput, optionalToInput } from "../../lib/forms.ts";
 import { amountBeforeTax, amountToInput, sameAmount, subtractAmounts, taxOn } from "./amounts.ts";
+import type { EditorText } from "./text.ts";
 
 export type LineItemInputInit = MessageInitShape<typeof ExpenseLineItemInputSchema>;
 
@@ -13,12 +14,14 @@ export type LineItemInputInit = MessageInitShape<typeof ExpenseLineItemInputSche
 // with the rate, so they differ only in what the editor asks for.
 export type TaxMode = "exclude" | "include" | "exempt" | "manual";
 
-export const TAX_MODES: readonly { value: TaxMode; label: string }[] = [
-  { value: "exclude", label: "Entered amount excludes tax" },
-  { value: "include", label: "Entered amount includes tax" },
-  { value: "exempt", label: "Tax does not apply" },
-  { value: "manual", label: "Enter amounts manually" },
-];
+export function taxModes(text: EditorText): readonly { value: TaxMode; label: string }[] {
+  return [
+    { value: "exclude", label: text("tax_mode_exclude") },
+    { value: "include", label: text("tax_mode_include") },
+    { value: "exempt", label: text("tax_mode_exempt") },
+    { value: "manual", label: text("tax_mode_manual") },
+  ];
+}
 
 // What the editor reads as a line item's stored values imply: no rate is a tax entered by hand.
 export function taxModeOf(taxRate: string | undefined): TaxMode {
@@ -44,18 +47,22 @@ export type LineItemValues = {
   fileIds: string[];
 };
 
-export const FIELD_LABELS: Readonly<Record<keyof LineItemValues, string>> = {
-  title: "Title",
-  notes: "Notes",
-  taxMode: "Tax mode",
-  taxRate: "Tax rate",
-  amount: "Amount",
-  taxAmount: "Tax amount",
-  preliminal: "Preliminal",
-  fileIds: "Attached files",
-};
+export function fieldLabels(text: EditorText): Readonly<Record<keyof LineItemValues, string>> {
+  return {
+    title: text("title_label"),
+    notes: text("notes_label"),
+    taxMode: text("tax_mode_label"),
+    taxRate: text("tax_rate_label"),
+    amount: text("amount_label"),
+    taxAmount: text("tax_amount_label"),
+    preliminal: text("preliminal_badge"),
+    fileIds: text("attached_files"),
+  };
+}
 
-export const LINE_ITEM_LAYOUT: FieldLayout = { labels: FIELD_LABELS };
+export function lineItemLayout(text: EditorText): FieldLayout {
+  return { labels: fieldLabels(text) };
+}
 
 // The configured rate a stored one equals, as the select offers it, such as "0.1" for "0.1000".
 export function rateOption(rates: readonly string[], rate: string): string {
