@@ -56,13 +56,13 @@ RSpec.describe RetractTitoTicketJob, type: :job do
     )
   end
 
-  it 'completes a retraction whose registration is already cancelled' do
+  it 'completes a retraction whose registration is already cancelled, keeping the registration as it now stands' do
     allow(api).to receive(:get_registration).and_return({registration: registration_data.merge('cancelled' => true)})
 
     described_class.perform_now(retraction)
 
     expect(api).not_to have_received(:cancel_registration)
-    expect(retraction.reload.completed).to be true
+    expect(retraction.reload).to have_attributes(completed: true, tito_registration: include('cancelled' => true))
   end
 
   it 'skips a completed retraction' do
