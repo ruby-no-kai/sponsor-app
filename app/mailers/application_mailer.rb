@@ -2,8 +2,6 @@
 # frozen_string_literal: true
 
 class ApplicationMailer < ActionMailer::Base
-  #: type mailgun_variables = Hash[Symbol, (String | Integer)?]
-
   default(
     from: "#{Rails.application.config.x.org_name} Sponsorships <#{Rails.application.config.x.default_email_address}>",
     reply_to: Rails.application.config.x.default_email_reply_to,
@@ -29,7 +27,7 @@ class ApplicationMailer < ActionMailer::Base
     @sponsorship = nil #: Sponsorship?
     @conference = nil #: Conference?
     @mailgun_tags = nil #: (Array[String] | Symbol)?
-    @mailgun_variables = nil #: (mailgun_variables | Symbol)?
+    @mailgun_variables = nil #: (Rk::SponsorApp::Internal::MailgunUserVariables | Symbol)?
     @list_name = nil #: (Array[String?] | Symbol)?
     @subject_prefix = nil #: String?
   end
@@ -50,7 +48,7 @@ class ApplicationMailer < ActionMailer::Base
   private def add_mailer_mailgun_tag
     mailer_name = Must.because(self.class.name) { "mailers are named classes" }
     tag mailer_name
-    variable mailer: mailer_name
+    mailgun_variables.mailer = mailer_name
   end
 
   #: () -> void
@@ -78,12 +76,12 @@ class ApplicationMailer < ActionMailer::Base
     @mailgun_tags = (current || []).concat(tags)
   end
 
-  #: (mailgun_variables) -> void
-  private def variable(h)
+  #: () -> Rk::SponsorApp::Internal::MailgunUserVariables
+  private def mailgun_variables
     current = @mailgun_variables
     raise "BUG: used after commit" if current.is_a?(Symbol)
 
-    @mailgun_variables = (current || {}).merge!(h)
+    @mailgun_variables = current || Rk::SponsorApp::Internal::MailgunUserVariables.new
   end
 
   #: (String) -> void
@@ -110,7 +108,9 @@ class ApplicationMailer < ActionMailer::Base
     vars = @mailgun_variables
     raise "BUG: used after commit" if vars.is_a?(Symbol)
 
-    headers 'X-Mailgun-Variables' => vars.to_json if vars
+    if vars
+      headers 'X-Mailgun-Variables' => Rk::SponsorApp::Internal::MailgunUserVariables.encode_json(vars, preserve_proto_fieldnames: true)
+    end
     @mailgun_variables = :committed
   end
 

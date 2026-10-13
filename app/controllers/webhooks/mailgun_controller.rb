@@ -11,7 +11,16 @@ module Webhooks
     def webhook
       return render(status: :unauthorized, plain: 'Signature Invalid') unless signature_valid?
 
-      case user_variables[:mailer]
+      event_data = params.require('event-data').permit!.to_hash
+      begin
+        event = Rk::SponsorApp::Internal::MailgunEvent.decode_json(JSON.generate(event_data), ignore_unknown_fields: true)
+      rescue Google::Protobuf::ParseError => e
+        # Mailgun retries an event until it is answered 200 or 406, and this one would fail every time.
+        Sentry.capture_exception(e)
+        return render(status: :not_acceptable, plain: 'Unreadable event-data')
+      end
+
+      case event.user_variables&.mailer
       when 'BroadcastMailer'
         ProcessBroadcastDeliveryMailgunEventJob.perform_later(event_data)
       end
@@ -35,16 +44,6 @@ module Webhooks
       expected_signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('SHA256'), api_key, data)
 
       Rack::Utils.secure_compare signature, expected_signature
-    end
-
-    #: () -> ActionController::Parameters
-    private def event_data
-      params.require('event-data').permit!
-    end
-
-    #: () -> untyped
-    private def user_variables
-      event_data['user-variables'] || {}
     end
   end
 end

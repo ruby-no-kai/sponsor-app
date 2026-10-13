@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app.internal;
+
+option ruby_package = "Rk::SponsorApp::Internal";
+
+// Sent as the X-Mailgun-Variables header of outgoing mail, in .proto field names. Mailgun echoes
+// it in the user-variables of webhook event-data.
+message MailgunUserVariables {
+  // Class name of the mailer that sent the message, such as "BroadcastMailer". The webhook
+  // dispatches events on it.
+  string mailer = 1;
+
+  // Set by BroadcastMailer.
+  optional int64 broadcast_id = 2;
+
+  // Set by BroadcastMailer, naming the BroadcastDelivery that webhook events update.
+  optional int64 delivery_id = 3;
+}
