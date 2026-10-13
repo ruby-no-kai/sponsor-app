@@ -343,6 +343,12 @@ GEM
       premailer (~> 1.7, >= 1.7.9)
     prettyprint (0.2.1)
     prism (1.9.0)
+    protovalidate (0.1.0.beta3-aarch64-linux-gnu)
+      google-protobuf (>= 4.31)
+    protovalidate (0.1.0.beta3-arm64-darwin)
+      google-protobuf (>= 4.31)
+    protovalidate (0.1.0.beta3-x86_64-linux-gnu)
+      google-protobuf (>= 4.31)
     public_suffix (7.0.5)
     puma (8.0.2)
       nio4r (~> 2.0)
@@ -602,6 +608,7 @@ DEPENDENCIES
   pg (>= 0.18, < 2.0)
   premailer-rails
   protobufable!
+  protovalidate (= 0.1.0.beta3)
   puma
   rack-contrib
   rails (~> 8.1.0)

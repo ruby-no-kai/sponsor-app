@@ -85,6 +85,113 @@ module Rk
         | ("booth_assigned" name, bool value) -> void
         | ("total_fee" name, (::String | ::Symbol) value) -> void
     end
+
+    # The writable fields of a line item, taken by AdminService.CreateExpenseLineItem and
+    # UpdateExpenseLineItem. An update replaces every field but position.
+    # Amounts are non-negative decimals with at most ten digits before the point and two after it,
+    # such as "12000" or "12000.50".
+    class ExpenseLineItemInput < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::ExpenseLineItemInput]
+
+      # What the expense was for.
+      attr_reader title(): ::String
+      attr_writer title(): ::String | ::Symbol
+      def clear_title: () -> void
+
+      # Anything the sponsor adds about the expense. Absent stores none.
+      attr_reader notes(): ::String
+      attr_writer notes(): ::String | ::Symbol
+      def has_notes?: () -> bool
+      def clear_notes: () -> void
+
+      # Amount before tax.
+      attr_reader amount(): ::String
+      attr_writer amount(): ::String | ::Symbol
+      def clear_amount: () -> void
+
+      # Tax rate to calculate the tax at, one of ExpenseReportCalculation.tax_rates, such as "0.1".
+      # Absent takes tax_amount as entered. A rate that is not offered is answered `invalid_argument`
+      # with PROBLEM_TYPE_INVALID_RECORD.
+      attr_reader tax_rate(): ::String
+      attr_writer tax_rate(): ::String | ::Symbol
+      def has_tax_rate?: () -> bool
+      def clear_tax_rate: () -> void
+
+      # Tax on the amount. With tax_rate it is recalculated from amount, rounded down to
+      # ExpenseReportCalculation.decimal digits, but must still be a decimal, such as "0".
+      attr_reader tax_amount(): ::String
+      attr_writer tax_amount(): ::String | ::Symbol
+      def clear_tax_amount: () -> void
+
+      # Whether the amount is a planned budget rather than a final figure.
+      attr_accessor preliminal(): bool
+      def clear_preliminal: () -> void
+
+      # Place to put the line item at among the report's line items, 1 being the first. The others
+      # keep their order around it. Absent keeps a line item where it is, and adds a new one last.
+      attr_reader position(): ::Integer
+      attr_writer position(): ::Integer | ::Float
+      def has_position?: () -> bool
+      def clear_position: () -> void
+
+      # IDs of the sponsorship's ExpenseFile receipts and invoices to attach, replacing those
+      # attached. A file of another sponsorship is answered `not_found`.
+      attr_accessor file_ids(): ::Google::Protobuf::RepeatedField[::Integer, ::Integer | ::Float]
+      def clear_file_ids: () -> void
+
+      attr_reader _notes(): ::String?
+      def has__notes?: () -> bool
+      def clear__notes: () -> void
+
+      attr_reader _tax_rate(): ::String?
+      def has__tax_rate?: () -> bool
+      def clear__tax_rate: () -> void
+
+      attr_reader _position(): ::Integer?
+      def has__position?: () -> bool
+      def clear__position: () -> void
+
+      type init_map = {
+        title: (::String | ::Symbol)?,
+        "title" => (::String | ::Symbol)?,
+        notes: (::String | ::Symbol)?,
+        "notes" => (::String | ::Symbol)?,
+        amount: (::String | ::Symbol)?,
+        "amount" => (::String | ::Symbol)?,
+        tax_rate: (::String | ::Symbol)?,
+        "tax_rate" => (::String | ::Symbol)?,
+        tax_amount: (::String | ::Symbol)?,
+        "tax_amount" => (::String | ::Symbol)?,
+        preliminal: bool?,
+        "preliminal" => bool?,
+        position: (::Integer | ::Float)?,
+        "position" => (::Integer | ::Float)?,
+        file_ids: ::Array[::Integer | ::Float]?,
+        "file_ids" => ::Array[::Integer | ::Float]?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("title" name) -> ::String
+        | ("notes" name) -> ::String
+        | ("amount" name) -> ::String
+        | ("tax_rate" name) -> ::String
+        | ("tax_amount" name) -> ::String
+        | ("preliminal" name) -> bool
+        | ("position" name) -> ::Integer
+        | ("file_ids" name) -> (::Google::Protobuf::RepeatedField[::Integer, ::Integer | ::Float])
+
+      def []=:
+          ("title" name, (::String | ::Symbol) value) -> void
+        | ("notes" name, (::String | ::Symbol) value) -> void
+        | ("amount" name, (::String | ::Symbol) value) -> void
+        | ("tax_rate" name, (::String | ::Symbol) value) -> void
+        | ("tax_amount" name, (::String | ::Symbol) value) -> void
+        | ("preliminal" name, bool value) -> void
+        | ("position" name, (::Integer | ::Float) value) -> void
+        | ("file_ids" name, (::Google::Protobuf::RepeatedField[::Integer, ::Integer | ::Float]) value) -> void
+    end
   end
 end
 
@@ -93,6 +200,7 @@ module Google
     class DescriptorPool
       def lookup:
           ("rubykaigi.sponsor_app.ExpenseReportCalculation" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ExpenseReportCalculation)])
+        | ("rubykaigi.sponsor_app.ExpenseLineItemInput" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ExpenseLineItemInput)])
         | ...
     end
   end

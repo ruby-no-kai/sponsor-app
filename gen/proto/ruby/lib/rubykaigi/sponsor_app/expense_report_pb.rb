@@ -4,8 +4,10 @@
 
 require 'google/protobuf'
 
+require 'buf/validate/validate_pb'
 
-descriptor_data = "\n*rubykaigi/sponsor_app/expense_report.proto\x12\x15rubykaigi.sponsor_app\"\x8c\x02\n\x18\x45xpenseReportCalculation\x12\x1b\n\ttax_rates\x18\x01 \x03(\tR\x08taxRates\x12\x18\n\x07\x64\x65\x63imal\x18\x02 \x01(\x05R\x07\x64\x65\x63imal\x12\"\n\nplan_price\x18\x03 \x01(\tH\x00R\tplanPrice\x88\x01\x01\x12-\n\x10plan_price_booth\x18\x04 \x01(\tH\x01R\x0eplanPriceBooth\x88\x01\x01\x12%\n\x0e\x62ooth_assigned\x18\x05 \x01(\x08R\rboothAssigned\x12\x1b\n\ttotal_fee\x18\x06 \x01(\tR\x08totalFeeB\r\n\x0b_plan_priceB\x13\n\x11_plan_price_boothB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
+
+descriptor_data = "\n*rubykaigi/sponsor_app/expense_report.proto\x12\x15rubykaigi.sponsor_app\x1a\x1b\x62uf/validate/validate.proto\"\x8c\x02\n\x18\x45xpenseReportCalculation\x12\x1b\n\ttax_rates\x18\x01 \x03(\tR\x08taxRates\x12\x18\n\x07\x64\x65\x63imal\x18\x02 \x01(\x05R\x07\x64\x65\x63imal\x12\"\n\nplan_price\x18\x03 \x01(\tH\x00R\tplanPrice\x88\x01\x01\x12-\n\x10plan_price_booth\x18\x04 \x01(\tH\x01R\x0eplanPriceBooth\x88\x01\x01\x12%\n\x0e\x62ooth_assigned\x18\x05 \x01(\x08R\rboothAssigned\x12\x1b\n\ttotal_fee\x18\x06 \x01(\tR\x08totalFeeB\r\n\x0b_plan_priceB\x13\n\x11_plan_price_booth\"\xb6\x06\n\x14\x45xpenseLineItemInput\x12t\n\x05title\x18\x01 \x01(\tB^\xbaH[\xba\x01U\n\'expense_line_item_input.title.not_blank\x12\x17value must not be blank\x1a\x11this.trim() != \'\'\xc8\x01\x01R\x05title\x12\x19\n\x05notes\x18\x02 \x01(\tH\x00R\x05notes\x88\x01\x01\x12\xa2\x01\n\x06\x61mount\x18\x03 \x01(\tB\x89\x01\xbaH\x85\x01\xba\x01\x81\x01\n%expense_line_item_input.amount.format\x12)must be an amount such as 1000 or 1000.50\x1a-this.matches(\'^[0-9]{1,10}([.][0-9]{1,2})?$\')R\x06\x61mount\x12\x9c\x01\n\x08tax_rate\x18\x04 \x01(\tB|\xbaHy\xba\x01v\n\'expense_line_item_input.tax_rate.format\x12\"must be a rate such as 0.1 or 0.08\x1a\'this.matches(\'^[0-9]([.][0-9]{1,4})?$\')H\x01R\x07taxRate\x88\x01\x01\x12\xad\x01\n\ntax_amount\x18\x05 \x01(\tB\x8d\x01\xbaH\x89\x01\xba\x01\x85\x01\n)expense_line_item_input.tax_amount.format\x12)must be an amount such as 1000 or 1000.50\x1a-this.matches(\'^[0-9]{1,10}([.][0-9]{1,2})?$\')R\ttaxAmount\x12\x1e\n\npreliminal\x18\x06 \x01(\x08R\npreliminal\x12(\n\x08position\x18\x07 \x01(\x05\x42\x07\xbaH\x04\x1a\x02 \x00H\x02R\x08position\x88\x01\x01\x12+\n\x08\x66ile_ids\x18\x08 \x03(\x03\x42\x10\x30\x01\xbaH\x0b\x92\x01\x08\x18\x01\"\x04\"\x02 \x00R\x07\x66ileIdsB\x08\n\x06_notesB\x0b\n\t_tax_rateB\x0b\n\t_positionB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
@@ -13,5 +15,6 @@ pool.add_serialized_file(descriptor_data)
 module Rk
   module SponsorApp
     ExpenseReportCalculation = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.ExpenseReportCalculation").msgclass
+    ExpenseLineItemInput = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.ExpenseLineItemInput").msgclass
   end
 end

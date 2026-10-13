@@ -2,31 +2,43 @@
 # frozen_string_literal: true
 
 class ExpenseLineItemsController < ApplicationController
+  include ProtobufRequestBody
+  include ExpenseLineItemPatchable
+
   before_action :require_sponsorship_session
   before_action :set_conference
   before_action :require_custom_sponsorship
   before_action :set_expense_report
   before_action :set_line_item, only: [:update, :destroy]
 
+  protobuf_body Rk::SponsorApp::ExpenseLineItemPatch
   #: () -> void
   def create
-    @line_item = expense_report.line_items.build(line_item_params)
+    patch = message #: Rk::SponsorApp::ExpenseLineItemPatch
+    validate_line_item_input!(patch)
+    file_ids = line_item_file_ids(patch)
+    @line_item = expense_report.line_items.build(line_item_attributes(patch))
     line_item.assign_next_position
 
     ActiveRecord::Base.transaction do
       line_item.save!
-      sync_file_ids if params[:expense_line_item]&.key?(:file_ids)
+      sync_file_ids(file_ids) if file_ids
       after_line_item_change
     end
 
     render json: expense_report.reload.to_resource.to_h
   end
 
+  protobuf_body Rk::SponsorApp::ExpenseLineItemPatch
   #: () -> void
   def update
+    patch = message #: Rk::SponsorApp::ExpenseLineItemPatch
+    validate_line_item_input!(patch)
+    file_ids = line_item_file_ids(patch)
+
     ActiveRecord::Base.transaction do
-      line_item.assign_attributes(line_item_params)
-      sync_file_ids if params[:expense_line_item]&.key?(:file_ids)
+      line_item.assign_attributes(line_item_attributes(patch))
+      sync_file_ids(file_ids) if file_ids
       line_item.save!
       reindex_positions if line_item.saved_change_to_position?
       after_line_item_change
@@ -66,14 +78,8 @@ class ExpenseLineItemsController < ApplicationController
     @line_item = expense_report.line_items.find(params[:id]) #: ExpenseLineItem?
   end
 
-  #: () -> ActionController::Parameters
-  private def line_item_params
-    params.require(:expense_line_item).permit(:title, :notes, :amount, :tax_rate, :tax_amount, :preliminal, :position)
-  end
-
-  #: () -> void
-  private def sync_file_ids
-    new_ids = Array(params[:expense_line_item][:file_ids]).map(&:to_i)
+  #: (Array[Integer]) -> void
+  private def sync_file_ids(new_ids)
     current_ids = line_item.expense_file_ids
 
     (new_ids - current_ids).each do |file_id|

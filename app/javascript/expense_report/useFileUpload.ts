@@ -203,8 +203,8 @@ export function useFileUpload({
           const result = await createLineItem(lineItemsUrl, {
             title: "New expense",
             amount: "0",
-            tax_amount: "0",
-            file_ids: uploadedIdsRef.current,
+            taxAmount: "0",
+            fileIds: uploadedIdsRef.current.map(String),
           });
           onReportUpdate(result);
           const newItem = result.line_items[result.line_items.length - 1];
@@ -221,7 +221,9 @@ export function useFileUpload({
           const item = refreshed.line_items.find((i) => i.id === itemId);
           if (item) {
             const allFileIds = [...item.file_ids, ...uploadedIdsRef.current];
-            const result = await updateLineItem(lineItemsUrl, itemId, { file_ids: allFileIds });
+            const result = await updateLineItem(lineItemsUrl, itemId, {
+              fileIds: allFileIds.map(String),
+            });
             onReportUpdate(result);
             onSelectItem(itemId);
             return;

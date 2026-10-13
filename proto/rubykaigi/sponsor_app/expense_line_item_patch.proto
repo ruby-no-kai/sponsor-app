@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "rubykaigi/sponsor_app/expense_report.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// A change to an expense line item, which the expense report editor sends to create or update
+// one. The fields field_mask names are written from expense_line_item, and the others are left as
+// they are, or at their defaults on a new line item.
+message ExpenseLineItemPatch {
+  // Values to write. A field that field_mask names but this leaves unset is cleared: notes and
+  // tax_rate to none, file_ids to no files, and preliminal to false. title, amount and tax_amount
+  // cannot be cleared, and an unset position keeps the line item where it is.
+  //
+  // ExpenseLineItemInput's rules are checked only on the fields field_mask names, so a field the
+  // patch leaves out is not rejected for being unset. This message's own validation skips them.
+  ExpenseLineItemInput expense_line_item = 1 [(buf.validate.field).ignore = IGNORE_ALWAYS];
+
+  // Fields of expense_line_item to write, named as in the .proto, such as "title" or "file_ids".
+  // Naming a field ExpenseLineItemInput lacks is a bad request. position is ignored on a new line
+  // item, which is added last.
+  //
+  // Deprecated: a JSON body without field_mask writes the fields its expense_line_item has, null
+  // ones cleared. A body naming no field either way is a bad request.
+  repeated string field_mask = 2 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.string = {
+      in: [
+        "title",
+        "notes",
+        "amount",
+        "tax_rate",
+        "tax_amount",
+        "preliminal",
+        "position",
+        "file_ids"
+      ]
+    }
+  ];
+}

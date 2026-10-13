@@ -4,13 +4,14 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
+import { file_buf_validate_validate } from "../../buf/validate/validate_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file rubykaigi/sponsor_app/expense_report.proto.
  */
 export const file_rubykaigi_sponsor_app_expense_report: GenFile = /*@__PURE__*/
-  fileDesc("CipydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvZXhwZW5zZV9yZXBvcnQucHJvdG8SFXJ1YnlrYWlnaS5zcG9uc29yX2FwcCLFAQoYRXhwZW5zZVJlcG9ydENhbGN1bGF0aW9uEhEKCXRheF9yYXRlcxgBIAMoCRIPCgdkZWNpbWFsGAIgASgFEhcKCnBsYW5fcHJpY2UYAyABKAlIAIgBARIdChBwbGFuX3ByaWNlX2Jvb3RoGAQgASgJSAGIAQESFgoOYm9vdGhfYXNzaWduZWQYBSABKAgSEQoJdG90YWxfZmVlGAYgASgJQg0KC19wbGFuX3ByaWNlQhMKEV9wbGFuX3ByaWNlX2Jvb3RoQhHqAg5Sazo6U3BvbnNvckFwcGIGcHJvdG8z");
+  fileDesc("CipydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvZXhwZW5zZV9yZXBvcnQucHJvdG8SFXJ1YnlrYWlnaS5zcG9uc29yX2FwcCLFAQoYRXhwZW5zZVJlcG9ydENhbGN1bGF0aW9uEhEKCXRheF9yYXRlcxgBIAMoCRIPCgdkZWNpbWFsGAIgASgFEhcKCnBsYW5fcHJpY2UYAyABKAlIAIgBARIdChBwbGFuX3ByaWNlX2Jvb3RoGAQgASgJSAGIAQESFgoOYm9vdGhfYXNzaWduZWQYBSABKAgSEQoJdG90YWxfZmVlGAYgASgJQg0KC19wbGFuX3ByaWNlQhMKEV9wbGFuX3ByaWNlX2Jvb3RoIu0FChRFeHBlbnNlTGluZUl0ZW1JbnB1dBJtCgV0aXRsZRgBIAEoCUJeukhbugFVCidleHBlbnNlX2xpbmVfaXRlbV9pbnB1dC50aXRsZS5ub3RfYmxhbmsSF3ZhbHVlIG11c3Qgbm90IGJlIGJsYW5rGhF0aGlzLnRyaW0oKSAhPSAnJ8gBARISCgVub3RlcxgCIAEoCUgAiAEBEpoBCgZhbW91bnQYAyABKAlCiQG6SIUBugGBAQolZXhwZW5zZV9saW5lX2l0ZW1faW5wdXQuYW1vdW50LmZvcm1hdBIpbXVzdCBiZSBhbiBhbW91bnQgc3VjaCBhcyAxMDAwIG9yIDEwMDAuNTAaLXRoaXMubWF0Y2hlcygnXlswLTldezEsMTB9KFsuXVswLTldezEsMn0pPyQnKRKTAQoIdGF4X3JhdGUYBCABKAlCfLpIeboBdgonZXhwZW5zZV9saW5lX2l0ZW1faW5wdXQudGF4X3JhdGUuZm9ybWF0EiJtdXN0IGJlIGEgcmF0ZSBzdWNoIGFzIDAuMSBvciAwLjA4Gid0aGlzLm1hdGNoZXMoJ15bMC05XShbLl1bMC05XXsxLDR9KT8kJylIAYgBARKiAQoKdGF4X2Ftb3VudBgFIAEoCUKNAbpIiQG6AYUBCilleHBlbnNlX2xpbmVfaXRlbV9pbnB1dC50YXhfYW1vdW50LmZvcm1hdBIpbXVzdCBiZSBhbiBhbW91bnQgc3VjaCBhcyAxMDAwIG9yIDEwMDAuNTAaLXRoaXMubWF0Y2hlcygnXlswLTldezEsMTB9KFsuXVswLTldezEsMn0pPyQnKRISCgpwcmVsaW1pbmFsGAYgASgIEh4KCHBvc2l0aW9uGAcgASgFQge6SAQaAiAASAKIAQESIgoIZmlsZV9pZHMYCCADKANCEDABukgLkgEIGAEiBCICIABCCAoGX25vdGVzQgsKCV90YXhfcmF0ZUILCglfcG9zaXRpb25CEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_buf_validate_validate]);
 
 /**
  * The figures an expense report is weighed against, which its editor shows beside it.
@@ -70,4 +71,83 @@ export type ExpenseReportCalculation = Message<"rubykaigi.sponsor_app.ExpenseRep
  */
 export const ExpenseReportCalculationSchema: GenMessage<ExpenseReportCalculation> = /*@__PURE__*/
   messageDesc(file_rubykaigi_sponsor_app_expense_report, 0);
+
+/**
+ * The writable fields of a line item, taken by AdminService.CreateExpenseLineItem and
+ * UpdateExpenseLineItem. An update replaces every field but position.
+ *
+ * Amounts are non-negative decimals with at most ten digits before the point and two after it,
+ * such as "12000" or "12000.50".
+ *
+ * @generated from message rubykaigi.sponsor_app.ExpenseLineItemInput
+ */
+export type ExpenseLineItemInput = Message<"rubykaigi.sponsor_app.ExpenseLineItemInput"> & {
+  /**
+   * What the expense was for.
+   *
+   * @generated from field: string title = 1;
+   */
+  title: string;
+
+  /**
+   * Anything the sponsor adds about the expense. Absent stores none.
+   *
+   * @generated from field: optional string notes = 2;
+   */
+  notes?: string | undefined;
+
+  /**
+   * Amount before tax.
+   *
+   * @generated from field: string amount = 3;
+   */
+  amount: string;
+
+  /**
+   * Tax rate to calculate the tax at, one of ExpenseReportCalculation.tax_rates, such as "0.1".
+   * Absent takes tax_amount as entered. A rate that is not offered is answered `invalid_argument`
+   * with PROBLEM_TYPE_INVALID_RECORD.
+   *
+   * @generated from field: optional string tax_rate = 4;
+   */
+  taxRate?: string | undefined;
+
+  /**
+   * Tax on the amount. With tax_rate it is recalculated from amount, rounded down to
+   * ExpenseReportCalculation.decimal digits, but must still be a decimal, such as "0".
+   *
+   * @generated from field: string tax_amount = 5;
+   */
+  taxAmount: string;
+
+  /**
+   * Whether the amount is a planned budget rather than a final figure.
+   *
+   * @generated from field: bool preliminal = 6;
+   */
+  preliminal: boolean;
+
+  /**
+   * Place to put the line item at among the report's line items, 1 being the first. The others
+   * keep their order around it. Absent keeps a line item where it is, and adds a new one last.
+   *
+   * @generated from field: optional int32 position = 7;
+   */
+  position?: number | undefined;
+
+  /**
+   * IDs of the sponsorship's ExpenseFile receipts and invoices to attach, replacing those
+   * attached. A file of another sponsorship is answered `not_found`.
+   *
+   * @generated from field: repeated int64 file_ids = 8 [jstype = JS_STRING];
+   */
+  fileIds: string[];
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.ExpenseLineItemInput.
+ * Use `create(ExpenseLineItemInputSchema)` to create a new message.
+ */
+export const ExpenseLineItemInputSchema: GenMessage<ExpenseLineItemInput> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_expense_report, 1);
 

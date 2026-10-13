@@ -168,10 +168,10 @@ export function LineItemForm({
       title,
       notes: notes || null,
       amount: netAmount,
-      tax_rate: rate,
-      tax_amount: taxAmt,
+      taxRate: rate,
+      taxAmount: taxAmt,
       preliminal,
-      file_ids: fileIds,
+      fileIds: fileIds.map(String),
     });
   };
 
@@ -207,8 +207,8 @@ export function LineItemForm({
       const result = await createLineItem(lineItemsUrl, {
         title: "New expense",
         amount: "0",
-        tax_amount: "0",
-        file_ids: fileIds,
+        taxAmount: "0",
+        fileIds: fileIds.map(String),
       });
       onUpdate(result);
       const newItem = result.line_items[result.line_items.length - 1];

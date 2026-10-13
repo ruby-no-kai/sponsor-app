@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package rubykaigi.sponsor_app;
 
+import "buf/validate/validate.proto";
+
 option ruby_package = "Rk::SponsorApp";
 
 // The figures an expense report is weighed against, which its editor shows beside it.
@@ -26,4 +28,63 @@ message ExpenseReportCalculation {
   // The fee the expenses are offset against: plan_price, plus plan_price_booth when a booth is
   // assigned. "0" while the plan is undetermined.
   string total_fee = 6;
+}
+
+// The writable fields of a line item, taken by AdminService.CreateExpenseLineItem and
+// UpdateExpenseLineItem. An update replaces every field but position.
+//
+// Amounts are non-negative decimals with at most ten digits before the point and two after it,
+// such as "12000" or "12000.50".
+message ExpenseLineItemInput {
+  // What the expense was for.
+  string title = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "expense_line_item_input.title.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Anything the sponsor adds about the expense. Absent stores none.
+  optional string notes = 2;
+
+  // Amount before tax.
+  string amount = 3 [(buf.validate.field).cel = {
+    id: "expense_line_item_input.amount.format"
+    message: "must be an amount such as 1000 or 1000.50"
+    expression: "this.matches('^[0-9]{1,10}([.][0-9]{1,2})?$')"
+  }];
+
+  // Tax rate to calculate the tax at, one of ExpenseReportCalculation.tax_rates, such as "0.1".
+  // Absent takes tax_amount as entered. A rate that is not offered is answered `invalid_argument`
+  // with PROBLEM_TYPE_INVALID_RECORD.
+  optional string tax_rate = 4 [(buf.validate.field).cel = {
+    id: "expense_line_item_input.tax_rate.format"
+    message: "must be a rate such as 0.1 or 0.08"
+    expression: "this.matches('^[0-9]([.][0-9]{1,4})?$')"
+  }];
+
+  // Tax on the amount. With tax_rate it is recalculated from amount, rounded down to
+  // ExpenseReportCalculation.decimal digits, but must still be a decimal, such as "0".
+  string tax_amount = 5 [(buf.validate.field).cel = {
+    id: "expense_line_item_input.tax_amount.format"
+    message: "must be an amount such as 1000 or 1000.50"
+    expression: "this.matches('^[0-9]{1,10}([.][0-9]{1,2})?$')"
+  }];
+
+  // Whether the amount is a planned budget rather than a final figure.
+  bool preliminal = 6;
+
+  // Place to put the line item at among the report's line items, 1 being the first. The others
+  // keep their order around it. Absent keeps a line item where it is, and adds a new one last.
+  optional int32 position = 7 [(buf.validate.field).int32.gt = 0];
+
+  // IDs of the sponsorship's ExpenseFile receipts and invoices to attach, replacing those
+  // attached. A file of another sponsorship is answered `not_found`.
+  repeated int64 file_ids = 8 [
+    jstype = JS_STRING,
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.int64.gt = 0
+  ];
 }

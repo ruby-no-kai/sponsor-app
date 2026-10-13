@@ -55,8 +55,8 @@ export function FileView({
       const result = await createLineItem(lineItemsUrl, {
         title: file.filename || "New expense",
         amount: "0",
-        tax_amount: "0",
-        file_ids: [file.id],
+        taxAmount: "0",
+        fileIds: [String(file.id)],
       });
       onUpdate(result);
       const newItem = result.line_items[result.line_items.length - 1];
@@ -89,7 +89,7 @@ export function FileView({
         const item = report.line_items.find((i) => i.id === itemId);
         if (!item || item.file_ids.includes(file.id)) continue;
         result = await updateLineItem(lineItemsUrl, itemId, {
-          file_ids: [...item.file_ids, file.id],
+          fileIds: [...item.file_ids, file.id].map(String),
         });
       }
       if (result) {

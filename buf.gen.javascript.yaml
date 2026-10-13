@@ -1,14 +1,16 @@
-# TypeScript for the browser code in app/javascript, which decodes only the messages listed below.
+# TypeScript for the browser code in app/javascript, which reads or sends only the messages listed below.
 # A template of its own, as buf.gen.yaml's Ruby covers every message.
 version: v2
 plugins:
   # The local plugin is locked to the @bufbuild/protobuf runtime by pnpm-lock.yaml.
   - local: node_modules/.bin/protoc-gen-es
     out: app/javascript/gen
+    include_imports: true
     opt:
       - target=ts
 inputs:
   - directory: proto
     types:
       - rubykaigi.sponsor_app.AssetFileUpload
+      - rubykaigi.sponsor_app.ExpenseLineItemPatch
       - rubykaigi.sponsor_app.ExpenseReportCalculation
