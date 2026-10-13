@@ -45,6 +45,11 @@ export const paths = {
   sponsorEventEditingHistory: "/admin/conferences/:slug/events/:id/editing_history",
 
   // Announcements
+  announcements: "/admin/conferences/:slug/announcements",
+  announcementNew: "/admin/conferences/:slug/announcements/new",
+  // `:id` is "issue:locale", as the HAML pages spell it.
+  announcement: "/admin/conferences/:slug/announcements/:id",
+  announcementEdit: "/admin/conferences/:slug/announcements/:id/edit",
 
   // Broadcasts
 

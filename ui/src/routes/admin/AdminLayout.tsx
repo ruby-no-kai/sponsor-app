@@ -90,7 +90,11 @@ function conferenceSections(slug: string, { isEditable }: { isEditable: boolean 
       icon: CalendarDotsIcon,
       path: generatePath(paths.sponsorEvents, { slug }),
     },
-    { label: "Announcements", icon: MegaphoneIcon, path: `${base}/announcements` },
+    {
+      label: "Announcements",
+      icon: MegaphoneIcon,
+      path: generatePath(paths.announcements, { slug }),
+    },
     { label: "Broadcasts", icon: EnvelopeSimpleIcon, path: `${base}/broadcasts` },
     { label: "Expense reports", icon: ReceiptIcon, path: `${base}/expense_reports` },
     {
