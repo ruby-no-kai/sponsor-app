@@ -6,8 +6,8 @@ require 'open3'
 RSpec.describe 'sponsor_app-proto' do # rubocop:disable RSpec/DescribeClass
   let(:gem_lib) { Rails.root.join('gen/proto/ruby/lib').to_s }
 
-  it 'registers org.rubykaigi.sponsor_app.Conference as Rk::SponsorApp::Conference' do
-    descriptor = Google::Protobuf::DescriptorPool.generated_pool.lookup('org.rubykaigi.sponsor_app.Conference')
+  it 'registers rubykaigi.sponsor_app.Conference as Rk::SponsorApp::Conference' do
+    descriptor = Google::Protobuf::DescriptorPool.generated_pool.lookup('rubykaigi.sponsor_app.Conference')
     expect(descriptor.msgclass).to eq(Rk::SponsorApp::Conference)
   end
 
@@ -66,13 +66,13 @@ RSpec.describe 'sponsor_app-proto' do # rubocop:disable RSpec/DescribeClass
       out.lines(chomp: true).filter_map { |path| path.delete_prefix("#{gem_lib}/") if path.start_with?("#{gem_lib}/") }
     end
 
-    it 'loads generated files of org.rubykaigi packages only' do
-      expect(loaded_from_gem).to include('org/rubykaigi/sponsor_app/conference_pb.rb')
-      expect(loaded_from_gem - ['sponsor_app-proto.rb']).to all(start_with('org/rubykaigi/'))
+    it 'loads generated files of rubykaigi packages only' do
+      expect(loaded_from_gem).to include('rubykaigi/sponsor_app/conference_pb.rb')
+      expect(loaded_from_gem - ['sponsor_app-proto.rb']).to all(start_with('rubykaigi/'))
     end
 
     it 'has no generated copy of a package that a gem owns' do
-      expect(Dir.glob('**/*_pb.rb', base: gem_lib)).to all(start_with('org/rubykaigi/'))
+      expect(Dir.glob('**/*_pb.rb', base: gem_lib)).to all(start_with('rubykaigi/'))
     end
   end
 end

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package org.rubykaigi.sponsor_app;
+package rubykaigi.sponsor_app;
 
 import "google/protobuf/timestamp.proto";
 
