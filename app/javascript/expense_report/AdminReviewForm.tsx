@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import type { ExpenseReport } from "./types";
 import { createReview } from "./api";
+import { ExpenseReportReview_Action } from "../gen/rubykaigi/sponsor_app/expense_report_pb";
 
 type AdminReviewFormProps = {
   report: ExpenseReport;
@@ -28,8 +29,11 @@ export function AdminReviewForm({ report, reviewsUrl, onUpdate, onError }: Admin
     setSubmitting(true);
     try {
       const result = await createReview(reviewsUrl, {
-        action_type: actionType,
-        comment: comment.trim() || null,
+        action:
+          actionType === "approve"
+            ? ExpenseReportReview_Action.APPROVE
+            : ExpenseReportReview_Action.REJECT,
+        comment: comment.trim() || undefined,
       });
       onUpdate(result);
       setComment("");

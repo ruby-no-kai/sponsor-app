@@ -45,8 +45,45 @@ module Protobufable::AlbaBinding::HelperMethods
   def with_protobuf(klass, &block); end
 end
 
+# pkg:gem/protobufable#lib/protobufable/bad_request.rb:32
+module Protobufable::BadRequest
+  class << self
+    # pkg:gem/protobufable#lib/protobufable/bad_request.rb:42
+    def for(violations, message_class, json_names: T.unsafe(nil)); end
+  end
+end
+
+# pkg:gem/protobufable#lib/protobufable/bad_request.rb:34
+Protobufable::BadRequest::MESSAGE = T.let(T.unsafe(nil), String)
+
+# pkg:gem/protobufable#lib/protobufable/column_validatable.rb:25
+module Protobufable::ColumnValidatable
+  extend ::ActiveSupport::Concern
+
+  private
+
+  # pkg:gem/protobufable#lib/protobufable/column_validatable.rb:40
+  def validate_protobuf_message_columns; end
+end
+
 # pkg:gem/protobufable#lib/protobufable.rb:26
 class Protobufable::Error < ::StandardError; end
+
+# pkg:gem/protobufable#lib/protobufable/field_path.rb:21
+module Protobufable::FieldPath
+  class << self
+    # pkg:gem/protobufable#lib/protobufable/field_path.rb:29
+    def render(path, message_class, json_names: T.unsafe(nil)); end
+
+    private
+
+    # pkg:gem/protobufable#lib/protobufable/field_path.rb:42
+    def publish(field, element, json_names:); end
+
+    # pkg:gem/protobufable#lib/protobufable/field_path.rb:52
+    def subscript(element); end
+  end
+end
 
 # pkg:gem/protobufable#lib/protobufable/json_type.rb:25
 class Protobufable::JsonType < ::ActiveModel::Type::Value
@@ -173,6 +210,51 @@ module Protobufable::RequestParseable::RequestPatch
 
   # pkg:gem/protobufable#lib/protobufable/request_parseable.rb:80
   def params_parsers; end
+end
+
+# pkg:gem/protobufable#lib/protobufable/request_validatable.rb:32
+module Protobufable::RequestValidatable
+  extend ::ActiveSupport::Concern
+  include GeneratedInstanceMethods
+  include ::Protobufable::RequestParseable
+
+  mixes_in_class_methods GeneratedClassMethods
+  mixes_in_class_methods ::Protobufable::RequestParseable::ClassMethods
+  mixes_in_class_methods ::Protobufable::RequestValidatable::ClassMethods
+
+  private
+
+  # pkg:gem/protobufable#lib/protobufable/request_validatable.rb:100
+  def validate_protobuf_body!; end
+
+  module GeneratedClassMethods
+    def protobuf_body_declarations; end
+    def protobuf_body_declarations=(value); end
+    def protobuf_body_declarations?; end
+  end
+
+  module GeneratedInstanceMethods; end
+end
+
+# pkg:gem/protobufable#lib/protobufable/request_validatable.rb:67
+module Protobufable::RequestValidatable::ClassMethods
+  # pkg:gem/protobufable#lib/protobufable/request_validatable.rb:81
+  def method_added(method_name); end
+
+  # pkg:gem/protobufable#lib/protobufable/request_validatable.rb:92
+  def protobuf_body_pending?; end
+end
+
+# pkg:gem/protobufable#lib/protobufable/request_validatable.rb:38
+class Protobufable::RequestValidatable::InvalidMessage < ::Protobufable::Error
+  # pkg:gem/protobufable#lib/protobufable/request_validatable.rb:49
+  def initialize(violations, message_class); end
+
+  # pkg:gem/protobufable#lib/protobufable/request_validatable.rb:43
+  def message_class; end
+
+  # pkg:gem/protobufable#lib/protobufable/request_validatable.rb:40
+  def violations; end
 end
 
 # pkg:gem/protobufable#lib/protobufable/version.rb:9

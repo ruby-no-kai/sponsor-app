@@ -3,10 +3,13 @@
 
 module Admin
   class ExpenseReportReviewsController < Admin::ApplicationController
+    include ProtobufRequestBody
+
     before_action :set_conference
     before_action :set_sponsorship
     before_action :set_expense_report
 
+    protobuf_body Rk::SponsorApp::ExpenseReportReviewInput
     #: () -> void
     def create
       submission = expense_report.current_submission
@@ -14,14 +17,24 @@ module Admin
 
       ExpenseReportReview.create_for!(
         submission,
-        action: params.fetch(:action_type),
-        comment: params[:comment].presence,
+        action: review_action(message),
+        comment: message.comment.presence,
         staff: current_staff,
       )
 
       render json: expense_report.reload.to_resource.to_h
     rescue ActiveRecord::RecordInvalid => e
       render status: :unprocessable_content, json: {error: e.record.errors.full_messages}
+    end
+
+    # ExpenseReportReview#action for the verdict.
+    #: (Rk::SponsorApp::ExpenseReportReviewInput) -> String
+    private def review_action(input)
+      case input.action
+      when :ACTION_APPROVE then 'approve'
+      when :ACTION_REJECT then 'reject'
+      else raise ActionController::BadRequest, 'action must be ACTION_APPROVE or ACTION_REJECT'
+      end
     end
 
     #: () -> void

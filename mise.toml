@@ -38,7 +38,7 @@ depends = ["gen:proto", "gen:rbi"]
 [tasks."gen:proto"]
 description = "Generate Ruby and RBS into gen/proto/ruby, and TypeScript into app/javascript/gen"
 depends = ["js:install"]
-sources = ["proto/**/*.proto", "buf.gen.yaml", "buf.gen.javascript.yaml", "buf.yaml", "pnpm-lock.yaml"]
+sources = ["proto/**/*.proto", "buf.gen.yaml", "buf.gen.javascript.yaml", "buf.yaml", "buf.lock", "pnpm-lock.yaml"]
 outputs = { auto = true }
 run = '''
 set -eu

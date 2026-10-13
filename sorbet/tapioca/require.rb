@@ -7,3 +7,4 @@
 # never requires itself.
 
 require "protobufable/alba_binding"
+require "protobufable/protovalidate"

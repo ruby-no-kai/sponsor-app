@@ -72,7 +72,7 @@ export function LeftPane({
       const result = await createLineItem(lineItemsUrl, {
         title: "New expense",
         amount: "0",
-        tax_amount: "0",
+        taxAmount: "0",
       });
       onUpdate(result);
       const newItem = result.line_items[result.line_items.length - 1];

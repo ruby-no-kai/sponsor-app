@@ -6,6 +6,7 @@ local generated = List(
   "gen/**",
   "third_party/sorbet/rbi/dsl/rk/**",
   "third_party/sorbet/rbi/dsl/google/**",
+  "third_party/sorbet/rbi/dsl/buf/**",
   "third_party/sorbet/rbi/dsl/protobufable/**",
   "app/javascript/gen/**",
 )
