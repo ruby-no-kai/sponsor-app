@@ -1,7 +1,17 @@
 GIT
+  remote: https://github.com/ivry-inc/connect_rpc_rails.git
+  revision: 85c44368d8ec764e3f06966bd7038323af79eb47
+  ref: 85c44368d8ec764e3f06966bd7038323af79eb47
+  specs:
+    connect_rpc_rails (0.1.0)
+      actionpack (>= 7.0)
+      base64
+      google-protobuf (~> 4.26)
+
+GIT
   remote: https://github.com/sorah/protobufable.git
-  revision: bbb2280e68a3ebf784dd6435175eaa7f9b9b10a2
-  ref: bbb2280e68a3ebf784dd6435175eaa7f9b9b10a2
+  revision: 3e143adcb76aa5db5b7b4269479356e1c5ddcd5e
+  ref: 3e143adcb76aa5db5b7b4269479356e1c5ddcd5e
   specs:
     protobufable (0.1.0)
       actionpack (>= 7.1)
@@ -586,6 +596,7 @@ DEPENDENCIES
   aws_lambda_ric
   bootsnap
   commonmarker
+  connect_rpc_rails!
   connection_pool
   factory_bot_rails
   faker

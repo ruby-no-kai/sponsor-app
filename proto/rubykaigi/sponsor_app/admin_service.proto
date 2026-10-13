@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "rubykaigi/sponsor_app/admin_viewer.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// The staff area: conferences, their sponsorships and everything organizers manage.
+//
+// Served over the Connect protocol: by POST, which must send `Connect-Protocol-Version: 1`, and
+// by GET for an RPC without side effects. A browser may call it only from this site's own origin.
+//
+// Every RPC needs the staff session that the staff area's GitHub sign-in creates, and answers
+// `unauthenticated` without one.
+service AdminService {
+  // Conferences
+
+  // Form descriptions
+
+  // Plans
+
+  // Sponsorships
+
+  // Organizations
+
+  // Booth assignments
+
+  // Sponsor events
+
+  // Announcements
+
+  // Broadcasts
+
+  // Expense reports
+
+  // Viewer
+
+  // Returns the signed-in staff member.
+  rpc GetViewer(AdminServiceGetViewerRequest) returns (AdminServiceGetViewerResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Ends the staff session. A sponsor session in the same browser stays signed in.
+  rpc SignOut(AdminServiceSignOutRequest) returns (AdminServiceSignOutResponse);
+}

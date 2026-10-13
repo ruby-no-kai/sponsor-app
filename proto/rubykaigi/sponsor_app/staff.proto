@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+option ruby_package = "Rk::SponsorApp";
+
+// An organizer who signs in to the staff area with GitHub.
+message Staff {
+  // GitHub login, such as "sorah". Unique across staff.
+  string login = 1;
+
+  // Display name from the GitHub profile, or the login when the profile sets none.
+  string name = 2;
+
+  // URL of the GitHub avatar. Absent when GitHub provided none.
+  optional string avatar_url = 3;
+
+  // Whether access is limited to conferences that admit restricted staff and whose GitHub
+  // repository this staff member could read at sign-in. Unrestricted staff can manage every
+  // conference.
+  bool restricted = 4;
+}

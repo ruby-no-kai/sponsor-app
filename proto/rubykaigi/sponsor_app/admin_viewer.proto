@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "rubykaigi/sponsor_app/staff.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// Request for AdminService.GetViewer.
+message AdminServiceGetViewerRequest {}
+
+// Response for AdminService.GetViewer.
+message AdminServiceGetViewerResponse {
+  // The staff member signed in to this session.
+  Staff staff = 1;
+}
+
+// Request for AdminService.SignOut.
+message AdminServiceSignOutRequest {}
+
+// Response for AdminService.SignOut.
+message AdminServiceSignOutResponse {}

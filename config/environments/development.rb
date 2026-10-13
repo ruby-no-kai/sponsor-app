@@ -123,5 +123,7 @@ Rails.application.configure do
 
   config.x.dev.sponsor_impersonation = true
 
+  config.x.connect_rpc.enabled = true
+
   config.hosts.concat ENV["SPONSOR_APP_HOST"]&.split(",") if ENV["SPONSOR_APP_HOST"].present?
 end

@@ -62,4 +62,6 @@ Rails.application.configure do
 
   config.x.default_email_address = 'sponsorapp@localhost'
   config.x.default_email_host_part = 'sponsorapp@localhost'
+
+  config.x.connect_rpc.enabled = true
 end

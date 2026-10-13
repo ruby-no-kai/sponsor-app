@@ -18,6 +18,10 @@ Rails.application.configure do
   config.x.default_email_reply_to = ENV.fetch('DEFAULT_EMAIL_REPLY_TO', config.x.default_email_address)
   config.x.default_email_host_part = ENV.fetch('DEFAULT_EMAIL_HOST')
 
+  # CloudFront forwards an allowlist of headers (tf/cloudfront.tf) that lacks Connect-Protocol-Version,
+  # Connect-Timeout-Ms and Sec-Fetch-Site.
+  config.x.connect_rpc.enabled = ENV['SPONSOR_APP_CONNECT_RPC'].present?
+
   config.x.github.repo = ENV.fetch('GITHUB_REPO')
   config.x.github.client_id = ENV.fetch('GITHUB_CLIENT_ID')
   config.x.github.client_secret = ENV.fetch('GITHUB_CLIENT_SECRET')
