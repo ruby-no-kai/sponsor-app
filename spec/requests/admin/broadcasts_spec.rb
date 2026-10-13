@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe "Admin Broadcasts", type: :request do
+  filter_class = Rk::SponsorApp::Internal::BroadcastRecipientFilter
+
   let(:conference) { FactoryBot.create(:conference) }
   let(:staff) { FactoryBot.create(:staff) }
   let(:session_token) { FactoryBot.create(:session_token, staff:) }
@@ -41,7 +43,48 @@ RSpec.describe "Admin Broadcasts", type: :request do
       broadcast = conference.broadcasts.last
       expect(broadcast).to have_attributes(staff:, status: 'created')
       expect(response).to redirect_to(conference_broadcast_path(conference, broadcast))
-      expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(broadcast, [instance_of(ActionController::Parameters)])
+      expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(
+        broadcast,
+        [filter_class.new(raw: filter_class::Raw.new(emails: ['someone@example.com']))],
+      )
+    end
+
+    it "leaves the plan and status of current sponsors out of the queued filter" do
+      allow(CreateBroadcastDeliveriesJob).to receive(:perform_later)
+
+      post conference_broadcasts_path(conference), params: {
+        broadcast: {campaign: 'c', description: 'd', title: 't', body: 'b'},
+        recipient_filter: {kind: 'all', locale: 'ja', exhibitors: '1', plan_id: '12', status: 'active'},
+      }
+
+      expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(
+        conference.broadcasts.last,
+        [filter_class.new(current_sponsors: filter_class::CurrentSponsors.new(locale: 'ja', exhibitors_only: true))],
+      )
+    end
+
+    it "queues nothing to filter for none" do
+      allow(CreateBroadcastDeliveriesJob).to receive(:perform_later)
+
+      post conference_broadcasts_path(conference), params: {
+        broadcast: {campaign: 'c', description: 'd', title: 't', body: 'b'},
+        recipient_filter: {kind: 'none'},
+      }
+
+      expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(conference.broadcasts.last, [])
+    end
+
+    it "refuses an unknown filter kind without creating a broadcast" do
+      allow(CreateBroadcastDeliveriesJob).to receive(:perform_later)
+
+      expect do
+        post conference_broadcasts_path(conference), params: {
+          broadcast: {campaign: 'c', description: 'd', title: 't', body: 'b'},
+          recipient_filter: {kind: 'everyone'},
+        }
+      end.not_to change(conference.broadcasts, :count)
+      expect(response).to have_http_status(:bad_request)
+      expect(CreateBroadcastDeliveriesJob).not_to have_received(:perform_later)
     end
   end
 

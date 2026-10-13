@@ -19,7 +19,7 @@ RSpec.describe ProcessSponsorshipEditJob, type: :job do
     described_class.perform_now(sponsorship.last_editing_history)
 
     expect(SlackWebhookJob).to have_received(:perform_now).with(
-      hash_including(text: a_string_including('Renamed', 'edited by sponsor')),
+      text: a_string_including('Renamed', 'edited by sponsor'),
       hook_name: :feed,
     )
     expect(GenerateSponsorsYamlFileJob).to have_received(:perform_now).with(conference)
@@ -36,7 +36,7 @@ RSpec.describe ProcessSponsorshipEditJob, type: :job do
     described_class.perform_now(sponsorship.last_editing_history)
 
     expect(SlackWebhookJob).to have_received(:perform_now).with(
-      hash_including(text: a_string_including("edited by #{staff.login} (staff)")),
+      text: a_string_including("edited by #{staff.login} (staff)"),
       hook_name: :feed,
     )
   end

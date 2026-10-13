@@ -18,6 +18,7 @@ module Admin
 
     #: () -> void
     def create
+      filter = recipient_filter
       @broadcast = Broadcast.new(broadcast_params)
       @broadcast.conference = conference
       @broadcast.staff = current_staff
@@ -25,7 +26,7 @@ module Admin
 
       respond_to do |format|
         if @broadcast.save
-          CreateBroadcastDeliveriesJob.perform_later(@broadcast, [recipient_filter].compact)
+          CreateBroadcastDeliveriesJob.perform_later(@broadcast, [filter].compact)
           format.html do
             redirect_to conference_broadcast_path(conference, @broadcast)
           end
@@ -90,17 +91,10 @@ module Admin
       )
     end
 
-    #: () -> ActionController::Parameters
+    #: () -> Rk::SponsorApp::Internal::BroadcastRecipientFilter?
     private def recipient_filter
-      params.require(:recipient_filter).permit(
-        :kind,
-        :locale,
-        :exhibitors,
-        :id,
-        :exclude_current_sponsors,
-        :emails,
-        sponsorship_ids: [],
-      )
+      # TODO: apply plan and status, which the form offers, as BroadcastDeliveriesController does.
+      BroadcastRecipientFilterParams.build(params.require(:recipient_filter).except(:plan_id, :status))
     end
   end
 end

@@ -25,7 +25,7 @@ RSpec.describe BackfillSponsorshipAssetFileChecksumJob, type: :job do
     expect(asset_file).to have_received(:put_object).with(body: anything, checksum_algorithm: 'SHA256', content_type: 'image/png')
     expect(asset_file.reload.checksum_sha256).to eq('new')
     expect(SlackWebhookJob).to have_received(:perform_now).with(
-      hash_including(text: a_string_including('(- → new)')),
+      text: a_string_including('(- → new)'),
       hook_name: 'feed',
     )
   end

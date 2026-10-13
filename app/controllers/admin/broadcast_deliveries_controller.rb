@@ -8,12 +8,13 @@ module Admin
 
     #: () -> void
     def create
+      filter = recipient_filter
       if broadcast.ready?
         ApplicationRecord.transaction do
           broadcast.lock!
           if broadcast.ready?
             broadcast.update!(status: :modifying)
-            CreateBroadcastDeliveriesJob.perform_later(broadcast, [recipient_filter])
+            CreateBroadcastDeliveriesJob.perform_later(broadcast, [filter].compact)
           else
             flash[:error] = 'Unable to modify'
           end
@@ -55,19 +56,9 @@ module Admin
     #: () -> BroadcastDelivery
     private def delivery = Must.because(@delivery) { "set_delivery runs before destroy" }
 
-    #: () -> ActionController::Parameters
+    #: () -> Rk::SponsorApp::Internal::BroadcastRecipientFilter?
     private def recipient_filter
-      params.require(:recipient_filter).permit(
-        :kind,
-        :locale,
-        :exhibitors,
-        :id,
-        :exclude_current_sponsors,
-        :emails,
-        :plan_id,
-        :status,
-        sponsorship_ids: [],
-      )
+      BroadcastRecipientFilterParams.build(params.require(:recipient_filter))
     end
   end
 end

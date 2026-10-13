@@ -27,7 +27,7 @@ RSpec.describe "Expense Report Submissions", type: :request do
       allow(SlackWebhookJob).to receive(:perform_later).and_call_original
       post user_conference_sponsorship_expense_report_submission_path(conference), as: :json
       expect(SlackWebhookJob).to have_received(:perform_later).with(
-        hash_including(:text),
+        text: a_string_including('submitted an'),
         hook_name: :feed,
       )
     end

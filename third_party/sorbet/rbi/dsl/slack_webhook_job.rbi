@@ -9,14 +9,21 @@ class SlackWebhookJob
   class << self
     sig do
       params(
-        payload: T.untyped,
-        hook_name: T.untyped,
+        legacy_payload: T.nilable(T::Hash[::Symbol, ::String]),
+        text: T.nilable(::String),
+        hook_name: T.any(::String, ::Symbol),
         block: T.nilable(T.proc.params(job: SlackWebhookJob).void)
       ).returns(T.any(SlackWebhookJob, FalseClass))
     end
-    def perform_later(payload, hook_name: T.unsafe(nil), &block); end
+    def perform_later(legacy_payload = T.unsafe(nil), text: T.unsafe(nil), hook_name: T.unsafe(nil), &block); end
 
-    sig { params(payload: T.untyped, hook_name: T.untyped).returns(T.untyped) }
-    def perform_now(payload, hook_name: T.unsafe(nil)); end
+    sig do
+      params(
+        legacy_payload: T.nilable(T::Hash[::Symbol, ::String]),
+        text: T.nilable(::String),
+        hook_name: T.any(::String, ::Symbol)
+      ).void
+    end
+    def perform_now(legacy_payload = T.unsafe(nil), text: T.unsafe(nil), hook_name: T.unsafe(nil)); end
   end
 end

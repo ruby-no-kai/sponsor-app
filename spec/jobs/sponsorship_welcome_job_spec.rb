@@ -19,7 +19,7 @@ RSpec.describe SponsorshipWelcomeJob, type: :job do
 
     expect(ActionMailer::Base.deliveries.last(2).map(&:to)).to eq([[sponsorship.contact.email], [conference.contact_email_address]])
     expect(SessionToken.find_by!(email: sponsorship.contact.email).expires_at).to be > 11.months.from_now
-    expect(SlackWebhookJob).to have_received(:perform_now).with(hash_including(text: a_string_including(sponsorship.name)))
+    expect(SlackWebhookJob).to have_received(:perform_now).with(text: a_string_including(sponsorship.name))
     expect(EnsureSponsorshipTitoDiscountCodeJob).to have_received(:perform_later).with(sponsorship, 'attendee')
     expect(GenerateSponsorsYamlFileJob).to have_received(:perform_later).with(conference)
   end

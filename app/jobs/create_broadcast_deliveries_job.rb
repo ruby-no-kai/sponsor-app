@@ -2,85 +2,51 @@
 # frozen_string_literal: true
 
 class CreateBroadcastDeliveriesJob < ApplicationJob
-  # Permitted recipient filter form params, as ActiveJob deserializes them.
-  #: type filter_params = Hash[String | Symbol, untyped]
-
   Recipient = Data.define(:sponsorship, :email, :email_ccs)
 
   module Filters
     class Base
-      #: (broadcast: Broadcast, params: CreateBroadcastDeliveriesJob::filter_params) -> void
-      def initialize(broadcast:, params:)
+      #: (broadcast: Broadcast) -> void
+      def initialize(broadcast:)
         @broadcast = broadcast
-        @params = params
       end
 
       #: Broadcast
       attr_reader :broadcast
-
-      #: CreateBroadcastDeliveriesJob::filter_params
-      attr_reader :params
 
       #: () -> Array[Recipient]
       def recipients
         raise NotImplementedError
       end
 
-      #: () -> Sponsorship::PrivateRelation
-      private def status_scope
-        case params[:status]
-        when 'all', nil
+      #: (Symbol | Integer) -> Sponsorship::PrivateRelation
+      private def status_scope(status)
+        case status
+        when :SPONSORSHIP_STATUS_UNSPECIFIED
           Sponsorship.all
-        when 'not_accepted'
+        when :SPONSORSHIP_STATUS_NOT_ACCEPTED
           Sponsorship.not_accepted
-        when 'pending'
+        when :SPONSORSHIP_STATUS_PENDING
           Sponsorship.pending
-        when 'accepted'
+        when :SPONSORSHIP_STATUS_ACCEPTED
           Sponsorship.accepted
-        when 'active'
+        when :SPONSORSHIP_STATUS_ACTIVE
           Sponsorship.active
-        when 'withdrawn'
+        when :SPONSORSHIP_STATUS_WITHDRAWN
           Sponsorship.withdrawn
         else
-          Sponsorship.none
+          raise ArgumentError, "unknown sponsorship status: #{status.inspect}"
         end
       end
 
-      #: () -> Sponsorship::PrivateRelation?
-      private def plan_scope
-        if params[:plan_id].present?
-          plan = Must.expect(@broadcast.conference).plans.where(id: params[:plan_id]).first
-          if plan
-            return Sponsorship.where(plan:)
-          end
-        end
-        nil
+      #: (String) -> Sponsorship::PrivateRelation
+      private def locale_scope(locale)
+        Sponsorship.where(locale:)
       end
 
-      #: () -> Sponsorship::PrivateRelation?
-      private def locale_scope
-        if params[:locale].present?
-          Sponsorship.where(locale: params[:locale])
-        end
-      end
-
-      #: () -> Sponsorship::PrivateRelation?
-      private def exhibitor_scope
-        if params[:exhibitors].present?
-          Sponsorship.exhibitor
-        end
-      end
-
-      #: (Sponsorship::PrivateAssociationRelation) -> Sponsorship::PrivateAssociationRelation
-      private def scope_sponsorships(scope)
-        [
-          status_scope,
-          plan_scope,
-          locale_scope,
-          exhibitor_scope,
-        ].inject(scope) do |r, i|
-          i ? r.merge(i) : r
-        end
+      #: (Sponsorship::PrivateAssociationRelation, Array[Sponsorship::PrivateRelation?]) -> Sponsorship::PrivateAssociationRelation
+      private def scope_sponsorships(scope, scopes)
+        scopes.compact.inject(scope) { |r, i| r.merge(i) }
       end
 
       #: (Sponsorship::PrivateRelation | Sponsorship::PrivateAssociationRelation) -> Array[Recipient]
@@ -96,52 +62,100 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
       end
     end
 
-    class All < Base
+    class CurrentSponsors < Base
+      #: (broadcast: Broadcast, filter: Rk::SponsorApp::Internal::BroadcastRecipientFilter::CurrentSponsors) -> void
+      def initialize(broadcast:, filter:)
+        super(broadcast:)
+        @filter = filter
+      end
+
+      #: Rk::SponsorApp::Internal::BroadcastRecipientFilter::CurrentSponsors
+      attr_reader :filter
+
       #: () -> Array[Recipient]
       def recipients
-        scope = scope_sponsorships(Must.expect(@broadcast.conference).sponsorships.includes(:contact))
+        conference = Must.expect(broadcast.conference)
+        scope = scope_sponsorships(conference.sponsorships.includes(:contact), [
+          status_scope(filter.status),
+          plan_scope(conference),
+          (locale_scope(filter.locale) if filter.has_locale?),
+          (Sponsorship.exhibitor if filter.exhibitors_only),
+        ])
         sponsorships_to_recipients(scope)
+      end
+
+      #: (Conference) -> Sponsorship::PrivateRelation?
+      private def plan_scope(conference)
+        return unless filter.has_plan_id?
+
+        plan = conference.plans.find_by(id: filter.plan_id)
+        Sponsorship.where(plan:) if plan
       end
     end
 
     class PastSponsors < Base
+      #: (broadcast: Broadcast, filter: Rk::SponsorApp::Internal::BroadcastRecipientFilter::PastSponsors) -> void
+      def initialize(broadcast:, filter:)
+        super(broadcast:)
+        @filter = filter
+      end
+
+      #: Rk::SponsorApp::Internal::BroadcastRecipientFilter::PastSponsors
+      attr_reader :filter
+
+      # TODO: apply exclude_current_sponsors, which the form offers.
       #: () -> Array[Recipient]
       def recipients
-        conference = Conference.find_by!(id: params[:id])
-        scope = scope_sponsorships(conference.sponsorships.includes(:contact))
+        conference = Conference.find_by!(id: filter.conference_id)
+        scope = scope_sponsorships(conference.sponsorships.includes(:contact), [
+          status_scope(filter.status),
+          (locale_scope(filter.locale) if filter.has_locale?),
+        ])
         sponsorships_to_recipients(scope)
       end
     end
 
     class Manual < Base
+      #: (broadcast: Broadcast, filter: Rk::SponsorApp::Internal::BroadcastRecipientFilter::Manual) -> void
+      def initialize(broadcast:, filter:)
+        super(broadcast:)
+        @filter = filter
+      end
+
+      #: Rk::SponsorApp::Internal::BroadcastRecipientFilter::Manual
+      attr_reader :filter
+
       #: () -> Array[Recipient]
       def recipients
-        scope = Sponsorship.where(id: Array(params[:sponsorship_ids]))
-        if params[:exclude_current_sponsors].present?
-          scope = scope.where.not(organization_id: Must.expect(@broadcast.conference).sponsorships.pluck(:organization_id))
-        end
-        sponsorships_to_recipients(scope)
+        sponsorships_to_recipients(Sponsorship.where(id: filter.sponsorship_ids.to_a))
       end
     end
 
     class Raw < Base
+      #: (broadcast: Broadcast, filter: Rk::SponsorApp::Internal::BroadcastRecipientFilter::Raw) -> void
+      def initialize(broadcast:, filter:)
+        super(broadcast:)
+        @filter = filter
+      end
+
+      #: Rk::SponsorApp::Internal::BroadcastRecipientFilter::Raw
+      attr_reader :filter
+
       #: () -> Array[Recipient]
       def recipients
-        Array(params[:emails]).flatten.flat_map do |email_lines|
-          email_lines.to_s.each_line.map do |email|
-            Recipient.new(
-              sponsorship: nil,
-              email: email.chomp,
-              email_ccs: [],
-            )
-          end
+        filter.emails.map do |email|
+          Recipient.new(
+            sponsorship: nil,
+            email:,
+            email_ccs: [],
+          )
         end
       end
     end
   end
 
-  #: (Broadcast, Array[filter_params]) -> void
-  def perform(broadcast, recipient_filter_params)
+  #: (Broadcast, Array[Rk::SponsorApp::Internal::BroadcastRecipientFilter | Hash[String, untyped]]) -> void
+  def perform(broadcast, recipient_filters)
     ApplicationRecord.transaction do
       @broadcast = broadcast #: Broadcast?
       broadcast.lock!
@@ -158,11 +172,9 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
       end
 
       existing_emails = broadcast.deliveries.pluck(:recipient).tally
-      recipients = recipient_filter_params.flat_map do |filter|
-        filter = filter.dup
-        kind = filter.delete('kind')
-
-        filter_recipients(kind, filter)
+      recipients = recipient_filters.flat_map do |argument|
+        filter = recipient_filter(argument)
+        filter ? filter_recipients(filter) : []
       end
 
       recipients.map do |recipient|
@@ -183,21 +195,34 @@ class CreateBroadcastDeliveriesJob < ApplicationJob
     end
   end
 
-  #: (String?, filter_params) -> Array[Recipient]
-  def filter_recipients(kind, params)
-    case kind.to_s
-    when 'all'
-      Filters::All.new(broadcast: broadcast, params: params).recipients
-    when 'past_sponsors'
-      Filters::PastSponsors.new(broadcast: broadcast, params: params).recipients
-    when 'raw'
-      Filters::Raw.new(broadcast: broadcast, params: params).recipients
-    when 'manual'
-      Filters::Manual.new(broadcast: broadcast, params: params).recipients
-    when 'none'
-      []
+  # Queued jobs may still carry the permitted form params as a Hash.
+  #: (Rk::SponsorApp::Internal::BroadcastRecipientFilter | Hash[String, untyped]) -> Rk::SponsorApp::Internal::BroadcastRecipientFilter?
+  private def recipient_filter(argument)
+    case argument
+    when Hash
+      BroadcastRecipientFilterParams.from_legacy_hash(argument)
     else
-      []
+      argument
+    end
+  end
+
+  #: (Rk::SponsorApp::Internal::BroadcastRecipientFilter) -> Array[Recipient]
+  private def filter_recipients(filter)
+    case filter.kind
+    when :current_sponsors
+      sub = Must.because(filter.current_sponsors) { "kind names the field that is set" }
+      Filters::CurrentSponsors.new(broadcast:, filter: sub).recipients
+    when :past_sponsors
+      sub = Must.because(filter.past_sponsors) { "kind names the field that is set" }
+      Filters::PastSponsors.new(broadcast:, filter: sub).recipients
+    when :manual
+      sub = Must.because(filter.manual) { "kind names the field that is set" }
+      Filters::Manual.new(broadcast:, filter: sub).recipients
+    when :raw
+      sub = Must.because(filter.raw) { "kind names the field that is set" }
+      Filters::Raw.new(broadcast:, filter: sub).recipients
+    else
+      raise ArgumentError, "unknown recipient filter kind: #{filter.kind.inspect}"
     end
   end
 

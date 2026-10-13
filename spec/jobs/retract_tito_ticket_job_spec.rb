@@ -51,7 +51,7 @@ RSpec.describe RetractTitoTicketJob, type: :job do
     expect(api).to have_received(:cancel_registration).with('rubykaigi/2026', 'reg_1')
     expect(retraction.reload.completed).to be true
     expect(SlackWebhookJob).to have_received(:perform_later).with(
-      hash_including(text: a_string_including('ABC123', '(sponsor)')),
+      text: a_string_including('ABC123', '(sponsor)'),
       hook_name: :feed,
     )
   end
