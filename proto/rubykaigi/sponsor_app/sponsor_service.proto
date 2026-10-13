@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package rubykaigi.sponsor_app;
 
+import "rubykaigi/sponsor_app/sponsor_applications.proto";
 import "rubykaigi/sponsor_app/sponsor_shell.proto";
 import "rubykaigi/sponsor_app/sponsor_viewer.proto";
 
@@ -50,6 +51,48 @@ service SponsorService {
   }
 
   // Applications
+
+  // Returns a conference's application form, with what a new application starts from. Answers
+  // without a session too. A hidden conference answers `not_found`, as an unknown one does, unless
+  // the request carries its invitation code or the signed-in contact sponsors it already. Answers
+  // `failed_precondition` while the organizers have not described the form, unless it has only its
+  // conference.
+  rpc GetApplicationForm(SponsorServiceGetApplicationFormRequest) returns (SponsorServiceGetApplicationFormResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Applies for a sponsorship of a conference, and signs this browser in as its contact. Answers
+  // without a session too, and a hidden conference takes its invitation code as
+  // GetApplicationForm does. Answers `failed_precondition` when the signed-in contact has applied
+  // already, the conference takes no applications (unless this browser is signed in to the staff
+  // area too) or its form is not described, and `aborted` when an application from the same
+  // organization lands first.
+  rpc CreateSponsorship(SponsorServiceCreateSponsorshipRequest) returns (SponsorServiceCreateSponsorshipResponse);
+
+  // Returns the signed-in contact's application to a conference with its form, for editing.
+  rpc GetSponsorshipApplication(SponsorServiceGetSponsorshipApplicationRequest) returns (SponsorServiceGetSponsorshipApplicationResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Changes the signed-in contact's application to a conference. Answers `failed_precondition`
+  // once the conference stops taking amendments, for organizers too.
+  rpc UpdateSponsorship(SponsorServiceUpdateSponsorshipRequest) returns (SponsorServiceUpdateSponsorshipResponse);
+
+  // Starts uploading a logo for a new application. Answers without a session too, keeping the file
+  // for this browser until an application claims it. Answers `failed_precondition` when the
+  // signed-in contact's sponsorship of the conference has a logo already, which
+  // InitiateSponsorshipAssetUpdate replaces, or when the conference takes no amendments, unless
+  // this browser is signed in to the staff area too.
+  rpc CreateSponsorshipAssetUpload(SponsorServiceCreateSponsorshipAssetUploadRequest) returns (SponsorServiceCreateSponsorshipAssetUploadResponse);
+
+  // Starts uploading a logo file again, replacing what it holds once the upload completes. Answers
+  // `failed_precondition` when the conference takes no amendments, unless this browser is signed
+  // in to the staff area too.
+  rpc InitiateSponsorshipAssetUpdate(SponsorServiceInitiateSponsorshipAssetUpdateRequest) returns (SponsorServiceInitiateSponsorshipAssetUpdateResponse);
+
+  // Records an upload as complete, once the storage holds the file. Answers `failed_precondition`
+  // while the storage holds none.
+  rpc CompleteSponsorshipAssetUpload(SponsorServiceCompleteSponsorshipAssetUploadRequest) returns (SponsorServiceCompleteSponsorshipAssetUploadResponse);
 
   // Exhibitions and events
 

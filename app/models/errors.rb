@@ -85,14 +85,15 @@ module Errors
 
     # The Input field an attribute of the same name maps to, or nil when the Input has none. An
     # autosaved association's attribute, such as :"contact.email", maps through the Input's message
-    # field of the association's name.
+    # field of the association's name. An association the Input names by ID, such as :plan, maps to
+    # its `_id` field.
     #: (Symbol) -> String?
     private def field_path(attribute)
       return if attribute == :base
 
       descriptor = @input_class&.descriptor #: Google::Protobuf::Descriptor?
       names = attribute.to_s.split('.').map do |segment|
-        field = descriptor&.lookup(segment) #: Google::Protobuf::FieldDescriptor?
+        field = descriptor&.lookup(segment) || descriptor&.lookup("#{segment}_id") #: Google::Protobuf::FieldDescriptor?
         return unless field
 
         subtype = field.subtype

@@ -4,6 +4,8 @@
 
 import type { GenFile, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { SponsorServiceCompleteSponsorshipAssetUploadRequestSchema, SponsorServiceCompleteSponsorshipAssetUploadResponseSchema, SponsorServiceCreateSponsorshipAssetUploadRequestSchema, SponsorServiceCreateSponsorshipAssetUploadResponseSchema, SponsorServiceCreateSponsorshipRequestSchema, SponsorServiceCreateSponsorshipResponseSchema, SponsorServiceGetApplicationFormRequestSchema, SponsorServiceGetApplicationFormResponseSchema, SponsorServiceGetSponsorshipApplicationRequestSchema, SponsorServiceGetSponsorshipApplicationResponseSchema, SponsorServiceInitiateSponsorshipAssetUpdateRequestSchema, SponsorServiceInitiateSponsorshipAssetUpdateResponseSchema, SponsorServiceUpdateSponsorshipRequestSchema, SponsorServiceUpdateSponsorshipResponseSchema } from "./sponsor_applications_pb.ts";
+import { file_rubykaigi_sponsor_app_sponsor_applications } from "./sponsor_applications_pb.ts";
 import type { SponsorServiceGetSponsorshipRequestSchema, SponsorServiceGetSponsorshipResponseSchema, SponsorServiceGetTranslationsRequestSchema, SponsorServiceGetTranslationsResponseSchema, SponsorServiceListOpenConferencesRequestSchema, SponsorServiceListOpenConferencesResponseSchema, SponsorServiceSetLocaleRequestSchema, SponsorServiceSetLocaleResponseSchema } from "./sponsor_shell_pb.ts";
 import { file_rubykaigi_sponsor_app_sponsor_shell } from "./sponsor_shell_pb.ts";
 import type { SponsorServiceGetViewerRequestSchema, SponsorServiceGetViewerResponseSchema, SponsorServiceSignOutRequestSchema, SponsorServiceSignOutResponseSchema } from "./sponsor_viewer_pb.ts";
@@ -13,7 +15,7 @@ import { file_rubykaigi_sponsor_app_sponsor_viewer } from "./sponsor_viewer_pb.t
  * Describes the file rubykaigi/sponsor_app/sponsor_service.proto.
  */
 export const file_rubykaigi_sponsor_app_sponsor_service: GenFile = /*@__PURE__*/
-  fileDesc("CitydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvc3BvbnNvcl9zZXJ2aWNlLnByb3RvEhVydWJ5a2FpZ2kuc3BvbnNvcl9hcHAyyAYKDlNwb25zb3JTZXJ2aWNlEpEBCg9HZXRUcmFuc2xhdGlvbnMSOy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VHZXRUcmFuc2xhdGlvbnNSZXF1ZXN0GjwucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlR2V0VHJhbnNsYXRpb25zUmVzcG9uc2UiA5ACARJ6CglTZXRMb2NhbGUSNS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VTZXRMb2NhbGVSZXF1ZXN0GjYucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlU2V0TG9jYWxlUmVzcG9uc2USnQEKE0xpc3RPcGVuQ29uZmVyZW5jZXMSPy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VMaXN0T3BlbkNvbmZlcmVuY2VzUmVxdWVzdBpALnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUxpc3RPcGVuQ29uZmVyZW5jZXNSZXNwb25zZSIDkAIBEo4BCg5HZXRTcG9uc29yc2hpcBI6LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUdldFNwb25zb3JzaGlwUmVxdWVzdBo7LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUdldFNwb25zb3JzaGlwUmVzcG9uc2UiA5ACARJ/CglHZXRWaWV3ZXISNS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VHZXRWaWV3ZXJSZXF1ZXN0GjYucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlR2V0Vmlld2VyUmVzcG9uc2UiA5ACARJ0CgdTaWduT3V0EjMucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlU2lnbk91dFJlcXVlc3QaNC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VTaWduT3V0UmVzcG9uc2VCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_rubykaigi_sponsor_app_sponsor_shell, file_rubykaigi_sponsor_app_sponsor_viewer]);
+  fileDesc("CitydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvc3BvbnNvcl9zZXJ2aWNlLnByb3RvEhVydWJ5a2FpZ2kuc3BvbnNvcl9hcHAy7w8KDlNwb25zb3JTZXJ2aWNlEpEBCg9HZXRUcmFuc2xhdGlvbnMSOy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VHZXRUcmFuc2xhdGlvbnNSZXF1ZXN0GjwucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlR2V0VHJhbnNsYXRpb25zUmVzcG9uc2UiA5ACARJ6CglTZXRMb2NhbGUSNS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VTZXRMb2NhbGVSZXF1ZXN0GjYucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlU2V0TG9jYWxlUmVzcG9uc2USnQEKE0xpc3RPcGVuQ29uZmVyZW5jZXMSPy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VMaXN0T3BlbkNvbmZlcmVuY2VzUmVxdWVzdBpALnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUxpc3RPcGVuQ29uZmVyZW5jZXNSZXNwb25zZSIDkAIBEo4BCg5HZXRTcG9uc29yc2hpcBI6LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUdldFNwb25zb3JzaGlwUmVxdWVzdBo7LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUdldFNwb25zb3JzaGlwUmVzcG9uc2UiA5ACARKaAQoSR2V0QXBwbGljYXRpb25Gb3JtEj4ucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlR2V0QXBwbGljYXRpb25Gb3JtUmVxdWVzdBo/LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUdldEFwcGxpY2F0aW9uRm9ybVJlc3BvbnNlIgOQAgESkgEKEUNyZWF0ZVNwb25zb3JzaGlwEj0ucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlQ3JlYXRlU3BvbnNvcnNoaXBSZXF1ZXN0Gj4ucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlQ3JlYXRlU3BvbnNvcnNoaXBSZXNwb25zZRKvAQoZR2V0U3BvbnNvcnNoaXBBcHBsaWNhdGlvbhJFLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUdldFNwb25zb3JzaGlwQXBwbGljYXRpb25SZXF1ZXN0GkYucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlR2V0U3BvbnNvcnNoaXBBcHBsaWNhdGlvblJlc3BvbnNlIgOQAgESkgEKEVVwZGF0ZVNwb25zb3JzaGlwEj0ucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlVXBkYXRlU3BvbnNvcnNoaXBSZXF1ZXN0Gj4ucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlVXBkYXRlU3BvbnNvcnNoaXBSZXNwb25zZRKzAQocQ3JlYXRlU3BvbnNvcnNoaXBBc3NldFVwbG9hZBJILnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUNyZWF0ZVNwb25zb3JzaGlwQXNzZXRVcGxvYWRSZXF1ZXN0GkkucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlQ3JlYXRlU3BvbnNvcnNoaXBBc3NldFVwbG9hZFJlc3BvbnNlErkBCh5Jbml0aWF0ZVNwb25zb3JzaGlwQXNzZXRVcGRhdGUSSi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VJbml0aWF0ZVNwb25zb3JzaGlwQXNzZXRVcGRhdGVSZXF1ZXN0GksucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlSW5pdGlhdGVTcG9uc29yc2hpcEFzc2V0VXBkYXRlUmVzcG9uc2USuQEKHkNvbXBsZXRlU3BvbnNvcnNoaXBBc3NldFVwbG9hZBJKLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yU2VydmljZUNvbXBsZXRlU3BvbnNvcnNoaXBBc3NldFVwbG9hZFJlcXVlc3QaSy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VDb21wbGV0ZVNwb25zb3JzaGlwQXNzZXRVcGxvYWRSZXNwb25zZRJ/CglHZXRWaWV3ZXISNS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VHZXRWaWV3ZXJSZXF1ZXN0GjYucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlR2V0Vmlld2VyUmVzcG9uc2UiA5ACARJ0CgdTaWduT3V0EjMucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JTZXJ2aWNlU2lnbk91dFJlcXVlc3QaNC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclNlcnZpY2VTaWduT3V0UmVzcG9uc2VCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_rubykaigi_sponsor_app_sponsor_applications, file_rubykaigi_sponsor_app_sponsor_shell, file_rubykaigi_sponsor_app_sponsor_viewer]);
 
 /**
  * The sponsor area: applying for a sponsorship and managing it afterwards.
@@ -82,6 +84,93 @@ export const SponsorService: GenService<{
     methodKind: "unary";
     input: typeof SponsorServiceGetSponsorshipRequestSchema;
     output: typeof SponsorServiceGetSponsorshipResponseSchema;
+  },
+  /**
+   * Returns a conference's application form, with what a new application starts from. Answers
+   * without a session too. A hidden conference answers `not_found`, as an unknown one does, unless
+   * the request carries its invitation code or the signed-in contact sponsors it already. Answers
+   * `failed_precondition` while the organizers have not described the form, unless it has only its
+   * conference.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.SponsorService.GetApplicationForm
+   */
+  getApplicationForm: {
+    methodKind: "unary";
+    input: typeof SponsorServiceGetApplicationFormRequestSchema;
+    output: typeof SponsorServiceGetApplicationFormResponseSchema;
+  },
+  /**
+   * Applies for a sponsorship of a conference, and signs this browser in as its contact. Answers
+   * without a session too, and a hidden conference takes its invitation code as
+   * GetApplicationForm does. Answers `failed_precondition` when the signed-in contact has applied
+   * already, the conference takes no applications (unless this browser is signed in to the staff
+   * area too) or its form is not described, and `aborted` when an application from the same
+   * organization lands first.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.SponsorService.CreateSponsorship
+   */
+  createSponsorship: {
+    methodKind: "unary";
+    input: typeof SponsorServiceCreateSponsorshipRequestSchema;
+    output: typeof SponsorServiceCreateSponsorshipResponseSchema;
+  },
+  /**
+   * Returns the signed-in contact's application to a conference with its form, for editing.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.SponsorService.GetSponsorshipApplication
+   */
+  getSponsorshipApplication: {
+    methodKind: "unary";
+    input: typeof SponsorServiceGetSponsorshipApplicationRequestSchema;
+    output: typeof SponsorServiceGetSponsorshipApplicationResponseSchema;
+  },
+  /**
+   * Changes the signed-in contact's application to a conference. Answers `failed_precondition`
+   * once the conference stops taking amendments, for organizers too.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.SponsorService.UpdateSponsorship
+   */
+  updateSponsorship: {
+    methodKind: "unary";
+    input: typeof SponsorServiceUpdateSponsorshipRequestSchema;
+    output: typeof SponsorServiceUpdateSponsorshipResponseSchema;
+  },
+  /**
+   * Starts uploading a logo for a new application. Answers without a session too, keeping the file
+   * for this browser until an application claims it. Answers `failed_precondition` when the
+   * signed-in contact's sponsorship of the conference has a logo already, which
+   * InitiateSponsorshipAssetUpdate replaces, or when the conference takes no amendments, unless
+   * this browser is signed in to the staff area too.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.SponsorService.CreateSponsorshipAssetUpload
+   */
+  createSponsorshipAssetUpload: {
+    methodKind: "unary";
+    input: typeof SponsorServiceCreateSponsorshipAssetUploadRequestSchema;
+    output: typeof SponsorServiceCreateSponsorshipAssetUploadResponseSchema;
+  },
+  /**
+   * Starts uploading a logo file again, replacing what it holds once the upload completes. Answers
+   * `failed_precondition` when the conference takes no amendments, unless this browser is signed
+   * in to the staff area too.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.SponsorService.InitiateSponsorshipAssetUpdate
+   */
+  initiateSponsorshipAssetUpdate: {
+    methodKind: "unary";
+    input: typeof SponsorServiceInitiateSponsorshipAssetUpdateRequestSchema;
+    output: typeof SponsorServiceInitiateSponsorshipAssetUpdateResponseSchema;
+  },
+  /**
+   * Records an upload as complete, once the storage holds the file. Answers `failed_precondition`
+   * while the storage holds none.
+   *
+   * @generated from rpc rubykaigi.sponsor_app.SponsorService.CompleteSponsorshipAssetUpload
+   */
+  completeSponsorshipAssetUpload: {
+    methodKind: "unary";
+    input: typeof SponsorServiceCompleteSponsorshipAssetUploadRequestSchema;
+    output: typeof SponsorServiceCompleteSponsorshipAssetUploadResponseSchema;
   },
   /**
    * Returns who is using the sponsor area. Answers without a session too, describing a visitor

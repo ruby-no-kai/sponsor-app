@@ -1,0 +1,491 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "rubykaigi/sponsor_app/asset_upload.proto";
+import "rubykaigi/sponsor_app/conference.proto";
+import "rubykaigi/sponsor_app/form_description.proto";
+import "rubykaigi/sponsor_app/sponsor_viewer.proto";
+import "rubykaigi/sponsor_app/sponsorship.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// A plan as the application form offers it.
+message ApplicationPlan {
+  // Plan ID.
+  int64 id = 1;
+
+  // Display name, such as "Ruby" or "Platinum". Fallback option conditions name plans by it.
+  string name = 2;
+
+  // Price as the organizers word it. Empty when they give none.
+  string price_text = 3;
+
+  // Conference tickets the plan includes.
+  int32 number_of_guests = 4;
+
+  // Size of the booth the plan comes with. Zero when it comes with none.
+  int32 booth_size = 5;
+
+  // Whether the plan comes with a booth, so that its applicants may request one.
+  bool booth_eligible = 6;
+
+  // Whether the plan includes a sponsor talk.
+  bool talkable = 7;
+
+  // About how many words the sponsor's introduction may run to. An introduction more than a tenth
+  // longer is refused.
+  int32 words_limit = 8;
+
+  // Whether an application for the plan is accepted as soon as it is submitted. Otherwise the
+  // organizers decide after applications close.
+  bool auto_acceptance = 9;
+
+  // Whether the plan's active sponsorships fill its capacity.
+  bool sold_out = 10;
+
+  // Whether the plan has stopped taking applications.
+  bool closed = 11;
+
+  // Whether the plan takes applications, being neither sold out nor closed. An application keeps an
+  // unavailable plan it already has.
+  bool available = 12;
+}
+
+// What a conference's application form shows besides the applicant's own answers.
+message ApplicationForm {
+  // The conference applied to.
+  Conference conference = 1;
+
+  // Every plan of the conference, lowest rank first.
+  repeated ApplicationPlan plans = 2;
+
+  // The form's texts in the locale chosen for this browser, or in English when the form is not
+  // described in that locale.
+  FormDescription description = 3;
+}
+
+// A logo file uploaded for a sponsorship.
+//
+// The sponsor area downloads it from `/conferences/{slug}/sponsorship_asset_files/{id}`, under the
+// conference it was uploaded for, which redirects to a short-lived link to the storage.
+message SponsorshipAssetFile {
+  // Asset file ID.
+  int64 id = 1;
+
+  // Extension of the file's name in lower case, such as "svg". "unknown" when it had none.
+  string extension = 2;
+}
+
+// The answers of a sponsorship application, as its form shows them.
+message SponsorshipApplication {
+  // Whom the organizers write to.
+  message Contact {
+    // Email address, which the contact signs in to the sponsor area with.
+    string email = 1;
+
+    // Further addresses to copy, separated by commas or semicolons. Absent copies nobody.
+    optional string email_cc = 2;
+
+    // Postal address.
+    string address = 3;
+
+    // Company name.
+    string organization = 4;
+
+    // Department within the company. Absent names none.
+    optional string unit = 5;
+
+    // Person's name.
+    string name = 6;
+  }
+
+  // Whom invoices go to, when not to the contact.
+  message BillingContact {
+    // Email address.
+    string email = 1;
+
+    // Postal address.
+    string address = 2;
+
+    // Company name.
+    string organization = 3;
+
+    // Department within the company. Absent names none.
+    optional string unit = 4;
+
+    // Person's name.
+    string name = 5;
+  }
+
+  // ID of the plan applied for. Absent while it is undetermined, which the form calls "Other".
+  optional int64 plan_id = 1;
+
+  // Name the sponsor is listed under.
+  string name = 2;
+
+  // URL of the sponsor's website.
+  string url = 3;
+
+  // The sponsor's introduction.
+  string profile = 4;
+
+  // Whether the sponsor asked for a booth.
+  bool booth_requested = 5;
+
+  // The fallback option picked, as its value. Empty when none is.
+  string fallback_option = 6;
+
+  // Conference tickets asked for beyond the plan's. Absent when none are.
+  optional int32 number_of_additional_attendees = 7;
+
+  // Whom the organizers write to.
+  Contact contact = 8;
+
+  // Whom invoices go to. Absent sends them to contact.
+  optional BillingContact alternate_billing_contact = 9;
+
+  // What the sponsor asked of billing. Empty when nothing is.
+  string billing_request = 10;
+
+  // What the sponsor asked of the plan. Empty when nothing is.
+  string customization_request = 11;
+
+  // Anything else the sponsor told the organizers. Empty when nothing is.
+  string note = 12;
+
+  // The sponsor's logo.
+  optional SponsorshipAssetFile asset_file = 13;
+}
+
+// The answers of a sponsorship application, taken by SponsorService.CreateSponsorship and
+// UpdateSponsorship. Every field replaces what is stored.
+message SponsorshipInput {
+  // Whom the organizers write to.
+  message Contact {
+    // Email address, which the contact signs in to the sponsor area with. Its domain names the
+    // sponsoring organization, unless the application is affiliated with one.
+    string email = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.email = true
+    ];
+
+    // Further addresses to copy, separated by commas or semicolons. They cannot sign in. Absent or
+    // empty copies nobody.
+    optional string email_cc = 2;
+
+    // Postal address.
+    string address = 3 [(buf.validate.field).required = true];
+
+    // Company name.
+    string organization = 4 [(buf.validate.field).required = true];
+
+    // Department within the company. Absent or empty names none.
+    optional string unit = 5;
+
+    // Person's name.
+    string name = 6 [(buf.validate.field).required = true];
+  }
+
+  // Whom invoices go to, when not to the contact.
+  message BillingContact {
+    // Email address.
+    string email = 1 [
+      (buf.validate.field).required = true,
+      (buf.validate.field).string.email = true
+    ];
+
+    // Postal address.
+    string address = 2 [(buf.validate.field).required = true];
+
+    // Company name.
+    string organization = 3 [(buf.validate.field).required = true];
+
+    // Department within the company. Absent or empty names none.
+    optional string unit = 4;
+
+    // Person's name.
+    string name = 5 [(buf.validate.field).required = true];
+  }
+
+  // ID of the plan applied for, one of the conference's plans that is available. Absent applies for
+  // none, "Other", which only a conference allowing no plan accepts. A plan of another conference is
+  // answered `not_found`. Once the application is accepted, the plan cannot change.
+  optional int64 plan_id = 1 [(buf.validate.field).int64.gt = 0];
+
+  // Name to list the sponsor under, in English.
+  string name = 2 [(buf.validate.field).required = true];
+
+  // URL of the sponsor's website.
+  string url = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^https?://"
+  ];
+
+  // The sponsor's introduction, in English, of about the plan's words_limit words at most.
+  string profile = 4 [(buf.validate.field).required = true];
+
+  // Whether the sponsor asks for a booth, which only a plan with a booth takes.
+  bool booth_requested = 5;
+
+  // Alternative in case the plan applied for cannot be granted, as the value of a fallback option
+  // the form offers. Empty picks none.
+  string fallback_option = 6 [(buf.validate.field).string.max_len = 100];
+
+  // Conference tickets asked for beyond the plan's. Absent asks for none.
+  optional int32 number_of_additional_attendees = 7 [(buf.validate.field).int32.gte = 0];
+
+  // Whom the organizers write to.
+  Contact contact = 8 [(buf.validate.field).required = true];
+
+  // Whom invoices go to. Absent sends them to contact, removing any billing contact stored.
+  optional BillingContact alternate_billing_contact = 9;
+
+  // What the sponsor asks of billing, such as a contract to sign. Empty removes the request.
+  string billing_request = 10;
+
+  // What the sponsor asks of the plan. Empty removes the request.
+  string customization_request = 11;
+
+  // Anything else the sponsor tells the organizers. Empty removes it.
+  string note = 12;
+
+  // ID of the logo file: one uploaded in this browser through CreateSponsorshipAssetUpload, or, on
+  // a new application, the logo of another sponsorship the signed-in contact manages, which is
+  // copied. Any other file is answered `not_found`. UpdateSponsorship ignores it while the
+  // sponsorship has a logo, which InitiateSponsorshipAssetUpdate replaces in place.
+  optional int64 asset_file_id = 13 [(buf.validate.field).int64.gt = 0];
+}
+
+// Request for SponsorService.GetApplicationForm.
+message SponsorServiceGetApplicationFormRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Invitation code of a hidden conference, which its invitation link carries in `invite_code`.
+  // Ignored for a conference that is not hidden.
+  string invite_code = 2 [(buf.validate.field).string.max_len = 255];
+
+  // Affiliation code of an organization to apply as, which its affiliation link carries in
+  // `affiliation`. Empty applies as the organization the contact's email domain names.
+  string affiliation = 3 [(buf.validate.field).string.max_len = 255];
+
+  // ID of a sponsorship the signed-in contact manages, whose answers fill the form in. Absent fills
+  // nothing in.
+  optional int64 sponsorship_id_to_copy = 4 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for SponsorService.GetApplicationForm.
+message SponsorServiceGetApplicationFormResponse {
+  // The form. Only its conference is set while the conference takes no applications, unless
+  // staff_override is true.
+  ApplicationForm form = 1;
+
+  // Whether the conference takes applications now.
+  bool application_open = 2;
+
+  // Whether this browser may apply although application_open is false, as it is signed in to the
+  // staff area too.
+  bool staff_override = 3;
+
+  // Whether the signed-in contact has applied to the conference already. Their application then
+  // has a page of its own, and CreateSponsorship refuses another.
+  bool already_applied = 4;
+
+  // Name of the organization the affiliation code names. Absent without a code, or when the code
+  // names none.
+  optional string affiliated_organization_name = 5;
+
+  // Sponsorships the signed-in contact manages, whose answers can fill the form in, most recently
+  // applied first. Withdrawn ones are left out. Empty when no sponsor contact is signed in.
+  repeated SponsorViewer.Sponsorship copy_sources = 6;
+
+  // The answers of the sponsorship sponsorship_id_to_copy names that carry over to a new
+  // application: the listing, logo, contacts and billing request. Absent without one, when it is
+  // not among copy_sources, or while the form has only its conference.
+  optional SponsorshipApplication copied_application = 7;
+}
+
+// Request for SponsorService.CreateSponsorship.
+message SponsorServiceCreateSponsorshipRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Invitation code of a hidden conference, as GetApplicationForm takes it.
+  string invite_code = 2 [(buf.validate.field).string.max_len = 255];
+
+  // Affiliation code of an organization to apply as, as GetApplicationForm takes it.
+  string affiliation = 3 [(buf.validate.field).string.max_len = 255];
+
+  // The answers. A new application carries a logo.
+  SponsorshipInput input = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "sponsorship_input.asset_file_id.required"
+      message: "a logo file is required"
+      expression: "has(this.asset_file_id)"
+    }
+  ];
+
+  // Whether the applicant agrees to the policies the form shows, which they must.
+  bool policy_agreement = 5 [(buf.validate.field).cel = {
+    id: "policy_agreement.agreed"
+    message: "must agree to the policies"
+    expression: "this"
+  }];
+}
+
+// Response for SponsorService.CreateSponsorship.
+message SponsorServiceCreateSponsorshipResponse {
+  // The sponsorship applied for. It is accepted already when its plan accepts applications as they
+  // come.
+  Sponsorship sponsorship = 1;
+}
+
+// Request for SponsorService.GetSponsorshipApplication.
+message SponsorServiceGetSponsorshipApplicationRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for SponsorService.GetSponsorshipApplication.
+message SponsorServiceGetSponsorshipApplicationResponse {
+  // The form.
+  ApplicationForm form = 1;
+
+  // The answers as they stand.
+  SponsorshipApplication application = 2;
+
+  // Whether the sponsor may still change the application. Once false, UpdateSponsorship refuses
+  // every change.
+  bool amendment_open = 3;
+
+  // Whether the application is accepted, which fixes its plan.
+  bool accepted = 4;
+}
+
+// Request for SponsorService.UpdateSponsorship.
+message SponsorServiceUpdateSponsorshipRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Every answer, replacing what is stored.
+  SponsorshipInput input = 2 [(buf.validate.field).required = true];
+}
+
+// Response for SponsorService.UpdateSponsorship.
+message SponsorServiceUpdateSponsorshipResponse {
+  // The sponsorship as updated.
+  Sponsorship sponsorship = 1;
+}
+
+// Request for SponsorService.CreateSponsorshipAssetUpload.
+message SponsorServiceCreateSponsorshipAssetUploadRequest {
+  // Slug of the conference to upload the logo for, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Invitation code of a hidden conference, as GetApplicationForm takes it.
+  string invite_code = 2 [(buf.validate.field).string.max_len = 255];
+
+  // MIME type of the file: an image, SVG, PDF, ZIP archive or Illustrator or PostScript file. Absent
+  // when the browser cannot tell, which leaves the type to the storage, checked on completion.
+  optional string content_type = 3 [(buf.validate.field).string = {
+    in: [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+      "application/pdf",
+      "application/zip",
+      "application/x-zip-compressed",
+      "application/postscript",
+      "application/illustrator",
+      "application/octet-stream"
+    ]
+  }];
+}
+
+// Response for SponsorService.CreateSponsorshipAssetUpload.
+message SponsorServiceCreateSponsorshipAssetUploadResponse {
+  // Where and how to upload the file.
+  AssetUpload upload = 1;
+}
+
+// Request for SponsorService.InitiateSponsorshipAssetUpdate.
+message SponsorServiceInitiateSponsorshipAssetUpdateRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of the logo file to upload again: the logo of the signed-in contact's sponsorship of the
+  // conference, or one uploaded in this browser that no application has claimed.
+  int64 asset_file_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // MIME type of the file, as CreateSponsorshipAssetUpload takes it.
+  optional string content_type = 3 [(buf.validate.field).string = {
+    in: [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+      "application/pdf",
+      "application/zip",
+      "application/x-zip-compressed",
+      "application/postscript",
+      "application/illustrator",
+      "application/octet-stream"
+    ]
+  }];
+}
+
+// Response for SponsorService.InitiateSponsorshipAssetUpdate.
+message SponsorServiceInitiateSponsorshipAssetUpdateResponse {
+  // Where and how to upload the file.
+  AssetUpload upload = 1;
+}
+
+// Request for SponsorService.CompleteSponsorshipAssetUpload.
+message SponsorServiceCompleteSponsorshipAssetUploadRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of the logo file uploaded, as InitiateSponsorshipAssetUpdate takes it.
+  int64 asset_file_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // Version the storage answered the upload with, in its `x-amz-version-id` header. Empty when it
+  // answered none.
+  string version_id = 3 [(buf.validate.field).string.max_len = 1024];
+
+  // Extension of the file's name, such as "svg". Letters and digits only are kept, in lower case.
+  // Empty records "unknown".
+  string extension = 4 [(buf.validate.field).string.max_len = 255];
+}
+
+// Response for SponsorService.CompleteSponsorshipAssetUpload.
+message SponsorServiceCompleteSponsorshipAssetUploadResponse {
+  // The file as uploaded.
+  SponsorshipAssetFile asset_file = 1;
+}

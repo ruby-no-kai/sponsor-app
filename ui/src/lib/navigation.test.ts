@@ -30,7 +30,7 @@ describe("goTo", () => {
   it("loads any other path as a page of its own, so HAML renders it", () => {
     const { calls, navigator } = recorder();
     goTo(
-      "/conferences/rubykaigi2048/sponsorship/new?invite_code=abc",
+      "/conferences/rubykaigi2048/sponsorship_asset_files/42",
       { replace: true },
       navigator,
       BASE,
@@ -38,7 +38,7 @@ describe("goTo", () => {
     goTo("/session/new", {}, navigator, BASE);
 
     assert.deepEqual(calls, [
-      "replace /conferences/rubykaigi2048/sponsorship/new?invite_code=abc",
+      "replace /conferences/rubykaigi2048/sponsorship_asset_files/42",
       "assign /session/new",
     ]);
   });

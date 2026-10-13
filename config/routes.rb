@@ -210,6 +210,13 @@ Rails.application.routes.draw do
       rpc 'GetSponsorship' => 'api/sponsor/sponsorships'
 
       # Applications
+      rpc 'GetApplicationForm' => 'api/sponsor/sponsorship_applications'
+      rpc 'CreateSponsorship' => 'api/sponsor/sponsorship_applications'
+      rpc 'GetSponsorshipApplication' => 'api/sponsor/sponsorship_applications'
+      rpc 'UpdateSponsorship' => 'api/sponsor/sponsorship_applications'
+      rpc 'CreateSponsorshipAssetUpload' => 'api/sponsor/sponsorship_asset_files'
+      rpc 'InitiateSponsorshipAssetUpdate' => 'api/sponsor/sponsorship_asset_files'
+      rpc 'CompleteSponsorshipAssetUpload' => 'api/sponsor/sponsorship_asset_files'
 
       # Exhibitions and events
 

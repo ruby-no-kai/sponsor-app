@@ -131,6 +131,7 @@ en:
       title: Apply
     edit:
       title: Edit Application
+      amendment_availability: "You can amend your application until %{ts}."
     form:
       optional: '(Optional)'
       header: '%{name} Sponsorship Application Form'
@@ -188,6 +189,10 @@ en:
          If you have multiple files, archive all files in .zip file; This is useful in case you want us to follow a guideline, or use a separate file such as different color mode (RGB/CMYK) for website and printing purpose. If you submit a single file, please choose a one in RGB color mode.
       others_help: |
         Use the following field for anything you want let us know in advance.
+      tickets: 'Conference Tickets'
+      tickets_included_in_plan: 'Included in your plan'
+      tickets_additionally_request: 'Additional tickets'
+      tickets_total: 'Total'
       note: 'Others'
       policies: 'Policies'
       submit: 'Submit'
@@ -273,8 +278,6 @@ en:
         description: 'You can review past announcements sent to you via email, in addition to the latest informations shown above.'
         view_all: 'View All Emails'
       announcements: 'Announcements'
-    edit:
-      amendment_availability: "You can amend your application until %{ts}."
   expense_reports:
     show:
       title: Expense Report
@@ -569,6 +572,56 @@ en:
         other: 'Show %{count} older announcements'
 
     # Applications
+    applications:
+      other_plan: 'Other'
+      staff_preview: "Applications are not open. You see this form as you are signed in as staff."
+      opens_at: 'Applications open at %{ts}.'
+      amendment_closed: 'Your application can no longer be changed. Contact the organizers for any change.'
+      updated: 'Your application was successfully updated.'
+      back_to_portal: 'Back to the sponsorship portal'
+      cancel: 'Cancel'
+      sections:
+        title: 'Sections'
+        contact: 'Point of contact'
+        billing: 'Billing information'
+        plan: 'Sponsorship package'
+        booth: 'Sponsor booth'
+        fallback_option: 'Alternative plan preferences'
+        company: 'Sponsor information'
+        logo: 'Logo'
+        tickets: 'Conference tickets'
+        note: 'Others'
+        policies: 'Policies'
+      not_saved: 'Your application was not saved.'
+      fields_need_attention:
+        one: '%{field}: %{message}'
+        other: '%{count} fields need attention, starting with %{field}: %{message}'
+      show: 'Show'
+      billing_contact: 'Billing contact'
+      asset_file:
+        replace: 'Replace'
+        cancel: 'Cancel'
+        download: 'Download the current file (.%{extension})'
+        copied: 'The logo of your application to %{conference} will be copied.'
+        uploading: 'Uploading the logo'
+        too_large: '%{file} is larger than %{size} MB, so it was not uploaded. Choose a smaller file and save again.'
+        unsupported_type: '%{file} is not a type we accept, so it was not uploaded. Choose an .ai, .eps, .svg, .pdf or .zip file and save again.'
+        upload_failed: '%{file} could not be sent to our file storage. Your other answers are kept. Check your connection, choose the file again and save.'
+        service_failed: 'The logo upload could not start because our service had a problem. Your other answers are kept. Choose %{file} again and save, and contact the organizers if this keeps happening.'
+      errors:
+        required: 'This field is required'
+        choose_plan: 'Pick a plan'
+        email: 'Enter an email address'
+        url: 'Enter a URL starting with http:// or https://'
+        whole_number: 'Enter a whole number of 0 or more'
+        choose_file: 'Choose a file to upload'
+        acknowledge: 'Check the box in the notice above to confirm it, then submit'
+        agree: 'Agree to the policies to submit'
+
+    # Choosing a file
+    files:
+      choose: 'Choose file'
+      remove: 'Remove'
 
     # Exhibitions and events
 
