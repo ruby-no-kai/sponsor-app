@@ -33,6 +33,8 @@ module SponsorTranslations
     # Exhibitions and events
 
     # Broadcasts and passes
+    'broadcasts',
+    'sponsor_ui.broadcasts',
 
     # Expense reports
   ].freeze #: Array[String]

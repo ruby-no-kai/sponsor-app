@@ -221,6 +221,7 @@ Rails.application.routes.draw do
       # Exhibitions and events
 
       # Broadcasts and passes
+      rpc 'ListBroadcastDeliveries' => 'api/sponsor/broadcasts'
 
       # Expense reports
 
