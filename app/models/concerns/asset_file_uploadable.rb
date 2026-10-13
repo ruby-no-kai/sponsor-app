@@ -17,7 +17,7 @@ module AssetFileUploadable
     end
 
     before_destroy :capture_object_key_for_cleanup
-    after_destroy :destroy_s3_object
+    after_destroy_commit :destroy_s3_object
   end
 
   #: () -> String
