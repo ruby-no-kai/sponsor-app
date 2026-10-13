@@ -43,13 +43,41 @@ module Api
         Rk::SponsorApp::AdminServiceCreateBroadcastResponse.new(broadcast: broadcast_message(broadcast.reload))
       end
 
+      # Saves under the row lock DispatchBroadcast takes, so the title and body cannot change while
+      # the broadcast is being dispatched.
       authorize :conference
       #: () -> Rk::SponsorApp::AdminServiceUpdateBroadcastResponse
       def update_broadcast
         broadcast = find_broadcast
-        save_input!(broadcast)
+        broadcast.with_lock { save_input!(broadcast) }
 
         Rk::SponsorApp::AdminServiceUpdateBroadcastResponse.new(broadcast: broadcast_message(broadcast))
+      end
+
+      authorize :conference
+      #: () -> Rk::SponsorApp::AdminServiceDispatchBroadcastResponse
+      def dispatch_broadcast
+        broadcast = find_broadcast
+        claim_dispatch!(broadcast)
+        broadcast.perform_later!
+
+        Rk::SponsorApp::AdminServiceDispatchBroadcastResponse.new(broadcast: broadcast_message(broadcast.reload))
+      end
+
+      # Takes the row lock that recipient changes also take, so a broadcast is dispatched once and
+      # with the recipients it had when ready.
+      #: (Broadcast) -> void
+      private def claim_dispatch!(broadcast)
+        broadcast.with_lock do
+          unless broadcast.ready?
+            raise Errors::FailedPrecondition.new(detail: "The broadcast #{broadcast.id} is #{broadcast.status}, not ready to dispatch.")
+          end
+          unless broadcast.deliveries.exists?
+            raise Errors::FailedPrecondition.new(detail: "The broadcast #{broadcast.id} has no recipients.")
+          end
+
+          broadcast.update!(staff: current_staff, status: :pending)
+        end
       end
 
       # A validation failure raises ActiveRecord::RecordInvalid, which is answered as

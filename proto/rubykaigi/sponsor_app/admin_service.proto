@@ -259,6 +259,12 @@ service AdminService {
   // answered `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
   rpc RemoveBroadcastDelivery(AdminServiceRemoveBroadcastDeliveryRequest) returns (AdminServiceRemoveBroadcastDeliveryResponse);
 
+  // Sends a ready broadcast to every recipient, recording the staff member signed in as its
+  // sender. The emails go out in the background and cannot be recalled. A broadcast in any other
+  // state, such as one already dispatched, or one without recipients is answered
+  // `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc DispatchBroadcast(AdminServiceDispatchBroadcastRequest) returns (AdminServiceDispatchBroadcastResponse);
+
   // Expense reports
 
   // Viewer
