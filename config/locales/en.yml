@@ -633,11 +633,31 @@ en:
     # Exhibitions and events
     events:
       back_to_portal: 'Back to the sponsorship portal'
+      not_saved: 'Your event was not saved.'
       exhibition_not_saved: 'Your booth details were not saved.'
       exhibition_unavailable: 'Booth details open once a booth is assigned to your sponsorship.'
       exhibition_placeholder: 'For example: booth size, power needs, food and drink, demos'
+      cancel: 'Cancel'
+      time_zone: 'Enter the local time at the venue.'
+      withdraw_title: 'Withdraw "%{title}"?'
+      policy_title: 'Event policy'
+      image:
+        download: 'Download the current image (.%{extension})'
+        replace: 'Replace'
+        remove: 'Remove'
+        cancel: 'Cancel'
+        removing: 'The image will be removed when you save.'
+        uploading: 'Uploading the image'
+        too_large: '%{file} is larger than %{size} MB, so it was not uploaded. Choose a smaller image and save again.'
+        unsupported_type: '%{file} is not a PNG, JPEG or WebP image, so it was not uploaded. Choose another image and save again.'
+        upload_failed: '%{file} could not be sent to our file storage. Your other answers are kept. Check your connection, choose the image again and save.'
+        service_failed: 'The image upload could not start because our service had a problem. Your other answers are kept. Choose %{file} again and save, and contact the organizers if this keeps happening.'
       errors:
         required: 'This field is required'
+        url: 'Enter a URL starting with http:// or https://'
+        datetime: 'Enter a date and time'
+        acknowledge: 'Check this box to submit'
+        agree: 'Agree to the event policy to submit'
 
     # Broadcasts and passes
     broadcasts:

@@ -11,21 +11,29 @@ export function ConfirmButton({
   icon,
   iconOnly = false,
   variant = "destructive",
+  triggerVariant = variant,
   size,
   title,
   description,
   confirmLabel,
+  cancelLabel = "Cancel",
   onConfirm,
+  onError = notifyError,
 }: {
   label: string;
   icon?: Icon;
   iconOnly?: boolean;
   variant?: "primary" | "destructive";
+  // How the button that opens the dialog looks, such as a quieter "secondary-destructive".
+  triggerVariant?: "primary" | "destructive" | "secondary-destructive";
   size?: "sm" | "base";
   title: string;
   description: ReactNode;
   confirmLabel: string;
+  cancelLabel?: string;
   onConfirm: () => Promise<void>;
+  // Reports a failed action. The default words it in English, as the staff area does.
+  onError?: (error: unknown) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
@@ -36,7 +44,7 @@ export function ConfirmButton({
       await onConfirm();
       setOpen(false);
     } catch (error) {
-      notifyError(error);
+      onError(error);
     } finally {
       setIsRunning(false);
     }
@@ -56,7 +64,7 @@ export function ConfirmButton({
               aria-label={label}
             />
           ) : (
-            <Button {...props} variant={variant} icon={icon} size={size}>
+            <Button {...props} variant={triggerVariant} icon={icon} size={size}>
               {label}
             </Button>
           )
@@ -69,7 +77,7 @@ export function ConfirmButton({
           <Dialog.Close
             render={(props) => (
               <Button {...props} variant="secondary">
-                Cancel
+                {cancelLabel}
               </Button>
             )}
           />

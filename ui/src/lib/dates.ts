@@ -38,6 +38,19 @@ export function formatVenueDate(timestamp: Timestamp | undefined, unset = "—")
   return timestamp === undefined ? unset : venueDateFormat.format(timestampDate(timestamp));
 }
 
+// A moment at the venue in the given locale, such as "Sep 13, 2026, 7:00 PM", read from the UTC
+// fields the timestamp carries and naming no zone.
+export function formatVenueDateTime(timestamp: Timestamp, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "UTC",
+  }).format(timestampDate(timestamp));
+}
+
 // "Sep 13, 2026 – Nov 13, 2026", or one side with its own unset text when the other is missing.
 export function formatDateRange(
   from: Timestamp | undefined,
