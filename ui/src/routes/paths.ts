@@ -58,6 +58,7 @@ export const paths = {
   broadcastEdit: "/admin/conferences/:slug/broadcasts/:id/edit",
 
   // Expense reports
+  expenseReports: "/admin/conferences/:slug/expense_reports",
 
   // Sponsor: Translations
 

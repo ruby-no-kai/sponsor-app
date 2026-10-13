@@ -3,6 +3,7 @@ syntax = "proto3";
 package rubykaigi.sponsor_app;
 
 import "google/protobuf/timestamp.proto";
+import "rubykaigi/sponsor_app/expense_report.proto";
 import "rubykaigi/sponsor_app/organization_summary.proto";
 import "rubykaigi/sponsor_app/sponsor_event_status.proto";
 import "rubykaigi/sponsor_app/sponsorship_summary.proto";
@@ -120,25 +121,7 @@ message AdminSponsorship {
   // The expenses of a custom package the organizers reimburse.
   message ExpenseReport {
     // Where the report stands.
-    enum Status {
-      // The zero value proto3 requires. Never returned.
-      STATUS_UNSPECIFIED = 0;
-
-      // Being written by the sponsor.
-      STATUS_DRAFT = 1;
-
-      // Submitted and awaiting review.
-      STATUS_SUBMITTED = 2;
-
-      // Approved by the organizers.
-      STATUS_APPROVED = 3;
-
-      // Returned to the sponsor for changes.
-      STATUS_REJECTED = 4;
-    }
-
-    // Where the report stands.
-    Status status = 1;
+    rubykaigi.sponsor_app.ExpenseReport.Status status = 1;
 
     // Sum of the line items before tax, as a decimal such as "120000.0".
     string total_amount = 2;

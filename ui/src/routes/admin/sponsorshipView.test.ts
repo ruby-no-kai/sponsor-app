@@ -3,11 +3,11 @@ import { describe, it } from "node:test";
 import { create } from "@bufbuild/protobuf";
 import {
   AdminSponsorshipSchema,
-  AdminSponsorship_ExpenseReport_Status,
   AdminSponsorship_TitoDiscountCode_Kind,
 } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
+import { ExpenseReport_Status } from "../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
+import { EXPENSE_REPORT_STATUS_LABELS } from "./expense_report/reportView.ts";
 import {
-  EXPENSE_REPORT_STATUS_LABELS,
   boothStatus,
   customizationStatus,
   formatAmount,
@@ -78,7 +78,7 @@ describe("labels", () => {
       "Exhibitor (Paid)",
     );
     assert.equal(
-      labelOf(EXPENSE_REPORT_STATUS_LABELS, AdminSponsorship_ExpenseReport_Status.SUBMITTED).text,
+      labelOf(EXPENSE_REPORT_STATUS_LABELS, ExpenseReport_Status.SUBMITTED).text,
       "submitted",
     );
     assert.equal(labelOf(EXPENSE_REPORT_STATUS_LABELS, 99 as never).text, "99");

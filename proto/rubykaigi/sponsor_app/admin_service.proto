@@ -6,6 +6,7 @@ import "rubykaigi/sponsor_app/admin_announcements.proto";
 import "rubykaigi/sponsor_app/admin_booth_assignments.proto";
 import "rubykaigi/sponsor_app/admin_broadcasts.proto";
 import "rubykaigi/sponsor_app/admin_conferences.proto";
+import "rubykaigi/sponsor_app/admin_expense_reports.proto";
 import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
 import "rubykaigi/sponsor_app/admin_organizations.proto";
 import "rubykaigi/sponsor_app/admin_plans.proto";
@@ -266,6 +267,23 @@ service AdminService {
   rpc DispatchBroadcast(AdminServiceDispatchBroadcastRequest) returns (AdminServiceDispatchBroadcastResponse);
 
   // Expense reports
+
+  // Lists the sponsorships of a conference with a confirmed custom package, each with its expense
+  // report in brief and the fee its expenses are offset against.
+  rpc ListExpenseReports(AdminServiceListExpenseReportsRequest) returns (AdminServiceListExpenseReportsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns a sponsorship's expense report with its line items, uploaded files and latest review.
+  // A sponsorship without a report is answered `not_found`, as only its sponsor can start one.
+  rpc GetExpenseReport(AdminServiceGetExpenseReportRequest) returns (AdminServiceGetExpenseReportResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns the tax rates, rounding and fees a sponsorship's expense report is weighed against.
+  rpc CalculateExpenseReport(AdminServiceCalculateExpenseReportRequest) returns (AdminServiceCalculateExpenseReportResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Viewer
 

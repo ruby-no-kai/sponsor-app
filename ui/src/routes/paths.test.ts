@@ -87,6 +87,10 @@ describe("isSpaPathname", () => {
     assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/broadcasts/7/deliveries"));
     assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/broadcasts/7/dispatch_delivery"));
   });
+
+  it("matches the expense report list", () => {
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/expense_reports"));
+  });
 });
 
 describe("matchSpaPath", () => {
