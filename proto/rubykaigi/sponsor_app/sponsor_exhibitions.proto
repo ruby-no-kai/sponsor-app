@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "rubykaigi/sponsor_app/exhibition.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// What a sponsor tells the organizers about its booth, taken by SponsorService.CreateExhibition
+// and UpdateExhibition. Every field replaces what is stored.
+message ExhibitionInput {
+  // The exhibit, in plain text with line breaks. Not blank.
+  string description = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 20000,
+    (buf.validate.field).cel = {
+      id: "exhibition_input.description.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+}
+
+// Request for SponsorService.CreateExhibition.
+message SponsorServiceCreateExhibitionRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // The booth details.
+  ExhibitionInput input = 2 [(buf.validate.field).required = true];
+}
+
+// Response for SponsorService.CreateExhibition.
+message SponsorServiceCreateExhibitionResponse {
+  // The booth details as saved.
+  Exhibition exhibition = 1;
+}
+
+// Request for SponsorService.UpdateExhibition.
+message SponsorServiceUpdateExhibitionRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Every field, replacing what is stored.
+  ExhibitionInput input = 2 [(buf.validate.field).required = true];
+}
+
+// Response for SponsorService.UpdateExhibition.
+message SponsorServiceUpdateExhibitionResponse {
+  // The booth details as saved.
+  Exhibition exhibition = 1;
+}

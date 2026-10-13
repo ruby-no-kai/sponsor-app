@@ -631,6 +631,13 @@ en:
       remove: 'Remove'
 
     # Exhibitions and events
+    events:
+      back_to_portal: 'Back to the sponsorship portal'
+      exhibition_not_saved: 'Your booth details were not saved.'
+      exhibition_unavailable: 'Booth details open once a booth is assigned to your sponsorship.'
+      exhibition_placeholder: 'For example: booth size, power needs, food and drink, demos'
+      errors:
+        required: 'This field is required'
 
     # Broadcasts and passes
     broadcasts:
