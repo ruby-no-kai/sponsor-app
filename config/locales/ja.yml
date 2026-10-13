@@ -634,11 +634,31 @@ ja:
     # Exhibitions and events
     events:
       back_to_portal: 'スポンサーポータルに戻る'
+      not_saved: 'イベントを保存できませんでした。'
       exhibition_not_saved: 'ブース詳細を保存できませんでした。'
       exhibition_unavailable: 'ブース詳細は、スポンサーシップにブースが割り当てられた後に提出できます。'
       exhibition_placeholder: '例: ブースの規模、電源の要否、飲食物の提供、デモの内容'
+      cancel: 'キャンセル'
+      time_zone: '会場の現地時刻で入力してください。'
+      withdraw_title: '「%{title}」を取り下げますか？'
+      policy_title: 'イベントポリシー'
+      image:
+        download: '現在の画像をダウンロード (.%{extension})'
+        replace: '差し替える'
+        remove: '削除する'
+        cancel: 'キャンセル'
+        removing: '保存すると画像が削除されます。'
+        uploading: '画像をアップロードしています'
+        too_large: '%{file} は %{size} MB を超えているためアップロードしていません。より小さい画像を選択して、もう一度保存してください。'
+        unsupported_type: '%{file} は PNG, JPEG, WebP のいずれでもないためアップロードしていません。別の画像を選択して、もう一度保存してください。'
+        upload_failed: '%{file} をファイルストレージへ送信できませんでした。入力内容は保持されています。通信環境を確認し、画像を選び直してから保存してください。'
+        service_failed: 'サービス側の問題で画像のアップロードを開始できませんでした。入力内容は保持されています。%{file} を選び直して保存してください。解決しない場合は運営チームへお問い合わせください。'
       errors:
         required: '入力してください'
+        url: 'http:// または https:// で始まる URL を入力してください'
+        datetime: '日時を入力してください'
+        acknowledge: '送信するにはチェックしてください'
+        agree: '送信するにはイベントポリシーへの同意が必要です'
 
     # Broadcasts and passes
     broadcasts:

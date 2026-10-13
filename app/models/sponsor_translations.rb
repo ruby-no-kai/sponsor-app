@@ -32,7 +32,10 @@ module SponsorTranslations
 
     # Exhibitions and events
     'exhibitions',
+    'sponsor_events',
+    'views.sponsor_events',
     'activerecord.attributes.exhibition',
+    'activerecord.attributes.sponsor_event',
     'sponsor_ui.events',
 
     # Broadcasts and passes
