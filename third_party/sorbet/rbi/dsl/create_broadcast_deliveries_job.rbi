@@ -9,14 +9,19 @@ class CreateBroadcastDeliveriesJob
   class << self
     sig do
       params(
-        broadcast: T.untyped,
-        recipient_filter_params: T.untyped,
+        broadcast: ::Broadcast,
+        recipient_filters: T::Array[T.any(::Rk::SponsorApp::Internal::BroadcastRecipientFilter, T::Hash[::String, T.untyped])],
         block: T.nilable(T.proc.params(job: CreateBroadcastDeliveriesJob).void)
       ).returns(T.any(CreateBroadcastDeliveriesJob, FalseClass))
     end
-    def perform_later(broadcast, recipient_filter_params, &block); end
+    def perform_later(broadcast, recipient_filters, &block); end
 
-    sig { params(broadcast: T.untyped, recipient_filter_params: T.untyped).returns(T.untyped) }
-    def perform_now(broadcast, recipient_filter_params); end
+    sig do
+      params(
+        broadcast: ::Broadcast,
+        recipient_filters: T::Array[T.any(::Rk::SponsorApp::Internal::BroadcastRecipientFilter, T::Hash[::String, T.untyped])]
+      ).void
+    end
+    def perform_now(broadcast, recipient_filters); end
   end
 end

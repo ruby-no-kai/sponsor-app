@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe "Admin Broadcast Deliveries", type: :request do
+  filter_class = Rk::SponsorApp::Internal::BroadcastRecipientFilter
+
   let(:conference) { FactoryBot.create(:conference) }
   let(:staff) { FactoryBot.create(:staff) }
   let(:session_token) { FactoryBot.create(:session_token, staff:) }
@@ -25,7 +27,60 @@ RSpec.describe "Admin Broadcast Deliveries", type: :request do
 
         expect(response).to redirect_to(conference_broadcast_path(conference, broadcast))
         expect(broadcast.reload).to be_modifying
-        expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(broadcast, [instance_of(ActionController::Parameters)])
+        expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(
+          broadcast,
+          [filter_class.new(raw: filter_class::Raw.new(emails: ['someone@example.com']))],
+        )
+      end
+
+      it "queues the plan and status of current sponsors" do
+        post conference_broadcast_deliveries_path(conference, broadcast), params: {
+          recipient_filter: {kind: 'all', locale: 'ja', exhibitors: '1', plan_id: '12', status: 'active'},
+        }
+
+        expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(
+          broadcast,
+          [
+            filter_class.new(
+              current_sponsors: filter_class::CurrentSponsors.new(
+                locale: 'ja',
+                exhibitors_only: true,
+                plan_id: 12,
+                status: :SPONSORSHIP_STATUS_ACTIVE,
+              ),
+            ),
+          ],
+        )
+      end
+
+      it "queues every field of past sponsors" do
+        post conference_broadcast_deliveries_path(conference, broadcast), params: {
+          recipient_filter: {kind: 'past_sponsors', id: '7', locale: 'en', exclude_current_sponsors: '1', status: 'pending'},
+        }
+
+        expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(
+          broadcast,
+          [
+            filter_class.new(
+              past_sponsors: filter_class::PastSponsors.new(
+                conference_id: 7,
+                locale: 'en',
+                exclude_current_sponsors: true,
+                status: :SPONSORSHIP_STATUS_PENDING,
+              ),
+            ),
+          ],
+        )
+      end
+
+      it "refuses an unknown status and leaves the broadcast ready" do
+        post conference_broadcast_deliveries_path(conference, broadcast), params: {
+          recipient_filter: {kind: 'all', status: 'bogus'},
+        }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(broadcast.reload).to be_ready
+        expect(CreateBroadcastDeliveriesJob).not_to have_received(:perform_later)
       end
     end
 

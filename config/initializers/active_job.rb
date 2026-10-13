@@ -12,6 +12,8 @@ Rails.application.configure do
     :inline
   end
   ActiveJob::Base.queue_adapter = config.active_job.queue_adapter = adapter
+
+  config.active_job.custom_serializers << ProtobufMessageSerializer
 end
 
 ActiveJob::Base.queue_as ENV['LAMBDAKIQ_QUEUE'] if ENV['LAMBDAKIQ_QUEUE']

@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app.internal;
+
+option ruby_package = "Rk::SponsorApp::Internal";
+
+// Selects the recipients of a broadcast. Passed to CreateBroadcastDeliveriesJob as a job argument,
+// built from the admin recipient filter form.
+message BroadcastRecipientFilter {
+  oneof kind {
+    // The form's kind "all".
+    CurrentSponsors current_sponsors = 1;
+    PastSponsors past_sponsors = 2;
+    Manual manual = 3;
+    Raw raw = 4;
+  }
+
+  enum SponsorshipStatus {
+    // Every status, the form's "all".
+    SPONSORSHIP_STATUS_UNSPECIFIED = 0;
+    SPONSORSHIP_STATUS_PENDING = 1;
+    SPONSORSHIP_STATUS_ACTIVE = 2;
+    // Includes withdrawn sponsorships.
+    SPONSORSHIP_STATUS_NOT_ACCEPTED = 3;
+    // Includes withdrawn sponsorships.
+    SPONSORSHIP_STATUS_ACCEPTED = 4;
+    SPONSORSHIP_STATUS_WITHDRAWN = 5;
+  }
+
+  // Sponsorships of the broadcast's conference.
+  message CurrentSponsors {
+    optional string locale = 1;
+    bool exhibitors_only = 2;
+    // A plan of the broadcast's conference. An id naming no such plan filters nothing.
+    optional int64 plan_id = 3;
+    SponsorshipStatus status = 4;
+  }
+
+  // Sponsorships of another conference.
+  message PastSponsors {
+    int64 conference_id = 1;
+    optional string locale = 2;
+    // Sent by the form, but CreateBroadcastDeliveriesJob does not apply it.
+    bool exclude_current_sponsors = 3;
+    SponsorshipStatus status = 4;
+  }
+
+  // Sponsorships picked one by one.
+  message Manual {
+    repeated int64 sponsorship_ids = 1;
+  }
+
+  // Addresses without a sponsorship.
+  message Raw {
+    repeated string emails = 1;
+  }
+}
