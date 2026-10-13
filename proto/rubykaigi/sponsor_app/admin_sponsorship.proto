@@ -4,6 +4,7 @@ package rubykaigi.sponsor_app;
 
 import "google/protobuf/timestamp.proto";
 import "rubykaigi/sponsor_app/organization_summary.proto";
+import "rubykaigi/sponsor_app/sponsor_event_status.proto";
 import "rubykaigi/sponsor_app/sponsorship_summary.proto";
 
 option ruby_package = "Rk::SponsorApp";
@@ -102,24 +103,6 @@ message AdminSponsorship {
 
   // An event the sponsor hosts, such as a party or a meetup.
   message SponsorEvent {
-    // Where the organizers' review of the event stands.
-    enum Status {
-      // The zero value proto3 requires. Never returned.
-      STATUS_UNSPECIFIED = 0;
-
-      // Submitted and awaiting review.
-      STATUS_PENDING = 1;
-
-      // Accepted and listed.
-      STATUS_ACCEPTED = 2;
-
-      // Turned down.
-      STATUS_REJECTED = 3;
-
-      // Withdrawn by the sponsor.
-      STATUS_WITHDRAWN = 4;
-    }
-
     // Event ID.
     int64 id = 1;
 
@@ -127,7 +110,7 @@ message AdminSponsorship {
     string title = 2;
 
     // Where the organizers' review stands.
-    Status status = 3;
+    SponsorEventStatus status = 3;
 
     // When the event starts, as the local time at the venue. The Timestamp carries that wall clock
     // as the same reading in UTC.

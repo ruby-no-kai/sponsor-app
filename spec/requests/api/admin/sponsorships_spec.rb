@@ -127,7 +127,7 @@ RSpec.describe 'AdminService sponsorships', type: :request do
 
         result = connect_call(rpc, request_for(sponsorship)).sponsorship
 
-        expect(result.sponsor_events.map { [it.id, it.status] }).to eq([[earlier.id, :STATUS_PENDING], [later.id, :STATUS_ACCEPTED]])
+        expect(result.sponsor_events.map { [it.id, it.status] }).to eq([[earlier.id, :SPONSOR_EVENT_STATUS_PENDING], [later.id, :SPONSOR_EVENT_STATUS_ACCEPTED]])
         expect(result.expense_report).to have_attributes(status: :STATUS_SUBMITTED, total_amount: '1200.0', total_tax_amount: '120.0')
       end
 

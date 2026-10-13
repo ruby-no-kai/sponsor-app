@@ -69,6 +69,26 @@ function comparePaths(a: PathSegment[], b: PathSegment[], order: readonly string
   return a.length - b.length;
 }
 
+const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// Error messages on a path, and with items on the elements of the list it names, such as
+// `priorityHuman[1]`, which have no form field of their own.
+export function errorsAt(
+  fieldMeta: FieldMetas,
+  path: string,
+  { items = false }: { items?: boolean } = {},
+): string[] {
+  const itemPath = new RegExp(`^${escapeRegExp(path)}\\[(\\d+)\\]$`);
+  return Object.entries(fieldMeta).flatMap(([name, meta]) => {
+    const messages = (meta?.errors ?? []).filter(
+      (error): error is string => typeof error === "string",
+    );
+    if (name === path) return messages;
+    const item = items ? itemPath.exec(name) : null;
+    return item === null ? [] : messages.map((message) => `#${Number(item[1]) + 1}: ${message}`);
+  });
+}
+
 // The fields showing an error, in the order the editor lays them out, each with its first message.
 export function erroredFields(fieldMeta: FieldMetas, layout: FieldLayout): FieldError[] {
   const order = Object.keys(layout.labels);

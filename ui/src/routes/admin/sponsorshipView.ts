@@ -3,7 +3,6 @@ import { ValueSchema } from "@bufbuild/protobuf/wkt";
 import type { Value } from "@bufbuild/protobuf/wkt";
 import {
   AdminSponsorship_ExpenseReport_Status,
-  AdminSponsorship_SponsorEvent_Status,
   AdminSponsorship_TitoDiscountCode_Kind,
 } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 import type { AdminSponsorship } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
@@ -77,14 +76,6 @@ export function titoKindLabel(kind: AdminSponsorship_TitoDiscountCode_Kind): str
       return `Kind ${kind}`;
   }
 }
-
-export const EVENT_STATUS_LABELS: Readonly<Record<AdminSponsorship_SponsorEvent_Status, Label>> = {
-  [AdminSponsorship_SponsorEvent_Status.UNSPECIFIED]: { text: "unknown", tone: "outline" },
-  [AdminSponsorship_SponsorEvent_Status.PENDING]: { text: "pending", tone: "warning" },
-  [AdminSponsorship_SponsorEvent_Status.ACCEPTED]: { text: "accepted", tone: "success" },
-  [AdminSponsorship_SponsorEvent_Status.REJECTED]: { text: "rejected", tone: "error" },
-  [AdminSponsorship_SponsorEvent_Status.WITHDRAWN]: { text: "withdrawn", tone: "outline" },
-};
 
 export const EXPENSE_REPORT_STATUS_LABELS: Readonly<
   Record<AdminSponsorship_ExpenseReport_Status, Label>
