@@ -14,7 +14,7 @@ RSpec.describe "Sponsorships", type: :request do
 
     it "stores the request locale and releases the uploaded asset file from the session" do
       post user_conference_sponsorship_asset_files_path(conference), params: {content_type: 'image/png'}
-      asset_file_id = response.parsed_body.fetch('id').to_i
+      asset_file_id = response.parsed_body.fetch('file_id').to_i
 
       post user_conference_sponsorship_path(conference), params: {
         hl: 'ja',

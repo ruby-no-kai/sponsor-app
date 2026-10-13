@@ -33,6 +33,26 @@ RSpec.describe AssetFileUploadable do
     end
   end
 
+  describe '#make_session' do
+    before do
+      allow(Aws::STS::Client).to receive(:new).and_return(Aws::STS::Client.new(stub_responses: true, region: 'ap-northeast-1'))
+    end
+
+    it 'presigns a POST of the object pinned to its content type' do
+      file = FactoryBot.create(:expense_file, content_type: 'application/pdf')
+
+      session = file.make_session
+      expect(session).to include(id: file.id, max_size: ExpenseFile::MAX_FILE_SIZE, url: start_with('https://dummy.'))
+      expect(session.fetch(:fields)).to include('key' => file.object_key, 'Content-Type' => 'application/pdf')
+    end
+
+    it 'leaves the content type to the uploader when the file declares none' do
+      file = FactoryBot.create(:expense_file, content_type: nil)
+
+      expect(file.make_session.fetch(:fields)).not_to have_key('Content-Type')
+    end
+  end
+
   describe '.asset_file_bucket' do
     it 'is available on including models' do
       expect(ExpenseFile.asset_file_bucket).to eq(Rails.application.config.x.asset_file_uploadable.bucket)

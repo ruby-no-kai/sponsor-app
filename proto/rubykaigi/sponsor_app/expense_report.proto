@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+option ruby_package = "Rk::SponsorApp";
+
+// The figures an expense report is weighed against, which its editor shows beside it.
+message ExpenseReportCalculation {
+  // The tax rates a line item may be calculated at, such as "0.1", "0.08" and "0.0". The first is
+  // the one an editor offers first.
+  repeated string tax_rates = 1;
+
+  // Digits after the decimal point that amounts are given in. Calculated tax is rounded down to
+  // them.
+  int32 decimal = 2;
+
+  // Fee of the sponsorship's plan. Absent while the plan is undetermined.
+  optional string plan_price = 3;
+
+  // Fee the plan adds when a booth is assigned. Absent while the plan is undetermined.
+  optional string plan_price_booth = 4;
+
+  // Whether the sponsorship is assigned a booth.
+  bool booth_assigned = 5;
+
+  // The fee the expenses are offset against: plan_price, plus plan_price_booth when a booth is
+  // assigned. "0" while the plan is undetermined.
+  string total_fee = 6;
+}

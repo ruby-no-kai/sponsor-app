@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import AssetFileUploader from "../AssetFileUploader";
+import AssetFileUploader, { parseAssetFileUpload } from "../AssetFileUploader";
 import type { UploadDialogState, FileUploadEntry } from "./UploadDialog";
 import { deleteFile, updateLineItem, createLineItem, fetchReport } from "./api";
 import type { ExpenseReport } from "./types";
@@ -89,8 +89,8 @@ export function useFileUpload({
       if (!resp.ok) {
         throw new Error(`Failed to create file record: ${resp.status}`);
       }
-      const session = await resp.json();
-      const id = parseInt(session.id, 10);
+      const session = parseAssetFileUpload(await resp.json());
+      const id = Number(session.fileId);
       return { id, initiateUrl: `${filesUrl}/${id}/initiate_update` };
     },
     [filesUrl],

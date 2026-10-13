@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import type { EditorProps, ExpenseReport, CalculateResponse } from "./types";
+import type { ExpenseReportCalculation } from "../gen/rubykaigi/sponsor_app/expense_report_pb";
+import type { EditorProps, ExpenseReport } from "./types";
 import { fetchReport, fetchCalculate, submitReport, withdrawSubmission } from "./api";
 import { LeftPane } from "./LeftPane";
 import { CenterPane } from "./CenterPane";
@@ -24,7 +25,7 @@ export function ExpenseReportEditor(props: EditorProps) {
 function ExpenseReportEditorInner(props: EditorProps) {
   const i18n = useI18n();
   const [report, setReport] = useState<ExpenseReport | null>(null);
-  const [calcData, setCalcData] = useState<CalculateResponse | null>(null);
+  const [calcData, setCalcData] = useState<ExpenseReportCalculation | null>(null);
 
   const parseFragment = (): { itemId: number | null; fileId: number | null } => {
     const hash = window.location.hash;
@@ -173,13 +174,13 @@ function ExpenseReportEditorInner(props: EditorProps) {
           {calcData &&
             (() => {
               const d = calcData.decimal;
-              const fee = parseFloat(calcData.total_fee) || 0;
+              const fee = parseFloat(calcData.totalFee) || 0;
               const expense = parseFloat(report.total_amount) || 0;
               const remaining = fee - expense;
               return (
                 <span className="ml-3" style={{ whiteSpace: "nowrap" }}>
                   <span className="text-muted">{i18n.fee}</span>{" "}
-                  <strong>{formatAmount(calcData.total_fee, d)}</strong>
+                  <strong>{formatAmount(calcData.totalFee, d)}</strong>
                   <span className="text-muted ml-2">{i18n.expense}</span>{" "}
                   <strong>{formatAmount(report.total_amount, d)}</strong>
                   <span className="text-muted"> {i18n.plus_tax} </span>
@@ -362,7 +363,7 @@ function SubmitButton({
 }: {
   submissionUrl: string;
   report: ExpenseReport;
-  calcData: CalculateResponse;
+  calcData: ExpenseReportCalculation;
   onUpdate: (r: ExpenseReport) => void;
   onError: (e: string) => void;
 }) {

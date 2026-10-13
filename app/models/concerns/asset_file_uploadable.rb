@@ -27,11 +27,9 @@ module AssetFileUploadable
     "#{asset_file_global_prefix}#{prefix}#{handle}--#{id}"
   end
 
-  #: () -> { url: String, fields: Hash[String, String], max_size: Integer, id: String }
+  #: () -> { url: String, fields: Hash[String, String], max_size: Integer, id: Integer }
   def make_session
-    upload_url_and_fields.merge(
-      id: id.to_s,
-    )
+    upload_url_and_fields.merge(id:)
   end
 
   #: (?disposition: Symbol) -> String

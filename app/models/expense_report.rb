@@ -32,6 +32,9 @@ class ExpenseReport < ApplicationRecord
   validates :total_tax_amount, numericality: {less_than: 10_000_000_000}, allow_nil: true
   validate :validate_custom_sponsorship
 
+  #: () -> ExpenseReportResource
+  def to_resource = ExpenseReportResource.new(self)
+
   #: () -> void
   def recalculate_totals
     self.total_amount = line_items.sum(:amount).to_d

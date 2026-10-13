@@ -16,14 +16,14 @@ class ExpenseReportSubmissionsController < ApplicationController
       hook_name: :feed,
     )
 
-    render json: report_json
+    render json: expense_report.reload.to_resource.to_h
   end
 
   #: () -> void
   def destroy
     expense_report.withdraw_submission!
 
-    render json: report_json
+    render json: expense_report.reload.to_resource.to_h
   end
 
   #: () -> void
@@ -40,11 +40,6 @@ class ExpenseReportSubmissionsController < ApplicationController
   private def set_expense_report
     @expense_report = current_sponsorship.expense_report #: ExpenseReport?
     raise ActiveRecord::RecordNotFound unless @expense_report
-  end
-
-  #: () -> Hash[String, untyped]
-  private def report_json
-    ExpenseReportResource.new(expense_report.reload).to_h
   end
 
   #: () -> Conference

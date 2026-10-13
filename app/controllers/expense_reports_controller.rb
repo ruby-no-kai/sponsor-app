@@ -20,7 +20,7 @@ class ExpenseReportsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to user_conference_sponsorship_expense_report_path(conference) }
-      format.json { render json: report_json }
+      format.json { render json: expense_report.reload.to_resource.to_h }
     end
   end
 
@@ -28,7 +28,7 @@ class ExpenseReportsController < ApplicationController
   def show
     respond_to do |format|
       format.html
-      format.json { render json: report_json }
+      format.json { render json: expense_report.reload.to_resource.to_h }
     end
   end
 
@@ -39,20 +39,12 @@ class ExpenseReportsController < ApplicationController
     expense_report.refresh_submission_snapshot
     expense_report.save!
 
-    render json: report_json
+    render json: expense_report.reload.to_resource.to_h
   end
 
   #: () -> void
   def calculate
-    plan = current_sponsorship.plan
-    render json: {
-      tax_rates: Rails.configuration.x.expense_report.tax_rates.map { |r| r.to_f.to_s },
-      decimal: Rails.configuration.x.expense_report.decimal,
-      plan_price: plan&.price.to_s,
-      plan_price_booth: plan&.price_booth.to_s,
-      booth_assigned: current_sponsorship.booth_assigned?,
-      total_fee: calculate_total_fee.to_s,
-    }
+    render proto_json: ExpenseReportCalculationResource.new(current_sponsorship).as_protobuf
   end
 
   #: () -> void
@@ -69,21 +61,6 @@ class ExpenseReportsController < ApplicationController
   private def set_expense_report
     @expense_report = current_sponsorship.expense_report #: ExpenseReport?
     raise ActiveRecord::RecordNotFound unless @expense_report
-  end
-
-  #: () -> Hash[String, untyped]
-  private def report_json
-    ExpenseReportResource.new(expense_report.reload).to_h
-  end
-
-  #: () -> (BigDecimal | Integer)
-  private def calculate_total_fee
-    plan = current_sponsorship.plan
-    return 0 unless plan
-
-    fee = plan.price
-    fee += plan.price_booth if current_sponsorship.booth_assigned?
-    fee
   end
 
   #: () -> Conference

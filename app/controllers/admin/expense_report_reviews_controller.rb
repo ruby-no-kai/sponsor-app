@@ -19,7 +19,7 @@ module Admin
         staff: current_staff,
       )
 
-      render json: ExpenseReportResource.new(expense_report.reload).to_h
+      render json: expense_report.reload.to_resource.to_h
     rescue ActiveRecord::RecordInvalid => e
       render status: :unprocessable_content, json: {error: e.record.errors.full_messages}
     end

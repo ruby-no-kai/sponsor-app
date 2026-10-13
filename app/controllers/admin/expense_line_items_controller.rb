@@ -19,7 +19,7 @@ module Admin
         after_line_item_change
       end
 
-      render json: report_json
+      render json: expense_report.reload.to_resource.to_h
     end
 
     #: () -> void
@@ -32,7 +32,7 @@ module Admin
         after_line_item_change
       end
 
-      render json: report_json
+      render json: expense_report.reload.to_resource.to_h
     end
 
     #: () -> void
@@ -42,7 +42,7 @@ module Admin
         after_line_item_change
       end
 
-      render json: report_json
+      render json: expense_report.reload.to_resource.to_h
     end
 
     #: () -> void
@@ -117,11 +117,6 @@ module Admin
       expense_report.recalculate_totals
       expense_report.refresh_submission_snapshot
       expense_report.save!
-    end
-
-    #: () -> Hash[String, untyped]
-    private def report_json
-      ExpenseReportResource.new(expense_report.reload).to_h
     end
   end
 end

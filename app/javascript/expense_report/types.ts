@@ -25,8 +25,8 @@ export type ExpenseLineItem = {
 
 export type ExpenseFile = {
   id: number;
-  filename: string;
-  content_type: string;
+  filename: string | null;
+  content_type: string | null;
   status: "pending" | "uploaded";
   created_at: string;
 };
@@ -35,15 +35,6 @@ export type ExpenseReportReview = {
   action: "approve" | "reject";
   comment: string | null;
   created_at: string;
-};
-
-export type CalculateResponse = {
-  tax_rates: string[];
-  decimal: number;
-  plan_price: string;
-  plan_price_booth: string;
-  booth_assigned: boolean;
-  total_fee: string;
 };
 
 export type TaxMode = "exclude" | "include" | "exempt" | "manual";

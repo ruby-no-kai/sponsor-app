@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, type RefObject } from "react";
-import type { ExpenseLineItem, ExpenseReport, CalculateResponse, TaxMode } from "./types";
+import type { ExpenseReportCalculation } from "../gen/rubykaigi/sponsor_app/expense_report_pb";
+import type { ExpenseFile, ExpenseLineItem, ExpenseReport, TaxMode } from "./types";
 import { updateLineItem, deleteLineItem, createLineItem } from "./api";
 import { DropZoneIndicator } from "./FileDropOverlay";
 import { useI18n, splitAt } from "./I18nContext";
@@ -8,7 +9,7 @@ import { formatAmount } from "./format";
 type LineItemFormProps = {
   item: ExpenseLineItem;
   report: ExpenseReport;
-  calcData: CalculateResponse | null;
+  calcData: ExpenseReportCalculation | null;
   isReadOnly: boolean;
   lineItemsUrl: string;
   filesUrl: string;
@@ -144,7 +145,7 @@ export function LineItemForm({
     setEnteredAmount(formatForInput(item.amount));
   }, [item.id, item.file_ids.join(",")]);
 
-  const taxRates = calcData?.tax_rates || [];
+  const taxRates = calcData?.taxRates || [];
 
   const handleTaxModeChange = (newMode: TaxMode) => {
     setTaxMode(newMode);
@@ -466,7 +467,7 @@ function AttachFileBox({
   onAttachFile,
   onUploadFiles,
 }: {
-  attachableFiles: { id: number; filename: string }[];
+  attachableFiles: Pick<ExpenseFile, "id" | "filename">[];
   onAttachFile: (id: number) => void;
   onUploadFiles: (files: File[]) => void;
 }) {

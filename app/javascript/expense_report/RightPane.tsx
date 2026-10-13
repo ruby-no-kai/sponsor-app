@@ -60,14 +60,14 @@ export function RightPane({
         {isImage && (
           <img
             src={previewUrl}
-            alt={file.filename}
+            alt={file.filename ?? undefined}
             style={{ maxWidth: "100%", maxHeight: "100%" }}
           />
         )}
         {isPdf && (
           <iframe
             src={previewUrl}
-            title={file.filename}
+            title={file.filename ?? undefined}
             style={{ width: "100%", height: "100%", border: "none" }}
           />
         )}
