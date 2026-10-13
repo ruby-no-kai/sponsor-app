@@ -18,7 +18,7 @@ RSpec.describe "Admin Dashboard", type: :request do
 
       get slacktown_path
       expect(response).to have_http_status(:ok)
-      expect(SlackWebhookJob).to have_received(:perform_later).with({text: a_string_including(staff.login)})
+      expect(SlackWebhookJob).to have_received(:perform_later).with(text: a_string_including(staff.login))
     end
 
     it "sends a test mail on mailtown" do

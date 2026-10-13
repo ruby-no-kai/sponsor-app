@@ -14,9 +14,7 @@ class ProcessSponsorEventEditJob < ApplicationJob
     actor = staff ? "#{staff.login} (staff)" : 'sponsor'
     action = is_new_submission ? 'filed' : 'edited'
     SlackWebhookJob.perform_now(
-      {
-        text: ":calendar: <#{conference_sponsor_event_url(conference, sponsor_event)}|#{sponsor_event.title}> (<#{conference_sponsorship_url(conference, sponsorship)}|#{sponsorship.name}>): #{action} by #{actor} [#{edit.diff_summary.map { |s| "`#{s}`" }.join(", ")}] <#{conference_sponsor_event_editing_histories_url(conference, sponsor_event)}|diff>",
-      },
+      text: ":calendar: <#{conference_sponsor_event_url(conference, sponsor_event)}|#{sponsor_event.title}> (<#{conference_sponsorship_url(conference, sponsorship)}|#{sponsorship.name}>): #{action} by #{actor} [#{edit.diff_summary.map { |s| "`#{s}`" }.join(", ")}] <#{conference_sponsor_event_editing_histories_url(conference, sponsor_event)}|diff>",
       hook_name: :feed,
     )
 

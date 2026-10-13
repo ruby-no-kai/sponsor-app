@@ -12,9 +12,7 @@ class BackfillSponsorshipAssetFileChecksumJob < ApplicationJob
     was = sponsorship_asset_file.checksum_sha256_was
     sponsorship_asset_file.save!
     SlackWebhookJob.perform_now(
-      {
-        text: ":receipt: <#{conference_sponsorship_url(sponsorship.conference, sponsorship)}|#{sponsorship.name}> asset file checksum backfilled (#{was} → #{sponsorship_asset_file.checksum_sha256})",
-      },
+      text: ":receipt: <#{conference_sponsorship_url(sponsorship.conference, sponsorship)}|#{sponsorship.name}> asset file checksum backfilled (#{was} → #{sponsorship_asset_file.checksum_sha256})",
       hook_name: 'feed',
     )
   end

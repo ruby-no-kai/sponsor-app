@@ -46,9 +46,7 @@ class RetractTitoTicketJob < ApplicationJob
       sponsorship = Must.expect(retraction.sponsorship)
       release_slugs = Must.because(retraction.ticket_release_slugs) { "refresh_tito_registration has loaded the registration" }
       SlackWebhookJob.perform_later(
-        {
-          text: ":rewind: <#{conference_sponsorship_url(conference, sponsorship)}|#{sponsorship.name}> retracted their Tito order <#{retraction.tito_admin_url}|#{retraction.order_reference}> (#{release_slugs.join(",")}).\n\n>>> *Reason:* #{retraction.reason.truncate(500)}",
-        },
+        text: ":rewind: <#{conference_sponsorship_url(conference, sponsorship)}|#{sponsorship.name}> retracted their Tito order <#{retraction.tito_admin_url}|#{retraction.order_reference}> (#{release_slugs.join(",")}).\n\n>>> *Reason:* #{retraction.reason.truncate(500)}",
         hook_name: :feed,
       )
 

@@ -21,9 +21,7 @@ class ExhibitionsController < ApplicationController
 
     if @exhibition.save
       SlackWebhookJob.perform_later(
-        {
-          text: ":customs: <#{conference_sponsorship_url(current_sponsorship.conference, current_sponsorship)}|#{current_sponsorship.name}> booth details submitted by sponsor",
-        },
+        text: ":customs: <#{conference_sponsorship_url(current_sponsorship.conference, current_sponsorship)}|#{current_sponsorship.name}> booth details submitted by sponsor",
         hook_name: 'feed',
       )
       redirect_to user_conference_sponsorship_path, notice: t('.notice')
@@ -45,9 +43,7 @@ class ExhibitionsController < ApplicationController
 
     if @exhibition.update(exhibition_params)
       SlackWebhookJob.perform_later(
-        {
-          text: ":customs: <#{conference_sponsorship_url(current_sponsorship.conference, current_sponsorship)}|#{current_sponsorship.name}> booth details edited by sponsor",
-        },
+        text: ":customs: <#{conference_sponsorship_url(current_sponsorship.conference, current_sponsorship)}|#{current_sponsorship.name}> booth details edited by sponsor",
         hook_name: 'feed',
       )
       redirect_to user_conference_sponsorship_path, notice: t('.notice')

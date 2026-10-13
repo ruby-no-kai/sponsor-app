@@ -7,16 +7,16 @@ require 'json'
 require 'optparse'
 
 class SlackWebhookJob < ApplicationJob
-  #: type payload = { text: String }
-
-  #: (payload, ?hook_name: Symbol | String) -> void
-  def perform(payload, hook_name: :default)
+  # Queued jobs may still pass the {text:} Hash positionally.
+  #: (?Hash[Symbol, String]?, ?text: String?, ?hook_name: Symbol | String) -> void
+  def perform(legacy_payload = nil, text: nil, hook_name: :default)
     url = webhook_url(hook_name)
     return unless url
 
+    text ||= Must.because(legacy_payload) { "producers pass text:" }.fetch(:text)
     Net::HTTP.post_form(
       URI.parse(url),
-      payload: payload.to_json,
+      payload: {text:}.to_json,
     )
   end
 
