@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "rubykaigi/sponsor_app/conference.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// An email the organizers sent to sponsors, as the sponsorship received it.
+message BroadcastDelivery {
+  // Identifier of the email, shared by every sponsorship it was sent to.
+  int64 broadcast_id = 1;
+
+  // Subject.
+  string title = 2;
+
+  // When the email was sent.
+  google.protobuf.Timestamp sent_at = 3;
+
+  // Body as HTML, rendered from the organizers' Markdown. The placeholders the email carried for
+  // the sponsor's sign-in link are replaced with a link to the sponsorship's dashboard. Organizers
+  // may write raw HTML in it, so a client renders it in a sandbox.
+  string body_html = 4;
+}
+
+// Request for SponsorService.ListBroadcastDeliveries.
+message SponsorServiceListBroadcastDeliveriesRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for SponsorService.ListBroadcastDeliveries.
+message SponsorServiceListBroadcastDeliveriesResponse {
+  // The conference sponsored.
+  Conference conference = 1;
+
+  // Emails sent to the sponsorship, newest first, each once however many times it reached the
+  // sponsorship. Emails still being sent are left out.
+  repeated BroadcastDelivery broadcast_deliveries = 2;
+}

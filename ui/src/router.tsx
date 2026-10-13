@@ -344,6 +344,12 @@ export const router = createBrowserRouter([
               // Sponsor: Exhibitions and events
 
               // Sponsor: Broadcasts and passes
+              {
+                path: paths.sponsorBroadcasts,
+                lazy: {
+                  Component: async () => (await import("./routes/sponsor/Broadcasts.tsx")).default,
+                },
+              },
 
               // Sponsor: Expense reports
 

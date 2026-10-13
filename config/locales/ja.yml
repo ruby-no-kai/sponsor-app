@@ -627,6 +627,10 @@ ja:
     # Exhibitions and events
 
     # Broadcasts and passes
+    broadcasts:
+      back: 'スポンサーポータルへ戻る'
+      intro: '運営チームからメールで配信したお知らせを新しい順に表示しています。最新の状況は%{link}をご確認ください。'
+      portal: 'スポンサーポータル'
 
     # Expense reports
 

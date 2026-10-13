@@ -626,6 +626,10 @@ en:
     # Exhibitions and events
 
     # Broadcasts and passes
+    broadcasts:
+      back: 'Back to the sponsorship portal'
+      intro: 'Announcements the organizers sent you by email, newest first. Their current status is on the %{link}.'
+      portal: 'sponsorship portal'
 
     # Expense reports
 
