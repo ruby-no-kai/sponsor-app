@@ -201,6 +201,8 @@ Sorbet with inline RBS comments (`#:`); see `docs/type-checking.md`.
 
 `proto/` is the schema of record (package `rubykaigi.sponsor_app`, Ruby namespace `Rk::SponsorApp`). buf generates Ruby and RBS from it into `gen/proto/ruby/`, the `sponsor_app-proto` path gem that Bundler loads at boot, and TypeScript into `ui/src/gen/` for the SPA. Generated files are committed.
 
+[docs/protobuf.md](docs/protobuf.md) explains how the pieces fit: toolchain, Connect RPC, validation, problems, resources, message columns, the SPA and the known trade-offs.
+
 ```bash
 mise run gen            # Run every generator: gen/ and ui/src/gen from proto/, then the message RBIs (boots Rails, needs no database)
 mise run gen:proto      # Regenerate gen/ and ui/src/gen only
