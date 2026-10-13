@@ -19,4 +19,10 @@ RSpec.describe AdminTestMailer, type: :mailer do
     expect(JSON.parse(header_values('X-Mailgun-Variables').sole)).to eq('mailer' => 'AdminTestMailer')
     expect(header_values('List-ID')).to be_empty
   end
+
+  it 'sends user variables without broadcast ids' do
+    variables = Rk::SponsorApp::Internal::MailgunUserVariables.decode_json(header_values('X-Mailgun-Variables').sole)
+    expect(variables.has_broadcast_id?).to be(false)
+    expect(variables.has_delivery_id?).to be(false)
+  end
 end

@@ -14,7 +14,8 @@ class BroadcastMailer < ApplicationMailer
 
     message_id_for "broadcasts/#{broadcast.id}/deliveries/#{delivery.id}"
     tag "broadcast:#{broadcast.id}" # rubocop:disable Rails/ContentTag
-    variable broadcast_id: broadcast.id, delivery_id: delivery.id
+    mailgun_variables.broadcast_id = broadcast.id
+    mailgun_variables.delivery_id = delivery.id
     list_name 'broadcast'
     headers 'X-Auto-Response-Suppress' => 'All'
     mail(

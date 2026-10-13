@@ -25,10 +25,20 @@ RSpec.describe BroadcastMailer, type: :mailer do
 
     it 'tags the message for Mailgun' do
       expect(header_values('X-Mailgun-Tag')).to eq(['BroadcastMailer', "broadcast:#{broadcast.id}", "sponsorship:#{sponsorship.id}"])
+    end
+
+    it 'sends user variables in .proto field names, with int64 ids as strings' do
       expect(JSON.parse(header_values('X-Mailgun-Variables').sole)).to eq(
         'mailer' => 'BroadcastMailer',
-        'broadcast_id' => broadcast.id,
-        'delivery_id' => delivery.id,
+        'broadcast_id' => broadcast.id.to_s,
+        'delivery_id' => delivery.id.to_s,
+      )
+    end
+
+    it 'sends user variables that decode as MailgunUserVariables' do
+      variables = Rk::SponsorApp::Internal::MailgunUserVariables.decode_json(header_values('X-Mailgun-Variables').sole)
+      expect(variables).to eq(
+        Rk::SponsorApp::Internal::MailgunUserVariables.new(mailer: 'BroadcastMailer', broadcast_id: broadcast.id, delivery_id: delivery.id),
       )
     end
 
