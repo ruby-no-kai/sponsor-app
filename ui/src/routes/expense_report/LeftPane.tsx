@@ -1,14 +1,12 @@
 import { Button, Text } from "@cloudflare/kumo";
 import { PlusIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
-import { AdminService } from "../../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
-import { useRpcMutation } from "../../../lib/rpc.ts";
-import { notifyError } from "../../../lib/toast.ts";
 import { useEditor } from "./EditorContext.ts";
 import { PaneHeader, UploadHint } from "./EditorParts.tsx";
 import { moveLineItem, newLineItemInput } from "./lineItemForm.ts";
 import { fileName, unlinkedFiles } from "./reportView.ts";
 import { SortableLineItemList } from "./SortableLineItemList.tsx";
+import { useAction } from "./useAction.ts";
 
 // The line items, then the files no line item attaches.
 export function LeftPane({
@@ -27,7 +25,9 @@ export function LeftPane({
   dropIndicator: ReactNode;
 }) {
   const {
-    target,
+    rpc,
+    text,
+    notify,
     report,
     rounding,
     readOnly,
@@ -36,18 +36,15 @@ export function LeftPane({
     refreshReport,
     updateLineItem,
   } = useEditor();
-  const createLineItem = useRpcMutation(AdminService.method.createExpenseLineItem);
+  const createLineItem = useAction(rpc.createLineItem);
 
   async function handleAdd() {
     try {
-      const response = await createLineItem.trigger({
-        ...target,
-        input: newLineItemInput("New expense"),
-      });
+      const response = await createLineItem.run(newLineItemInput(text("new_item_title")));
       applyReport(response.report);
       if (response.lineItem !== undefined) onSelectItem(response.lineItem.id);
     } catch (error) {
-      notifyError(error);
+      notify(error);
     }
   }
 
@@ -59,7 +56,7 @@ export function LeftPane({
     try {
       await updateLineItem(movedId, () => ({ position: move.place }));
     } catch (error) {
-      notifyError(error);
+      notify(error);
       await refreshReport();
     }
   }
@@ -69,16 +66,16 @@ export function LeftPane({
       data-drop-zone="unlinked"
       className={`relative flex min-w-0 flex-col ${isMobile ? "" : "border-r border-kumo-line"}`}
     >
-      <PaneHeader title="Line items">
+      <PaneHeader title={text("line_items")}>
         {!readOnly && (
           <Button
             variant="secondary"
             size="sm"
             icon={PlusIcon}
-            loading={createLineItem.isMutating}
+            loading={createLineItem.isRunning}
             onClick={() => void handleAdd()}
           >
-            Add item
+            {text("add_item")}
           </Button>
         )}
       </PaneHeader>
@@ -94,13 +91,13 @@ export function LeftPane({
         {report.lineItems.length === 0 && (
           <div className="px-3 py-2">
             <Text variant="secondary" size="sm">
-              No line items yet
+              {text("no_line_items")}
             </Text>
           </div>
         )}
       </div>
 
-      <PaneHeader title="Other files" />
+      <PaneHeader title={text("files")} />
       <ul>
         {unlinkedFiles(report).map((file) => (
           <li key={file.id.toString()}>
@@ -112,12 +109,12 @@ export function LeftPane({
                 file.id === selectedFileId ? "bg-kumo-info-tint" : "hover:bg-kumo-tint"
               }`}
             >
-              {fileName(file)}
+              {fileName(file, text)}
             </button>
           </li>
         ))}
       </ul>
-      {!readOnly && <UploadHint prompt="Drop files to add or" onUploadFiles={onUploadFiles} />}
+      {!readOnly && <UploadHint message="drop_to_add" onUploadFiles={onUploadFiles} />}
       {dropIndicator}
     </div>
   );

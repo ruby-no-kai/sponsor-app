@@ -2,13 +2,19 @@ import { createContext, useContext } from "react";
 import type {
   ExpenseLineItem,
   ExpenseReport,
-} from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
+} from "../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
+import type { ExpenseRpc } from "./expenseRpc.ts";
 import type { LineItemInputInit, Rounding } from "./lineItemForm.ts";
+import type { Role } from "./reportView.ts";
+import type { EditorText } from "./text.ts";
 
 // What every pane of the editor reads and acts through.
 export type Editor = {
-  // The fields every expense report RPC request starts with.
-  target: { conferenceSlug: string; sponsorshipId: bigint };
+  role: Role;
+  rpc: ExpenseRpc;
+  text: EditorText;
+  // Reports a failed action, in the language the editor speaks.
+  notify: (error: unknown) => void;
   report: ExpenseReport;
   rounding: Rounding;
   readOnly: boolean;
@@ -24,7 +30,7 @@ export type Editor = {
     lineItemId: string,
     change: (item: ExpenseLineItem) => LineItemInputInit,
   ) => Promise<boolean>;
-  // The staff area's page redirecting to the file in the storage, for previews and downloads.
+  // The page redirecting to the file in the storage, for previews and downloads.
   fileUrl: (fileId: string) => string;
 };
 

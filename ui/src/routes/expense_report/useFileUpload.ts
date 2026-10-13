@@ -1,8 +1,7 @@
 import { useRef, useState } from "react";
-import { AdminService } from "../../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
-import { callRpc } from "../../../lib/rpc.ts";
-import { notifyError, toastManager } from "../../../lib/toast.ts";
-import { extensionOf, postToStorage, sendToStorage } from "../../../lib/upload.ts";
+import { problemDetailsOf } from "../../lib/errors.ts";
+import { toastManager } from "../../lib/toast.ts";
+import { extensionOf, postToStorage, sendToStorage } from "../../lib/upload.ts";
 import type { Editor } from "./EditorContext.ts";
 import { newLineItemInput } from "./lineItemForm.ts";
 import type { Selection } from "./reportView.ts";
@@ -23,7 +22,10 @@ export type UploadTarget = { kind: "item"; id: string } | { kind: "new-item" } |
 
 type Decision = "retry" | "discard";
 
+// The problem's title, which the server words in the viewer's language, else the error's message.
 function messageOf(error: unknown): string {
+  const title = problemDetailsOf(error)?.title;
+  if (title) return title;
   return error instanceof Error ? error.message : String(error);
 }
 
@@ -33,7 +35,10 @@ export function useFileUpload({
   editor,
   select,
 }: {
-  editor: Pick<Editor, "target" | "applyReport" | "refreshReport" | "updateLineItem">;
+  editor: Pick<
+    Editor,
+    "rpc" | "text" | "notify" | "applyReport" | "refreshReport" | "updateLineItem"
+  >;
   select: (selection: Selection) => void;
 }): {
   state: UploadState;
@@ -41,7 +46,7 @@ export function useFileUpload({
   retry: () => void;
   discard: () => void;
 } {
-  const { target, applyReport, refreshReport, updateLineItem } = editor;
+  const { rpc, text, notify, applyReport, refreshReport, updateLineItem } = editor;
   const [state, setState] = useState<UploadState>({ kind: "idle" });
   const decide = useRef<((decision: Decision) => void) | undefined>(undefined);
 
@@ -67,24 +72,15 @@ export function useFileUpload({
       for (;;) {
         try {
           mark(index, { status: "uploading" });
-          const { upload } =
+          const upload =
             fileId === undefined
-              ? await callRpc(AdminService.method.createExpenseFileUpload, {
-                  ...target,
-                  input: { filename: file.name, contentType: file.type },
-                })
-              : await callRpc(AdminService.method.initiateExpenseFileUpdate, { ...target, fileId });
-          if (upload === undefined) throw new Error("The server returned no upload");
+              ? await rpc.createFileUpload({ filename: file.name, contentType: file.type })
+              : await rpc.initiateFileUpdate(fileId);
           fileId = upload.fileId;
           const versionId = await sendToStorage(upload, file, postToStorage, ({ loaded }) =>
             show(loaded),
           );
-          await callRpc(AdminService.method.completeExpenseFileUpload, {
-            ...target,
-            fileId,
-            versionId,
-            extension: extensionOf(file.name),
-          });
+          await rpc.completeFileUpload({ fileId, versionId, extension: extensionOf(file.name) });
           completed += Math.max(file.size, 1);
           mark(index, { status: "done" });
           return fileId;
@@ -97,9 +93,7 @@ export function useFileUpload({
           if (decision === "discard") {
             if (fileId !== undefined) {
               // A pending file left behind is never listed, so a failed delete is let go.
-              await callRpc(AdminService.method.deleteExpenseFile, { ...target, fileId }).catch(
-                () => undefined,
-              );
+              await rpc.deleteFile(fileId).catch(() => undefined);
             }
             completed += Math.max(file.size, 1);
             mark(index, { status: "discarded" });
@@ -122,10 +116,9 @@ export function useFileUpload({
   async function place(fileIds: string[], destination: UploadTarget) {
     try {
       if (destination.kind === "new-item") {
-        const response = await callRpc(AdminService.method.createExpenseLineItem, {
-          ...target,
-          input: newLineItemInput("New expense", fileIds),
-        });
+        const response = await rpc.createLineItem(
+          newLineItemInput(text("new_item_title"), fileIds),
+        );
         applyReport(response.report);
         if (response.lineItem !== undefined) select({ kind: "item", id: response.lineItem.id });
         return;
@@ -146,7 +139,7 @@ export function useFileUpload({
       const [first] = fileIds;
       if (first !== undefined) select({ kind: "file", id: first });
     } catch (error) {
-      notifyError(error);
+      notify(error);
     }
   }
 
@@ -156,8 +149,10 @@ export function useFileUpload({
     if (refused.length > 0) {
       toastManager.add({
         variant: "error",
-        title: `Unsupported file type: ${refused.map((file) => file.name).join(", ")}`,
-        description: "Upload JPEG, PNG, GIF or WebP images, or PDFs.",
+        title: text("error_unsupported_file", {
+          names: refused.map((file) => file.name).join(", "),
+        }),
+        description: text("supported_file_types"),
       });
     }
     const accepted = files.filter(isAllowedFile);

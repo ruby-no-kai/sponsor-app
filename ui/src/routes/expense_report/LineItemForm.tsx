@@ -3,33 +3,33 @@ import { TrashIcon, XIcon } from "@phosphor-icons/react";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 import type { RefObject } from "react";
-import { AdminService } from "../../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
 import type {
   ExpenseLineItem,
   ExpenseReport,
-} from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
-import { fieldViolations } from "../../../lib/errors.ts";
-import { erroredFields } from "../../../lib/fieldErrors.ts";
-import { useSaveRejection } from "../../../lib/rejection.ts";
-import { useRpcMutation } from "../../../lib/rpc.ts";
-import { notifyError, toastManager } from "../../../lib/toast.ts";
-import { ConfirmAction } from "./ConfirmAction.tsx";
-import { ErrorList, joined, SaveErrorBanner, useFieldReveal } from "../FormParts.tsx";
+} from "../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
+import { fieldViolations } from "../../lib/errors.ts";
+import { erroredFields } from "../../lib/fieldErrors.ts";
+import { useSaveRejection } from "../../lib/rejection.ts";
+import { toastManager } from "../../lib/toast.ts";
+import { ErrorList, joined, SaveErrorBanner, useFieldReveal } from "../admin/FormParts.tsx";
+import { saveErrorMessages } from "./saveErrorMessages.ts";
 import { addAmounts, formatAmountAt, formatRate } from "./amounts.ts";
+import { ConfirmAction } from "./ConfirmAction.tsx";
 import { useEditor } from "./EditorContext.ts";
 import { UploadHint } from "./EditorParts.tsx";
 import {
-  FIELD_LABELS,
-  LINE_ITEM_LAYOUT,
-  TAX_MODES,
+  fieldLabels,
   isLineItemChanged,
   lineItemInputFrom,
+  lineItemLayout,
   lineItemValuesFrom,
   newLineItemInput,
   storedAmounts,
+  taxModes,
 } from "./lineItemForm.ts";
 import type { TaxMode } from "./lineItemForm.ts";
 import { fileName } from "./reportView.ts";
+import { useAction } from "./useAction.ts";
 
 // Edits the selected line item. The parent keys it by the stored item but its position, so a save
 // or a change made elsewhere starts it afresh, and a reorder does not.
@@ -49,11 +49,15 @@ export function LineItemForm({
   onPreviewFile: (id: string) => void;
   onUploadLinked: (files: File[]) => void;
 }) {
-  const { target, report, rounding, readOnly, isMobile, applyReport, fileUrl } = useEditor();
+  const { role, rpc, text, notify, report, rounding, readOnly, isMobile, applyReport, fileUrl } =
+    useEditor();
   const { decimal, taxRates } = rounding;
-  const updateLineItem = useRpcMutation(AdminService.method.updateExpenseLineItem);
-  const createLineItem = useRpcMutation(AdminService.method.createExpenseLineItem);
-  const deleteLineItem = useRpcMutation(AdminService.method.deleteExpenseLineItem);
+  const updateLineItem = useAction(rpc.updateLineItem);
+  const createLineItem = useAction(rpc.createLineItem);
+  const deleteLineItem = useAction(rpc.deleteLineItem);
+  const labels = fieldLabels(text);
+  const layout = lineItemLayout(text);
+  const taxModeItems = taxModes(text);
   // The error of the last save, for its code and request ID.
   const [saveError, setSaveError] = useState<unknown>();
   const { formRef, reveal } = useFieldReveal();
@@ -65,21 +69,17 @@ export function LineItemForm({
     onSubmit: async ({ value, formApi }) => {
       let result: ExpenseReport | undefined;
       try {
-        const response = await updateLineItem.trigger({
-          ...target,
-          lineItemId: item.id,
-          input: lineItemInputFrom(value, decimal),
-        });
+        const response = await updateLineItem.run(item.id, lineItemInputFrom(value, decimal));
         result = response.report;
       } catch (error) {
         setSaveError(error);
         rejection.reject(formApi, value, fieldViolations(error, { prefix: "input." }));
-        const [first] = erroredFields(formApi.state.fieldMeta, LINE_ITEM_LAYOUT);
+        const [first] = erroredFields(formApi.state.fieldMeta, layout);
         if (first !== undefined) reveal(first.path);
         return;
       }
       setSaveError(undefined);
-      toastManager.add({ variant: "success", title: `Saved ${item.title}` });
+      toastManager.add({ variant: "success", title: text("saved", { title: item.title }) });
       applyReport(result);
     },
   });
@@ -96,28 +96,23 @@ export function LineItemForm({
   async function handleAddSameFiles() {
     try {
       if (isChanged) {
-        const saved = await updateLineItem.trigger({
-          ...target,
-          lineItemId: item.id,
-          input: lineItemInputFrom(values, decimal),
-        });
+        const saved = await updateLineItem.run(item.id, lineItemInputFrom(values, decimal));
         applyReport(saved.report);
       }
-      const response = await createLineItem.trigger({
-        ...target,
-        input: newLineItemInput("New expense", values.fileIds),
-      });
+      const response = await createLineItem.run(
+        newLineItemInput(text("new_item_title"), values.fileIds),
+      );
       applyReport(response.report);
       if (response.lineItem !== undefined) onSelectItem(response.lineItem.id);
     } catch (error) {
-      notifyError(error);
+      notify(error);
     }
   }
 
   async function handleDelete() {
-    const response = await deleteLineItem.trigger({ ...target, lineItemId: item.id });
+    const changed = await deleteLineItem.run(item.id);
     dirtyRef.current = false;
-    applyReport(response.report);
+    applyReport(changed);
     onDeleted();
   }
 
@@ -141,7 +136,12 @@ export function LineItemForm({
     ...taxRates.map((rate) => ({ label: formatRate(rate), value: rate })),
     ...(taxRates.includes(values.taxRate)
       ? []
-      : [{ label: `${formatRate(values.taxRate)} (not offered)`, value: values.taxRate }]),
+      : [
+          {
+            label: text("rate_not_offered", { rate: formatRate(values.taxRate) }),
+            value: values.taxRate,
+          },
+        ]),
   ];
 
   return (
@@ -157,7 +157,7 @@ export function LineItemForm({
       <form.Field name="title">
         {(field) => (
           <Input
-            label={FIELD_LABELS.title}
+            label={labels.title}
             data-field={field.name}
             value={field.state.value}
             onChange={(event) => field.handleChange(event.target.value)}
@@ -171,10 +171,10 @@ export function LineItemForm({
       <form.Field name="notes">
         {(field) => (
           <InputArea
-            label={FIELD_LABELS.notes}
+            label={labels.notes}
             data-field={field.name}
             rows={2}
-            placeholder="(optional)"
+            placeholder={text("notes_placeholder")}
             value={field.state.value}
             onChange={(event) => field.handleChange(event.target.value)}
             onBlur={field.handleBlur}
@@ -188,13 +188,13 @@ export function LineItemForm({
         {(field) => (
           <div data-field={field.name}>
             <Select
-              label={FIELD_LABELS.taxMode}
+              label={labels.taxMode}
               value={field.state.value}
               onValueChange={(value) => {
-                const mode = TAX_MODES.find((option) => option.value === value)?.value;
+                const mode = taxModeItems.find((option) => option.value === value)?.value;
                 if (mode !== undefined) changeTaxMode(mode);
               }}
-              items={TAX_MODES}
+              items={taxModeItems}
               disabled={readOnly}
             />
           </div>
@@ -206,7 +206,7 @@ export function LineItemForm({
           {(field) => (
             <div data-field={field.name}>
               <Select
-                label={FIELD_LABELS.taxRate}
+                label={labels.taxRate}
                 value={field.state.value}
                 onValueChange={(value) => field.handleChange(String(value ?? ""))}
                 items={rateItems}
@@ -222,7 +222,7 @@ export function LineItemForm({
         <form.Field name="amount">
           {(field) => (
             <Input
-              label={values.taxMode === "include" ? "Amount (incl. tax)" : "Amount (excl. tax)"}
+              label={values.taxMode === "include" ? text("amount_incl") : text("amount_excl")}
               data-field={field.name}
               inputMode="decimal"
               className="font-mono"
@@ -238,7 +238,7 @@ export function LineItemForm({
           <form.Field name="taxAmount">
             {(field) => (
               <Input
-                label={FIELD_LABELS.taxAmount}
+                label={labels.taxAmount}
                 data-field={field.name}
                 inputMode="decimal"
                 className="font-mono"
@@ -257,7 +257,7 @@ export function LineItemForm({
       </form.Subscribe>
 
       <Text variant="secondary">
-        Total (incl. tax):{" "}
+        {text("total_incl_label")}:{" "}
         <span className="font-mono text-[0.9em] font-medium">
           {total === undefined ? "—" : formatAmountAt(total, decimal)}
         </span>
@@ -267,7 +267,7 @@ export function LineItemForm({
         {(field) => (
           <div className="flex flex-col gap-1" data-field={field.name}>
             <Checkbox
-              label="Preliminal (planned budget, not finalized)"
+              label={text("preliminal_label")}
               checked={field.state.value}
               onCheckedChange={(checked) => field.handleChange(checked)}
               disabled={readOnly}
@@ -281,11 +281,11 @@ export function LineItemForm({
         {(field) => (
           <div className="flex flex-col gap-2" data-field={field.name}>
             <Text bold size="sm">
-              {FIELD_LABELS.fileIds}
+              {labels.fileIds}
             </Text>
             {attached.length === 0 ? (
               <Text variant="secondary" size="sm">
-                No files attached
+                {text("no_files_attached")}
               </Text>
             ) : (
               <ul className="flex flex-col gap-1">
@@ -300,7 +300,7 @@ export function LineItemForm({
                           : onPreviewFile(file.id)
                       }
                     >
-                      {fileName(file)}
+                      {fileName(file, text)}
                     </button>
                     {!readOnly && (
                       <Button
@@ -308,8 +308,8 @@ export function LineItemForm({
                         size="sm"
                         shape="square"
                         icon={XIcon}
-                        title={`Detach ${fileName(file)}`}
-                        aria-label={`Detach ${fileName(file)}`}
+                        title={text("detach", { name: fileName(file, text) })}
+                        aria-label={text("detach", { name: fileName(file, text) })}
                         onClick={() =>
                           field.handleChange(field.state.value.filter((id) => id !== file.id))
                         }
@@ -321,10 +321,10 @@ export function LineItemForm({
             )}
             <ErrorList errors={field.state.meta.errors} />
             {!readOnly && (
-              <UploadHint prompt="Drop files here to attach, or" onUploadFiles={onUploadLinked}>
+              <UploadHint message="drop_or_upload" onUploadFiles={onUploadLinked}>
                 {attachable.length > 0 && (
                   <Select
-                    aria-label="Link an existing file"
+                    aria-label={text("link_existing")}
                     value=""
                     onValueChange={(value) => {
                       if (typeof value === "string" && value !== "") {
@@ -332,9 +332,9 @@ export function LineItemForm({
                       }
                     }}
                     items={[
-                      { label: "Link an existing file…", value: "" },
+                      { label: text("link_existing"), value: "" },
                       ...attachable.map((file) => ({
-                        label: fileName(file),
+                        label: fileName(file, text),
                         value: file.id,
                       })),
                     ]}
@@ -350,7 +350,7 @@ export function LineItemForm({
         <form.Subscribe
           selector={(state) => ({
             formError: state.errorMap.onChange,
-            errored: erroredFields(state.fieldMeta, LINE_ITEM_LAYOUT),
+            errored: erroredFields(state.fieldMeta, layout),
             isSubmitting: state.isSubmitting,
           })}
         >
@@ -361,6 +361,7 @@ export function LineItemForm({
                 errored={errored}
                 error={saveError}
                 onShow={reveal}
+                messages={role === "sponsor" ? saveErrorMessages(text) : undefined}
               />
               <div className="flex flex-wrap items-center gap-2">
                 <Button
@@ -369,23 +370,25 @@ export function LineItemForm({
                   loading={isSubmitting}
                   disabled={!isChanged}
                 >
-                  Save
+                  {text("save")}
                 </Button>
                 <Button
                   variant="secondary"
-                  loading={createLineItem.isMutating}
+                  loading={createLineItem.isRunning}
                   onClick={() => void handleAddSameFiles()}
                 >
-                  Duplicate line, keep files
+                  {text("duplicate_keep_files")}
                 </Button>
               </div>
               <div className="flex border-t border-kumo-line pt-3">
                 <ConfirmAction
-                  label="Delete"
+                  label={text("delete")}
                   icon={TrashIcon}
-                  title="Delete this line item?"
-                  description={`${item.title} is removed from the report. Its files stay.`}
-                  confirmLabel="Delete"
+                  title={text("confirm_delete_item")}
+                  description={item.title}
+                  confirmLabel={text("delete")}
+                  cancelLabel={text("review_dialog_cancel")}
+                  onError={notify}
                   onConfirm={handleDelete}
                 />
               </div>

@@ -245,6 +245,10 @@ Rails.application.routes.draw do
       rpc 'CreateExpenseLineItem' => 'api/sponsor/expense_line_items'
       rpc 'UpdateExpenseLineItem' => 'api/sponsor/expense_line_items'
       rpc 'DeleteExpenseLineItem' => 'api/sponsor/expense_line_items'
+      rpc 'CreateExpenseFileUpload' => 'api/sponsor/expense_files'
+      rpc 'InitiateExpenseFileUpdate' => 'api/sponsor/expense_files'
+      rpc 'CompleteExpenseFileUpload' => 'api/sponsor/expense_files'
+      rpc 'DeleteExpenseFile' => 'api/sponsor/expense_files'
 
       # Viewer
       rpc 'GetViewer' => 'api/sponsor/viewer'

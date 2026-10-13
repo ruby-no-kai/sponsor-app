@@ -2,7 +2,6 @@ import { Button, Dialog } from "@cloudflare/kumo";
 import type { Icon } from "@phosphor-icons/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { notifyError } from "../../../lib/toast.ts";
 
 type Variant = "primary" | "secondary" | "secondary-destructive" | "destructive";
 
@@ -17,10 +16,10 @@ export function ConfirmAction({
   title,
   description,
   confirmLabel,
-  cancelLabel = "Cancel",
+  cancelLabel,
   beforeOpen,
   onConfirm,
-  onError = notifyError,
+  onError,
 }: {
   label: string;
   icon?: Icon;
@@ -30,10 +29,10 @@ export function ConfirmAction({
   title: string;
   description: ReactNode;
   confirmLabel: string;
-  cancelLabel?: string;
+  cancelLabel: string;
   beforeOpen?: () => boolean;
   onConfirm: () => Promise<void>;
-  onError?: (error: unknown) => void;
+  onError: (error: unknown) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);

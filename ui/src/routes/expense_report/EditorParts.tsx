@@ -1,6 +1,7 @@
 import { Text } from "@cloudflare/kumo";
 import { useRef } from "react";
 import type { ReactNode } from "react";
+import { useEditor } from "./EditorContext.ts";
 import { ALLOWED_CONTENT_TYPES } from "./upload.ts";
 
 export function PaneHeader({ title, children }: { title: string; children?: ReactNode }) {
@@ -14,28 +15,33 @@ export function PaneHeader({ title, children }: { title: string; children?: Reac
   );
 }
 
-// A dashed box offering the file picker beside dropping.
+// A dashed box offering the file picker beside dropping. `message` is a text with a `%{link}` to
+// put the picker's button in.
 export function UploadHint({
-  prompt,
+  message,
   onUploadFiles,
   children,
 }: {
-  prompt: string;
+  message: "drop_to_add" | "drop_or_upload";
   onUploadFiles: (files: File[]) => void;
   children?: ReactNode;
 }) {
+  const { text } = useEditor();
   const inputRef = useRef<HTMLInputElement>(null);
   return (
     <div className="m-1 flex flex-col gap-2 rounded-sm border border-dashed border-kumo-line px-3 py-2 text-center text-sm text-kumo-subtle">
       <div>
-        {prompt}{" "}
-        <button
-          type="button"
-          className="text-kumo-link underline"
-          onClick={() => inputRef.current?.click()}
-        >
-          upload
-        </button>
+        {text.rich(message, {
+          link: (
+            <button
+              type="button"
+              className="text-kumo-link underline"
+              onClick={() => inputRef.current?.click()}
+            >
+              {text("upload")}
+            </button>
+          ),
+        })}
       </div>
       <input
         ref={inputRef}

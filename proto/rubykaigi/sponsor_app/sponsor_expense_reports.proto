@@ -152,10 +152,105 @@ message SponsorServiceWithdrawExpenseReportSubmissionResponse {
 }
 
 // Request for SponsorService.CreateExpenseFileUpload.
+message SponsorServiceCreateExpenseFileUploadRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // The file to upload.
+  ExpenseFileUploadInput input = 2 [(buf.validate.field).required = true];
+}
+
 // Response for SponsorService.CreateExpenseFileUpload.
+message SponsorServiceCreateExpenseFileUploadResponse {
+  // Where and how to upload the file.
+  ExpenseFileUpload upload = 1;
+}
+
 // Request for SponsorService.InitiateExpenseFileUpdate.
+message SponsorServiceInitiateExpenseFileUpdateRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of an expense file of the sponsorship.
+  int64 file_id = 2 [
+    jstype = JS_STRING,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  // MIME type of the file to upload, as ExpenseFileUploadInput.content_type. Absent keeps the
+  // one declared when the upload was created.
+  optional string content_type = 3 [(buf.validate.field).string = {
+    in: [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "application/pdf"
+    ]
+  }];
+}
+
 // Response for SponsorService.InitiateExpenseFileUpdate.
+message SponsorServiceInitiateExpenseFileUpdateResponse {
+  // Where and how to upload the file.
+  ExpenseFileUpload upload = 1;
+}
+
 // Request for SponsorService.CompleteExpenseFileUpload.
+message SponsorServiceCompleteExpenseFileUploadRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of an expense file of the sponsorship.
+  int64 file_id = 2 [
+    jstype = JS_STRING,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  // Name to give the file. Absent keeps the name given when the upload was created.
+  optional string filename = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+
+  // Version the storage answered the upload with, in its `x-amz-version-id` header. Empty when it
+  // answered none.
+  string version_id = 4 [(buf.validate.field).string.max_len = 1024];
+
+  // Extension of the file's name, such as "pdf". Letters and digits only are kept, in lower
+  // case. Empty records "unknown".
+  string extension = 5 [(buf.validate.field).string.max_len = 255];
+}
+
 // Response for SponsorService.CompleteExpenseFileUpload.
+message SponsorServiceCompleteExpenseFileUploadResponse {
+  // The file as uploaded, with the content type the storage recorded.
+  ExpenseFile file = 1;
+}
+
 // Request for SponsorService.DeleteExpenseFile.
+message SponsorServiceDeleteExpenseFileRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of an expense file of the sponsorship.
+  int64 file_id = 2 [
+    jstype = JS_STRING,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
 // Response for SponsorService.DeleteExpenseFile.
+message SponsorServiceDeleteExpenseFileResponse {}

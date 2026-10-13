@@ -220,6 +220,25 @@ service SponsorService {
   // PROBLEM_TYPE_FAILED_PRECONDITION.
   rpc WithdrawExpenseReportSubmission(SponsorServiceWithdrawExpenseReportSubmissionRequest) returns (SponsorServiceWithdrawExpenseReportSubmissionResponse);
 
+  // Starts uploading an expense file: records the file, then returns a presigned POST to the
+  // storage for the browser to send it with. CompleteExpenseFileUpload lists the file once the
+  // upload is done. A report that is submitted or approved is answered `failed_precondition`
+  // with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc CreateExpenseFileUpload(SponsorServiceCreateExpenseFileUploadRequest) returns (SponsorServiceCreateExpenseFileUploadResponse);
+
+  // Returns a fresh presigned POST for an expense file, to retry its upload or replace its
+  // contents. Answers a submitted or approved report as CreateExpenseFileUpload does.
+  rpc InitiateExpenseFileUpdate(SponsorServiceInitiateExpenseFileUpdateRequest) returns (SponsorServiceInitiateExpenseFileUpdateResponse);
+
+  // Records that an expense file's upload is done, taking its version, checksum and content type
+  // from the storage. A file the storage does not hold yet is answered `failed_precondition`, and
+  // so is a submitted or approved report.
+  rpc CompleteExpenseFileUpload(SponsorServiceCompleteExpenseFileUploadRequest) returns (SponsorServiceCompleteExpenseFileUploadResponse);
+
+  // Deletes an expense file from the storage, detaching it from every line item. Answers a
+  // submitted or approved report as CreateExpenseFileUpload does.
+  rpc DeleteExpenseFile(SponsorServiceDeleteExpenseFileRequest) returns (SponsorServiceDeleteExpenseFileResponse);
+
   // Viewer
 
   // Returns who is using the sponsor area. Answers without a session too, describing a visitor

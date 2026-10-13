@@ -4,7 +4,7 @@ import { create, toJson } from "@bufbuild/protobuf";
 import {
   ExpenseLineItemInputSchema,
   ExpenseLineItemSchema,
-} from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
+} from "../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
 import {
   isLineItemChanged,
   lineItemInputFrom,
