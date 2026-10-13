@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app.internal;
+
+import "rubykaigi/sponsor_app/internal/mailgun_user_variables.proto";
+
+option ruby_package = "Rk::SponsorApp::Internal";
+
+// The fields the Mailgun webhook reads from an event-data, decoded from Mailgun's JSON with unknown
+// fields ignored. BroadcastDelivery#mailgun_events keeps the event-data itself, as Mailgun sent it.
+message MailgunEvent {
+  // Mailgun's ID of the event.
+  string id = 1;
+
+  // What happened to the message, such as "delivered" or "opened".
+  string event = 2;
+
+  // The X-Mailgun-Variables the message was sent with. Absent when it carried none.
+  MailgunUserVariables user_variables = 3 [json_name = "user-variables"];
+}

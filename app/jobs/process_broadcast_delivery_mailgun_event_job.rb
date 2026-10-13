@@ -5,18 +5,23 @@ class ProcessBroadcastDeliveryMailgunEventJob < ApplicationJob
   # A Mailgun webhook event-data payload.
   #: type mailgun_event = Hash[String, untyped]
 
+  # The webhook answers an unreadable event 406 instead of queueing it, and a job holding one would fail
+  # every retry the same way.
+  discard_on Google::Protobuf::ParseError do |_job, error|
+    Sentry.capture_exception(error)
+  end
+
   #: (mailgun_event) -> void
   def perform(event_data)
-    @event_data = event_data #: mailgun_event?
-    delivery_id = user_variables['delivery_id']
+    event = Rk::SponsorApp::Internal::MailgunEvent.decode_json(JSON.generate(event_data), ignore_unknown_fields: true)
     ApplicationRecord.transaction do
-      delivery = BroadcastDelivery.lock.find(delivery_id)
+      delivery = BroadcastDelivery.lock.find(event.user_variables&.delivery_id)
       delivery.add_mailgun_event event_data
 
       last_event = Must.because(delivery.mailgun_events.last) { "add_mailgun_event has just added an event" }
       # Events arrive out of order; only the latest one decides the status.
-      if event_data['id'] == last_event['id']
-        delivery.status = case event_data['event']
+      if last_event['id'] == event.id
+        delivery.status = case event.event
         when 'accepted'
           :accepted
         when 'rejected'
@@ -37,13 +42,5 @@ class ProcessBroadcastDeliveryMailgunEventJob < ApplicationJob
       delivery.save!
       Must.expect(delivery.broadcast).update_status.save!
     end
-  end
-
-  #: mailgun_event?
-  attr_reader :event_data
-
-  #: () -> Hash[String, untyped]
-  def user_variables
-    Must.because(event_data) { "perform sets the event data" }['user-variables'] || {}
   end
 end
