@@ -25,8 +25,8 @@ export type ExpenseLineItem = {
 
 export type ExpenseFile = {
   id: number;
-  filename: string;
-  content_type: string;
+  filename: string | null;
+  content_type: string | null;
   status: "pending" | "uploaded";
   created_at: string;
 };

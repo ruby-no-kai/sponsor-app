@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import type { ExpenseReportCalculation } from "../gen/rubykaigi/sponsor_app/expense_report_pb";
-import type { ExpenseReport, ExpenseLineItem } from "./types";
+import type { ExpenseFile, ExpenseReport, ExpenseLineItem } from "./types";
 import { useI18n } from "./I18nContext";
 import { formatAmount } from "./format";
 
@@ -21,7 +21,7 @@ type LineItemGroup = {
 
 function groupLineItems(report: ExpenseReport): {
   groups: LineItemGroup[];
-  unlinkedFiles: { id: number; filename: string }[];
+  unlinkedFiles: Pick<ExpenseFile, "id" | "filename">[];
 } {
   const fileMap = new Map(report.files.map((f) => [f.id, f]));
   const grouped = new Map<string, { fileIds: number[]; items: ExpenseLineItem[] }>();
