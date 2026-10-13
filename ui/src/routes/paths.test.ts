@@ -68,6 +68,7 @@ describe("isSpaPathname", () => {
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/events"));
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/events/42"));
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/events/42/edit"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/events/42/editing_history"));
     assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/events/42/download_asset"));
   });
 });

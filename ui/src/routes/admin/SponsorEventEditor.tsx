@@ -117,6 +117,7 @@ function Editor({
         (key) =>
           isRpcKeyOf(key, AdminService.method.getSponsorEvent) ||
           isRpcKeyOf(key, AdminService.method.listSponsorEvents) ||
+          isRpcKeyOf(key, AdminService.method.listSponsorEventEditingHistory) ||
           isRpcKeyOf(key, AdminService.method.getSponsorship),
       );
       await navigate(eventPath);

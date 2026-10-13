@@ -204,6 +204,13 @@ export const router = createBrowserRouter([
                     (await import("./routes/admin/SponsorEventEditor.tsx")).default,
                 },
               },
+              {
+                path: paths.sponsorEventEditingHistory,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorEventEditingHistory.tsx")).default,
+                },
+              },
 
               // Announcements
 

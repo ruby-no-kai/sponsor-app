@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { create } from "@bufbuild/protobuf";
-import { ValueSchema } from "@bufbuild/protobuf/wkt";
 import {
   AdminSponsorshipSchema,
   AdminSponsorship_ExpenseReport_Status,
@@ -12,7 +11,6 @@ import {
   boothStatus,
   customizationStatus,
   formatAmount,
-  formatHistoryValue,
   isOverWordLimit,
   isWebUrl,
   labelOf,
@@ -92,19 +90,5 @@ describe("formatAmount", () => {
     assert.equal(formatAmount("1200000.0"), "1,200,000");
     assert.equal(formatAmount("1234.5"), "1,234.5");
     assert.equal(formatAmount("0.0"), "0");
-  });
-});
-
-describe("formatHistoryValue", () => {
-  it("shows JSON, and a dash for no value", () => {
-    assert.equal(formatHistoryValue(undefined), "—");
-    assert.equal(
-      formatHistoryValue(create(ValueSchema, { kind: { case: "nullValue", value: 0 } })),
-      "null",
-    );
-    assert.equal(
-      formatHistoryValue(create(ValueSchema, { kind: { case: "stringValue", value: "a" } })),
-      '"a"',
-    );
   });
 });

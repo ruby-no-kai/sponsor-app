@@ -42,6 +42,7 @@ export const paths = {
   sponsorEvents: "/admin/conferences/:slug/events",
   sponsorEvent: "/admin/conferences/:slug/events/:id",
   sponsorEventEdit: "/admin/conferences/:slug/events/:id/edit",
+  sponsorEventEditingHistory: "/admin/conferences/:slug/events/:id/editing_history",
 
   // Announcements
 
