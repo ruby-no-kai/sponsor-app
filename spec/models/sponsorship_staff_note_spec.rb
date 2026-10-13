@@ -3,5 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe SponsorshipStaffNote, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it 'requires a body that is not blank' do
+    note = described_class.new(body: " \n ")
+
+    expect(note).not_to be_valid
+    expect(note.errors.details[:body]).to eq([{error: :blank}])
+  end
 end

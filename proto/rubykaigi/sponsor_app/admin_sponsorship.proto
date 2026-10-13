@@ -1,0 +1,265 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "google/protobuf/timestamp.proto";
+import "rubykaigi/sponsor_app/organization_summary.proto";
+import "rubykaigi/sponsor_app/sponsorship_summary.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// A sponsorship as organizers see it: the application, its plan and booth, the tickets it
+// includes, and what the sponsor has submitted since.
+//
+// Staff-only. SponsorService never returns it.
+message AdminSponsorship {
+  // A plan of the conference, with the terms a sponsorship on it gets.
+  message Plan {
+    // Plan ID.
+    int64 id = 1;
+
+    // Display name, such as "Ruby" or "Platinum".
+    string name = 2;
+
+    // Position among the conference's plans, which are listed lowest rank first.
+    int32 rank = 3;
+
+    // Price as the application form shows it, such as "JPY 1,500,000".
+    string price_text = 4;
+
+    // Conference tickets the plan includes.
+    int32 number_of_guests = 5;
+
+    // Size of the booth the plan comes with, counted against the conference's booth capacity.
+    // Zero when the plan offers no booth.
+    int32 booth_size = 6;
+
+    // Whether the plan includes a sponsor talk.
+    bool talkable = 7;
+
+    // Words the sponsor's profile should stay within.
+    int32 words_limit = 8;
+
+    // Words past which an application is refused: words_limit with a margin.
+    int32 words_limit_hard = 9;
+  }
+
+  // Someone the organizers write to about the sponsorship.
+  message Contact {
+    // Email address.
+    string email = 1;
+
+    // Further addresses to copy, as the sponsor typed them: separated by commas or semicolons.
+    // Absent when the sponsor copies nobody.
+    optional string email_cc = 2;
+
+    // Postal address.
+    string address = 3;
+
+    // Company name.
+    string organization = 4;
+
+    // Department within the company. Absent when the sponsor named none.
+    optional string unit = 5;
+
+    // Person's name.
+    string name = 6;
+
+    // URL that opens a new email to this contact in the organizers' mail client, from the
+    // conference's contact address and copying email_cc.
+    string compose_email_url = 7;
+  }
+
+  // A discount code the ticketing service applies to the tickets a sponsorship includes.
+  message TitoDiscountCode {
+    // Which tickets the code is for.
+    enum Kind {
+      // The zero value proto3 requires. Never returned.
+      KIND_UNSPECIFIED = 0;
+
+      // Conference tickets for the sponsor's attendees.
+      KIND_ATTENDEE = 1;
+
+      // Passes for the staff of the sponsor's booth.
+      KIND_BOOTH_STAFF = 2;
+
+      // Passes for booth staff beyond those the plan includes, which the sponsor pays for.
+      KIND_BOOTH_PAID = 3;
+    }
+
+    // Which tickets the code is for.
+    Kind kind = 1;
+
+    // The code itself.
+    string code = 2;
+
+    // URL where the sponsor registers with the code.
+    string registration_url = 3;
+
+    // URL of the ticketing service's admin page listing the registrations that used the code.
+    string dashboard_url = 4;
+  }
+
+  // An event the sponsor hosts, such as a party or a meetup.
+  message SponsorEvent {
+    // Where the organizers' review of the event stands.
+    enum Status {
+      // The zero value proto3 requires. Never returned.
+      STATUS_UNSPECIFIED = 0;
+
+      // Submitted and awaiting review.
+      STATUS_PENDING = 1;
+
+      // Accepted and listed.
+      STATUS_ACCEPTED = 2;
+
+      // Turned down.
+      STATUS_REJECTED = 3;
+
+      // Withdrawn by the sponsor.
+      STATUS_WITHDRAWN = 4;
+    }
+
+    // Event ID.
+    int64 id = 1;
+
+    // Title of the event.
+    string title = 2;
+
+    // Where the organizers' review stands.
+    Status status = 3;
+
+    // When the event starts, as the local time at the venue. The Timestamp carries that wall clock
+    // as the same reading in UTC.
+    google.protobuf.Timestamp starts_at = 4;
+  }
+
+  // The expenses of a custom package the organizers reimburse.
+  message ExpenseReport {
+    // Where the report stands.
+    enum Status {
+      // The zero value proto3 requires. Never returned.
+      STATUS_UNSPECIFIED = 0;
+
+      // Being written by the sponsor.
+      STATUS_DRAFT = 1;
+
+      // Submitted and awaiting review.
+      STATUS_SUBMITTED = 2;
+
+      // Approved by the organizers.
+      STATUS_APPROVED = 3;
+
+      // Returned to the sponsor for changes.
+      STATUS_REJECTED = 4;
+    }
+
+    // Where the report stands.
+    Status status = 1;
+
+    // Sum of the line items before tax, as a decimal such as "120000.0".
+    string total_amount = 2;
+
+    // Sum of the line items' tax, as a decimal such as "12000.0".
+    string total_tax_amount = 3;
+  }
+
+  // Sponsorship ID.
+  int64 id = 1;
+
+  // Name the sponsor is listed under.
+  string name = 2;
+
+  // Where the sponsorship stands.
+  SponsorshipState state = 3;
+
+  // When the organizers accepted the application. Absent while it awaits acceptance. A withdrawn
+  // sponsorship keeps it.
+  optional google.protobuf.Timestamp accepted_at = 4;
+
+  // When the sponsorship was withdrawn. Absent unless it was.
+  optional google.protobuf.Timestamp withdrawn_at = 5;
+
+  // Whether the sponsor is left out of the sponsor list published to the conference website,
+  // whatever its state.
+  bool suspended = 6;
+
+  // Locale the sponsor applied in, such as "en", which emails to the sponsor are written in.
+  string locale = 7;
+
+  // The sponsoring company.
+  OrganizationSummary organization = 8;
+
+  // Whether the sponsor has uploaded its logo and other assets. The staff area's download link
+  // for them answers not found until it has.
+  bool asset_file_uploaded = 9;
+
+  // The plan sponsored. Absent while the plan is undetermined.
+  optional Plan plan = 10;
+
+  // Alternative the sponsor picked in case the plan applied for cannot be granted, as one of the
+  // fallback option values of the conference's application form. Empty when none was picked.
+  string fallback_option = 11;
+
+  // Whether the custom package named in customization_name is confirmed. Until it is, the sponsor
+  // is published under its plan.
+  bool customization = 12;
+
+  // Name of a custom package arranged for this sponsor. Absent when none is arranged.
+  optional string customization_name = 13;
+
+  // Whether the sponsor asked for a booth.
+  bool booth_requested = 14;
+
+  // Whether the sponsor has been assigned a booth.
+  bool booth_assigned = 15;
+
+  // Conference tickets the plan includes. Zero without a plan.
+  int32 included_attendees = 16;
+
+  // Conference tickets the organizers granted beyond the plan's. Absent when none were set.
+  optional int32 number_of_additional_attendees = 17;
+
+  // Conference tickets the sponsor may claim: included_attendees plus the additional ones while
+  // the sponsorship is active, and zero otherwise.
+  int32 total_attendees = 18;
+
+  // Discount codes for the tickets the sponsorship includes, one per kind created so far. Empty
+  // when the conference does not sell tickets through the ticketing service.
+  repeated TitoDiscountCode tito_discount_codes = 19;
+
+  // What the sponsor asked of the custom package. Empty when nothing was asked.
+  string customization_request = 20;
+
+  // What the sponsor asked of billing, such as the invoice's addressee. Empty when nothing was
+  // asked.
+  string billing_request = 21;
+
+  // Anything else the sponsor told the organizers. Empty when nothing was.
+  string note = 22;
+
+  // What the sponsor will exhibit at its booth. Absent until the sponsor submits it.
+  optional string exhibition_description = 23;
+
+  // Events the sponsor hosts, earliest first.
+  repeated SponsorEvent sponsor_events = 24;
+
+  // The expense report of the custom package. Absent unless a custom package is arranged and the
+  // sponsor has started a report.
+  optional ExpenseReport expense_report = 25;
+
+  // URL of the sponsor's website, as published.
+  string url = 26;
+
+  // The sponsor's introduction, as published.
+  string profile = 27;
+
+  // Words in profile, as the application form counts them against the plan's words_limit.
+  int32 word_count = 28;
+
+  // Whom the organizers write to.
+  Contact contact = 29;
+
+  // Whom invoices go to. Absent when they go to contact.
+  optional Contact alternate_billing_contact = 30;
+}

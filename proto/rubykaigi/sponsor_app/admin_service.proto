@@ -5,6 +5,7 @@ package rubykaigi.sponsor_app;
 import "rubykaigi/sponsor_app/admin_conferences.proto";
 import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
 import "rubykaigi/sponsor_app/admin_plans.proto";
+import "rubykaigi/sponsor_app/admin_sponsorships.proto";
 import "rubykaigi/sponsor_app/admin_viewer.proto";
 
 option ruby_package = "Rk::SponsorApp";
@@ -92,6 +93,48 @@ service AdminService {
   rpc UpdatePlan(AdminServiceUpdatePlanRequest) returns (AdminServiceUpdatePlanResponse);
 
   // Sponsorships
+
+  // Returns one sponsorship of a conference with what its staff page shows: the latest staff
+  // notes, and the plans and fallback options an editor of it offers.
+  rpc GetSponsorship(AdminServiceGetSponsorshipRequest) returns (AdminServiceGetSponsorshipResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Replaces every changeable field of a sponsorship, recording the signed-in staff member in its
+  // editing history, then publishes the change: a chat notification, the sponsor list on the
+  // conference website and the ticketing service's discount codes. The sponsor's own form rules,
+  // such as plan availability and word limits, do not apply. A record failing validation is
+  // answered `invalid_argument` with PROBLEM_TYPE_INVALID_RECORD.
+  rpc UpdateSponsorship(AdminServiceUpdateSponsorshipRequest) returns (AdminServiceUpdateSponsorshipResponse);
+
+  // Withdraws a sponsorship, releasing its plan and booth, and publishes the change as
+  // UpdateSponsorship does. Withdrawal is final: a withdrawn sponsorship is answered
+  // `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc WithdrawSponsorship(AdminServiceWithdrawSponsorshipRequest) returns (AdminServiceWithdrawSponsorshipResponse);
+
+  // Lists every save of a sponsorship with what it changed.
+  rpc ListSponsorshipEditingHistory(AdminServiceListSponsorshipEditingHistoryRequest) returns (AdminServiceListSponsorshipEditingHistoryResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Lists the staff notes on a sponsorship.
+  rpc ListSponsorshipStaffNotes(AdminServiceListSponsorshipStaffNotesRequest) returns (AdminServiceListSponsorshipStaffNotesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Writes a staff note on a sponsorship.
+  rpc CreateSponsorshipStaffNote(AdminServiceCreateSponsorshipStaffNoteRequest) returns (AdminServiceCreateSponsorshipStaffNoteResponse);
+
+  // Replaces the body and pinning of a staff note, whoever wrote it.
+  rpc UpdateSponsorshipStaffNote(AdminServiceUpdateSponsorshipStaffNoteRequest) returns (AdminServiceUpdateSponsorshipStaffNoteResponse);
+
+  // Deletes a staff note, whoever wrote it.
+  rpc DeleteSponsorshipStaffNote(AdminServiceDeleteSponsorshipStaffNoteRequest) returns (AdminServiceDeleteSponsorshipStaffNoteResponse);
+
+  // Issues a one-minute sign-in for the sponsorship's contact, to see the sponsor pages as they
+  // do. Development only: elsewhere it is answered `not_found`, and GetSponsorship's
+  // impersonation_enabled is false.
+  rpc ImpersonateSponsorship(AdminServiceImpersonateSponsorshipRequest) returns (AdminServiceImpersonateSponsorshipResponse);
 
   // Organizations
 

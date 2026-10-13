@@ -114,6 +114,34 @@ export const router = createBrowserRouter([
               },
 
               // Sponsorships
+              {
+                path: paths.sponsorship,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorshipDetail.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorshipEdit,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorshipEditor.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorshipEditingHistory,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorshipEditingHistory.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorshipStaffNotes,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorshipStaffNotes.tsx")).default,
+                },
+              },
 
               // Organizations
 
