@@ -4,6 +4,7 @@ package rubykaigi.sponsor_app;
 
 import "rubykaigi/sponsor_app/sponsor_applications.proto";
 import "rubykaigi/sponsor_app/sponsor_broadcasts.proto";
+import "rubykaigi/sponsor_app/sponsor_passes.proto";
 import "rubykaigi/sponsor_app/sponsor_shell.proto";
 import "rubykaigi/sponsor_app/sponsor_viewer.proto";
 
@@ -102,6 +103,14 @@ service SponsorService {
   // Lists the emails the organizers sent to the signed-in contact's sponsorship, with the sign-in
   // link each carried pointing at the sponsorship's dashboard.
   rpc ListBroadcastDeliveries(SponsorServiceListBroadcastDeliveriesRequest) returns (SponsorServiceListBroadcastDeliveriesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Lists the registrations made on the ticketing service through the sponsorship's discount
+  // codes, asking the ticketing service on every call. Answers `failed_precondition` until the
+  // conference distributes tickets through the ticketing service and the sponsorship is set up
+  // there, and `internal` when the registrations span more than one page there.
+  rpc ListPassRedemptions(SponsorServiceListPassRedemptionsRequest) returns (SponsorServiceListPassRedemptionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 

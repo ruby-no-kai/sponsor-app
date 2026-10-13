@@ -105,9 +105,11 @@ describe("isSpaPathname", () => {
     assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/expense_files/7"));
   });
 
-  it("matches the sponsor's email history page", () => {
+  it("matches the sponsor's email history and pass pages", () => {
     const base = "/conferences/rubykaigi2048/sponsorship";
     assert.ok(isSpaPathname(`${base}/broadcasts`));
+    assert.ok(isSpaPathname(`${base}/pass_redemptions`));
+    assert.ok(!isSpaPathname(`${base}/pass_redemptions/101`));
   });
 });
 

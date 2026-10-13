@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "rubykaigi/sponsor_app/conference.proto";
+import "rubykaigi/sponsor_app/tito_discount_code.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// A discount code as the ticketing service applies it, through which a sponsor's people claim
+// their tickets.
+message PassDiscountCode {
+  // Which tickets the code is for.
+  TitoDiscountCode.Kind kind = 1;
+
+  // URL where the sponsor's people register with the code. Anyone holding it can claim the
+  // tickets, so the sponsor shares it with care.
+  string url = 2;
+
+  // Tickets the ticketing service admits through the code, as last set there. It can lag behind
+  // the tickets the sponsorship includes until the organizers update the code. Absent for
+  // KIND_BOOTH_PAID, whose passes are bought one by one.
+  optional int32 quantity = 3;
+}
+
+// A ticket a sponsor's people claimed through one of the sponsorship's discount codes.
+message PassTicket {
+  // Reference the ticketing service shows for the ticket, such as "ABCD-1".
+  string reference = 1;
+
+  // Slug of the ticket's release on the ticketing service, such as "sponsor", "exhibitor" or
+  // "exhibitor-paid". Absent for a release the organizers have not set up here.
+  optional string release_slug = 2;
+
+  // Email address of the person the ticket is assigned to. Absent while it is unassigned.
+  optional string email = 3;
+
+  // State on the ticketing service, such as "complete", "incomplete" or "unassigned". An
+  // incomplete ticket has questions left to answer before it shows a check-in code.
+  string state = 4;
+
+  // Whether the ticket has been voided.
+  bool void = 5;
+}
+
+// A registration on the ticketing service, made through one of the sponsorship's discount codes:
+// one purchase, holding one or more tickets.
+message PassRegistration {
+  // Identifier of the registration on the ticketing service, in decimal digits.
+  string id = 1;
+
+  // Reference the ticketing service shows for the registration, such as "ABCD".
+  string reference = 2;
+
+  // Email address of the person who registered. Absent when the ticketing service holds none.
+  optional string email = 3;
+
+  // Whether the sponsor can void the registration, provided the conference still allows it. Only a
+  // free, uncancelled registration whose tickets are all of one release and all claimed with the
+  // same one of the sponsorship's codes qualifies.
+  bool retractable = 4;
+
+  // Tickets claimed with the sponsorship's discount codes. Tickets the registration holds through
+  // other codes are left out.
+  repeated PassTicket tickets = 5;
+}
+
+// Request for SponsorService.ListPassRedemptions.
+message SponsorServiceListPassRedemptionsRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for SponsorService.ListPassRedemptions.
+message SponsorServiceListPassRedemptionsResponse {
+  // The conference sponsored, whose contact address takes requests to void a registration by hand.
+  Conference conference = 1;
+
+  // Codes to claim the tickets with, one per kind created so far: conference tickets, then booth
+  // passes, then paid booth passes.
+  repeated PassDiscountCode discount_codes = 2;
+
+  // Registrations made through the codes, as the ticketing service lists them.
+  repeated PassRegistration registrations = 3;
+
+  // Whether the conference still lets sponsors void a registration themselves.
+  bool retraction_enabled = 4;
+}

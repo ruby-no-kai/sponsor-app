@@ -154,6 +154,26 @@ RSpec.describe PassRedemption do
       end
     end
 
+    describe '#holds_other_codes?' do
+      it 'is true for a registration holding a ticket claimed with another code' do
+        collection = collection_of(mixed_registration, sponsorship:)
+
+        expect(collection.holds_other_codes?(collection.registrations.sole)).to be true
+      end
+
+      it 'is false for a registration of the sponsorship codes only' do
+        collection = collection_of(registration, sponsorship:)
+
+        expect(collection.holds_other_codes?(collection.registrations.sole)).to be false
+      end
+
+      it 'is false without a sponsorship' do
+        collection = collection_of(mixed_registration, conference:)
+
+        expect(collection.holds_other_codes?(collection.registrations.sole)).to be false
+      end
+    end
+
     describe '#retractable?' do
       it 'judges a registration on the shown tickets only' do
         collection = collection_of(mixed_registration, sponsorship:)
