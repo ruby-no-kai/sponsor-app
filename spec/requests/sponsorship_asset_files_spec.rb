@@ -25,7 +25,7 @@ RSpec.describe "Sponsorship asset files", type: :request do
 
   def upload
     post user_conference_sponsorship_asset_files_path(conference), params: {content_type: 'image/png'}
-    SponsorshipAssetFile.find(response.parsed_body.fetch('id'))
+    SponsorshipAssetFile.find(response.parsed_body.fetch('file_id'))
   end
 
   describe "POST create" do
@@ -34,6 +34,9 @@ RSpec.describe "Sponsorship asset files", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body['report_to']).to eq(user_conference_sponsorship_asset_file_path(conference, asset_file))
+      expect(response.parsed_body.keys).to eq(%w(file_id url fields max_size report_to id))
+      expect(response.parsed_body).to include('file_id' => asset_file.id.to_s, 'id' => asset_file.id.to_s, 'max_size' => AssetFileUploadable::MAX_FILE_SIZE.to_s)
+      expect(response.parsed_body.fetch('fields')).to include('key' => asset_file.object_key, 'Content-Type' => 'image/png')
       expect(asset_file.prefix).to eq("c-#{conference.id}/")
       expect(session[:asset_file_ids]).to eq([asset_file.id])
     end
@@ -79,7 +82,7 @@ RSpec.describe "Sponsorship asset files", type: :request do
 
       post initiate_update_user_conference_sponsorship_asset_file_path(conference, asset_file), params: {content_type: 'image/jpeg'}
       expect(response).to have_http_status(:ok)
-      expect(response.parsed_body['id']).to eq(asset_file.id.to_s)
+      expect(response.parsed_body['file_id']).to eq(asset_file.id.to_s)
     end
 
     it "is not found for staff on an unknown conference" do

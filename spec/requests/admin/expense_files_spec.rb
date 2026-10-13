@@ -13,10 +13,15 @@ RSpec.describe "Admin Expense Files", type: :request do
     get claim_user_session_path(session_token.handle)
   end
 
+  def stub_upload_session
+    allow_any_instance_of(ExpenseFile).to receive(:make_session) do |file| # rubocop:disable RSpec/AnyInstance
+      {url: 'https://s3.example.com/', fields: {}, max_size: 1, id: file.id}
+    end
+  end
+
   describe "POST create" do
     it "prepares a file and returns an upload session reporting to the admin path" do
-      session = {url: 'https://s3.example.com/', fields: {}, max_size: 1, id: 'x'}
-      allow_any_instance_of(ExpenseFile).to receive(:make_session).and_return(session) # rubocop:disable RSpec/AnyInstance
+      stub_upload_session
 
       expect do
         post conference_sponsorship_expense_files_path(conference, sponsorship), params: {filename: 'receipt.pdf', content_type: 'application/pdf'}, as: :json
@@ -32,8 +37,7 @@ RSpec.describe "Admin Expense Files", type: :request do
     it "returns an upload session for the existing file" do
       file = ExpenseFile.prepare(conference:, sponsorship:)
       file.save!
-      session = {url: 'https://s3.example.com/', fields: {}, max_size: 1, id: 'x'}
-      allow_any_instance_of(ExpenseFile).to receive(:make_session).and_return(session) # rubocop:disable RSpec/AnyInstance
+      stub_upload_session
 
       post initiate_update_conference_sponsorship_expense_file_path(conference, sponsorship, file), params: {content_type: 'image/png'}, as: :json
 
@@ -73,8 +77,11 @@ RSpec.describe "Admin Expense Files", type: :request do
     it "prepares, re-initiates and records an upload end to end" do
       post conference_sponsorship_expense_files_path(conference, sponsorship), params: {filename: 'receipt.pdf', content_type: 'application/pdf'}
       expect(response).to have_http_status(:ok)
-      file = ExpenseFile.find(response.parsed_body.fetch('id'))
+      file = ExpenseFile.find(response.parsed_body.fetch('file_id'))
       expect(response.parsed_body['report_to']).to eq(conference_sponsorship_expense_file_path(conference, sponsorship, file))
+      expect(response.parsed_body.keys).to eq(%w(file_id url fields max_size report_to id))
+      expect(response.parsed_body).to include('file_id' => file.id.to_s, 'id' => file.id.to_s, 'max_size' => ExpenseFile::MAX_FILE_SIZE.to_s)
+      expect(response.parsed_body.fetch('fields')).to include('key' => file.object_key, 'Content-Type' => 'application/pdf')
 
       post initiate_update_conference_sponsorship_expense_file_path(conference, sponsorship, file), params: {content_type: 'application/pdf'}
       expect(response).to have_http_status(:ok)

@@ -10,4 +10,5 @@ plugins:
 inputs:
   - directory: proto
     types:
+      - rubykaigi.sponsor_app.AssetFileUpload
       - rubykaigi.sponsor_app.ExpenseReportCalculation

@@ -1,6 +1,12 @@
+import { fromJson, type JsonValue } from "@bufbuild/protobuf";
 import axios from "axios";
 
 import Rails from "@rails/ujs";
+
+import {
+  AssetFileUploadSchema,
+  type AssetFileUpload,
+} from "./gen/rubykaigi/sponsor_app/asset_file_upload_pb";
 
 export type UploadProgress = { loaded: number; total: number };
 
@@ -11,13 +17,16 @@ type Params = {
   onProgress?: (progress: UploadProgress) => any;
 };
 
-type SessionData = {
-  id: string;
-  url: string;
-  fields: Record<string, string>;
-  report_to: string;
-  max_size?: number;
-};
+// Reads the upload session the server answers, ignoring fields a newer release adds.
+export function parseAssetFileUpload(json: JsonValue): AssetFileUpload {
+  const session = fromJson(AssetFileUploadSchema, json, {
+    ignoreUnknownFields: true,
+  });
+  if (session.fileId === "0") {
+    throw new Error("Upload session has no file_id");
+  }
+  return session;
+}
 
 export default class AssetFileUploader {
   public file: File;
@@ -27,7 +36,7 @@ export default class AssetFileUploader {
 
   public onProgress?: (progress: { loaded: number; total: number }) => any;
 
-  private session?: SessionData;
+  private session?: AssetFileUpload;
 
   constructor(params: Params) {
     this.file = params.file;
@@ -66,10 +75,10 @@ export default class AssetFileUploader {
       body: sessionPayload,
     });
     if (sessionResp.ok) {
-      const session: SessionData = await sessionResp.json();
+      const session = parseAssetFileUpload(await sessionResp.json());
       this.session = session;
-      this.fileId = this.session.id;
-      return this.session;
+      this.fileId = session.fileId;
+      return session;
     } else {
       throw `Uploader getSession failed: status=${sessionResp.status}`;
     }
@@ -78,9 +87,9 @@ export default class AssetFileUploader {
   public async perform() {
     const session = await this.getSession();
 
-    if (session.max_size && this.file.size > session.max_size) {
+    if (session.maxSize && BigInt(this.file.size) > session.maxSize) {
       throw new Error(
-        `File size (${this.file.size} bytes) exceeds maximum allowed size (${session.max_size} bytes)`,
+        `File size (${this.file.size} bytes) exceeds maximum allowed size (${session.maxSize} bytes)`,
       );
     }
 
@@ -114,7 +123,7 @@ export default class AssetFileUploader {
     const extension = this.file.name.split(".").pop() || "";
 
     await axios.put(
-      session.report_to,
+      session.reportTo,
       {
         extension,
         version_id,

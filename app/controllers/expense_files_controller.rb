@@ -14,7 +14,7 @@ class ExpenseFilesController < ApplicationController
     @asset_file = ExpenseFile.prepare(conference:, sponsorship: current_sponsorship)
     asset_file.assign_attributes(params.permit(:filename, :content_type))
     asset_file.save!
-    render json: make_session
+    render proto_json: make_session
   end
 
   #: () -> void
@@ -38,7 +38,7 @@ class ExpenseFilesController < ApplicationController
   #: () -> void
   def initiate_update
     asset_file.content_type = params[:content_type] if params[:content_type].present?
-    render json: make_session
+    render proto_json: make_session
   end
 
   #: () -> void

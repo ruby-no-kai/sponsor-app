@@ -23,11 +23,9 @@ module AssetFileSessionable
     end
   end
 
-  #: () -> { url: String, fields: Hash[String, String], max_size: Integer, id: String, report_to: String }
+  #: () -> Rk::SponsorApp::AssetFileUpload
   private def make_session
-    asset_file.make_session.merge(
-      report_to: asset_file_report_to_url(asset_file),
-    )
+    AssetFileUploadResource.new(asset_file.make_session, params: {report_to: asset_file_report_to_url(asset_file)}).as_protobuf
   end
 
   # Each controller must implement this method

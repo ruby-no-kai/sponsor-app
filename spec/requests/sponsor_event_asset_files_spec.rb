@@ -22,7 +22,7 @@ RSpec.describe "Sponsor event asset files", type: :request do
 
   def upload
     post user_conference_event_asset_files_path(conference), params: {content_type: 'image/png'}
-    SponsorEventAssetFile.find(response.parsed_body.fetch('id'))
+    SponsorEventAssetFile.find(response.parsed_body.fetch('file_id'))
   end
 
   it "prepares an upload session" do
@@ -30,6 +30,9 @@ RSpec.describe "Sponsor event asset files", type: :request do
 
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body['report_to']).to eq(user_conference_event_asset_file_path(conference, asset_file))
+    expect(response.parsed_body.keys).to eq(%w(file_id url fields max_size report_to id))
+    expect(response.parsed_body).to include('file_id' => asset_file.id.to_s, 'id' => asset_file.id.to_s, 'max_size' => SponsorEventAssetFile::MAX_FILE_SIZE.to_s)
+    expect(response.parsed_body.fetch('fields')).to include('key' => asset_file.object_key, 'Content-Type' => 'image/png')
     expect(asset_file.sponsorship).to eq(sponsorship)
     expect(asset_file.prefix).to eq("c-#{conference.id}/events/s-#{sponsorship.id}/")
   end
