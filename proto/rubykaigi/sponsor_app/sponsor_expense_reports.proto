@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "rubykaigi/sponsor_app/expense_report.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// Request for SponsorService.GetExpenseReport.
+message SponsorServiceGetExpenseReportRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for SponsorService.GetExpenseReport.
+message SponsorServiceGetExpenseReportResponse {
+  // The sponsorship's expense report.
+  ExpenseReport report = 1;
+}
+
+// Request for SponsorService.CalculateExpenseReport.
+message SponsorServiceCalculateExpenseReportRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for SponsorService.CalculateExpenseReport.
+message SponsorServiceCalculateExpenseReportResponse {
+  // The figures the sponsorship's expenses are weighed against.
+  ExpenseReportCalculation calculation = 1;
+}
+
+// Request for SponsorService.CreateExpenseReport.
+message SponsorServiceCreateExpenseReportRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for SponsorService.CreateExpenseReport.
+message SponsorServiceCreateExpenseReportResponse {
+  // The sponsorship's expense report. Unchanged when one already existed.
+  ExpenseReport report = 1;
+}
+
+// Request for SponsorService.CreateExpenseLineItem.
+// Response for SponsorService.CreateExpenseLineItem.
+// Request for SponsorService.UpdateExpenseLineItem.
+// Response for SponsorService.UpdateExpenseLineItem.
+// Request for SponsorService.DeleteExpenseLineItem.
+// Response for SponsorService.DeleteExpenseLineItem.
+// Request for SponsorService.SubmitExpenseReport.
+// Response for SponsorService.SubmitExpenseReport.
+// Request for SponsorService.WithdrawExpenseReportSubmission.
+// Response for SponsorService.WithdrawExpenseReportSubmission.
+// Request for SponsorService.CreateExpenseFileUpload.
+// Response for SponsorService.CreateExpenseFileUpload.
+// Request for SponsorService.InitiateExpenseFileUpdate.
+// Response for SponsorService.InitiateExpenseFileUpdate.
+// Request for SponsorService.CompleteExpenseFileUpload.
+// Response for SponsorService.CompleteExpenseFileUpload.
+// Request for SponsorService.DeleteExpenseFile.
+// Response for SponsorService.DeleteExpenseFile.

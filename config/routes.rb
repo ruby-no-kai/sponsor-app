@@ -237,6 +237,9 @@ Rails.application.routes.draw do
       rpc 'CreatePassRetraction' => 'api/sponsor/passes'
 
       # Expense reports
+      rpc 'GetExpenseReport' => 'api/sponsor/expense_reports'
+      rpc 'CalculateExpenseReport' => 'api/sponsor/expense_reports'
+      rpc 'CreateExpenseReport' => 'api/sponsor/expense_reports'
 
       # Viewer
       rpc 'GetViewer' => 'api/sponsor/viewer'
