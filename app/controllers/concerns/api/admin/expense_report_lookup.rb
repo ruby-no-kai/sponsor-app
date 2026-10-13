@@ -3,7 +3,7 @@
 
 module Api
   module Admin
-    # For RPCs under `authorize :conference` acting on a sponsorship's expense report.
+    # For RPCs under `authorize :conference` acting on a sponsorship's expense report or files.
     # @requires_ancestor: Api::Admin::ApplicationController
     module ExpenseReportLookup
       #: (Sponsorship) -> ExpenseReport
@@ -21,10 +21,10 @@ module Api
         refuse_approved!(report)
       end
 
-      # An approved report takes no more changes.
-      #: (ExpenseReport) -> void
+      # An approved report and the files it was approved with take no more changes.
+      #: (ExpenseReport?) -> void
       private def refuse_approved!(report)
-        return unless report.status == 'approved'
+        return unless report && report.status == 'approved'
 
         raise Errors::FailedPrecondition.new(
           detail: "The expense report of the sponsorship #{report.sponsorship_id} is approved and takes no more changes.",

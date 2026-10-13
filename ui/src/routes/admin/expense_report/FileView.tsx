@@ -1,24 +1,29 @@
 import { Button, Checkbox, Text } from "@cloudflare/kumo";
+import { TrashIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { AdminService } from "../../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
 import type { ExpenseFile } from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
 import { useRpcMutation } from "../../../lib/rpc.ts";
 import { notifyError } from "../../../lib/toast.ts";
+import { ConfirmButton } from "../ConfirmButton.tsx";
 import { useEditor } from "./EditorContext.ts";
 import { newLineItemInput } from "./lineItemForm.ts";
 import { fileName } from "./reportView.ts";
 
-// What can be done with a file no line item attaches: make one of it or attach it.
+// What can be done with a file no line item attaches: make one of it, attach it, or delete it.
 export function FileView({
   file,
   onSelectItem,
+  onDeleted,
 }: {
   file: ExpenseFile;
   onSelectItem: (id: string) => void;
+  onDeleted: () => void;
 }) {
   const { target, report, isMobile, applyReport, refreshReport, updateLineItem, fileUrl } =
     useEditor();
   const createLineItem = useRpcMutation(AdminService.method.createExpenseLineItem);
+  const deleteFile = useRpcMutation(AdminService.method.deleteExpenseFile);
   const [chosenIds, setChosenIds] = useState<ReadonlySet<string>>(new Set());
   const [isLinking, setIsLinking] = useState(false);
   const [isChoosing, setIsChoosing] = useState(false);
@@ -55,6 +60,12 @@ export function FileView({
     } finally {
       setIsLinking(false);
     }
+  }
+
+  async function handleDelete() {
+    await deleteFile.trigger({ ...target, fileId: file.id });
+    onDeleted();
+    await refreshReport();
   }
 
   function toggle(id: string, checked: boolean) {
@@ -120,6 +131,17 @@ export function FileView({
             Link to existing line items
           </Button>
         ))}
+
+      <hr className="w-full border-kumo-line" />
+      <ConfirmButton
+        label="Delete this file"
+        icon={TrashIcon}
+        size="sm"
+        title="Delete this file?"
+        description={`${fileName(file)} is deleted from the storage.`}
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

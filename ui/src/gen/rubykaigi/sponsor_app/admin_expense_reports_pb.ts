@@ -5,7 +5,7 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
-import type { ExpenseLineItem, ExpenseLineItemInput, ExpenseReport, ExpenseReport_Status, ExpenseReportCalculation, ExpenseReportReview_Action } from "./expense_report_pb.ts";
+import type { ExpenseFile, ExpenseFileUpload, ExpenseFileUploadInput, ExpenseLineItem, ExpenseLineItemInput, ExpenseReport, ExpenseReport_Status, ExpenseReportCalculation, ExpenseReportReview_Action } from "./expense_report_pb.ts";
 import { file_rubykaigi_sponsor_app_expense_report } from "./expense_report_pb.ts";
 import type { SponsorshipSummary } from "./sponsorship_summary_pb.ts";
 import { file_rubykaigi_sponsor_app_sponsorship_summary } from "./sponsorship_summary_pb.ts";
@@ -15,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file rubykaigi/sponsor_app/admin_expense_reports.proto.
  */
 export const file_rubykaigi_sponsor_app_admin_expense_reports: GenFile = /*@__PURE__*/
-  fileDesc("CjFydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fZXhwZW5zZV9yZXBvcnRzLnByb3RvEhVydWJ5a2FpZ2kuc3BvbnNvcl9hcHAigQMKFUV4cGVuc2VSZXBvcnRUYWJsZVJvdxI+CgtzcG9uc29yc2hpcBgBIAEoCzIpLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yc2hpcFN1bW1hcnkSIAoTZGlzcGxheWVkX3BsYW5fbmFtZRgCIAEoCUgAiAEBEhEKCXRvdGFsX2ZlZRgDIAEoCRJICgZyZXBvcnQYBCABKAsyMy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZVJlcG9ydFRhYmxlUm93LlJlcG9ydEgBiAEBGoUBCgZSZXBvcnQSOwoGc3RhdHVzGAEgASgOMisucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQuU3RhdHVzEhQKDHRvdGFsX2Ftb3VudBgCIAEoCRIYChB0b3RhbF90YXhfYW1vdW50GAMgASgJEg4KBm9mZnNldBgEIAEoCUIWChRfZGlzcGxheWVkX3BsYW5fbmFtZUIJCgdfcmVwb3J0IowBChhFeHBlbnNlUmVwb3J0UmV2aWV3SW5wdXQSTgoGYWN0aW9uGAEgASgOMjEucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRSZXZpZXcuQWN0aW9uQgu6SAjIAQGCAQIQARIUCgdjb21tZW50GAIgASgJSACIAQFCCgoIX2NvbW1lbnQiYAolQWRtaW5TZXJ2aWNlTGlzdEV4cGVuc2VSZXBvcnRzUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJCJkCiZBZG1pblNlcnZpY2VMaXN0RXhwZW5zZVJlcG9ydHNSZXNwb25zZRI6CgRyb3dzGAEgAygLMiwucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRUYWJsZVJvdyJ/CiNBZG1pblNlcnZpY2VHZXRFeHBlbnNlUmVwb3J0UmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgACKcAQokQWRtaW5TZXJ2aWNlR2V0RXhwZW5zZVJlcG9ydFJlc3BvbnNlEjQKBnJlcG9ydBgBIAEoCzIkLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlUmVwb3J0Ej4KC3Nwb25zb3JzaGlwGAIgASgLMikucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JzaGlwU3VtbWFyeSKFAQopQWRtaW5TZXJ2aWNlQ2FsY3VsYXRlRXhwZW5zZVJlcG9ydFJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAAicgoqQWRtaW5TZXJ2aWNlQ2FsY3VsYXRlRXhwZW5zZVJlcG9ydFJlc3BvbnNlEkQKC2NhbGN1bGF0aW9uGAEgASgLMi8ucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRDYWxjdWxhdGlvbiLIAQooQWRtaW5TZXJ2aWNlQ3JlYXRlRXhwZW5zZUxpbmVJdGVtUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgABJCCgVpbnB1dBgDIAEoCzIrLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlTGluZUl0ZW1JbnB1dEIGukgDyAEBIpwBCilBZG1pblNlcnZpY2VDcmVhdGVFeHBlbnNlTGluZUl0ZW1SZXNwb25zZRI5CglsaW5lX2l0ZW0YASABKAsyJi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZUxpbmVJdGVtEjQKBnJlcG9ydBgCIAEoCzIkLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlUmVwb3J0IukBCihBZG1pblNlcnZpY2VVcGRhdGVFeHBlbnNlTGluZUl0ZW1SZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAEh8KDGxpbmVfaXRlbV9pZBgDIAEoA0IJMAG6SAQiAiAAEkIKBWlucHV0GAQgASgLMisucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VMaW5lSXRlbUlucHV0Qga6SAPIAQEinAEKKUFkbWluU2VydmljZVVwZGF0ZUV4cGVuc2VMaW5lSXRlbVJlc3BvbnNlEjkKCWxpbmVfaXRlbRgBIAEoCzImLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlTGluZUl0ZW0SNAoGcmVwb3J0GAIgASgLMiQucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQipQEKKEFkbWluU2VydmljZURlbGV0ZUV4cGVuc2VMaW5lSXRlbVJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAASHwoMbGluZV9pdGVtX2lkGAMgASgDQgkwAbpIBCICIAAiYQopQWRtaW5TZXJ2aWNlRGVsZXRlRXhwZW5zZUxpbmVJdGVtUmVzcG9uc2USNAoGcmVwb3J0GAEgASgLMiQucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQi0AEKLEFkbWluU2VydmljZUNyZWF0ZUV4cGVuc2VSZXBvcnRSZXZpZXdSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAEkYKBWlucHV0GAMgASgLMi8ucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRSZXZpZXdJbnB1dEIGukgDyAEBImUKLUFkbWluU2VydmljZUNyZWF0ZUV4cGVuc2VSZXBvcnRSZXZpZXdSZXNwb25zZRI0CgZyZXBvcnQYASABKAsyJC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZVJlcG9ydEIR6gIOUms6OlNwb25zb3JBcHBiBnByb3RvMw", [file_buf_validate_validate, file_rubykaigi_sponsor_app_expense_report, file_rubykaigi_sponsor_app_sponsorship_summary]);
+  fileDesc("CjFydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fZXhwZW5zZV9yZXBvcnRzLnByb3RvEhVydWJ5a2FpZ2kuc3BvbnNvcl9hcHAigQMKFUV4cGVuc2VSZXBvcnRUYWJsZVJvdxI+CgtzcG9uc29yc2hpcBgBIAEoCzIpLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yc2hpcFN1bW1hcnkSIAoTZGlzcGxheWVkX3BsYW5fbmFtZRgCIAEoCUgAiAEBEhEKCXRvdGFsX2ZlZRgDIAEoCRJICgZyZXBvcnQYBCABKAsyMy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZVJlcG9ydFRhYmxlUm93LlJlcG9ydEgBiAEBGoUBCgZSZXBvcnQSOwoGc3RhdHVzGAEgASgOMisucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQuU3RhdHVzEhQKDHRvdGFsX2Ftb3VudBgCIAEoCRIYChB0b3RhbF90YXhfYW1vdW50GAMgASgJEg4KBm9mZnNldBgEIAEoCUIWChRfZGlzcGxheWVkX3BsYW5fbmFtZUIJCgdfcmVwb3J0IowBChhFeHBlbnNlUmVwb3J0UmV2aWV3SW5wdXQSTgoGYWN0aW9uGAEgASgOMjEucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRSZXZpZXcuQWN0aW9uQgu6SAjIAQGCAQIQARIUCgdjb21tZW50GAIgASgJSACIAQFCCgoIX2NvbW1lbnQiYAolQWRtaW5TZXJ2aWNlTGlzdEV4cGVuc2VSZXBvcnRzUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJCJkCiZBZG1pblNlcnZpY2VMaXN0RXhwZW5zZVJlcG9ydHNSZXNwb25zZRI6CgRyb3dzGAEgAygLMiwucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRUYWJsZVJvdyJ/CiNBZG1pblNlcnZpY2VHZXRFeHBlbnNlUmVwb3J0UmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgACKcAQokQWRtaW5TZXJ2aWNlR2V0RXhwZW5zZVJlcG9ydFJlc3BvbnNlEjQKBnJlcG9ydBgBIAEoCzIkLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlUmVwb3J0Ej4KC3Nwb25zb3JzaGlwGAIgASgLMikucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JzaGlwU3VtbWFyeSKFAQopQWRtaW5TZXJ2aWNlQ2FsY3VsYXRlRXhwZW5zZVJlcG9ydFJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAAicgoqQWRtaW5TZXJ2aWNlQ2FsY3VsYXRlRXhwZW5zZVJlcG9ydFJlc3BvbnNlEkQKC2NhbGN1bGF0aW9uGAEgASgLMi8ucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRDYWxjdWxhdGlvbiLIAQooQWRtaW5TZXJ2aWNlQ3JlYXRlRXhwZW5zZUxpbmVJdGVtUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgABJCCgVpbnB1dBgDIAEoCzIrLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlTGluZUl0ZW1JbnB1dEIGukgDyAEBIpwBCilBZG1pblNlcnZpY2VDcmVhdGVFeHBlbnNlTGluZUl0ZW1SZXNwb25zZRI5CglsaW5lX2l0ZW0YASABKAsyJi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZUxpbmVJdGVtEjQKBnJlcG9ydBgCIAEoCzIkLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlUmVwb3J0IukBCihBZG1pblNlcnZpY2VVcGRhdGVFeHBlbnNlTGluZUl0ZW1SZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAEh8KDGxpbmVfaXRlbV9pZBgDIAEoA0IJMAG6SAQiAiAAEkIKBWlucHV0GAQgASgLMisucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VMaW5lSXRlbUlucHV0Qga6SAPIAQEinAEKKUFkbWluU2VydmljZVVwZGF0ZUV4cGVuc2VMaW5lSXRlbVJlc3BvbnNlEjkKCWxpbmVfaXRlbRgBIAEoCzImLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlTGluZUl0ZW0SNAoGcmVwb3J0GAIgASgLMiQucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQipQEKKEFkbWluU2VydmljZURlbGV0ZUV4cGVuc2VMaW5lSXRlbVJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAASHwoMbGluZV9pdGVtX2lkGAMgASgDQgkwAbpIBCICIAAiYQopQWRtaW5TZXJ2aWNlRGVsZXRlRXhwZW5zZUxpbmVJdGVtUmVzcG9uc2USNAoGcmVwb3J0GAEgASgLMiQucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQi0AEKLEFkbWluU2VydmljZUNyZWF0ZUV4cGVuc2VSZXBvcnRSZXZpZXdSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAEkYKBWlucHV0GAMgASgLMi8ucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRSZXZpZXdJbnB1dEIGukgDyAEBImUKLUFkbWluU2VydmljZUNyZWF0ZUV4cGVuc2VSZXBvcnRSZXZpZXdSZXNwb25zZRI0CgZyZXBvcnQYASABKAsyJC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZVJlcG9ydCLMAQoqQWRtaW5TZXJ2aWNlQ3JlYXRlRXhwZW5zZUZpbGVVcGxvYWRSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAEkQKBWlucHV0GAMgASgLMi0ucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VGaWxlVXBsb2FkSW5wdXRCBrpIA8gBASJnCitBZG1pblNlcnZpY2VDcmVhdGVFeHBlbnNlRmlsZVVwbG9hZFJlc3BvbnNlEjgKBnVwbG9hZBgBIAEoCzIoLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlRmlsZVVwbG9hZCKWAgosQWRtaW5TZXJ2aWNlSW5pdGlhdGVFeHBlbnNlRmlsZVVwZGF0ZVJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAASGgoHZmlsZV9pZBgDIAEoA0IJMAG6SAQiAiAAEl8KDGNvbnRlbnRfdHlwZRgEIAEoCUJEukhBcj9SCmltYWdlL2pwZWdSCWltYWdlL3BuZ1IJaW1hZ2UvZ2lmUgppbWFnZS93ZWJwUg9hcHBsaWNhdGlvbi9wZGZIAIgBAUIPCg1fY29udGVudF90eXBlImkKLUFkbWluU2VydmljZUluaXRpYXRlRXhwZW5zZUZpbGVVcGRhdGVSZXNwb25zZRI4CgZ1cGxvYWQYASABKAsyKC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZUZpbGVVcGxvYWQijwIKLEFkbWluU2VydmljZUNvbXBsZXRlRXhwZW5zZUZpbGVVcGxvYWRSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAEhoKB2ZpbGVfaWQYAyABKANCCTABukgEIgIgABIhCghmaWxlbmFtZRgEIAEoCUIKukgHcgUQARj/AUgAiAEBEhwKCnZlcnNpb25faWQYBSABKAlCCLpIBXIDGIAIEhsKCWV4dGVuc2lvbhgGIAEoCUIIukgFcgMY/wFCCwoJX2ZpbGVuYW1lImEKLUFkbWluU2VydmljZUNvbXBsZXRlRXhwZW5zZUZpbGVVcGxvYWRSZXNwb25zZRIwCgRmaWxlGAEgASgLMiIucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VGaWxlIpwBCiRBZG1pblNlcnZpY2VEZWxldGVFeHBlbnNlRmlsZVJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAASGgoHZmlsZV9pZBgDIAEoA0IJMAG6SAQiAiAAIicKJUFkbWluU2VydmljZURlbGV0ZUV4cGVuc2VGaWxlUmVzcG9uc2VCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_buf_validate_validate, file_rubykaigi_sponsor_app_expense_report, file_rubykaigi_sponsor_app_sponsorship_summary]);
 
 /**
  * A custom sponsorship with its expense report in brief, as the list of a conference's expense
@@ -528,4 +528,253 @@ export type AdminServiceCreateExpenseReportReviewResponse = Message<"rubykaigi.s
  */
 export const AdminServiceCreateExpenseReportReviewResponseSchema: GenMessage<AdminServiceCreateExpenseReportReviewResponse> = /*@__PURE__*/
   messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 15);
+
+/**
+ * Request for AdminService.CreateExpenseFileUpload.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCreateExpenseFileUploadRequest
+ */
+export type AdminServiceCreateExpenseFileUploadRequest = Message<"rubykaigi.sponsor_app.AdminServiceCreateExpenseFileUploadRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * The file to upload.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseFileUploadInput input = 3;
+   */
+  input?: ExpenseFileUploadInput | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCreateExpenseFileUploadRequest.
+ * Use `create(AdminServiceCreateExpenseFileUploadRequestSchema)` to create a new message.
+ */
+export const AdminServiceCreateExpenseFileUploadRequestSchema: GenMessage<AdminServiceCreateExpenseFileUploadRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 16);
+
+/**
+ * Response for AdminService.CreateExpenseFileUpload.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCreateExpenseFileUploadResponse
+ */
+export type AdminServiceCreateExpenseFileUploadResponse = Message<"rubykaigi.sponsor_app.AdminServiceCreateExpenseFileUploadResponse"> & {
+  /**
+   * Where and how to upload the file.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseFileUpload upload = 1;
+   */
+  upload?: ExpenseFileUpload | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCreateExpenseFileUploadResponse.
+ * Use `create(AdminServiceCreateExpenseFileUploadResponseSchema)` to create a new message.
+ */
+export const AdminServiceCreateExpenseFileUploadResponseSchema: GenMessage<AdminServiceCreateExpenseFileUploadResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 17);
+
+/**
+ * Request for AdminService.InitiateExpenseFileUpdate.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceInitiateExpenseFileUpdateRequest
+ */
+export type AdminServiceInitiateExpenseFileUpdateRequest = Message<"rubykaigi.sponsor_app.AdminServiceInitiateExpenseFileUpdateRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * ID of an expense file of the sponsorship.
+   *
+   * @generated from field: int64 file_id = 3 [jstype = JS_STRING];
+   */
+  fileId: string;
+
+  /**
+   * MIME type of the file to upload, as ExpenseFileUploadInput.content_type. Absent keeps the
+   * one declared when the upload was created.
+   *
+   * @generated from field: optional string content_type = 4;
+   */
+  contentType?: string | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceInitiateExpenseFileUpdateRequest.
+ * Use `create(AdminServiceInitiateExpenseFileUpdateRequestSchema)` to create a new message.
+ */
+export const AdminServiceInitiateExpenseFileUpdateRequestSchema: GenMessage<AdminServiceInitiateExpenseFileUpdateRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 18);
+
+/**
+ * Response for AdminService.InitiateExpenseFileUpdate.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceInitiateExpenseFileUpdateResponse
+ */
+export type AdminServiceInitiateExpenseFileUpdateResponse = Message<"rubykaigi.sponsor_app.AdminServiceInitiateExpenseFileUpdateResponse"> & {
+  /**
+   * Where and how to upload the file.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseFileUpload upload = 1;
+   */
+  upload?: ExpenseFileUpload | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceInitiateExpenseFileUpdateResponse.
+ * Use `create(AdminServiceInitiateExpenseFileUpdateResponseSchema)` to create a new message.
+ */
+export const AdminServiceInitiateExpenseFileUpdateResponseSchema: GenMessage<AdminServiceInitiateExpenseFileUpdateResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 19);
+
+/**
+ * Request for AdminService.CompleteExpenseFileUpload.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCompleteExpenseFileUploadRequest
+ */
+export type AdminServiceCompleteExpenseFileUploadRequest = Message<"rubykaigi.sponsor_app.AdminServiceCompleteExpenseFileUploadRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * ID of an expense file of the sponsorship.
+   *
+   * @generated from field: int64 file_id = 3 [jstype = JS_STRING];
+   */
+  fileId: string;
+
+  /**
+   * Name to give the file. Absent keeps the name given when the upload was created.
+   *
+   * @generated from field: optional string filename = 4;
+   */
+  filename?: string | undefined;
+
+  /**
+   * Version the storage answered the upload with, in its `x-amz-version-id` header. Empty when it
+   * answered none.
+   *
+   * @generated from field: string version_id = 5;
+   */
+  versionId: string;
+
+  /**
+   * Extension of the file's name, such as "pdf". Letters and digits only are kept, in lower
+   * case. Empty records "unknown".
+   *
+   * @generated from field: string extension = 6;
+   */
+  extension: string;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCompleteExpenseFileUploadRequest.
+ * Use `create(AdminServiceCompleteExpenseFileUploadRequestSchema)` to create a new message.
+ */
+export const AdminServiceCompleteExpenseFileUploadRequestSchema: GenMessage<AdminServiceCompleteExpenseFileUploadRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 20);
+
+/**
+ * Response for AdminService.CompleteExpenseFileUpload.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCompleteExpenseFileUploadResponse
+ */
+export type AdminServiceCompleteExpenseFileUploadResponse = Message<"rubykaigi.sponsor_app.AdminServiceCompleteExpenseFileUploadResponse"> & {
+  /**
+   * The file as uploaded, with the content type the storage recorded.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseFile file = 1;
+   */
+  file?: ExpenseFile | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCompleteExpenseFileUploadResponse.
+ * Use `create(AdminServiceCompleteExpenseFileUploadResponseSchema)` to create a new message.
+ */
+export const AdminServiceCompleteExpenseFileUploadResponseSchema: GenMessage<AdminServiceCompleteExpenseFileUploadResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 21);
+
+/**
+ * Request for AdminService.DeleteExpenseFile.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceDeleteExpenseFileRequest
+ */
+export type AdminServiceDeleteExpenseFileRequest = Message<"rubykaigi.sponsor_app.AdminServiceDeleteExpenseFileRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * ID of an expense file of the sponsorship.
+   *
+   * @generated from field: int64 file_id = 3 [jstype = JS_STRING];
+   */
+  fileId: string;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceDeleteExpenseFileRequest.
+ * Use `create(AdminServiceDeleteExpenseFileRequestSchema)` to create a new message.
+ */
+export const AdminServiceDeleteExpenseFileRequestSchema: GenMessage<AdminServiceDeleteExpenseFileRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 22);
+
+/**
+ * Response for AdminService.DeleteExpenseFile.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceDeleteExpenseFileResponse
+ */
+export type AdminServiceDeleteExpenseFileResponse = Message<"rubykaigi.sponsor_app.AdminServiceDeleteExpenseFileResponse"> & {
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceDeleteExpenseFileResponse.
+ * Use `create(AdminServiceDeleteExpenseFileResponseSchema)` to create a new message.
+ */
+export const AdminServiceDeleteExpenseFileResponseSchema: GenMessage<AdminServiceDeleteExpenseFileResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 23);
 

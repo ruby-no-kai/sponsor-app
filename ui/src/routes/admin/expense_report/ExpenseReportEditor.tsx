@@ -26,6 +26,7 @@ import { labelOf } from "../sponsorshipView.ts";
 import { formatAmountAt, subtractAmounts } from "./amounts.ts";
 import { EditorProvider } from "./EditorContext.ts";
 import type { Editor } from "./EditorContext.ts";
+import { FileDropOverlay, DropZoneIndicator } from "./FileDropOverlay.tsx";
 import { FileView } from "./FileView.tsx";
 import { LeftPane } from "./LeftPane.tsx";
 import { lineItemInputOf } from "./lineItemForm.ts";
@@ -39,6 +40,9 @@ import {
 import type { Selection } from "./reportView.ts";
 import { ReviewForm } from "./ReviewForm.tsx";
 import { RightPane } from "./RightPane.tsx";
+import { UploadDialog } from "./UploadDialog.tsx";
+import { useFileUpload } from "./useFileUpload.ts";
+import type { UploadTarget } from "./useFileUpload.ts";
 import { useIsMobile } from "./useIsMobile.ts";
 
 export default function ExpenseReportEditor() {
@@ -188,6 +192,18 @@ function ReportEditor({
       `/admin/conferences/${encodeURIComponent(slug)}/sponsorships/${sponsorshipId}/expense_files/${fileId}`,
   };
 
+  const upload = useFileUpload({
+    editor,
+    select: (next) => {
+      if (next?.kind === "item") showItem(next.id);
+      else if (next?.kind === "file") showFile(next.id);
+    },
+  });
+  const linkedTarget: UploadTarget =
+    selectedItem === undefined ? { kind: "new-item" } : { kind: "item", id: selectedItem.id };
+  const uploadLinked = (files: File[]) => upload.start(files, linkedTarget);
+  const uploadUnlinked = (files: File[]) => upload.start(files, { kind: "files" });
+
   const previewFile = report.files.find((file) => file.id === previewFileId);
   const review = report.latestReview;
   const status = labelOf(EXPENSE_REPORT_STATUS_LABELS, report.status);
@@ -204,10 +220,11 @@ function ReportEditor({
         onSelectItem={showItem}
         onDeleted={clearSelection}
         onPreviewFile={setPreviewFileId}
+        onUploadLinked={uploadLinked}
       />
     );
   } else if (selectedFile !== undefined && !readOnly) {
-    center = <FileView file={selectedFile} onSelectItem={showItem} />;
+    center = <FileView file={selectedFile} onSelectItem={showItem} onDeleted={clearSelection} />;
   } else {
     center = (
       <div className="flex flex-1 items-center justify-center p-4">
@@ -265,50 +282,92 @@ function ReportEditor({
           />
         )}
 
-        <div
-          className={`flex overflow-hidden rounded-lg border border-kumo-line bg-kumo-base ${
-            isMobile ? "min-h-[60vh] flex-col" : "h-[80vh]"
-          }`}
+        <FileDropOverlay
+          disabled={readOnly}
+          onDropUnlinked={uploadUnlinked}
+          onDropLinked={uploadLinked}
+          zoneOverride={isMobile ? (mobileView === "list" ? "unlinked" : "linked") : undefined}
         >
-          {(!isMobile || mobileView === "list") && (
-            <LeftPane
-              selectedItemId={selectedItem?.id}
-              selectedFileId={selection?.kind === "file" ? selection.id : undefined}
-              onSelectItem={(id) => {
-                if (confirmLeaving()) showItem(id);
-              }}
-              onSelectFile={(id) => {
-                if (confirmLeaving()) showFile(id);
-              }}
-            />
-          )}
-          {(!isMobile || mobileView === "detail") && (
-            <>
-              {isMobile && (
-                <div className="border-b border-kumo-line p-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    icon={ArrowLeftIcon}
-                    onClick={() => {
-                      if (!confirmLeaving()) return;
-                      setMobileView("list");
-                      clearSelection();
-                    }}
-                  >
-                    Back
-                  </Button>
-                </div>
+          {({ isDragging, hoverZone }) => (
+            <div
+              className={`flex overflow-hidden rounded-lg border border-kumo-line bg-kumo-base ${
+                isMobile ? "min-h-[60vh] flex-col" : "h-[80vh]"
+              }`}
+            >
+              {(!isMobile || mobileView === "list") && (
+                <LeftPane
+                  selectedItemId={selectedItem?.id}
+                  selectedFileId={selection?.kind === "file" ? selection.id : undefined}
+                  onSelectItem={(id) => {
+                    if (confirmLeaving()) showItem(id);
+                  }}
+                  onSelectFile={(id) => {
+                    if (confirmLeaving()) showFile(id);
+                  }}
+                  onUploadFiles={uploadUnlinked}
+                  dropIndicator={
+                    <DropZoneIndicator
+                      visible={isDragging}
+                      highlighted={hoverZone === "unlinked"}
+                      label="Add as a new file"
+                    />
+                  }
+                />
               )}
-              <div className="flex min-h-0 min-w-64 flex-[4_0_0] flex-col overflow-auto">
-                {center}
-              </div>
-            </>
+              {(!isMobile || mobileView === "detail") && (
+                <>
+                  {isMobile && (
+                    <div className="border-b border-kumo-line p-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        icon={ArrowLeftIcon}
+                        onClick={() => {
+                          if (!confirmLeaving()) return;
+                          setMobileView("list");
+                          clearSelection();
+                        }}
+                      >
+                        Back
+                      </Button>
+                    </div>
+                  )}
+                  <div
+                    data-drop-zone="linked"
+                    className="relative flex min-h-0 min-w-64 flex-[4_0_0] flex-col overflow-auto"
+                  >
+                    {center}
+                    <DropZoneIndicator
+                      visible={isDragging}
+                      highlighted={hoverZone === "linked"}
+                      label={
+                        selectedItem === undefined
+                          ? "Create new line item"
+                          : `Link to "${selectedItem.title}"`
+                      }
+                    />
+                  </div>
+                </>
+              )}
+              {!isMobile && (
+                <RightPane
+                  file={previewFile}
+                  dropIndicator={
+                    <DropZoneIndicator
+                      visible={isDragging}
+                      highlighted={hoverZone === "linked"}
+                      label=""
+                    />
+                  }
+                />
+              )}
+            </div>
           )}
-          {!isMobile && <RightPane file={previewFile} />}
-        </div>
+        </FileDropOverlay>
 
         {report.status !== ExpenseReport_Status.DRAFT && <ReviewForm />}
+
+        <UploadDialog state={upload.state} onRetry={upload.retry} onDiscard={upload.discard} />
       </div>
     </EditorProvider>
   );

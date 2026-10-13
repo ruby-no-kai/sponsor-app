@@ -17,6 +17,7 @@ import { ConfirmButton } from "../ConfirmButton.tsx";
 import { ErrorList, joined, SaveErrorBanner, useFieldReveal } from "../FormParts.tsx";
 import { addAmounts, formatAmountAt, formatRate } from "./amounts.ts";
 import { useEditor } from "./EditorContext.ts";
+import { UploadHint } from "./EditorParts.tsx";
 import {
   FIELD_LABELS,
   LINE_ITEM_LAYOUT,
@@ -38,6 +39,7 @@ export function LineItemForm({
   onSelectItem,
   onDeleted,
   onPreviewFile,
+  onUploadLinked,
 }: {
   item: ExpenseLineItem;
   // Whether the form holds changes not saved, for the editor to ask before leaving them.
@@ -45,6 +47,7 @@ export function LineItemForm({
   onSelectItem: (id: string) => void;
   onDeleted: () => void;
   onPreviewFile: (id: string) => void;
+  onUploadLinked: (files: File[]) => void;
 }) {
   const { target, report, rounding, readOnly, isMobile, applyReport, fileUrl } = useEditor();
   const { decimal, taxRates } = rounding;
@@ -314,23 +317,27 @@ export function LineItemForm({
               </ul>
             )}
             <ErrorList errors={field.state.meta.errors} />
-            {!readOnly && attachable.length > 0 && (
-              <Select
-                aria-label="Link an existing file"
-                value=""
-                onValueChange={(value) => {
-                  if (typeof value === "string" && value !== "") {
-                    field.handleChange([...field.state.value, value]);
-                  }
-                }}
-                items={[
-                  { label: "Link an existing file…", value: "" },
-                  ...attachable.map((file) => ({
-                    label: fileName(file),
-                    value: file.id,
-                  })),
-                ]}
-              />
+            {!readOnly && (
+              <UploadHint prompt="Drop files here to attach, or" onUploadFiles={onUploadLinked}>
+                {attachable.length > 0 && (
+                  <Select
+                    aria-label="Link an existing file"
+                    value=""
+                    onValueChange={(value) => {
+                      if (typeof value === "string" && value !== "") {
+                        field.handleChange([...field.state.value, value]);
+                      }
+                    }}
+                    items={[
+                      { label: "Link an existing file…", value: "" },
+                      ...attachable.map((file) => ({
+                        label: fileName(file),
+                        value: file.id,
+                      })),
+                    ]}
+                  />
+                )}
+              </UploadHint>
             )}
           </div>
         )}

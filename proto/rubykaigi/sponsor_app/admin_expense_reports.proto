@@ -210,3 +210,119 @@ message AdminServiceCreateExpenseReportReviewResponse {
   // The report as reviewed, carrying the review as latest_review.
   ExpenseReport report = 1;
 }
+
+// Request for AdminService.CreateExpenseFileUpload.
+message AdminServiceCreateExpenseFileUploadRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // The file to upload.
+  ExpenseFileUploadInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.CreateExpenseFileUpload.
+message AdminServiceCreateExpenseFileUploadResponse {
+  // Where and how to upload the file.
+  ExpenseFileUpload upload = 1;
+}
+
+// Request for AdminService.InitiateExpenseFileUpdate.
+message AdminServiceInitiateExpenseFileUpdateRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // ID of an expense file of the sponsorship.
+  int64 file_id = 3 [
+    jstype = JS_STRING,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  // MIME type of the file to upload, as ExpenseFileUploadInput.content_type. Absent keeps the
+  // one declared when the upload was created.
+  optional string content_type = 4 [(buf.validate.field).string = {
+    in: [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "application/pdf"
+    ]
+  }];
+}
+
+// Response for AdminService.InitiateExpenseFileUpdate.
+message AdminServiceInitiateExpenseFileUpdateResponse {
+  // Where and how to upload the file.
+  ExpenseFileUpload upload = 1;
+}
+
+// Request for AdminService.CompleteExpenseFileUpload.
+message AdminServiceCompleteExpenseFileUploadRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // ID of an expense file of the sponsorship.
+  int64 file_id = 3 [
+    jstype = JS_STRING,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  // Name to give the file. Absent keeps the name given when the upload was created.
+  optional string filename = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+
+  // Version the storage answered the upload with, in its `x-amz-version-id` header. Empty when it
+  // answered none.
+  string version_id = 5 [(buf.validate.field).string.max_len = 1024];
+
+  // Extension of the file's name, such as "pdf". Letters and digits only are kept, in lower
+  // case. Empty records "unknown".
+  string extension = 6 [(buf.validate.field).string.max_len = 255];
+}
+
+// Response for AdminService.CompleteExpenseFileUpload.
+message AdminServiceCompleteExpenseFileUploadResponse {
+  // The file as uploaded, with the content type the storage recorded.
+  ExpenseFile file = 1;
+}
+
+// Request for AdminService.DeleteExpenseFile.
+message AdminServiceDeleteExpenseFileRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // ID of an expense file of the sponsorship.
+  int64 file_id = 3 [
+    jstype = JS_STRING,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+// Response for AdminService.DeleteExpenseFile.
+message AdminServiceDeleteExpenseFileResponse {}

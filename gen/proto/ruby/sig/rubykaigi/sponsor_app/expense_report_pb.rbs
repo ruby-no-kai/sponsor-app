@@ -590,6 +590,92 @@ module Rk
         | ("position" name, (::Integer | ::Float) value) -> void
         | ("file_ids" name, (::Google::Protobuf::RepeatedField[::Integer, ::Integer | ::Float]) value) -> void
     end
+
+    # A receipt or invoice to upload, taken by AdminService.CreateExpenseFileUpload.
+    class ExpenseFileUploadInput < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::ExpenseFileUploadInput]
+
+      # Name of the file, as the uploader's computer calls it.
+      attr_reader filename(): ::String
+      attr_writer filename(): ::String | ::Symbol
+      def clear_filename: () -> void
+
+      # MIME type of the file: a JPEG, PNG, GIF or WebP image, or a PDF.
+      attr_reader content_type(): ::String
+      attr_writer content_type(): ::String | ::Symbol
+      def clear_content_type: () -> void
+
+      type init_map = {
+        filename: (::String | ::Symbol)?,
+        "filename" => (::String | ::Symbol)?,
+        content_type: (::String | ::Symbol)?,
+        "content_type" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("filename" name) -> ::String
+        | ("content_type" name) -> ::String
+
+      def []=:
+          ("filename" name, (::String | ::Symbol) value) -> void
+        | ("content_type" name, (::String | ::Symbol) value) -> void
+    end
+
+    # An upload of an expense file in progress: a presigned POST to the storage, valid for 15
+    # minutes.
+    # POST a multipart form to `url` holding every entry of `fields`, then `x-amz-checksum-algorithm`
+    # set to "SHA256" and `x-amz-checksum-sha256` to the base64 SHA-256 digest of the file, then the
+    # file itself as `file`. The storage refuses a file larger than `max_size` or of another content
+    # type than the one declared. Report the upload as complete afterwards.
+    class ExpenseFileUpload < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::ExpenseFileUpload]
+
+      # ID of the ExpenseFile being uploaded.
+      attr_reader file_id(): ::Integer
+      attr_writer file_id(): ::Integer | ::Float
+      def clear_file_id: () -> void
+
+      # Where to POST the form.
+      attr_reader url(): ::String
+      attr_writer url(): ::String | ::Symbol
+      def clear_url: () -> void
+
+      # Form fields to send ahead of the file, as given.
+      attr_accessor fields(): ::Google::Protobuf::Map[::String, ::String, ::String | ::Symbol, ::String | ::Symbol]
+      def clear_fields: () -> void
+
+      # Largest file the storage accepts, in bytes.
+      attr_reader max_size(): ::Integer
+      attr_writer max_size(): ::Integer | ::Float
+      def clear_max_size: () -> void
+
+      type init_map = {
+        file_id: (::Integer | ::Float)?,
+        "file_id" => (::Integer | ::Float)?,
+        url: (::String | ::Symbol)?,
+        "url" => (::String | ::Symbol)?,
+        fields: ::Hash[::String | ::Symbol, ::String | ::Symbol]?,
+        "fields" => ::Hash[::String | ::Symbol, ::String | ::Symbol]?,
+        max_size: (::Integer | ::Float)?,
+        "max_size" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("file_id" name) -> ::Integer
+        | ("url" name) -> ::String
+        | ("fields" name) -> (::Google::Protobuf::Map[::String, ::String, ::String | ::Symbol, ::String | ::Symbol])
+        | ("max_size" name) -> ::Integer
+
+      def []=:
+          ("file_id" name, (::Integer | ::Float) value) -> void
+        | ("url" name, (::String | ::Symbol) value) -> void
+        | ("fields" name, (::Google::Protobuf::Map[::String, ::String, ::String | ::Symbol, ::String | ::Symbol]) value) -> void
+        | ("max_size" name, (::Integer | ::Float) value) -> void
+    end
   end
 end
 
@@ -605,6 +691,8 @@ module Google
         | ("rubykaigi.sponsor_app.ExpenseReportReview.Action" name) -> (::Google::Protobuf::EnumDescriptor & ::Google::Protobuf::_SpecificEnumDescriptor[singleton(::Rk::SponsorApp::ExpenseReportReview::Action)])
         | ("rubykaigi.sponsor_app.ExpenseReportCalculation" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ExpenseReportCalculation)])
         | ("rubykaigi.sponsor_app.ExpenseLineItemInput" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ExpenseLineItemInput)])
+        | ("rubykaigi.sponsor_app.ExpenseFileUploadInput" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ExpenseFileUploadInput)])
+        | ("rubykaigi.sponsor_app.ExpenseFileUpload" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::ExpenseFileUpload)])
         | ...
     end
   end

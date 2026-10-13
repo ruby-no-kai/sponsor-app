@@ -305,6 +305,26 @@ service AdminService {
   // `not_found`, and a draft, such as one whose submission was withdrawn, `failed_precondition`.
   rpc CreateExpenseReportReview(AdminServiceCreateExpenseReportReviewRequest) returns (AdminServiceCreateExpenseReportReviewResponse);
 
+  // Starts uploading an expense file for a sponsorship: records the file, then returns a presigned
+  // POST to the storage for the browser to send it with. CompleteExpenseFileUpload lists the file
+  // once the upload is done. A sponsorship whose expense report is approved is answered
+  // `failed_precondition`.
+  rpc CreateExpenseFileUpload(AdminServiceCreateExpenseFileUploadRequest) returns (AdminServiceCreateExpenseFileUploadResponse);
+
+  // Returns a fresh presigned POST for an expense file, to retry its upload or replace its
+  // contents. A sponsorship whose expense report is approved is answered `failed_precondition`.
+  rpc InitiateExpenseFileUpdate(AdminServiceInitiateExpenseFileUpdateRequest) returns (AdminServiceInitiateExpenseFileUpdateResponse);
+
+  // Records that an expense file's upload is done, taking its version, checksum and content type
+  // from the storage. A file the storage does not hold yet is answered `failed_precondition`, and
+  // so is a sponsorship whose expense report is approved.
+  rpc CompleteExpenseFileUpload(AdminServiceCompleteExpenseFileUploadRequest) returns (AdminServiceCompleteExpenseFileUploadResponse);
+
+  // Deletes an expense file from the storage, detaching it from every line item and rewriting the
+  // snapshot under review while the report is submitted. A sponsorship whose expense report is
+  // approved is answered `failed_precondition`.
+  rpc DeleteExpenseFile(AdminServiceDeleteExpenseFileRequest) returns (AdminServiceDeleteExpenseFileResponse);
+
   // Viewer
 
   // Returns the signed-in staff member.

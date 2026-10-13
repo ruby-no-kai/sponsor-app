@@ -1,10 +1,11 @@
 import { Button, Text } from "@cloudflare/kumo";
 import { PlusIcon } from "@phosphor-icons/react";
+import type { ReactNode } from "react";
 import { AdminService } from "../../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
 import { useRpcMutation } from "../../../lib/rpc.ts";
 import { notifyError } from "../../../lib/toast.ts";
 import { useEditor } from "./EditorContext.ts";
-import { PaneHeader } from "./EditorParts.tsx";
+import { PaneHeader, UploadHint } from "./EditorParts.tsx";
 import { moveLineItem, newLineItemInput } from "./lineItemForm.ts";
 import { fileName, unlinkedFiles } from "./reportView.ts";
 import { SortableLineItemList } from "./SortableLineItemList.tsx";
@@ -15,11 +16,15 @@ export function LeftPane({
   selectedFileId,
   onSelectItem,
   onSelectFile,
+  onUploadFiles,
+  dropIndicator,
 }: {
   selectedItemId: string | undefined;
   selectedFileId: string | undefined;
   onSelectItem: (id: string) => void;
   onSelectFile: (id: string) => void;
+  onUploadFiles: (files: File[]) => void;
+  dropIndicator: ReactNode;
 }) {
   const {
     target,
@@ -61,7 +66,8 @@ export function LeftPane({
 
   return (
     <div
-      className={`flex min-h-0 flex-col overflow-auto ${isMobile ? "flex-1" : "w-64 shrink-0 border-r border-kumo-line"}`}
+      data-drop-zone="unlinked"
+      className={`relative flex min-h-0 flex-col overflow-auto ${isMobile ? "flex-1" : "w-64 shrink-0 border-r border-kumo-line"}`}
     >
       <PaneHeader title="Line items">
         {!readOnly && (
@@ -112,6 +118,8 @@ export function LeftPane({
           </li>
         ))}
       </ul>
+      {!readOnly && <UploadHint prompt="Drop files to add or" onUploadFiles={onUploadFiles} />}
+      {dropIndicator}
     </div>
   );
 }

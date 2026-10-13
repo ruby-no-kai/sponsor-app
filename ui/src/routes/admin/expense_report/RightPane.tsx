@@ -1,17 +1,28 @@
 import { Link, Text } from "@cloudflare/kumo";
+import type { ReactNode } from "react";
 import type { ExpenseFile } from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
 import { useEditor } from "./EditorContext.ts";
 import { PaneHeader } from "./EditorParts.tsx";
 import { fileName } from "./reportView.ts";
 
 // Previews a file through the staff area's file page, which redirects to the storage.
-export function RightPane({ file }: { file: ExpenseFile | undefined }) {
+export function RightPane({
+  file,
+  dropIndicator,
+}: {
+  file: ExpenseFile | undefined;
+  dropIndicator: ReactNode;
+}) {
   const { fileUrl } = useEditor();
 
   if (file === undefined) {
     return (
-      <div className="flex flex-[5_0_0] items-center justify-center border-l border-kumo-line">
+      <div
+        data-drop-zone="linked"
+        className="relative flex flex-[5_0_0] items-center justify-center border-l border-kumo-line"
+      >
         <Text variant="secondary">Select a file to preview</Text>
+        {dropIndicator}
       </div>
     );
   }
@@ -19,7 +30,10 @@ export function RightPane({ file }: { file: ExpenseFile | undefined }) {
   const url = fileUrl(file.id);
   const name = fileName(file);
   return (
-    <div className="flex min-w-72 flex-[5_0_0] flex-col border-l border-kumo-line">
+    <div
+      data-drop-zone="linked"
+      className="relative flex min-w-72 flex-[5_0_0] flex-col border-l border-kumo-line"
+    >
       <PaneHeader title={name} />
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto p-2">
         {file.contentType.startsWith("image/") ? (
@@ -35,6 +49,7 @@ export function RightPane({ file }: { file: ExpenseFile | undefined }) {
           </Text>
         )}
       </div>
+      {dropIndicator}
     </div>
   );
 }
