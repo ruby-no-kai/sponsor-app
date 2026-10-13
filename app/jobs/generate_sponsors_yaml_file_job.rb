@@ -2,33 +2,6 @@
 # frozen_string_literal: true
 
 class GenerateSponsorsYamlFileJob < ApplicationJob
-  #: type sponsor_entry = {
-  #|   id: Integer,
-  #|   asset_file_id: Integer?,
-  #|   base_plan: String,
-  #|   plan_name: String?,
-  #|   slug: String?,
-  #|   name: String,
-  #|   url: String,
-  #|   profile: String,
-  #| }
-  #: type plan_entry = { plan_name: String?, sponsors: Array[sponsor_entry] }
-  #: type base_plan_entry = { base_plan: String, plans: Hash[String, plan_entry] }
-  #: type host_entry = { slug: String?, name: String, url: String }
-  #: type event_entry = {
-  #|   id: Integer,
-  #|   slug: String,
-  #|   title: String,
-  #|   starts_at: String,
-  #|   url: String,
-  #|   price: String,
-  #|   capacity: String,
-  #|   location_en: String,
-  #|   location_local: String,
-  #|   link_name: String,
-  #|   hosts: Array[host_entry],
-  #| }
-
   #: (Conference, ?push: bool) -> void
   def perform(conference, push: true)
     @conference = conference #: Conference?
@@ -47,7 +20,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
     conference.github_repo
   end
 
-  #: () -> Hash[String, base_plan_entry]?
+  #: () -> Hash[String, Hash[Symbol, untyped]]?
   def data
     sponsorships = conference.sponsorships
       .have_presence
@@ -55,46 +28,19 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       .includes(:plan)
       .includes(:organization)
       .includes(:asset_file)
-      .group_by { |s| presence_plan(s).name.downcase.gsub(/[^a-z0-9]/, '_') }
+      .to_a
 
-    @last = SponsorshipEditingHistory.where(sponsorship_id: sponsorships.each_value.flat_map { |ss| ss.map(&:id) }).order(id: :desc).first #: SponsorshipEditingHistory?
+    @last = SponsorshipEditingHistory.where(sponsorship_id: sponsorships.map(&:id)).order(id: :desc).first #: SponsorshipEditingHistory?
     unless @last # this is falsy if no sponsorships have presense
       Rails.logger.warn "Conference #{conference.slug} (#{conference.id}) have no sponsorships with presense, resulting null sponsors data"
       return
     end
     @last_id = @last.id #: Integer?
 
-    sponsorships.map do |base_plan_slug, sponsorships|
-      [
-        base_plan_slug,
-        {
-          base_plan: presence_plan(sponsorships.fetch(0)).name.downcase,
-          plans: sponsorships.group_by { |s| Must.because(s.plan_name) { "have_presence selects sponsorships with a plan" }.downcase.gsub(/[^a-z0-9]/, '_') }.map do |plan_slug, sponsors|
-            [
-              plan_slug,
-              {
-                plan_name: sponsors.fetch(0).plan_name,
-                sponsors: sponsors.map do |sp|
-                  {
-                    id: sp.id,
-                    asset_file_id: sp.asset_file&.id,
-                    base_plan: presence_plan(sp).name.downcase,
-                    plan_name: sp.plan_name,
-                    slug: sp.slug,
-                    name: sp.name,
-                    url: sp.url.strip,
-                    profile: sp.profile,
-                  }
-                end,
-              },
-            ]
-          end.to_h,
-        },
-      ]
-    end.to_h
+    SponsorsFile::BasePlanResource.mapping(sponsorships)
   end
 
-  #: () -> Array[event_entry]
+  #: () -> Array[Hash[Symbol, untyped]]
   def events_data
     events = conference.sponsor_events
       .accepted
@@ -105,29 +51,7 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
       .where(sponsor_event_id: events.map(&:id))
       .maximum(:id) #: Integer?
 
-    events.map do |event|
-      hosts = event.all_host_sponsorships.sort_by(&:id).map do |sponsorship|
-        {
-          slug: sponsorship.slug,
-          name: sponsorship.name,
-          url: sponsorship.url,
-        }
-      end
-
-      {
-        id: event.id,
-        slug: event.slug,
-        title: event.title,
-        starts_at: event.starts_at.iso8601,
-        url: event.url,
-        price: event.price,
-        capacity: event.capacity,
-        location_en: event.location_en,
-        location_local: event.location_local,
-        link_name: event.link_name,
-        hosts:,
-      }.compact
-    end
+    SponsorsFile::EventResource.new(events).to_h
   end
 
   #: () -> String?
@@ -224,11 +148,6 @@ class GenerateSponsorsYamlFileJob < ApplicationJob
 
   #: () -> Conference
   private def conference = Must.because(@conference) { "perform sets the conference" }
-
-  #: (Sponsorship) -> Plan
-  private def presence_plan(sponsorship)
-    Must.because(sponsorship.plan) { "have_presence selects sponsorships with a plan" }
-  end
 
   # For debugging
   #: (String) -> Octokit::Client

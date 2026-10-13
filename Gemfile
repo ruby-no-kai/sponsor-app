@@ -31,6 +31,7 @@ gem 'lambdakiq'
 
 gem 'google-protobuf'
 gem 'sponsor_app-proto', path: 'gen/proto/ruby'
+gem 'protobufable', git: 'https://github.com/sorah/protobufable.git', ref: 'f000d321a06633d8eff8b55f78b15069c02edc0c'
 
 gem 'alba'
 gem 'jbuilder', '~> 2.9'

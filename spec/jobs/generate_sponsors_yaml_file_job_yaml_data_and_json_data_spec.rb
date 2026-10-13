@@ -109,6 +109,17 @@ RSpec.describe GenerateSponsorsYamlFileJob, '#yaml_data and #json_data' do
     it 'writes the sponsors JSON' do
       expect(run_job.json_data).to eq(golden('sponsors.json'))
     end
+
+    it 'writes what SponsorsFile describes' do
+      expect(Rk::SponsorApp::SponsorsFile.descriptor.map(&:name)).to eq(%w[base_plans events]),
+        '#yaml_data and #json_data write the top-level fields by hand'
+
+      job = run_job
+      file = Rk::SponsorApp::SponsorsFile.new(base_plans: job.data, events: job.events_data)
+
+      expect(file.base_plans['platinum'].plans['platinum'].sponsors.map(&:has_asset_file_id?)).to eq([true, false])
+      expect(file.events.map { |event| event.hosts.map(&:name) }).to eq([['Lounge Inc.'], ['Fabrikam Inc.', 'Contoso Inc.', 'Planned Inc.']])
+    end
   end
 
   context 'with events only' do
