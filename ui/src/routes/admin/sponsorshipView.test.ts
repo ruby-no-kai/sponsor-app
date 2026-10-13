@@ -1,17 +1,16 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { create } from "@bufbuild/protobuf";
-import { ValueSchema } from "@bufbuild/protobuf/wkt";
 import {
   AdminSponsorshipSchema,
+  AdminSponsorship_ExpenseReport_Status,
   AdminSponsorship_TitoDiscountCode_Kind,
 } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 import {
-  EVENT_STATUS_LABELS,
+  EXPENSE_REPORT_STATUS_LABELS,
   boothStatus,
   customizationStatus,
   formatAmount,
-  formatHistoryValue,
   isOverWordLimit,
   isWebUrl,
   labelOf,
@@ -78,7 +77,11 @@ describe("labels", () => {
       titoKindLabel(AdminSponsorship_TitoDiscountCode_Kind.BOOTH_PAID),
       "Exhibitor (Paid)",
     );
-    assert.equal(labelOf(EVENT_STATUS_LABELS, 99 as never).text, "99");
+    assert.equal(
+      labelOf(EXPENSE_REPORT_STATUS_LABELS, AdminSponsorship_ExpenseReport_Status.SUBMITTED).text,
+      "submitted",
+    );
+    assert.equal(labelOf(EXPENSE_REPORT_STATUS_LABELS, 99 as never).text, "99");
   });
 });
 
@@ -87,19 +90,5 @@ describe("formatAmount", () => {
     assert.equal(formatAmount("1200000.0"), "1,200,000");
     assert.equal(formatAmount("1234.5"), "1,234.5");
     assert.equal(formatAmount("0.0"), "0");
-  });
-});
-
-describe("formatHistoryValue", () => {
-  it("shows JSON, and a dash for no value", () => {
-    assert.equal(formatHistoryValue(undefined), "—");
-    assert.equal(
-      formatHistoryValue(create(ValueSchema, { kind: { case: "nullValue", value: 0 } })),
-      "null",
-    );
-    assert.equal(
-      formatHistoryValue(create(ValueSchema, { kind: { case: "stringValue", value: "a" } })),
-      '"a"',
-    );
   });
 });

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+option ruby_package = "Rk::SponsorApp";
+
+// Where the organizers' review of an event a sponsor hosts stands. See AIP-216.
+enum SponsorEventStatus {
+  // The zero value proto3 requires. Never returned.
+  SPONSOR_EVENT_STATUS_UNSPECIFIED = 0;
+
+  // Submitted and awaiting review.
+  SPONSOR_EVENT_STATUS_PENDING = 1;
+
+  // Accepted and listed on the conference website.
+  SPONSOR_EVENT_STATUS_ACCEPTED = 2;
+
+  // Turned down.
+  SPONSOR_EVENT_STATUS_REJECTED = 3;
+
+  // Withdrawn. The sponsor can no longer edit it.
+  SPONSOR_EVENT_STATUS_WITHDRAWN = 4;
+}

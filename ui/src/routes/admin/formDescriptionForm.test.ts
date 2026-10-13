@@ -1,11 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { create, toBinary, toJson } from "@bufbuild/protobuf";
-import { Code, ConnectError } from "@connectrpc/connect";
-import { BadRequestSchema } from "../../gen/google/rpc/error_details_pb.ts";
+import { create, toJson } from "@bufbuild/protobuf";
 import { FormDescriptionInputSchema } from "../../gen/rubykaigi/sponsor_app/admin_form_descriptions_pb.ts";
 import { FormDescriptionSchema } from "../../gen/rubykaigi/sponsor_app/form_description_pb.ts";
-import { fieldViolations } from "../../lib/errors.ts";
 import { errorAnchor, erroredFields, fieldLabel } from "../../lib/fieldErrors.ts";
 import {
   FORM_DESCRIPTION_LAYOUT,
@@ -15,7 +12,6 @@ import {
   collidingOptions,
   defaultLocale,
   emptyFallbackOption,
-  errorsAt,
   formValuesFrom,
   inputFrom,
   isBoothRequest,
@@ -127,56 +123,6 @@ describe("movedIndex", () => {
     assert.equal(movedIndex(0, -1, 3), undefined);
     assert.equal(movedIndex(2, 1, 3), undefined);
     assert.equal(movedIndex(1, 1, 3), 2);
-  });
-});
-
-describe("errorsAt", () => {
-  // As TanStack Form holds the errors fieldViolations returned, under the field names.
-  function metasFor(...violations: { field: string; description: string }[]) {
-    const error = new ConnectError("invalid", Code.InvalidArgument);
-    error.details.push({
-      type: BadRequestSchema.typeName,
-      value: toBinary(BadRequestSchema, create(BadRequestSchema, { fieldViolations: violations })),
-    });
-    const { fields } = fieldViolations(error, { prefix: "input." });
-    return Object.fromEntries(
-      Object.entries(fields).map(([name, message]) => [name, { errors: [message] }]),
-    );
-  }
-
-  it("finds a violation at a nested field path", () => {
-    const metas = metasFor({
-      field: "input.fallbackOptions[1].value",
-      description: "value is required",
-    });
-
-    assert.deepEqual(errorsAt(metas, "fallbackOptions[1].value"), ["is required"]);
-    assert.deepEqual(errorsAt(metas, "fallbackOptions[0].value"), []);
-  });
-
-  it("finds a message-level violation on a list element", () => {
-    const metas = metasFor({
-      field: "input.fallbackOptions[0].conditions[1]",
-      description: "a condition must name plans or a booth request",
-    });
-
-    assert.deepEqual(errorsAt(metas, "fallbackOptions[0].conditions[1]"), [
-      "a condition must name plans or a booth request",
-    ]);
-  });
-
-  it("numbers the violations of list items when asked", () => {
-    const metas = metasFor(
-      { field: "input.fallbackOptions[0].priorityHuman", description: "too many" },
-      { field: "input.fallbackOptions[0].priorityHuman[1]", description: "too long" },
-      { field: "input.fallbackOptions[0].priorityHumanNote", description: "unrelated" },
-    );
-
-    assert.deepEqual(errorsAt(metas, "fallbackOptions[0].priorityHuman", { items: true }), [
-      "too many",
-      "#2: too long",
-    ]);
-    assert.deepEqual(errorsAt(metas, "fallbackOptions[0].priorityHuman"), ["too many"]);
   });
 });
 

@@ -183,6 +183,34 @@ export const router = createBrowserRouter([
               },
 
               // Sponsor events
+              {
+                path: paths.sponsorEvents,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorEventList.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorEvent,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorEventDetail.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorEventEdit,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorEventEditor.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorEventEditingHistory,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/SponsorEventEditingHistory.tsx")).default,
+                },
+              },
 
               // Announcements
 

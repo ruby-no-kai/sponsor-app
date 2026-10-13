@@ -6,7 +6,7 @@ module Api
     with_protobuf Rk::SponsorApp::AdminSponsorship::SponsorEvent do
       attributes :id, :title
       attributes starts_at: :timestamp
-      attribute(:status) { |event| :"STATUS_#{event.status.upcase}" }
+      attribute(:status) { |event| Api::AdminSponsorEventResource::STATUSES.fetch(event.status) }
     end
   end
 end

@@ -1,0 +1,227 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "rubykaigi/sponsor_app/editing_history.proto";
+import "rubykaigi/sponsor_app/sponsor_event_status.proto";
+import "rubykaigi/sponsor_app/sponsorship_summary.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// An event a sponsor hosts around the conference, such as a party or a meetup, as organizers
+// review it. The conference website lists the accepted ones.
+//
+// Staff-only. SponsorService never returns it.
+message AdminSponsorEvent {
+  // Event ID.
+  int64 id = 1;
+
+  // Identifier of the event on the conference website, unique within the conference, such as
+  // "example.com-1".
+  string slug = 2;
+
+  // Title of the event.
+  string title = 3;
+
+  // Where the organizers' review stands.
+  SponsorEventStatus status = 4;
+
+  // When the event starts, as the local time at the venue. The Timestamp carries that wall clock as
+  // the same reading in UTC.
+  google.protobuf.Timestamp starts_at = 5;
+
+  // URL of the event's own page, such as its registration page.
+  string url = 6;
+
+  // Text that listings link url with, such as "Registration". Empty when none is set.
+  string link_name = 7;
+
+  // Entrance fee as the sponsor wrote it, such as "1000 JPY". Empty when the sponsor gave none,
+  // which listings show as free.
+  string price = 8;
+
+  // How many people the event admits, as the sponsor wrote it, such as "100". Empty when the
+  // sponsor gave none.
+  string capacity = 9;
+
+  // Venue in English. Empty when the sponsor gave none.
+  string location_en = 10;
+
+  // Venue in the local language. Empty when the sponsor gave none.
+  string location_local = 11;
+
+  // The sponsorship that submitted the event.
+  SponsorshipSummary sponsorship = 12;
+
+  // Further sponsorships of the conference hosting the event, in the order organizers listed
+  // them. Withdrawn ones are included, though the conference website names only the hosts that
+  // have not withdrawn. A stored ID that names no sponsorship of the conference is left out.
+  repeated SponsorshipSummary co_hosts = 13;
+
+  // Organizers' remarks on the event, which the sponsor sees on its event page. Empty for none.
+  string admin_comment = 14;
+
+  // When the sponsor agreed to the event policy. Absent when it has not.
+  optional google.protobuf.Timestamp policy_acknowledged_at = 15;
+
+  // Whether the sponsor uploaded a hero image for the event. The staff area's download link for
+  // it answers not found until it has.
+  bool hero_image_uploaded = 16;
+}
+
+// The fields of a sponsor event organizers can change, taken by AdminService.UpdateSponsorEvent.
+// Every field replaces what is stored.
+message AdminSponsorEventInput {
+  // Title of the event.
+  string title = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "admin_sponsor_event_input.title.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // Identifier of the event on the conference website. A slug another event of the conference
+  // has is answered with PROBLEM_TYPE_INVALID_RECORD.
+  string slug = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "admin_sponsor_event_input.slug.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // When the event starts, as the local time at the venue carried as the same reading in UTC,
+  // within years 1 to 9999 as ProtoJSON spells them.
+  google.protobuf.Timestamp starts_at = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp = {
+      gte: {seconds: -62135596800}
+      lte: {
+        seconds: 253402300799
+        nanos: 999999999
+      }
+    }
+  ];
+
+  // URL of the event's own page, starting with "http://" or "https://".
+  string url = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "admin_sponsor_event_input.url.format"
+      message: "must start with http:// or https://"
+      expression: "this.matches('^https?://')"
+    }
+  ];
+
+  // Text that listings link url with, such as "Registration". Empty sets none.
+  string link_name = 5;
+
+  // Entrance fee in any form, such as "1000 JPY". Empty sets none, which listings show as free.
+  string price = 6;
+
+  // How many people the event admits, in any form, such as "100". Empty sets none.
+  string capacity = 7;
+
+  // Venue in English. Empty sets none.
+  string location_en = 8;
+
+  // Venue in the local language. Empty sets none.
+  string location_local = 9;
+
+  // Where the organizers' review stands. An accepted event is listed on the conference website.
+  SponsorEventStatus status = 10 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+
+  // IDs of further sponsorships of the conference hosting the event, in the order to list them.
+  // An ID that is no sponsorship of the conference is answered with PROBLEM_TYPE_INVALID_RECORD.
+  repeated int64 co_host_sponsorship_ids = 11 [(buf.validate.field).repeated = {
+    unique: true
+    items: {
+      int64: {gt: 0}
+    }
+  }];
+
+  // Organizers' remarks on the event, which the sponsor sees on its event page. Empty sets none.
+  string admin_comment = 12;
+}
+
+// Request for AdminService.ListSponsorEvents.
+message AdminServiceListSponsorEventsRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for AdminService.ListSponsorEvents.
+message AdminServiceListSponsorEventsResponse {
+  // Every event of the conference, grouped by status in the order SponsorEventStatus lists
+  // them, each group earliest start first. Not paginated, as a conference has a few dozen.
+  repeated AdminSponsorEvent sponsor_events = 1;
+}
+
+// Request for AdminService.GetSponsorEvent.
+message AdminServiceGetSponsorEventRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of an event of the conference.
+  int64 sponsor_event_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.GetSponsorEvent.
+message AdminServiceGetSponsorEventResponse {
+  // The event the request names.
+  AdminSponsorEvent sponsor_event = 1;
+}
+
+// Request for AdminService.UpdateSponsorEvent.
+message AdminServiceUpdateSponsorEventRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of an event of the conference.
+  int64 sponsor_event_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // Every changeable field, replacing what is stored.
+  AdminSponsorEventInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.UpdateSponsorEvent.
+message AdminServiceUpdateSponsorEventResponse {
+  // The event as updated.
+  AdminSponsorEvent sponsor_event = 1;
+}
+
+// Request for AdminService.ListSponsorEventEditingHistory.
+message AdminServiceListSponsorEventEditingHistoryRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of an event of the conference.
+  int64 sponsor_event_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.ListSponsorEventEditingHistory.
+message AdminServiceListSponsorEventEditingHistoryResponse {
+  // Every save of the event, by its sponsor or by staff, most recent first. Not paginated, as an
+  // event is saved a few times at most.
+  repeated EditingHistoryEntry entries = 1;
+}
