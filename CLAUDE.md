@@ -300,7 +300,23 @@ To add an SPA screen:
 - An RPC answering `unauthenticated` sends the browser to the Rails sign-in page, which brings it back afterwards. RPCs are same-origin and need no CSRF token.
 - A screen showing what a background job moves on, such as a broadcast's status, passes `useRpc` a `refreshInterval` function that polls until the job is done (`refreshIntervalFor` in `ui/src/routes/admin/broadcastView.ts`).
 - A group of fields two forms share is one form field holding an object, rendered by a controlled component that reads the errors below it with `errorsUnder` from `ui/src/lib/fieldErrors.ts` and sets `data-field` on each input (`ui/src/routes/admin/RecipientFilterFields.tsx`).
+- Navigate from code with `useGoTo()` from `ui/src/lib/navigation.ts`. It navigates in place only to a path in `paths.ts` and loads any other as a page, where the router would render its NotFound instead of the HAML page.
 - Code imported by a `*.test.ts` must be erasable TypeScript with `.ts` import extensions, as Node strips the types without compiling. tsconfig's `erasableSyntaxOnly` enforces the former; a missing `.ts` extension surfaces only when `mise run ui:test` loads the module.
+
+#### Sponsor screens in the sponsor's language
+
+The staff area is English only. The sponsor tree shows Rails' own locale texts, which `SponsorService.GetTranslations` serves in the locale the browser chose.
+
+- It serves only the scopes listed in `SponsorTranslations::SCOPES` (`app/models/sponsor_translations.rb`), in sections per domain like the service's. Never list `admin.*` or a mailer's scope.
+- `SponsorLayout` provides the texts through the React Context in `ui/src/lib/i18n.tsx`. Read them with `const t = useT()`, never through props:
+  - `t("root.index.sponsor_conference", {conference: name})` fills `%{conference}`, and `org_name` is filled in already.
+  - `t(key, {count})` picks the `.zero`, `.one` or `.other` form as I18n does.
+  - `t.rich(key, {link: <Link href="…">…</Link>})` puts elements in place of variables.
+  - `t.html(key, vars)` returns HTML for a key ending in `_html` and escapes every other text and every variable.
+  - `t.dateTime(timestamp)` shows a time in the browser's time zone, naming the zone. The HAML pages print UTC.
+  - A missing key renders as the key itself.
+- A sponsor screen writes no user-facing string itself. Reuse the HAML page's keys, adding their scope to `SCOPES`, or add texts only the SPA shows under `sponsor_ui.<domain>` in both `config/locales/en.yml` and `ja.yml`. `spec/requests/api/sponsor/locale_spec.rb` fails on a `sponsor_ui` key missing from `ja.yml`.
+- The SPA's page loads never reach Rails, so the language menu calls `SponsorService.SetLocale`, and `SponsorLayout` applies a `?hl=` the page was loaded with the same way before dropping it from the URL.
 
 ## Development Notes
 
@@ -391,3 +407,4 @@ terraform apply -target=aws_apprunner_service.prd
 - Locale stored per sponsorship for email communications
 - Form descriptions localized per conference
 - Admin interfaces don't need localization. Embed text directly into views.
+- The SPA's sponsor screens read the same locale files, see "Sponsor screens in the sponsor's language".

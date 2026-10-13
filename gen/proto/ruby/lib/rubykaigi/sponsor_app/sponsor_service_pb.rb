@@ -4,10 +4,11 @@
 
 require 'google/protobuf'
 
+require 'rubykaigi/sponsor_app/sponsor_shell_pb'
 require 'rubykaigi/sponsor_app/sponsor_viewer_pb'
 
 
-descriptor_data = "\n+rubykaigi/sponsor_app/sponsor_service.proto\x12\x15rubykaigi.sponsor_app\x1a*rubykaigi/sponsor_app/sponsor_viewer.proto2\x91\x01\n\x0eSponsorService\x12\x7f\n\tGetViewer\x12\x35.rubykaigi.sponsor_app.SponsorServiceGetViewerRequest\x1a\x36.rubykaigi.sponsor_app.SponsorServiceGetViewerResponse\"\x03\x90\x02\x01\x42\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
+descriptor_data = "\n+rubykaigi/sponsor_app/sponsor_service.proto\x12\x15rubykaigi.sponsor_app\x1a)rubykaigi/sponsor_app/sponsor_shell.proto\x1a*rubykaigi/sponsor_app/sponsor_viewer.proto2\xa1\x03\n\x0eSponsorService\x12\x91\x01\n\x0fGetTranslations\x12;.rubykaigi.sponsor_app.SponsorServiceGetTranslationsRequest\x1a<.rubykaigi.sponsor_app.SponsorServiceGetTranslationsResponse\"\x03\x90\x02\x01\x12z\n\tSetLocale\x12\x35.rubykaigi.sponsor_app.SponsorServiceSetLocaleRequest\x1a\x36.rubykaigi.sponsor_app.SponsorServiceSetLocaleResponse\x12\x7f\n\tGetViewer\x12\x35.rubykaigi.sponsor_app.SponsorServiceGetViewerRequest\x1a\x36.rubykaigi.sponsor_app.SponsorServiceGetViewerResponse\"\x03\x90\x02\x01\x42\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)

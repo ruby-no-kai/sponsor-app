@@ -297,17 +297,32 @@ export const router = createBrowserRouter([
           Component: async () => (await import("./routes/sponsor/SponsorLayout.tsx")).default,
         },
         children: [
-          // Sponsor: Translations
+          {
+            // Inside the layout, which provides the texts these read.
+            lazy: {
+              ErrorBoundary: async () =>
+                (await import("./routes/sponsor/SponsorRouteError.tsx")).SponsorRouteError,
+            },
+            children: [
+              // Sponsor: Shell
 
-          // Sponsor: Applications
+              // Sponsor: Applications
 
-          // Sponsor: Exhibitions and events
+              // Sponsor: Exhibitions and events
 
-          // Sponsor: Broadcasts and passes
+              // Sponsor: Broadcasts and passes
 
-          // Sponsor: Expense reports
+              // Sponsor: Expense reports
 
-          { path: "*", Component: NotFound },
+              {
+                path: "*",
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/sponsor/SponsorRouteError.tsx")).SponsorNotFound,
+                },
+              },
+            ],
+          },
         ],
       },
     ],

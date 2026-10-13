@@ -82,8 +82,8 @@ export type SponsorViewer = Message<"rubykaigi.sponsor_app.SponsorViewer"> & {
   sponsorships: SponsorViewer_Sponsorship[];
 
   /**
-   * Locale the sponsor area is shown in, "en" or "ja". Chosen with the `hl` query parameter,
-   * then remembered in a cookie.
+   * Locale the sponsor area is shown in, "en" or "ja". Chosen with SetLocale or the `hl` query
+   * parameter, then remembered in a cookie.
    *
    * @generated from field: string locale = 4;
    */
