@@ -1,0 +1,224 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// An announcement to sponsors in one locale, as organizers manage it.
+//
+// An announcement is written once per locale. The ones sharing an `issue` are the same
+// announcement in different locales. Sponsors read the published ones in their own locale on
+// their sponsorship page.
+//
+// Staff-only. SponsorService never returns it.
+message AdminAnnouncement {
+  // Identifies the announcement across its locales, such as "Hx3k_2Lp0aQ". Unique within the
+  // conference, and never changes.
+  string issue = 1;
+
+  // Locale it is written in, such as "en". Unique within the issue.
+  string locale = 2;
+
+  // Heading shown above the body.
+  string title = 3;
+
+  // The announcement in Markdown.
+  string body = 4;
+
+  // `body` rendered as HTML. Staff may embed raw HTML in the Markdown, which this holds as is.
+  string body_html = 5;
+
+  // Whether sponsors can read it. Staff alone see a draft.
+  bool published = 6;
+
+  // When it was published. Absent for a draft.
+  optional google.protobuf.Timestamp published_at = 7;
+
+  // Whether it is pinned, which lists it ahead of the unpinned ones.
+  bool pinned = 8;
+
+  // Whether only sponsorships with a booth assigned can read it.
+  bool exhibitors_only = 9;
+
+  // Revision of the text, which the issue's locales compare to tell whether a translation is
+  // pending. See AnnouncementInput.new_revision.
+  int32 revision = 10;
+
+  // The sponsorship page that shows it, scrolled to the announcement. Sponsors who cannot read it
+  // land on their page without it.
+  string sponsor_page_url = 11;
+}
+
+// One locale of an announcement issue, as listed beside the issue's other locales.
+//
+// Staff-only. SponsorService never returns it.
+message AdminAnnouncementSummary {
+  // Locale it is written in, such as "en".
+  string locale = 1;
+
+  // Heading shown above the body.
+  string title = 2;
+
+  // Whether sponsors can read it.
+  bool published = 3;
+
+  // Whether it is pinned, which lists it ahead of the unpinned ones.
+  bool pinned = 4;
+
+  // Whether only sponsorships with a booth assigned can read it.
+  bool exhibitors_only = 5;
+
+  // Revision of the text.
+  int32 revision = 6;
+
+  // Whether another locale of the issue has a newer revision, which this one has yet to be
+  // translated from.
+  bool behind = 7;
+}
+
+// An announcement issue: the same announcement in every locale it is written in.
+//
+// Staff-only. SponsorService never returns it.
+message AdminAnnouncementIssue {
+  // Identifies the issue within the conference, such as "Hx3k_2Lp0aQ".
+  string issue = 1;
+
+  // The announcement in each locale it is written in, ordered by locale.
+  repeated AdminAnnouncementSummary announcements = 2;
+}
+
+// The writable fields of an announcement, taken by AdminService.CreateAnnouncement and
+// UpdateAnnouncement.
+message AnnouncementInput {
+  // Locale it is written in: one of the locales sponsors read the app in.
+  string locale = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      in: [
+        "en",
+        "ja"
+      ]
+    }
+  ];
+
+  // Heading shown above the body.
+  string title = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 200,
+    (buf.validate.field).cel = {
+      id: "announcement_input.title.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // The announcement in Markdown. A blank body is answered with PROBLEM_TYPE_INVALID_RECORD.
+  string body = 3 [(buf.validate.field).string.max_len = 65536];
+
+  // Whether to list it ahead of the unpinned ones.
+  bool pinned = 4;
+
+  // Whether only sponsorships with a booth assigned can read it.
+  bool exhibitors_only = 5;
+
+  // Whether sponsors can read it. An announcement published again keeps the time it was first
+  // published.
+  bool published = 6;
+
+  // Whether the save raises this locale's revision to one above its stored one. A new announcement
+  // counts as stored at 1, so it is saved at 2 whatever the issue's revision. A revision above the
+  // issue's newest marks the issue's other locales as behind. Otherwise the save brings this locale
+  // to the issue's newest revision, marking it as translated.
+  bool new_revision = 7;
+}
+
+// Request for AdminService.ListAnnouncements.
+message AdminServiceListAnnouncementsRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for AdminService.ListAnnouncements.
+message AdminServiceListAnnouncementsResponse {
+  // Every announcement issue of the conference, the pinned ones first by the highest pinning
+  // priority among their locales, each group then newest first. An issue is pinned when any of its
+  // locales is. Not paginated, as a conference has a few dozen.
+  repeated AdminAnnouncementIssue issues = 1;
+}
+
+// Request for AdminService.GetAnnouncement.
+message AdminServiceGetAnnouncementRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Issue of the announcement, such as "Hx3k_2Lp0aQ".
+  string issue = 2 [(buf.validate.field).string.min_len = 1];
+
+  // Locale of the announcement, such as "en".
+  string locale = 3 [(buf.validate.field).string.min_len = 1];
+}
+
+// Response for AdminService.GetAnnouncement.
+message AdminServiceGetAnnouncementResponse {
+  // The announcement the request names.
+  AdminAnnouncement announcement = 1;
+
+  // The issue the announcement belongs to, in every locale, this one included.
+  AdminAnnouncementIssue issue = 2;
+}
+
+// Request for AdminService.CreateAnnouncement.
+message AdminServiceCreateAnnouncementRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Issue to write the announcement in another locale of. Unset starts a new issue, whose
+  // identifier the server generates.
+  optional string issue = 2 [(buf.validate.field).string.min_len = 1];
+
+  // The announcement to write. Its locale must be one the issue is not written in yet.
+  AnnouncementInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.CreateAnnouncement.
+message AdminServiceCreateAnnouncementResponse {
+  // The announcement written, with its issue.
+  AdminAnnouncement announcement = 1;
+}
+
+// Request for AdminService.UpdateAnnouncement.
+message AdminServiceUpdateAnnouncementRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Issue of the announcement, such as "Hx3k_2Lp0aQ".
+  string issue = 2 [(buf.validate.field).string.min_len = 1];
+
+  // Locale of the announcement to update, such as "en".
+  string locale = 3 [(buf.validate.field).string.min_len = 1];
+
+  // Every writable field, replacing what is stored. A changed locale must be one the issue is not
+  // written in yet.
+  AnnouncementInput input = 4 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.UpdateAnnouncement.
+message AdminServiceUpdateAnnouncementResponse {
+  // The announcement as updated.
+  AdminAnnouncement announcement = 1;
+}

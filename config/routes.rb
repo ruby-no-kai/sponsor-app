@@ -170,6 +170,10 @@ Rails.application.routes.draw do
       rpc 'ListSponsorEventEditingHistory' => 'api/admin/sponsor_event_editing_histories'
 
       # Announcements
+      rpc 'ListAnnouncements' => 'api/admin/announcements'
+      rpc 'GetAnnouncement' => 'api/admin/announcements'
+      rpc 'CreateAnnouncement' => 'api/admin/announcements'
+      rpc 'UpdateAnnouncement' => 'api/admin/announcements'
 
       # Broadcasts
 

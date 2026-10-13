@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package rubykaigi.sponsor_app;
 
+import "rubykaigi/sponsor_app/admin_announcements.proto";
 import "rubykaigi/sponsor_app/admin_booth_assignments.proto";
 import "rubykaigi/sponsor_app/admin_conferences.proto";
 import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
@@ -205,6 +206,28 @@ service AdminService {
   }
 
   // Announcements
+
+  // Lists a conference's announcements by issue, each issue with the announcement in every locale
+  // it is written in.
+  rpc ListAnnouncements(AdminServiceListAnnouncementsRequest) returns (AdminServiceListAnnouncementsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one announcement of a conference by its issue and locale, with the issue's locales.
+  rpc GetAnnouncement(AdminServiceGetAnnouncementRequest) returns (AdminServiceGetAnnouncementResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Writes an announcement, starting an issue or adding a locale to one, with the signed-in staff
+  // member as its author. An issue the conference does not have is answered `not_found`, and a
+  // locale the issue is already written in `aborted` with PROBLEM_TYPE_CONFLICT. A record failing
+  // validation is answered `invalid_argument` with PROBLEM_TYPE_INVALID_RECORD.
+  rpc CreateAnnouncement(AdminServiceCreateAnnouncementRequest) returns (AdminServiceCreateAnnouncementResponse);
+
+  // Replaces every writable field of an announcement, which stays in its issue. Moving it to a
+  // locale the issue is already written in is answered `aborted` with PROBLEM_TYPE_CONFLICT. A
+  // record failing validation is answered `invalid_argument` with PROBLEM_TYPE_INVALID_RECORD.
+  rpc UpdateAnnouncement(AdminServiceUpdateAnnouncementRequest) returns (AdminServiceUpdateAnnouncementResponse);
 
   // Broadcasts
 
