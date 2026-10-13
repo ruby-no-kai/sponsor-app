@@ -8,7 +8,7 @@ import { PageHeader } from "../../lib/PageHeader.tsx";
 import { useRpc } from "../../lib/rpc.ts";
 import { paths } from "../paths.ts";
 import { useConferenceName, useConferenceTitle } from "./conferenceTitle.ts";
-import { EXPENSE_REPORT_STATUS_LABELS } from "./expense_report/reportView.ts";
+import { EXPENSE_REPORT_STATUS_LABELS } from "../expense_report/reportView.ts";
 import { labelOf } from "./sponsorshipView.ts";
 
 export default function ExpenseReportList() {

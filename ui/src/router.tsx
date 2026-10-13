@@ -283,7 +283,7 @@ export const router = createBrowserRouter([
                 path: paths.expenseReport,
                 lazy: {
                   Component: async () =>
-                    (await import("./routes/admin/expense_report/ExpenseReportEditor.tsx")).default,
+                    (await import("./routes/admin/AdminExpenseReport.tsx")).default,
                 },
               },
 
@@ -408,6 +408,13 @@ export const router = createBrowserRouter([
               },
 
               // Sponsor: Expense reports
+              {
+                path: paths.sponsorExpenseReport,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/sponsor/ExpenseReport.tsx")).default,
+                },
+              },
 
               {
                 path: "*",

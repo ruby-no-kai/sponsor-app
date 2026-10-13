@@ -237,6 +237,18 @@ Rails.application.routes.draw do
       rpc 'CreatePassRetraction' => 'api/sponsor/passes'
 
       # Expense reports
+      rpc 'GetExpenseReport' => 'api/sponsor/expense_reports'
+      rpc 'CalculateExpenseReport' => 'api/sponsor/expense_reports'
+      rpc 'CreateExpenseReport' => 'api/sponsor/expense_reports'
+      rpc 'SubmitExpenseReport' => 'api/sponsor/expense_report_submissions'
+      rpc 'WithdrawExpenseReportSubmission' => 'api/sponsor/expense_report_submissions'
+      rpc 'CreateExpenseLineItem' => 'api/sponsor/expense_line_items'
+      rpc 'UpdateExpenseLineItem' => 'api/sponsor/expense_line_items'
+      rpc 'DeleteExpenseLineItem' => 'api/sponsor/expense_line_items'
+      rpc 'CreateExpenseFileUpload' => 'api/sponsor/expense_files'
+      rpc 'InitiateExpenseFileUpdate' => 'api/sponsor/expense_files'
+      rpc 'CompleteExpenseFileUpload' => 'api/sponsor/expense_files'
+      rpc 'DeleteExpenseFile' => 'api/sponsor/expense_files'
 
       # Viewer
       rpc 'GetViewer' => 'api/sponsor/viewer'

@@ -46,6 +46,8 @@ module SponsorTranslations
     'sponsor_ui.broadcasts',
 
     # Expense reports
+    'expense_reports.show',
+    'sponsor_ui.expense_reports',
   ].freeze #: Array[String]
 
   # Every scope's texts in the locale, each missing one given in English as I18n's fallback would.

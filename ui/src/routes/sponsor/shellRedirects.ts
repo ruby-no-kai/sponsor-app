@@ -10,6 +10,10 @@ export function dashboardPath(slug: string): string {
   return generatePath(paths.sponsorDashboard, { slug });
 }
 
+export function expenseReportPath(slug: string): string {
+  return generatePath(paths.sponsorExpenseReport, { slug });
+}
+
 export function applicationPath(slug: string): string {
   return generatePath(paths.sponsorApplicationNew, { slug });
 }

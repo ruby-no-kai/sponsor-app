@@ -6,6 +6,8 @@ module Api
     # For RPCs under `authorize :conference` acting on a sponsorship's expense report or files.
     # @requires_ancestor: Api::Admin::ApplicationController
     module ExpenseReportLookup
+      include Api::ExpenseReportWriting
+
       #: (Sponsorship) -> ExpenseReport
       private def expense_report_of(sponsorship)
         sponsorship.expense_report || raise(Errors::NotFound.new(
@@ -29,14 +31,6 @@ module Api
         raise Errors::FailedPrecondition.new(
           detail: "The expense report of the sponsorship #{report.sponsorship_id} is approved and takes no more changes.",
         )
-      end
-
-      # The report as a response carries it, read again to include what the RPC wrote.
-      #: (ExpenseReport) -> Rk::SponsorApp::ExpenseReport
-      private def expense_report_message(report)
-        Api::ExpenseReportResource.new(
-          ExpenseReport.includes(line_items: :expense_line_item_files).find(report.id),
-        ).as_protobuf
       end
     end
   end
