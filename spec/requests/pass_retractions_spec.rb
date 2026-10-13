@@ -27,7 +27,17 @@ RSpec.describe "Pass retractions", type: :request do
   it "renders the retraction form for a registration" do
     get new_user_conference_sponsorship_retraction_path(conference, 'reg_1')
     expect(response).to have_http_status(:ok)
+    expect(response.body).to include('Tickets to be voided')
     expect(tito_api).to have_received(:get_registration).with('rubykaigi/2099', 'reg_1', 'expand' => 'tickets')
+  end
+
+  it "links the contact address, escaped, once retraction is disabled" do
+    conference.update!(pass_retraction_disables_at: 1.day.ago, contact_email_address: 'sponsors+<b>@example.invalid')
+
+    get new_user_conference_sponsorship_retraction_path(conference, 'reg_1')
+
+    expect(response.body).to include('<a href="mailto:sponsors+&lt;b&gt;@example.invalid">sponsors+&lt;b&gt;@example.invalid</a>')
+    expect(response.body).not_to include('<b>')
   end
 
   context "with a completed retraction" do
