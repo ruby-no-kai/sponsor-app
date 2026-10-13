@@ -1,5 +1,21 @@
-import { Badge, Button, Empty, Link, LinkButton, Loader, Table, Text } from "@cloudflare/kumo";
-import { PencilSimpleIcon, PlusIcon, TrashIcon, UsersIcon } from "@phosphor-icons/react";
+import {
+  Badge,
+  Button,
+  Empty,
+  LayerCard,
+  Link,
+  LinkButton,
+  Loader,
+  Table,
+  Text,
+} from "@cloudflare/kumo";
+import {
+  PaperPlaneTiltIcon,
+  PencilSimpleIcon,
+  PlusIcon,
+  TrashIcon,
+  UsersIcon,
+} from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { generatePath, useParams } from "react-router";
@@ -13,7 +29,7 @@ import { AdminService } from "../../gen/rubykaigi/sponsor_app/admin_service_pb.t
 import { fieldViolations } from "../../lib/errors.ts";
 import { erroredFields, errorsUnder } from "../../lib/fieldErrors.ts";
 import type { FieldLayout } from "../../lib/fieldErrors.ts";
-import { idFromParam } from "../../lib/forms.ts";
+import { formatTimestamp, idFromParam } from "../../lib/forms.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
 import { useSaveRejection } from "../../lib/rejection.ts";
 import { isRpcKeyOf, useRpc, useRpcMutation } from "../../lib/rpc.ts";
@@ -119,6 +135,8 @@ function Detail({ slug, id, broadcastId }: { slug: string; id: string; broadcast
         )}
         <Deliveries slug={slug} broadcast={broadcast} deliveries={deliveries} />
       </Section>
+
+      <DispatchCard slug={slug} broadcast={broadcast} recipientCount={deliveries.length} />
     </div>
   );
 }
@@ -374,5 +392,70 @@ function RemoveDelivery({ slug, broadcast, delivery }: DeliveryProps) {
         await revalidate();
       }}
     />
+  );
+}
+
+function DispatchCard({
+  slug,
+  broadcast,
+  recipientCount,
+}: {
+  slug: string;
+  broadcast: AdminBroadcast;
+  recipientCount: number;
+}) {
+  const dispatchBroadcast = useRpcMutation(AdminService.method.dispatchBroadcast);
+  const revalidate = useRevalidateBroadcasts();
+  const isReady = broadcast.status === AdminBroadcast_Status.READY;
+  const canDispatch = isReady && recipientCount > 0;
+  const sendLabel = `Send to ${recipientCount} ${recipientCount === 1 ? "recipient" : "recipients"}`;
+
+  if (broadcast.dispatchedAt !== undefined) {
+    return <Text variant="secondary">Dispatched {formatTimestamp(broadcast.dispatchedAt)}</Text>;
+  }
+
+  return (
+    <LayerCard className="border-kumo-danger">
+      <LayerCard.Secondary>Dispatch</LayerCard.Secondary>
+      <LayerCard.Primary className="flex flex-col gap-3">
+        <Text variant="secondary">
+          Emails go out in the background and cannot be recalled. The title and body are fixed once
+          sent.
+        </Text>
+        <div className="flex flex-wrap items-center gap-3">
+          {canDispatch ? (
+            <ConfirmButton
+              label={sendLabel}
+              icon={PaperPlaneTiltIcon}
+              title={`Send "${broadcast.title}" now?`}
+              description={`It goes to ${recipientCount} ${recipientCount === 1 ? "recipient" : "recipients"} in the background. Sent emails cannot be recalled, and the title and body are fixed from now on.`}
+              confirmLabel="Send"
+              onConfirm={async () => {
+                const response = await dispatchBroadcast.trigger({
+                  conferenceSlug: slug,
+                  broadcastId: broadcast.id,
+                });
+                toastManager.add({
+                  variant: "success",
+                  title: `Dispatched the broadcast ${response.broadcast?.campaign ?? broadcast.campaign}`,
+                });
+                await revalidate();
+              }}
+            />
+          ) : (
+            <>
+              <Button variant="destructive" icon={PaperPlaneTiltIcon} disabled>
+                {sendLabel}
+              </Button>
+              <Text variant="secondary">
+                {isReady
+                  ? "Add recipients first."
+                  : `The broadcast is ${labelOf(BROADCAST_STATUS_LABELS, broadcast.status).text}, not ready.`}
+              </Text>
+            </>
+          )}
+        </div>
+      </LayerCard.Primary>
+    </LayerCard>
   );
 }

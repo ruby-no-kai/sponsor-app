@@ -443,3 +443,21 @@ message AdminServiceRemoveBroadcastDeliveryRequest {
 
 // Response for AdminService.RemoveBroadcastDelivery.
 message AdminServiceRemoveBroadcastDeliveryResponse {}
+
+// Request for AdminService.DispatchBroadcast.
+message AdminServiceDispatchBroadcastRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a ready broadcast of the conference.
+  int64 broadcast_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.DispatchBroadcast.
+message AdminServiceDispatchBroadcastResponse {
+  // The broadcast as dispatched, sending its emails.
+  AdminBroadcast broadcast = 1;
+}

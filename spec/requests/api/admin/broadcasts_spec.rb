@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'AdminService broadcasts', type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:staff) { FactoryBot.create(:staff) }
   let(:restricted_staff) { FactoryBot.create(:staff, restricted_repos: ['ruby-no-kai/rubykaigi-admitted']) }
   let(:conference) { FactoryBot.create(:conference, :full) }
@@ -11,6 +13,7 @@ RSpec.describe 'AdminService broadcasts', type: :request do
 
   before do
     allow(CreateBroadcastDeliveriesJob).to receive(:perform_later)
+    allow(DispatchBroadcastDeliveryJob).to receive(:perform_later)
   end
 
   def sponsorship_of(conference, **attributes)
@@ -443,6 +446,94 @@ RSpec.describe 'AdminService broadcasts', type: :request do
 
       expect(connect_call(rpc, request_with(input))).to have_attributes(code: 'permission_denied')
       expect(broadcast.reload.campaign).not_to eq('cfp-reminder')
+    end
+  end
+
+  describe 'DispatchBroadcast' do
+    let(:rpc) { connect_method('AdminService', 'DispatchBroadcast') }
+    let(:author) { FactoryBot.create(:staff) }
+    let(:broadcast) { FactoryBot.create(:broadcast, conference:, staff: author, status: :ready) }
+
+    def request_for(broadcast_id = broadcast.id)
+      Rk::SponsorApp::AdminServiceDispatchBroadcastRequest.new(conference_slug: conference.slug, broadcast_id:)
+    end
+
+    context 'with a staff session' do
+      before { sign_in_staff(staff) }
+
+      it 'queues an email per recipient, recording the staff member as the sender' do
+        deliveries = FactoryBot.create_list(:broadcast_delivery, 2, broadcast:, status: :ready)
+
+        result = travel_to(Time.zone.parse('2026-03-01 10:00:00')) { connect_call(rpc, request_for).broadcast }
+
+        expect(result).to have_attributes(status: :STATUS_PENDING, content_locked: true,
+          dispatched_at: Google::Protobuf::Timestamp.from_time(Time.zone.parse('2026-03-01 10:00:00')))
+        expect(broadcast.reload).to have_attributes(staff:, status: 'pending')
+        deliveries.each do |delivery|
+          expect(delivery.reload).to be_pending
+          expect(DispatchBroadcastDeliveryJob).to have_received(:perform_later).with(delivery)
+        end
+      end
+
+      [:created, :preparing, :modifying, :pending, :sending, :sent, :failed].each do |status|
+        it "answers failed_precondition for a #{status} broadcast, sending nothing" do
+          delivery = FactoryBot.create(:broadcast_delivery, broadcast:, status: :ready)
+          broadcast.update!(status:)
+
+          error = connect_call(rpc, request_for)
+
+          expect(error).to have_attributes(status: 400, code: 'failed_precondition')
+          expect(problem_type_of(error)).to eq('failed-precondition')
+          expect(broadcast.reload).to have_attributes(status: status.to_s, staff: author, dispatched_at: nil)
+          expect(delivery.reload).to be_ready
+          expect(DispatchBroadcastDeliveryJob).not_to have_received(:perform_later)
+        end
+      end
+
+      it 'answers failed_precondition for a broadcast without recipients' do
+        expect(connect_call(rpc, request_for)).to have_attributes(code: 'failed_precondition')
+        expect(broadcast.reload).to be_ready
+      end
+
+      it 'dispatches over binary protobuf too' do
+        delivery = FactoryBot.create(:broadcast_delivery, broadcast:, status: :ready)
+
+        expect(connect_call(rpc, request_for, codec: :proto).broadcast.status).to eq(:STATUS_PENDING)
+        expect(DispatchBroadcastDeliveryJob).to have_received(:perform_later).with(delivery)
+      end
+
+      it 'answers invalid_argument for a broadcast ID that cannot exist' do
+        expect(violations_of(connect_call(rpc, request_for(0)))).to eq([['broadcastId', 'INT64_GT']])
+      end
+
+      it 'answers not_found for a broadcast of another conference, sending nothing' do
+        other = FactoryBot.create(:broadcast, conference: other_conference, status: :ready)
+        FactoryBot.create(:broadcast_delivery, broadcast: other, status: :ready)
+
+        expect(connect_call(rpc, request_for(other.id))).to have_attributes(code: 'not_found')
+        expect(other.reload).to be_ready
+        expect(DispatchBroadcastDeliveryJob).not_to have_received(:perform_later)
+      end
+
+      it 'refuses GET, as dispatching has side effects' do
+        get "#{rpc.path}?#{URI.encode_www_form(connect: 'v1', encoding: 'json', message: request_for.to_json)}"
+
+        expect(response).to have_http_status(:method_not_allowed)
+        expect(broadcast.reload).to be_ready
+      end
+    end
+
+    it 'answers unauthenticated without a staff session, before judging the request' do
+      expect(connect_call(rpc, request_for(0))).to have_attributes(code: 'unauthenticated')
+    end
+
+    it 'answers permission_denied to restricted staff for a conference they may not manage, sending nothing' do
+      FactoryBot.create(:broadcast_delivery, broadcast:, status: :ready)
+      sign_in_staff(restricted_staff)
+
+      expect(connect_call(rpc, request_for)).to have_attributes(code: 'permission_denied')
+      expect(broadcast.reload).to be_ready
+      expect(DispatchBroadcastDeliveryJob).not_to have_received(:perform_later)
     end
   end
 end

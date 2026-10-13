@@ -3,7 +3,8 @@
 
 module Api
   module Admin
-    # Recipients change only while the broadcast is ready, under the broadcast's row lock.
+    # Recipients change only while the broadcast is ready, under the broadcast's row lock, which
+    # DispatchBroadcast also takes.
     class BroadcastDeliveriesController < Api::Admin::ApplicationController
       include Api::Admin::BroadcastLookup
       include Api::Admin::BroadcastRecipientFilterArgument

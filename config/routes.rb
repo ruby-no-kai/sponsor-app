@@ -182,6 +182,7 @@ Rails.application.routes.draw do
       rpc 'UpdateBroadcast' => 'api/admin/broadcasts'
       rpc 'AddBroadcastRecipients' => 'api/admin/broadcast_deliveries'
       rpc 'RemoveBroadcastDelivery' => 'api/admin/broadcast_deliveries'
+      rpc 'DispatchBroadcast' => 'api/admin/broadcasts'
 
       # Expense reports
 
