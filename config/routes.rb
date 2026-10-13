@@ -188,6 +188,10 @@ Rails.application.routes.draw do
       rpc 'ListExpenseReports' => 'api/admin/expense_reports'
       rpc 'GetExpenseReport' => 'api/admin/expense_reports'
       rpc 'CalculateExpenseReport' => 'api/admin/expense_reports'
+      rpc 'CreateExpenseLineItem' => 'api/admin/expense_line_items'
+      rpc 'UpdateExpenseLineItem' => 'api/admin/expense_line_items'
+      rpc 'DeleteExpenseLineItem' => 'api/admin/expense_line_items'
+      rpc 'CreateExpenseReportReview' => 'api/admin/expense_report_reviews'
 
       # Viewer
       rpc 'GetViewer' => 'api/admin/viewer'

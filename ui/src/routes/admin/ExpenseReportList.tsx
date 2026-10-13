@@ -70,8 +70,10 @@ export default function ExpenseReportList() {
 function rowHref(slug: string, row: ExpenseReportTableRow): string | undefined {
   if (row.sponsorship === undefined) return undefined;
   const id = row.sponsorship.id.toString();
-  const sponsorshipPath = generatePath(paths.sponsorship, { slug, id });
-  return row.report === undefined ? sponsorshipPath : `${sponsorshipPath}/expense_report`;
+  return generatePath(row.report === undefined ? paths.sponsorship : paths.expenseReport, {
+    slug,
+    id,
+  });
 }
 
 function StatusBadge({ report }: { report: ExpenseReportTableRow["report"] }) {

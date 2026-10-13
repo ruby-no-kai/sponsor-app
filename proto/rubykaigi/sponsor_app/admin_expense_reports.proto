@@ -111,3 +111,102 @@ message AdminServiceCalculateExpenseReportResponse {
   // The figures the sponsorship's expenses are weighed against.
   ExpenseReportCalculation calculation = 1;
 }
+
+// Request for AdminService.CreateExpenseLineItem.
+message AdminServiceCreateExpenseLineItemRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference that has an expense report.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // The line item to add.
+  ExpenseLineItemInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.CreateExpenseLineItem.
+message AdminServiceCreateExpenseLineItemResponse {
+  // The line item added.
+  ExpenseLineItem line_item = 1;
+
+  // The report as changed, with its totals recalculated.
+  ExpenseReport report = 2;
+}
+
+// Request for AdminService.UpdateExpenseLineItem.
+message AdminServiceUpdateExpenseLineItemRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference that has an expense report.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // ID of a line item of the sponsorship's expense report.
+  int64 line_item_id = 3 [
+    jstype = JS_STRING,
+    (buf.validate.field).int64.gt = 0
+  ];
+
+  // The line item's writable fields.
+  ExpenseLineItemInput input = 4 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.UpdateExpenseLineItem.
+message AdminServiceUpdateExpenseLineItemResponse {
+  // The line item as updated.
+  ExpenseLineItem line_item = 1;
+
+  // The report as changed, with its totals recalculated.
+  ExpenseReport report = 2;
+}
+
+// Request for AdminService.DeleteExpenseLineItem.
+message AdminServiceDeleteExpenseLineItemRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference that has an expense report.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // ID of a line item of the sponsorship's expense report.
+  int64 line_item_id = 3 [
+    jstype = JS_STRING,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+// Response for AdminService.DeleteExpenseLineItem.
+message AdminServiceDeleteExpenseLineItemResponse {
+  // The report as changed, with its totals recalculated.
+  ExpenseReport report = 1;
+}
+
+// Request for AdminService.CreateExpenseReportReview.
+message AdminServiceCreateExpenseReportReviewRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a sponsorship of the conference whose expense report has been submitted.
+  int64 sponsorship_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // The verdict, signed by the staff member signed in.
+  ExpenseReportReviewInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.CreateExpenseReportReview.
+message AdminServiceCreateExpenseReportReviewResponse {
+  // The report as reviewed, carrying the review as latest_review.
+  ExpenseReport report = 1;
+}

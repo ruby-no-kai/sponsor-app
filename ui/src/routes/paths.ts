@@ -59,6 +59,7 @@ export const paths = {
 
   // Expense reports
   expenseReports: "/admin/conferences/:slug/expense_reports",
+  expenseReport: "/admin/conferences/:slug/sponsorships/:id/expense_report",
 
   // Sponsor: Translations
 

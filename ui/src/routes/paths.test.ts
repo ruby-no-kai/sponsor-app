@@ -46,7 +46,6 @@ describe("isSpaPathname", () => {
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/editing_history"));
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/staff_notes"));
     assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/download_asset"));
-    assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/expense_report"));
     assert.ok(
       !isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/staff_notes/7/edit"),
     );
@@ -88,8 +87,10 @@ describe("isSpaPathname", () => {
     assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/broadcasts/7/dispatch_delivery"));
   });
 
-  it("matches the expense report list", () => {
+  it("matches the expense report pages but leaves file previews to Rails", () => {
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/expense_reports"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/expense_report"));
+    assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/expense_files/7"));
   });
 });
 
