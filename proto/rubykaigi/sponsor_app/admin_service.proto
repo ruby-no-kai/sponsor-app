@@ -2,8 +2,10 @@ syntax = "proto3";
 
 package rubykaigi.sponsor_app;
 
+import "rubykaigi/sponsor_app/admin_booth_assignments.proto";
 import "rubykaigi/sponsor_app/admin_conferences.proto";
 import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
+import "rubykaigi/sponsor_app/admin_organizations.proto";
 import "rubykaigi/sponsor_app/admin_plans.proto";
 import "rubykaigi/sponsor_app/admin_sponsorships.proto";
 import "rubykaigi/sponsor_app/admin_viewer.proto";
@@ -138,7 +140,41 @@ service AdminService {
 
   // Organizations
 
+  // Lists every organization with how many sponsorships it has. Restricted staff are answered
+  // `permission_denied`, as an organization spans conferences.
+  rpc ListOrganizations(AdminServiceListOrganizationsRequest) returns (AdminServiceListOrganizationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one organization by its domain, with its affiliation URLs and its sponsorships across
+  // conferences. Restricted staff are answered `permission_denied`.
+  rpc GetOrganization(AdminServiceGetOrganizationRequest) returns (AdminServiceGetOrganizationResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Creates an organization. A domain another organization has is answered with
+  // PROBLEM_TYPE_INVALID_RECORD. Restricted staff are answered `permission_denied`.
+  rpc CreateOrganization(AdminServiceCreateOrganizationRequest) returns (AdminServiceCreateOrganizationResponse);
+
+  // Replaces every writable field of an organization, its domain included. A domain another
+  // organization has is answered with PROBLEM_TYPE_INVALID_RECORD. Restricted staff are answered
+  // `permission_denied`.
+  rpc UpdateOrganization(AdminServiceUpdateOrganizationRequest) returns (AdminServiceUpdateOrganizationResponse);
+
   // Booth assignments
+
+  // Returns which sponsorships of a conference hold a booth and which could.
+  rpc GetBoothAssignment(AdminServiceGetBoothAssignmentRequest) returns (AdminServiceGetBoothAssignmentResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Assigns booths to exactly the sponsorships listed, taking them back from every other
+  // sponsorship of the conference, all or nothing. Each sponsorship it changes records the
+  // signed-in staff member in its editing history and publishes the change as UpdateSponsorship
+  // does. A sponsorship ID the conference does not have is answered `not_found`. A booth for a
+  // sponsorship that has withdrawn or awaits acceptance, and holds none yet, is answered
+  // `failed_precondition`. Neither answer changes anything.
+  rpc UpdateBoothAssignment(AdminServiceUpdateBoothAssignmentRequest) returns (AdminServiceUpdateBoothAssignmentResponse);
 
   // Sponsor events
 

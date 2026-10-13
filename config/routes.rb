@@ -154,8 +154,14 @@ Rails.application.routes.draw do
       rpc 'ImpersonateSponsorship' => 'api/admin/sponsorship_impersonations'
 
       # Organizations
+      rpc 'ListOrganizations' => 'api/admin/organizations'
+      rpc 'GetOrganization' => 'api/admin/organizations'
+      rpc 'CreateOrganization' => 'api/admin/organizations'
+      rpc 'UpdateOrganization' => 'api/admin/organizations'
 
       # Booth assignments
+      rpc 'GetBoothAssignment' => 'api/admin/booth_assignments'
+      rpc 'UpdateBoothAssignment' => 'api/admin/booth_assignments'
 
       # Sponsor events
 

@@ -108,7 +108,9 @@ function Detail({ slug, id, sponsorshipId }: { slug: string; id: string; sponsor
                   <Text variant="secondary">Unknown</Text>
                 ) : (
                   <Link
-                    href={`/admin/organizations/${encodeURIComponent(sponsorship.organization.domain)}`}
+                    href={generatePath(paths.organization, {
+                      domain: sponsorship.organization.domain,
+                    })}
                   >
                     {sponsorship.organization.name}
                   </Link>

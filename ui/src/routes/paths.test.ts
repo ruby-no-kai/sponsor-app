@@ -51,6 +51,18 @@ describe("isSpaPathname", () => {
       !isSpaPathname("/admin/conferences/rubykaigi2048/sponsorships/42/staff_notes/7/edit"),
     );
   });
+
+  it("matches the organization pages HAML has at the same paths, domains with dots included", () => {
+    assert.ok(isSpaPathname("/admin/organizations"));
+    assert.ok(isSpaPathname("/admin/organizations/new"));
+    assert.ok(isSpaPathname("/admin/organizations/contoso.example.co.invalid"));
+    assert.ok(isSpaPathname("/admin/organizations/contoso.example.co.invalid/edit"));
+    assert.ok(!isSpaPathname("/admin/organizations/contoso.example.co.invalid/sponsorships"));
+  });
+
+  it("matches the booth assignment page", () => {
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/booth_assignment"));
+  });
 });
 
 describe("matchSpaPath", () => {

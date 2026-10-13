@@ -6,8 +6,22 @@ class Organization < ApplicationRecord
 
   has_many :sponsorships, dependent: nil
   validates :name, presence: true
-  validates :domain, presence: true
+  validates :domain, presence: true, uniqueness: true
   validates :affiliation_code, presence: true, uniqueness: true
+
+  # Loads each organization's sponsorship_count in the same query, sparing a COUNT per organization.
+  scope :with_sponsorship_count, -> {
+    count = Sponsorship.where(Sponsorship.arel_table[:organization_id].eq(arel_table[:id])).select(Arel.star.count)
+    select(arel_table[Arel.star], count.arel.as('sponsorship_count'))
+  }
+
+  # Sponsorships of the organization across conferences, withdrawn ones included.
+  #: () -> Integer
+  def sponsorship_count
+    return sponsorships.count unless has_attribute?(:sponsorship_count)
+
+    self[:sponsorship_count]
+  end
 
   #: () -> String
   def slug
