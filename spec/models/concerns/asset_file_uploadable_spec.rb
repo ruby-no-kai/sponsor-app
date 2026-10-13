@@ -58,4 +58,31 @@ RSpec.describe AssetFileUploadable do
       expect(ExpenseFile.asset_file_bucket).to eq(Rails.application.config.x.asset_file_uploadable.bucket)
     end
   end
+
+  describe 'destroying' do
+    let(:s3_client) { instance_double(Aws::S3::Client, delete_object: nil) }
+
+    before { allow(Aws::S3::Client).to receive(:new).and_return(s3_client) }
+
+    it 'deletes the S3 object once the transaction commits' do
+      file = FactoryBot.create(:sponsor_event_asset_file)
+      key = file.object_key
+
+      file.destroy!
+
+      expect(s3_client).to have_received(:delete_object).with(bucket: file.asset_file_bucket, key:)
+    end
+
+    it 'keeps the S3 object when the transaction rolls back' do
+      file = FactoryBot.create(:sponsor_event_asset_file)
+
+      ActiveRecord::Base.transaction do
+        file.destroy!
+        raise ActiveRecord::Rollback
+      end
+
+      expect(s3_client).not_to have_received(:delete_object)
+      expect(SponsorEventAssetFile.exists?(file.id)).to be(true)
+    end
+  end
 end

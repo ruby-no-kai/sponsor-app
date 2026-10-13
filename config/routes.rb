@@ -219,6 +219,16 @@ Rails.application.routes.draw do
       rpc 'CompleteSponsorshipAssetUpload' => 'api/sponsor/sponsorship_asset_files'
 
       # Exhibitions and events
+      rpc 'CreateExhibition' => 'api/sponsor/exhibitions'
+      rpc 'UpdateExhibition' => 'api/sponsor/exhibitions'
+      rpc 'GetSponsorEventForm' => 'api/sponsor/sponsor_events'
+      rpc 'GetSponsorEvent' => 'api/sponsor/sponsor_events'
+      rpc 'CreateSponsorEvent' => 'api/sponsor/sponsor_events'
+      rpc 'UpdateSponsorEvent' => 'api/sponsor/sponsor_events'
+      rpc 'WithdrawSponsorEvent' => 'api/sponsor/sponsor_events'
+      rpc 'CreateSponsorEventAssetUpload' => 'api/sponsor/sponsor_event_asset_files'
+      rpc 'InitiateSponsorEventAssetUpdate' => 'api/sponsor/sponsor_event_asset_files'
+      rpc 'CompleteSponsorEventAssetUpload' => 'api/sponsor/sponsor_event_asset_files'
 
       # Broadcasts and passes
       rpc 'ListBroadcastDeliveries' => 'api/sponsor/broadcasts'

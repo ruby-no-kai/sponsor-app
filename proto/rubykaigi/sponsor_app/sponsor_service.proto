@@ -4,6 +4,8 @@ package rubykaigi.sponsor_app;
 
 import "rubykaigi/sponsor_app/sponsor_applications.proto";
 import "rubykaigi/sponsor_app/sponsor_broadcasts.proto";
+import "rubykaigi/sponsor_app/sponsor_events.proto";
+import "rubykaigi/sponsor_app/sponsor_exhibitions.proto";
 import "rubykaigi/sponsor_app/sponsor_passes.proto";
 import "rubykaigi/sponsor_app/sponsor_shell.proto";
 import "rubykaigi/sponsor_app/sponsor_viewer.proto";
@@ -97,6 +99,49 @@ service SponsorService {
   rpc CompleteSponsorshipAssetUpload(SponsorServiceCompleteSponsorshipAssetUploadRequest) returns (SponsorServiceCompleteSponsorshipAssetUploadResponse);
 
   // Exhibitions and events
+
+  // Submits what the sponsor will exhibit at its booth. Answers `failed_precondition` until a booth
+  // is assigned, and `aborted` when the sponsorship has booth details already, which
+  // UpdateExhibition changes. The booth details are on GetSponsorship.
+  rpc CreateExhibition(SponsorServiceCreateExhibitionRequest) returns (SponsorServiceCreateExhibitionResponse);
+
+  // Changes the booth details. Answers `not_found` before any are submitted and
+  // `failed_precondition` until a booth is assigned.
+  rpc UpdateExhibition(SponsorServiceUpdateExhibitionRequest) returns (SponsorServiceUpdateExhibitionResponse);
+
+  // Every RPC on events answers `failed_precondition` until the sponsorship is accepted. Those that
+  // change an event or its image answer `failed_precondition` too while the conference takes no
+  // event submissions. An event of another sponsorship is `not_found`.
+
+  // Returns whether the conference takes event submissions, and the texts the event form shows.
+  rpc GetSponsorEventForm(SponsorServiceGetSponsorEventFormRequest) returns (SponsorServiceGetSponsorEventFormResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns an event of the signed-in contact's sponsorship.
+  rpc GetSponsorEvent(SponsorServiceGetSponsorEventRequest) returns (SponsorServiceGetSponsorEventResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Submits an event for the organizers' review.
+  rpc CreateSponsorEvent(SponsorServiceCreateSponsorEventRequest) returns (SponsorServiceCreateSponsorEventResponse);
+
+  // Changes an event. Answers `failed_precondition` for a withdrawn event.
+  rpc UpdateSponsorEvent(SponsorServiceUpdateSponsorEventRequest) returns (SponsorServiceUpdateSponsorEventResponse);
+
+  // Withdraws an event, which the sponsor cannot undo. Answers `failed_precondition` for an event
+  // withdrawn already.
+  rpc WithdrawSponsorEvent(SponsorServiceWithdrawSponsorEventRequest) returns (SponsorServiceWithdrawSponsorEventResponse);
+
+  // Starts uploading an image for an event, which the event claims once saved with its ID.
+  rpc CreateSponsorEventAssetUpload(SponsorServiceCreateSponsorEventAssetUploadRequest) returns (SponsorServiceCreateSponsorEventAssetUploadResponse);
+
+  // Starts uploading an image file again, replacing what it holds once the upload completes.
+  rpc InitiateSponsorEventAssetUpdate(SponsorServiceInitiateSponsorEventAssetUpdateRequest) returns (SponsorServiceInitiateSponsorEventAssetUpdateResponse);
+
+  // Records an upload as complete, once the storage holds the image. Answers `failed_precondition`
+  // while the storage holds none.
+  rpc CompleteSponsorEventAssetUpload(SponsorServiceCompleteSponsorEventAssetUploadRequest) returns (SponsorServiceCompleteSponsorEventAssetUploadResponse);
 
   // Broadcasts and passes
 

@@ -1,0 +1,311 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "rubykaigi/sponsor_app/asset_upload.proto";
+import "rubykaigi/sponsor_app/conference.proto";
+import "rubykaigi/sponsor_app/sponsor_event_status.proto";
+
+option ruby_package = "Rk::SponsorApp";
+
+// The image of an event, which the conference website shows in its listing.
+//
+// The sponsor area downloads it from `/conferences/{slug}/event_asset_files/{id}`, which
+// redirects to a short-lived link to the storage.
+message SponsorEventAssetFile {
+  // Asset file ID.
+  int64 id = 1;
+
+  // Extension of the file's name in lower case, such as "png". "unknown" when it had none.
+  string extension = 2;
+}
+
+// An event a sponsor hosts, such as a party or a meetup, as its sponsor sees it.
+message SponsorEvent {
+  // Event ID.
+  int64 id = 1;
+
+  // Title of the event.
+  string title = 2;
+
+  // When the event starts, as the local time at the venue. The Timestamp carries that wall clock as
+  // the same reading in UTC.
+  google.protobuf.Timestamp starts_at = 3;
+
+  // URL of the event's own page, such as its registration page.
+  string url = 4;
+
+  // Entrance fee as the sponsor wrote it, such as "1000 JPY". Empty when it gave none.
+  string price = 5;
+
+  // How many people the event admits, as the sponsor wrote it. Empty when it gave none.
+  string capacity = 6;
+
+  // Venue in English. Empty when the sponsor gave none.
+  string location_en = 7;
+
+  // Venue in the local language. Empty when the sponsor gave none.
+  string location_local = 8;
+
+  // Where the organizers' review stands.
+  SponsorEventStatus status = 9;
+
+  // Organizers' remarks on the event. Empty for none.
+  string admin_comment = 10;
+
+  // When the sponsor agreed to the event policy. Absent when it has not.
+  optional google.protobuf.Timestamp policy_acknowledged_at = 11;
+
+  // The event's image. Absent when it has none.
+  optional SponsorEventAssetFile asset_file = 12;
+
+  // Whether the sponsor may change or withdraw the event now: it is not withdrawn, and the
+  // conference takes event submissions.
+  bool editable = 13;
+}
+
+// The fields of an event a sponsor writes, taken by SponsorService.CreateSponsorEvent and
+// UpdateSponsorEvent. Every field replaces what is stored. Organizers alone set an event's slug,
+// status, co-hosts, link text and remarks.
+message SponsorEventInput {
+  // Title of the event, in English.
+  string title = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).cel = {
+      id: "sponsor_event_input.title.not_blank"
+      message: "value must not be blank"
+      expression: "this.trim() != ''"
+    }
+  ];
+
+  // When the event itself starts, as the local time at the venue carried as the same reading in UTC,
+  // within years 1 to 9999 as ProtoJSON spells them.
+  google.protobuf.Timestamp starts_at = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp = {
+      gte: {seconds: -62135596800}
+      lte: {
+        seconds: 253402300799
+        nanos: 999999999
+      }
+    }
+  ];
+
+  // URL of the event's own page, starting with "http://" or "https://".
+  string url = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.max_len = 2048,
+    (buf.validate.field).string.pattern = "^https?://"
+  ];
+
+  // Entrance fee in any form, such as "Free" or "1000 JPY", in English. Empty sets none.
+  string price = 4 [(buf.validate.field).string.max_len = 255];
+
+  // How many people the event admits in any form, such as "100", in English. Empty sets none.
+  string capacity = 5 [(buf.validate.field).string.max_len = 255];
+
+  // Venue in English. Empty sets none.
+  string location_en = 6 [(buf.validate.field).string.max_len = 255];
+
+  // Venue in the local language, which attendees look for. Empty sets none.
+  string location_local = 7 [(buf.validate.field).string.max_len = 255];
+
+  // ID of the event's image: one uploaded in this sponsorship through
+  // CreateSponsorEventAssetUpload that no event has claimed, or the image the event has. Absent
+  // removes the event's image, and another ID replaces it. Any other file is answered `not_found`.
+  optional int64 asset_file_id = 8 [(buf.validate.field).int64.gt = 0];
+}
+
+// Request for SponsorService.GetSponsorEventForm.
+message SponsorServiceGetSponsorEventFormRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for SponsorService.GetSponsorEventForm.
+message SponsorServiceGetSponsorEventFormResponse {
+  // The conference.
+  Conference conference = 1;
+
+  // Whether the conference takes event submissions now. While false, every RPC that changes an
+  // event or its image answers `failed_precondition`.
+  bool submission_open = 2;
+
+  // Guidance shown above the form, as HTML the organizers wrote, in the locale chosen for this
+  // browser or else in English. Empty when they wrote none.
+  string sponsor_event_help_html = 3;
+
+  // The event policy, as HTML the organizers wrote, in the same locale. Empty when they wrote
+  // none.
+  string event_policy_html = 4;
+}
+
+// Request for SponsorService.GetSponsorEvent.
+message SponsorServiceGetSponsorEventRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Event ID. An event of another sponsorship is answered `not_found`.
+  int64 id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for SponsorService.GetSponsorEvent.
+message SponsorServiceGetSponsorEventResponse {
+  // The conference.
+  Conference conference = 1;
+
+  // The event.
+  SponsorEvent sponsor_event = 2;
+}
+
+// Request for SponsorService.CreateSponsorEvent.
+message SponsorServiceCreateSponsorEventRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // The event.
+  SponsorEventInput input = 2 [(buf.validate.field).required = true];
+
+  // Whether the sponsor agrees to the event policy the form shows, which it must.
+  bool policy_agreement = 3 [(buf.validate.field).cel = {
+    id: "policy_agreement.agreed"
+    message: "must agree to the event policy"
+    expression: "this"
+  }];
+}
+
+// Response for SponsorService.CreateSponsorEvent.
+message SponsorServiceCreateSponsorEventResponse {
+  // The event as submitted, awaiting review.
+  SponsorEvent sponsor_event = 1;
+}
+
+// Request for SponsorService.UpdateSponsorEvent.
+message SponsorServiceUpdateSponsorEventRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Event ID. An event of another sponsorship is answered `not_found`.
+  int64 id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // Every field, replacing what is stored.
+  SponsorEventInput input = 3 [(buf.validate.field).required = true];
+}
+
+// Response for SponsorService.UpdateSponsorEvent.
+message SponsorServiceUpdateSponsorEventResponse {
+  // The event as saved.
+  SponsorEvent sponsor_event = 1;
+}
+
+// Request for SponsorService.WithdrawSponsorEvent.
+message SponsorServiceWithdrawSponsorEventRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Event ID. An event of another sponsorship is answered `not_found`.
+  int64 id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for SponsorService.WithdrawSponsorEvent.
+message SponsorServiceWithdrawSponsorEventResponse {
+  // The event as withdrawn.
+  SponsorEvent sponsor_event = 1;
+}
+
+// Request for SponsorService.CreateSponsorEventAssetUpload.
+message SponsorServiceCreateSponsorEventAssetUploadRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // MIME type of the image: JPEG, PNG or WebP. Absent when the browser cannot tell, which leaves
+  // the type to the storage, checked on completion.
+  optional string content_type = 2 [(buf.validate.field).string = {
+    in: [
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ]
+  }];
+}
+
+// Response for SponsorService.CreateSponsorEventAssetUpload.
+message SponsorServiceCreateSponsorEventAssetUploadResponse {
+  // Where and how to upload the image.
+  AssetUpload upload = 1;
+}
+
+// Request for SponsorService.InitiateSponsorEventAssetUpdate.
+message SponsorServiceInitiateSponsorEventAssetUpdateRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of the image file to upload again: an event's image, or one uploaded through
+  // CreateSponsorEventAssetUpload. A file of another sponsorship is answered `not_found`.
+  int64 asset_file_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // MIME type of the image, as CreateSponsorEventAssetUpload takes it.
+  optional string content_type = 3 [(buf.validate.field).string = {
+    in: [
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ]
+  }];
+}
+
+// Response for SponsorService.InitiateSponsorEventAssetUpdate.
+message SponsorServiceInitiateSponsorEventAssetUpdateResponse {
+  // Where and how to upload the image.
+  AssetUpload upload = 1;
+}
+
+// Request for SponsorService.CompleteSponsorEventAssetUpload.
+message SponsorServiceCompleteSponsorEventAssetUploadRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of the image file uploaded, as InitiateSponsorEventAssetUpdate takes it.
+  int64 asset_file_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // Version the storage answered the upload with, in its `x-amz-version-id` header. Empty when it
+  // answered none.
+  string version_id = 3 [(buf.validate.field).string.max_len = 1024];
+
+  // Extension of the file's name, such as "png". Letters and digits only are kept, in lower case.
+  // Empty records "unknown", which is refused.
+  string extension = 4 [(buf.validate.field).string.max_len = 255];
+}
+
+// Response for SponsorService.CompleteSponsorEventAssetUpload.
+message SponsorServiceCompleteSponsorEventAssetUploadResponse {
+  // The image as uploaded.
+  SponsorEventAssetFile asset_file = 1;
+}
