@@ -507,6 +507,76 @@ ja:
       registration_reference: '登録'
       back: '利用状況へ戻る'
 
+  # Texts only the sponsor area's SPA (ui/) shows. SponsorTranslations::SCOPES serves them.
+  sponsor_ui:
+    # Shell
+    shell:
+      site_name: '%{org_name} スポンサーポータル'
+      menu: 'メニュー'
+      back_to_portal: 'スポンサーポータルへ戻る'
+      language: '言語'
+      language_names:
+        en: 'English'
+        ja: '日本語'
+      staff_mode: 'STAFF MODE'
+      expense_report_not_created: '経費報告はまだ作成されていません。'
+      not_found:
+        title: 'ページが見つかりません'
+        description: 'このアドレスにページはありません。'
+      error:
+        title: 'エラーが発生しました'
+        description: '時間をおいて再度お試しください。解決しない場合は、「詳細」にあるリクエスト ID を添えて運営チームへお問い合わせください。'
+        details: '詳細'
+        request_id: 'リクエスト ID: %{request_id}'
+
+    # Dashboard
+    dashboard:
+      todo:
+        title: 'やること'
+        booth_details: 'ブース詳細を提出してください'
+        booth_details_action: 'ブース詳細を提出する'
+        expense_draft: '経費報告を提出してください'
+        expense_rejected: '経費報告が差し戻されました'
+        expense_action: '経費報告を開く'
+        event_changes: '「%{title}」の内容修正が依頼されています'
+        event_action: 'イベントを開く'
+        not_confirmed: '申し込みはまだ確定していません'
+        not_confirmed_action: '申込内容を修正する'
+      confirmed: '確定済'
+      edit_application: '申込内容を修正する'
+      booth:
+        title: 'ブース詳細'
+        not_submitted: '未提出'
+        send: 'ブース詳細を提出する'
+        edit: 'ブース詳細を修正する'
+        assigned: 'ブースあり'
+        requested: 'ブース申込済'
+        none: 'ブースなし'
+      events:
+        title: 'スポンサー開催イベント'
+        submit_new: 'イベントを登録する'
+      tickets:
+        title: 'スポンサーチケット'
+        copy: 'URL をコピー'
+        about: 'この URL の使い方'
+        view_passes: '利用状況を確認する'
+      expense_report:
+        open: '経費報告を開く'
+      broadcasts:
+        title: 'メール配信履歴'
+        view_all: '全てのメールを見る'
+      older_announcements:
+        one: '過去のお知らせ 1 件を表示'
+        other: '過去のお知らせ %{count} 件を表示'
+
+    # Applications
+
+    # Exhibitions and events
+
+    # Broadcasts and passes
+
+    # Expense reports
+
   # Keyed by the identifier each ProblemType value publishes, with dashes as underscores.
   problem_details:
     titles:

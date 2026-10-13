@@ -43,7 +43,7 @@ import {
   Section,
   useFieldReveal,
 } from "./FormParts.tsx";
-import { SandboxedHtml } from "./SandboxedHtml.tsx";
+import { SandboxedHtml } from "../../lib/SandboxedHtml.tsx";
 import {
   BOOTH_REQUEST_LABELS,
   FIELD_LABELS,

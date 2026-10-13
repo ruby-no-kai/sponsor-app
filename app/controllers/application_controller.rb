@@ -4,7 +4,7 @@
 class ApplicationController < ActionController::Base
   include LocaleSelectable
 
-  before_action :set_locale
+  before_action :select_locale
   before_action :populate_sentry_scope
 
   #: () -> Staff?

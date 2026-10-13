@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package rubykaigi.sponsor_app;
 
+import "rubykaigi/sponsor_app/sponsor_shell.proto";
 import "rubykaigi/sponsor_app/sponsor_viewer.proto";
 
 option ruby_package = "Rk::SponsorApp";
@@ -23,7 +24,30 @@ option ruby_package = "Rk::SponsorApp";
 // outright, such as a GET of an RPC with side effects (405), an unsupported Content-Type (415) or
 // an unknown RPC (404), is answered with a plain-text body instead.
 service SponsorService {
-  // Translations
+  // Shell
+
+  // Returns the texts the sponsor area shows, in the locale chosen for this browser. Answers
+  // without a session too.
+  rpc GetTranslations(SponsorServiceGetTranslationsRequest) returns (SponsorServiceGetTranslationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Chooses the locale the sponsor area is shown in, and remembers it for this browser in a
+  // cookie. Answers without a session too.
+  rpc SetLocale(SponsorServiceSetLocaleRequest) returns (SponsorServiceSetLocaleResponse);
+
+  // Lists the conferences taking sponsorship applications now. A hidden conference, which takes
+  // applications by invitation only, is left out. Answers without a session too.
+  rpc ListOpenConferences(SponsorServiceListOpenConferencesRequest) returns (SponsorServiceListOpenConferencesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns the signed-in contact's sponsorship of a conference, with what its dashboard shows:
+  // the booth, events, expense report and tickets as they stand, and the announcements to
+  // sponsors.
+  rpc GetSponsorship(SponsorServiceGetSponsorshipRequest) returns (SponsorServiceGetSponsorshipResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Applications
 
@@ -40,4 +64,8 @@ service SponsorService {
   rpc GetViewer(SponsorServiceGetViewerRequest) returns (SponsorServiceGetViewerResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Signs the sponsor contact out of this browser. A staff session in the same browser stays
+  // signed in. Answers without a session too.
+  rpc SignOut(SponsorServiceSignOutRequest) returns (SponsorServiceSignOutResponse);
 }

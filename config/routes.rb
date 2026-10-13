@@ -203,7 +203,11 @@ Rails.application.routes.draw do
     end
 
     connect_service 'rubykaigi.sponsor_app.SponsorService' do
-      # Translations
+      # Shell
+      rpc 'GetTranslations' => 'api/sponsor/locale'
+      rpc 'SetLocale' => 'api/sponsor/locale'
+      rpc 'ListOpenConferences' => 'api/sponsor/conferences'
+      rpc 'GetSponsorship' => 'api/sponsor/sponsorships'
 
       # Applications
 
@@ -215,6 +219,7 @@ Rails.application.routes.draw do
 
       # Viewer
       rpc 'GetViewer' => 'api/sponsor/viewer'
+      rpc 'SignOut' => 'api/sponsor/viewer'
     end
   end
 

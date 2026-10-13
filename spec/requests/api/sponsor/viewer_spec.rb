@@ -62,4 +62,45 @@ RSpec.describe 'SponsorService viewer', type: :request do
       expect(viewer.has_email?).to be(false)
     end
   end
+
+  describe 'SignOut' do
+    let(:sign_out) { connect_method('SponsorService', 'SignOut') }
+    let(:sign_out_request) { Rk::SponsorApp::SponsorServiceSignOutRequest.new }
+    let(:conference) { FactoryBot.create(:conference, :full, application_opens_at: 1.day.ago) }
+    let(:sponsorship) { FactoryBot.create(:sponsorship, conference:, plan: conference.plans.first) }
+    let(:staff) { FactoryBot.create(:staff) }
+
+    before do
+      allow(Aws::STS::Client).to receive(:new).and_return(Aws::STS::Client.new(stub_responses: true, region: 'ap-northeast-1'))
+      allow(Aws::S3::Client).to receive(:new).and_return(Aws::S3::Client.new(stub_responses: true, region: 'ap-northeast-1'))
+    end
+
+    it "drops the contact's session and keeps the staff one" do
+      sign_in_staff(staff)
+      sign_in_sponsor(sponsorship.contact.email)
+      # A logo uploaded for a conference the contact has yet to apply to.
+      post user_conference_sponsorship_asset_files_path(FactoryBot.create(:conference, application_opens_at: 1.day.ago)), params: {content_type: 'image/png'}
+      expect(session.to_h.keys).to include('email', 'session_token_id', 'sponsorship_ids', 'asset_file_ids', 'staff_id')
+
+      expect(connect_call(sign_out, sign_out_request)).to eq(Rk::SponsorApp::SponsorServiceSignOutResponse.new)
+
+      expect(session.to_h.keys).not_to include('email', 'session_token_id', 'sponsorship_ids', 'sponsorship_id', 'asset_file_ids')
+      expect(session[:staff_id]).to eq(staff.id)
+      viewer = connect_call(rpc, request_message).viewer
+      expect(viewer).to have_attributes(staff: true, has_email?: false, sponsorships: [])
+    end
+
+    it 'answers a browser that is not signed in' do
+      expect(connect_call(sign_out, sign_out_request)).to eq(Rk::SponsorApp::SponsorServiceSignOutResponse.new)
+    end
+
+    it 'refuses a GET, as it has side effects' do
+      sign_in_sponsor(sponsorship.contact.email)
+
+      get "#{sign_out.path}?connect=v1&encoding=json&message=%7B%7D"
+
+      expect(response).to have_http_status(:method_not_allowed)
+      expect(session[:sponsorship_ids]).to eq([sponsorship.id])
+    end
+  end
 end

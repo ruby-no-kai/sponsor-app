@@ -30,8 +30,8 @@ import { fieldViolations } from "../../lib/errors.ts";
 import { erroredFields, errorsUnder } from "../../lib/fieldErrors.ts";
 import type { FieldLayout } from "../../lib/fieldErrors.ts";
 import { formatTimestamp, idFromParam } from "../../lib/forms.ts";
-import { PageHeader } from "../../lib/PageHeader.tsx";
 import { useSaveRejection } from "../../lib/rejection.ts";
+import { PageHeader } from "../../lib/PageHeader.tsx";
 import { isRpcKeyOf, useRpc, useRpcMutation } from "../../lib/rpc.ts";
 import { toastManager } from "../../lib/toast.ts";
 import { NotFound } from "../RouteError.tsx";
@@ -39,7 +39,7 @@ import { paths } from "../paths.ts";
 import { ConfirmButton } from "./ConfirmButton.tsx";
 import { SaveErrorBanner, Section, useFieldReveal } from "./FormParts.tsx";
 import { RecipientFilterFields } from "./RecipientFilterFields.tsx";
-import { SandboxedHtml } from "./SandboxedHtml.tsx";
+import { SandboxedHtml } from "../../lib/SandboxedHtml.tsx";
 import { StackedRow, TableOrStack } from "../../lib/StackedRows.tsx";
 import {
   BROADCAST_STATUS_LABELS,

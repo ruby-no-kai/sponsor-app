@@ -16,7 +16,7 @@ import {
   defaultLocale,
   parseAnnouncementId,
 } from "./announcementForm.ts";
-import { SandboxedHtml } from "./SandboxedHtml.tsx";
+import { SandboxedHtml } from "../../lib/SandboxedHtml.tsx";
 import { useConferenceName, useConferenceTitle } from "./conferenceTitle.ts";
 
 const NEW_LOCALE_TAB = "+";

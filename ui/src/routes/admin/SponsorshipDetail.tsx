@@ -15,6 +15,7 @@ import type {
 } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 import { AdminService } from "../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
 import { SponsorshipState } from "../../gen/rubykaigi/sponsor_app/sponsorship_summary_pb.ts";
+import { formatAmount, isWebUrl } from "../../lib/display.ts";
 import { idFromParam, idToInput } from "../../lib/forms.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
 import { isRpcKeyOf, useRpc, useRpcMutation } from "../../lib/rpc.ts";
@@ -29,9 +30,7 @@ import { SPONSOR_EVENT_STATUS_LABELS } from "./sponsorEventView.ts";
 import {
   boothStatus,
   customizationStatus,
-  formatAmount,
   isOverWordLimit,
-  isWebUrl,
   labelOf,
   titoKindLabel,
   wordCountText,

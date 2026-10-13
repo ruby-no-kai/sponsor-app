@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file rubykaigi/sponsor_app/sponsor_viewer.proto.
  */
 export const file_rubykaigi_sponsor_app_sponsor_viewer: GenFile = /*@__PURE__*/
-  fileDesc("CipydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvc3BvbnNvcl92aWV3ZXIucHJvdG8SFXJ1YnlrYWlnaS5zcG9uc29yX2FwcCIgCh5TcG9uc29yU2VydmljZUdldFZpZXdlclJlcXVlc3QiVwofU3BvbnNvclNlcnZpY2VHZXRWaWV3ZXJSZXNwb25zZRI0CgZ2aWV3ZXIYASABKAsyJC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclZpZXdlciL0AQoNU3BvbnNvclZpZXdlchISCgVlbWFpbBgBIAEoCUgAiAEBEg0KBXN0YWZmGAIgASgIEkYKDHNwb25zb3JzaGlwcxgDIAMoCzIwLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yVmlld2VyLlNwb25zb3JzaGlwEg4KBmxvY2FsZRgEIAEoCRpeCgtTcG9uc29yc2hpcBIKCgJpZBgBIAEoAxIMCgRuYW1lGAIgASgJEjUKCmNvbmZlcmVuY2UYAyABKAsyIS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQ29uZmVyZW5jZUIICgZfZW1haWxCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_rubykaigi_sponsor_app_conference]);
+  fileDesc("CipydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvc3BvbnNvcl92aWV3ZXIucHJvdG8SFXJ1YnlrYWlnaS5zcG9uc29yX2FwcCIgCh5TcG9uc29yU2VydmljZUdldFZpZXdlclJlcXVlc3QiVwofU3BvbnNvclNlcnZpY2VHZXRWaWV3ZXJSZXNwb25zZRI0CgZ2aWV3ZXIYASABKAsyJC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuU3BvbnNvclZpZXdlciL0AQoNU3BvbnNvclZpZXdlchISCgVlbWFpbBgBIAEoCUgAiAEBEg0KBXN0YWZmGAIgASgIEkYKDHNwb25zb3JzaGlwcxgDIAMoCzIwLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yVmlld2VyLlNwb25zb3JzaGlwEg4KBmxvY2FsZRgEIAEoCRpeCgtTcG9uc29yc2hpcBIKCgJpZBgBIAEoAxIMCgRuYW1lGAIgASgJEjUKCmNvbmZlcmVuY2UYAyABKAsyIS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQ29uZmVyZW5jZUIICgZfZW1haWwiHgocU3BvbnNvclNlcnZpY2VTaWduT3V0UmVxdWVzdCIfCh1TcG9uc29yU2VydmljZVNpZ25PdXRSZXNwb25zZUIR6gIOUms6OlNwb25zb3JBcHBiBnByb3RvMw", [file_rubykaigi_sponsor_app_conference]);
 
 /**
  * Request for SponsorService.GetViewer.
@@ -82,8 +82,8 @@ export type SponsorViewer = Message<"rubykaigi.sponsor_app.SponsorViewer"> & {
   sponsorships: SponsorViewer_Sponsorship[];
 
   /**
-   * Locale the sponsor area is shown in, "en" or "ja". Chosen with the `hl` query parameter,
-   * then remembered in a cookie.
+   * Locale the sponsor area is shown in, "en" or "ja". Chosen with SetLocale or the `hl` query
+   * parameter, then remembered in a cookie.
    *
    * @generated from field: string locale = 4;
    */
@@ -131,4 +131,34 @@ export type SponsorViewer_Sponsorship = Message<"rubykaigi.sponsor_app.SponsorVi
  */
 export const SponsorViewer_SponsorshipSchema: GenMessage<SponsorViewer_Sponsorship> = /*@__PURE__*/
   messageDesc(file_rubykaigi_sponsor_app_sponsor_viewer, 2, 0);
+
+/**
+ * Request for SponsorService.SignOut.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorServiceSignOutRequest
+ */
+export type SponsorServiceSignOutRequest = Message<"rubykaigi.sponsor_app.SponsorServiceSignOutRequest"> & {
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorServiceSignOutRequest.
+ * Use `create(SponsorServiceSignOutRequestSchema)` to create a new message.
+ */
+export const SponsorServiceSignOutRequestSchema: GenMessage<SponsorServiceSignOutRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_viewer, 3);
+
+/**
+ * Response for SponsorService.SignOut.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorServiceSignOutResponse
+ */
+export type SponsorServiceSignOutResponse = Message<"rubykaigi.sponsor_app.SponsorServiceSignOutResponse"> & {
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorServiceSignOutResponse.
+ * Use `create(SponsorServiceSignOutResponseSchema)` to create a new message.
+ */
+export const SponsorServiceSignOutResponseSchema: GenMessage<SponsorServiceSignOutResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_viewer, 4);
 
