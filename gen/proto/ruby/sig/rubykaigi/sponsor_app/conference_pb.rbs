@@ -3,7 +3,7 @@
 # The library is the definitive source for the API contract; if the RBS file
 # and the library's behavior differ, the library behavior is authoritative.
 # We welcome fixes to change the RBS file to match.
-# source: org/rubykaigi/sponsor_app/conference.proto
+# source: rubykaigi/sponsor_app/conference.proto
 
 module Rk
   module SponsorApp
@@ -171,7 +171,7 @@ module Google
   module Protobuf
     class DescriptorPool
       def lookup:
-          ("org.rubykaigi.sponsor_app.Conference" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::Conference)])
+          ("rubykaigi.sponsor_app.Conference" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::Conference)])
         | ...
     end
   end

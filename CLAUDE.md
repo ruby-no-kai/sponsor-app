@@ -184,7 +184,7 @@ Sorbet with inline RBS comments (`#:`); see `docs/type-checking.md`.
 
 ### Protocol Buffers
 
-`proto/` is the schema of record (package `org.rubykaigi.sponsor_app`, Ruby namespace `Rk::SponsorApp`). buf generates Ruby and RBS from it into `gen/proto/ruby/`, the `sponsor_app-proto` path gem that Bundler loads at boot. Generated files are committed.
+`proto/` is the schema of record (package `rubykaigi.sponsor_app`, Ruby namespace `Rk::SponsorApp`). buf generates Ruby and RBS from it into `gen/proto/ruby/`, the `sponsor_app-proto` path gem that Bundler loads at boot. Generated files are committed.
 
 ```bash
 mise run gen            # Run every generator: gen/ from proto/, then the message RBIs (boots Rails, needs no database)
