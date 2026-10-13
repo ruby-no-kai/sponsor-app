@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import { generatePath, useParams } from "react-router";
 import type { AdminSponsorEvent } from "../../gen/rubykaigi/sponsor_app/admin_sponsor_events_pb.ts";
 import { AdminService } from "../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
+import { isWebUrl } from "../../lib/display.ts";
 import { formatVenueTimestamp, idToInput } from "../../lib/forms.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
 import { useRpc } from "../../lib/rpc.ts";
@@ -11,7 +12,7 @@ import { StackedRow, TableOrStack } from "../../lib/StackedRows.tsx";
 import { paths } from "../paths.ts";
 import { useConferenceName, useConferenceTitle } from "./conferenceTitle.ts";
 import { SPONSOR_EVENT_STATUS_LABELS, linkText, publishedHosts } from "./sponsorEventView.ts";
-import { isWebUrl, labelOf } from "./sponsorshipView.ts";
+import { labelOf } from "./sponsorshipView.ts";
 
 export default function SponsorEventList() {
   const { slug = "" } = useParams();

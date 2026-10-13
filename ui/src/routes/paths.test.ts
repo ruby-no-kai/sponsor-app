@@ -16,6 +16,7 @@ describe("isSpaPathname", () => {
   it("matches the sponsor shell but leaves the application form to Rails", () => {
     assert.ok(isSpaPathname("/"));
     assert.ok(isSpaPathname("/conferences"));
+    assert.ok(isSpaPathname("/conferences/rubykaigi2048/sponsorship"));
     assert.ok(!isSpaPathname("/conferences/rubykaigi2048/sponsorship/new"));
     assert.ok(!isSpaPathname("/conferences/rubykaigi2048/sponsorship/edit"));
   });

@@ -16,11 +16,11 @@ import { fieldViolations } from "../../lib/errors.ts";
 import { formatTimestamp } from "../../lib/forms.ts";
 import { useSaveRejection } from "../../lib/rejection.ts";
 import { isRpcKeyOf, useRpcMutation } from "../../lib/rpc.ts";
+import { SandboxedHtml } from "../../lib/SandboxedHtml.tsx";
 import { notifyError } from "../../lib/toast.ts";
 import { RpcErrorDetails } from "../RouteError.tsx";
 import { ConfirmButton } from "./ConfirmButton.tsx";
 import { joined } from "./FormParts.tsx";
-import { SandboxedHtml } from "./SandboxedHtml.tsx";
 
 // Named after SponsorshipStaffNoteInput's JSON fields, as the violations of a rejected save are.
 type NoteValues = { body: string; pinned: boolean };

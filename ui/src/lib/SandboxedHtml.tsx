@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { markPlaceholders } from "../../lib/placeholders.ts";
+import { markPlaceholders } from "./placeholders.ts";
 
 // Staff-authored HTML, which Markdown lets carry raw HTML. The sandbox runs no script, so the
 // frame may share this origin to have its height read. Links open in a new tab. Headings are

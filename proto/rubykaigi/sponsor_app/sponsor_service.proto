@@ -42,6 +42,13 @@ service SponsorService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
+  // Returns the signed-in contact's sponsorship of a conference, with what its dashboard shows:
+  // the booth, events, expense report and tickets as they stand, and the announcements to
+  // sponsors.
+  rpc GetSponsorship(SponsorServiceGetSponsorshipRequest) returns (SponsorServiceGetSponsorshipResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   // Applications
 
   // Exhibitions and events

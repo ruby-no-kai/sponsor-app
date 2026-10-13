@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package rubykaigi.sponsor_app;
+
+option ruby_package = "Rk::SponsorApp";
+
+// A discount code on the ticketing service, through which a sponsor's people claim the tickets
+// the sponsorship includes.
+message TitoDiscountCode {
+  // Which tickets the code is for.
+  enum Kind {
+    // The zero value proto3 requires. Never returned.
+    KIND_UNSPECIFIED = 0;
+
+    // Conference tickets for the sponsor's attendees.
+    KIND_ATTENDEE = 1;
+
+    // Passes for the staff of the sponsor's booth.
+    KIND_BOOTH_STAFF = 2;
+
+    // Booth staff passes beyond those included, which the sponsor buys.
+    KIND_BOOTH_PAID = 3;
+  }
+
+  // Which tickets the code is for.
+  Kind kind = 1;
+
+  // URL where the sponsor's people register with the code. Anyone holding it can claim the
+  // tickets, so the sponsor shares it with care.
+  string url = 2;
+
+  // Tickets the sponsorship includes for the code. Absent for KIND_BOOTH_PAID, whose passes are
+  // bought one by one.
+  optional int32 quantity = 3;
+}

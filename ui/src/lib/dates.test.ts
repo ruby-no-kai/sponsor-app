@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { timestampFromDate } from "@bufbuild/protobuf/wkt";
-import { formatDate, formatDateRange, formatDateTime } from "./dates.ts";
+import { formatDate, formatDateRange, formatDateTime, formatVenueDate } from "./dates.ts";
 
 describe("formatDate", () => {
   it("shows the day without a time", () => {
@@ -30,5 +30,15 @@ describe("formatDateTime", () => {
     assert.match(text, /2026/);
     assert.doesNotMatch(text, /:\d\d:\d\d|GMT|UTC/);
     assert.equal(formatDateTime(undefined, "never"), "never");
+  });
+});
+
+describe("formatVenueDate", () => {
+  it("shows the UTC day, whatever the browser's time zone is", () => {
+    const day = formatVenueDate(timestampFromDate(new Date("2026-09-13T23:30:00Z")));
+    assert.match(day, /13/);
+    assert.match(day, /2026/);
+    assert.doesNotMatch(day, /:/);
+    assert.equal(formatVenueDate(undefined, "not scheduled"), "not scheduled");
   });
 });

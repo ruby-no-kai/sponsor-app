@@ -22,6 +22,10 @@ describe("destinationOf", () => {
     );
     assert.equal(destinationOf(req("HEAD", "/admin/conferences", page), BASE), "spa");
     assert.equal(destinationOf(req("GET", "/", page), BASE), "spa");
+    assert.equal(
+      destinationOf(req("GET", "/conferences/rubykaigi2048/sponsorship?hl=ja", page), BASE),
+      "spa",
+    );
   });
 
   it("renders the SPA for a path segment with dots, as an organization's domain has", () => {
@@ -60,7 +64,7 @@ describe("destinationOf", () => {
       "/admin/conferences/rubykaigi2048/sponsors_yml",
       "/admin/session/new?back_to=%2Fadmin",
       "/auth/github/callback",
-      "/conferences/rubykaigi2048/sponsorship",
+      "/conferences/rubykaigi2048/sponsorship/new",
       "/session/new",
       "/letter_opener",
       "/vite-dev/@vite/client",

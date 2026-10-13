@@ -18,12 +18,12 @@ function recorder() {
 describe("goTo", () => {
   it("navigates in place to an SPA path, keeping the query and fragment", () => {
     const { calls, navigator } = recorder();
-    goTo("/admin/conferences/rubykaigi2048?hl=ja#sponsorships", {}, navigator, BASE);
-    goTo("http://sponsor-app.localhost:1355/admin/conferences", { replace: true }, navigator, BASE);
+    goTo("/conferences/rubykaigi2048/sponsorship?hl=ja#announcements", {}, navigator, BASE);
+    goTo("http://sponsor-app.localhost:1355/conferences", { replace: true }, navigator, BASE);
 
     assert.deepEqual(calls, [
-      "navigate /admin/conferences/rubykaigi2048?hl=ja#sponsorships",
-      "navigate /admin/conferences (replace)",
+      "navigate /conferences/rubykaigi2048/sponsorship?hl=ja#announcements",
+      "navigate /conferences (replace)",
     ]);
   });
 
