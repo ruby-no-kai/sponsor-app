@@ -158,7 +158,7 @@ function Detail({ slug, id, sponsorshipId }: { slug: string; id: string; sponsor
               {sponsorship.customizationName !== undefined && (
                 <ExpenseReport
                   sponsorship={sponsorship}
-                  href={`${sponsorshipBase}/expense_report`}
+                  href={generatePath(paths.expenseReport, pathParams)}
                 />
               )}
             </div>

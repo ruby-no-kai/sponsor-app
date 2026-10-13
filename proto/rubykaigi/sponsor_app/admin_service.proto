@@ -285,6 +285,26 @@ service AdminService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
+  // Adds a line item to a sponsorship's expense report and recalculates its totals, rewriting the
+  // snapshot under review while the report is submitted. An approved report is answered
+  // `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc CreateExpenseLineItem(AdminServiceCreateExpenseLineItemRequest) returns (AdminServiceCreateExpenseLineItemResponse);
+
+  // Replaces the writable fields of a line item, moving it when given a position, and
+  // recalculates the report as CreateExpenseLineItem does. An approved report is answered
+  // `failed_precondition` with PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc UpdateExpenseLineItem(AdminServiceUpdateExpenseLineItemRequest) returns (AdminServiceUpdateExpenseLineItemResponse);
+
+  // Deletes a line item, keeping its files, and recalculates the report as CreateExpenseLineItem
+  // does. An approved report is answered `failed_precondition` with
+  // PROBLEM_TYPE_FAILED_PRECONDITION.
+  rpc DeleteExpenseLineItem(AdminServiceDeleteExpenseLineItemRequest) returns (AdminServiceDeleteExpenseLineItemResponse);
+
+  // Approves or rejects the latest submission of an expense report, replacing any verdict given
+  // on it before, and sets the report's status to match. A report never submitted is answered
+  // `not_found`, and a draft, such as one whose submission was withdrawn, `failed_precondition`.
+  rpc CreateExpenseReportReview(AdminServiceCreateExpenseReportReviewRequest) returns (AdminServiceCreateExpenseReportReviewResponse);
+
   // Viewer
 
   // Returns the signed-in staff member.

@@ -5,7 +5,7 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
-import type { ExpenseReport, ExpenseReport_Status, ExpenseReportCalculation, ExpenseReportReview_Action } from "./expense_report_pb.ts";
+import type { ExpenseLineItem, ExpenseLineItemInput, ExpenseReport, ExpenseReport_Status, ExpenseReportCalculation, ExpenseReportReview_Action } from "./expense_report_pb.ts";
 import { file_rubykaigi_sponsor_app_expense_report } from "./expense_report_pb.ts";
 import type { SponsorshipSummary } from "./sponsorship_summary_pb.ts";
 import { file_rubykaigi_sponsor_app_sponsorship_summary } from "./sponsorship_summary_pb.ts";
@@ -15,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file rubykaigi/sponsor_app/admin_expense_reports.proto.
  */
 export const file_rubykaigi_sponsor_app_admin_expense_reports: GenFile = /*@__PURE__*/
-  fileDesc("CjFydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fZXhwZW5zZV9yZXBvcnRzLnByb3RvEhVydWJ5a2FpZ2kuc3BvbnNvcl9hcHAigQMKFUV4cGVuc2VSZXBvcnRUYWJsZVJvdxI+CgtzcG9uc29yc2hpcBgBIAEoCzIpLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yc2hpcFN1bW1hcnkSIAoTZGlzcGxheWVkX3BsYW5fbmFtZRgCIAEoCUgAiAEBEhEKCXRvdGFsX2ZlZRgDIAEoCRJICgZyZXBvcnQYBCABKAsyMy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZVJlcG9ydFRhYmxlUm93LlJlcG9ydEgBiAEBGoUBCgZSZXBvcnQSOwoGc3RhdHVzGAEgASgOMisucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQuU3RhdHVzEhQKDHRvdGFsX2Ftb3VudBgCIAEoCRIYChB0b3RhbF90YXhfYW1vdW50GAMgASgJEg4KBm9mZnNldBgEIAEoCUIWChRfZGlzcGxheWVkX3BsYW5fbmFtZUIJCgdfcmVwb3J0IowBChhFeHBlbnNlUmVwb3J0UmV2aWV3SW5wdXQSTgoGYWN0aW9uGAEgASgOMjEucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRSZXZpZXcuQWN0aW9uQgu6SAjIAQGCAQIQARIUCgdjb21tZW50GAIgASgJSACIAQFCCgoIX2NvbW1lbnQiYAolQWRtaW5TZXJ2aWNlTGlzdEV4cGVuc2VSZXBvcnRzUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJCJkCiZBZG1pblNlcnZpY2VMaXN0RXhwZW5zZVJlcG9ydHNSZXNwb25zZRI6CgRyb3dzGAEgAygLMiwucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRUYWJsZVJvdyJ/CiNBZG1pblNlcnZpY2VHZXRFeHBlbnNlUmVwb3J0UmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgACKcAQokQWRtaW5TZXJ2aWNlR2V0RXhwZW5zZVJlcG9ydFJlc3BvbnNlEjQKBnJlcG9ydBgBIAEoCzIkLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlUmVwb3J0Ej4KC3Nwb25zb3JzaGlwGAIgASgLMikucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JzaGlwU3VtbWFyeSKFAQopQWRtaW5TZXJ2aWNlQ2FsY3VsYXRlRXhwZW5zZVJlcG9ydFJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAAicgoqQWRtaW5TZXJ2aWNlQ2FsY3VsYXRlRXhwZW5zZVJlcG9ydFJlc3BvbnNlEkQKC2NhbGN1bGF0aW9uGAEgASgLMi8ucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRDYWxjdWxhdGlvbkIR6gIOUms6OlNwb25zb3JBcHBiBnByb3RvMw", [file_buf_validate_validate, file_rubykaigi_sponsor_app_expense_report, file_rubykaigi_sponsor_app_sponsorship_summary]);
+  fileDesc("CjFydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fZXhwZW5zZV9yZXBvcnRzLnByb3RvEhVydWJ5a2FpZ2kuc3BvbnNvcl9hcHAigQMKFUV4cGVuc2VSZXBvcnRUYWJsZVJvdxI+CgtzcG9uc29yc2hpcBgBIAEoCzIpLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5TcG9uc29yc2hpcFN1bW1hcnkSIAoTZGlzcGxheWVkX3BsYW5fbmFtZRgCIAEoCUgAiAEBEhEKCXRvdGFsX2ZlZRgDIAEoCRJICgZyZXBvcnQYBCABKAsyMy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZVJlcG9ydFRhYmxlUm93LlJlcG9ydEgBiAEBGoUBCgZSZXBvcnQSOwoGc3RhdHVzGAEgASgOMisucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQuU3RhdHVzEhQKDHRvdGFsX2Ftb3VudBgCIAEoCRIYChB0b3RhbF90YXhfYW1vdW50GAMgASgJEg4KBm9mZnNldBgEIAEoCUIWChRfZGlzcGxheWVkX3BsYW5fbmFtZUIJCgdfcmVwb3J0IowBChhFeHBlbnNlUmVwb3J0UmV2aWV3SW5wdXQSTgoGYWN0aW9uGAEgASgOMjEucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRSZXZpZXcuQWN0aW9uQgu6SAjIAQGCAQIQARIUCgdjb21tZW50GAIgASgJSACIAQFCCgoIX2NvbW1lbnQiYAolQWRtaW5TZXJ2aWNlTGlzdEV4cGVuc2VSZXBvcnRzUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJCJkCiZBZG1pblNlcnZpY2VMaXN0RXhwZW5zZVJlcG9ydHNSZXNwb25zZRI6CgRyb3dzGAEgAygLMiwucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRUYWJsZVJvdyJ/CiNBZG1pblNlcnZpY2VHZXRFeHBlbnNlUmVwb3J0UmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgACKcAQokQWRtaW5TZXJ2aWNlR2V0RXhwZW5zZVJlcG9ydFJlc3BvbnNlEjQKBnJlcG9ydBgBIAEoCzIkLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlUmVwb3J0Ej4KC3Nwb25zb3JzaGlwGAIgASgLMikucnVieWthaWdpLnNwb25zb3JfYXBwLlNwb25zb3JzaGlwU3VtbWFyeSKFAQopQWRtaW5TZXJ2aWNlQ2FsY3VsYXRlRXhwZW5zZVJlcG9ydFJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAAicgoqQWRtaW5TZXJ2aWNlQ2FsY3VsYXRlRXhwZW5zZVJlcG9ydFJlc3BvbnNlEkQKC2NhbGN1bGF0aW9uGAEgASgLMi8ucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRDYWxjdWxhdGlvbiLIAQooQWRtaW5TZXJ2aWNlQ3JlYXRlRXhwZW5zZUxpbmVJdGVtUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIfCg5zcG9uc29yc2hpcF9pZBgCIAEoA0IHukgEIgIgABJCCgVpbnB1dBgDIAEoCzIrLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlTGluZUl0ZW1JbnB1dEIGukgDyAEBIpwBCilBZG1pblNlcnZpY2VDcmVhdGVFeHBlbnNlTGluZUl0ZW1SZXNwb25zZRI5CglsaW5lX2l0ZW0YASABKAsyJi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZUxpbmVJdGVtEjQKBnJlcG9ydBgCIAEoCzIkLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlUmVwb3J0IukBCihBZG1pblNlcnZpY2VVcGRhdGVFeHBlbnNlTGluZUl0ZW1SZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAEh8KDGxpbmVfaXRlbV9pZBgDIAEoA0IJMAG6SAQiAiAAEkIKBWlucHV0GAQgASgLMisucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VMaW5lSXRlbUlucHV0Qga6SAPIAQEinAEKKUFkbWluU2VydmljZVVwZGF0ZUV4cGVuc2VMaW5lSXRlbVJlc3BvbnNlEjkKCWxpbmVfaXRlbRgBIAEoCzImLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5FeHBlbnNlTGluZUl0ZW0SNAoGcmVwb3J0GAIgASgLMiQucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQipQEKKEFkbWluU2VydmljZURlbGV0ZUV4cGVuc2VMaW5lSXRlbVJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHwoOc3BvbnNvcnNoaXBfaWQYAiABKANCB7pIBCICIAASHwoMbGluZV9pdGVtX2lkGAMgASgDQgkwAbpIBCICIAAiYQopQWRtaW5TZXJ2aWNlRGVsZXRlRXhwZW5zZUxpbmVJdGVtUmVzcG9uc2USNAoGcmVwb3J0GAEgASgLMiQucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnQi0AEKLEFkbWluU2VydmljZUNyZWF0ZUV4cGVuc2VSZXBvcnRSZXZpZXdSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEh8KDnNwb25zb3JzaGlwX2lkGAIgASgDQge6SAQiAiAAEkYKBWlucHV0GAMgASgLMi8ucnVieWthaWdpLnNwb25zb3JfYXBwLkV4cGVuc2VSZXBvcnRSZXZpZXdJbnB1dEIGukgDyAEBImUKLUFkbWluU2VydmljZUNyZWF0ZUV4cGVuc2VSZXBvcnRSZXZpZXdSZXNwb25zZRI0CgZyZXBvcnQYASABKAsyJC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuRXhwZW5zZVJlcG9ydEIR6gIOUms6OlNwb25zb3JBcHBiBnByb3RvMw", [file_buf_validate_validate, file_rubykaigi_sponsor_app_expense_report, file_rubykaigi_sponsor_app_sponsorship_summary]);
 
 /**
  * A custom sponsorship with its expense report in brief, as the list of a conference's expense
@@ -283,4 +283,249 @@ export type AdminServiceCalculateExpenseReportResponse = Message<"rubykaigi.spon
  */
 export const AdminServiceCalculateExpenseReportResponseSchema: GenMessage<AdminServiceCalculateExpenseReportResponse> = /*@__PURE__*/
   messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 7);
+
+/**
+ * Request for AdminService.CreateExpenseLineItem.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCreateExpenseLineItemRequest
+ */
+export type AdminServiceCreateExpenseLineItemRequest = Message<"rubykaigi.sponsor_app.AdminServiceCreateExpenseLineItemRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference that has an expense report.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * The line item to add.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseLineItemInput input = 3;
+   */
+  input?: ExpenseLineItemInput | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCreateExpenseLineItemRequest.
+ * Use `create(AdminServiceCreateExpenseLineItemRequestSchema)` to create a new message.
+ */
+export const AdminServiceCreateExpenseLineItemRequestSchema: GenMessage<AdminServiceCreateExpenseLineItemRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 8);
+
+/**
+ * Response for AdminService.CreateExpenseLineItem.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCreateExpenseLineItemResponse
+ */
+export type AdminServiceCreateExpenseLineItemResponse = Message<"rubykaigi.sponsor_app.AdminServiceCreateExpenseLineItemResponse"> & {
+  /**
+   * The line item added.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseLineItem line_item = 1;
+   */
+  lineItem?: ExpenseLineItem | undefined;
+
+  /**
+   * The report as changed, with its totals recalculated.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseReport report = 2;
+   */
+  report?: ExpenseReport | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCreateExpenseLineItemResponse.
+ * Use `create(AdminServiceCreateExpenseLineItemResponseSchema)` to create a new message.
+ */
+export const AdminServiceCreateExpenseLineItemResponseSchema: GenMessage<AdminServiceCreateExpenseLineItemResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 9);
+
+/**
+ * Request for AdminService.UpdateExpenseLineItem.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceUpdateExpenseLineItemRequest
+ */
+export type AdminServiceUpdateExpenseLineItemRequest = Message<"rubykaigi.sponsor_app.AdminServiceUpdateExpenseLineItemRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference that has an expense report.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * ID of a line item of the sponsorship's expense report.
+   *
+   * @generated from field: int64 line_item_id = 3 [jstype = JS_STRING];
+   */
+  lineItemId: string;
+
+  /**
+   * The line item's writable fields.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseLineItemInput input = 4;
+   */
+  input?: ExpenseLineItemInput | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceUpdateExpenseLineItemRequest.
+ * Use `create(AdminServiceUpdateExpenseLineItemRequestSchema)` to create a new message.
+ */
+export const AdminServiceUpdateExpenseLineItemRequestSchema: GenMessage<AdminServiceUpdateExpenseLineItemRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 10);
+
+/**
+ * Response for AdminService.UpdateExpenseLineItem.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceUpdateExpenseLineItemResponse
+ */
+export type AdminServiceUpdateExpenseLineItemResponse = Message<"rubykaigi.sponsor_app.AdminServiceUpdateExpenseLineItemResponse"> & {
+  /**
+   * The line item as updated.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseLineItem line_item = 1;
+   */
+  lineItem?: ExpenseLineItem | undefined;
+
+  /**
+   * The report as changed, with its totals recalculated.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseReport report = 2;
+   */
+  report?: ExpenseReport | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceUpdateExpenseLineItemResponse.
+ * Use `create(AdminServiceUpdateExpenseLineItemResponseSchema)` to create a new message.
+ */
+export const AdminServiceUpdateExpenseLineItemResponseSchema: GenMessage<AdminServiceUpdateExpenseLineItemResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 11);
+
+/**
+ * Request for AdminService.DeleteExpenseLineItem.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceDeleteExpenseLineItemRequest
+ */
+export type AdminServiceDeleteExpenseLineItemRequest = Message<"rubykaigi.sponsor_app.AdminServiceDeleteExpenseLineItemRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference that has an expense report.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * ID of a line item of the sponsorship's expense report.
+   *
+   * @generated from field: int64 line_item_id = 3 [jstype = JS_STRING];
+   */
+  lineItemId: string;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceDeleteExpenseLineItemRequest.
+ * Use `create(AdminServiceDeleteExpenseLineItemRequestSchema)` to create a new message.
+ */
+export const AdminServiceDeleteExpenseLineItemRequestSchema: GenMessage<AdminServiceDeleteExpenseLineItemRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 12);
+
+/**
+ * Response for AdminService.DeleteExpenseLineItem.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceDeleteExpenseLineItemResponse
+ */
+export type AdminServiceDeleteExpenseLineItemResponse = Message<"rubykaigi.sponsor_app.AdminServiceDeleteExpenseLineItemResponse"> & {
+  /**
+   * The report as changed, with its totals recalculated.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseReport report = 1;
+   */
+  report?: ExpenseReport | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceDeleteExpenseLineItemResponse.
+ * Use `create(AdminServiceDeleteExpenseLineItemResponseSchema)` to create a new message.
+ */
+export const AdminServiceDeleteExpenseLineItemResponseSchema: GenMessage<AdminServiceDeleteExpenseLineItemResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 13);
+
+/**
+ * Request for AdminService.CreateExpenseReportReview.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCreateExpenseReportReviewRequest
+ */
+export type AdminServiceCreateExpenseReportReviewRequest = Message<"rubykaigi.sponsor_app.AdminServiceCreateExpenseReportReviewRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a sponsorship of the conference whose expense report has been submitted.
+   *
+   * @generated from field: int64 sponsorship_id = 2;
+   */
+  sponsorshipId: bigint;
+
+  /**
+   * The verdict, signed by the staff member signed in.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseReportReviewInput input = 3;
+   */
+  input?: ExpenseReportReviewInput | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCreateExpenseReportReviewRequest.
+ * Use `create(AdminServiceCreateExpenseReportReviewRequestSchema)` to create a new message.
+ */
+export const AdminServiceCreateExpenseReportReviewRequestSchema: GenMessage<AdminServiceCreateExpenseReportReviewRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 14);
+
+/**
+ * Response for AdminService.CreateExpenseReportReview.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceCreateExpenseReportReviewResponse
+ */
+export type AdminServiceCreateExpenseReportReviewResponse = Message<"rubykaigi.sponsor_app.AdminServiceCreateExpenseReportReviewResponse"> & {
+  /**
+   * The report as reviewed, carrying the review as latest_review.
+   *
+   * @generated from field: rubykaigi.sponsor_app.ExpenseReport report = 1;
+   */
+  report?: ExpenseReport | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceCreateExpenseReportReviewResponse.
+ * Use `create(AdminServiceCreateExpenseReportReviewResponseSchema)` to create a new message.
+ */
+export const AdminServiceCreateExpenseReportReviewResponseSchema: GenMessage<AdminServiceCreateExpenseReportReviewResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_expense_reports, 15);
 

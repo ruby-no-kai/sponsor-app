@@ -4,12 +4,13 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { notifyError } from "../../lib/toast.ts";
 
-// A destructive button that asks first. A failed action shows a toast and leaves the dialog open.
-// With iconOnly, the label is the button's accessible name.
+// A button that asks first, destructive unless told otherwise. A failed action shows a toast and
+// leaves the dialog open. With iconOnly, the label is the button's accessible name.
 export function ConfirmButton({
   label,
   icon,
   iconOnly = false,
+  variant = "destructive",
   size,
   title,
   description,
@@ -19,6 +20,7 @@ export function ConfirmButton({
   label: string;
   icon?: Icon;
   iconOnly?: boolean;
+  variant?: "primary" | "destructive";
   size?: "sm" | "base";
   title: string;
   description: ReactNode;
@@ -54,7 +56,7 @@ export function ConfirmButton({
               aria-label={label}
             />
           ) : (
-            <Button {...props} variant="destructive" icon={icon} size={size}>
+            <Button {...props} variant={variant} icon={icon} size={size}>
               {label}
             </Button>
           )
@@ -71,7 +73,7 @@ export function ConfirmButton({
               </Button>
             )}
           />
-          <Button variant="destructive" loading={isRunning} onClick={() => void handleConfirm()}>
+          <Button variant={variant} loading={isRunning} onClick={() => void handleConfirm()}>
             {confirmLabel}
           </Button>
         </div>

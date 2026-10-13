@@ -279,6 +279,13 @@ export const router = createBrowserRouter([
                     (await import("./routes/admin/ExpenseReportList.tsx")).default,
                 },
               },
+              {
+                path: paths.expenseReport,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/expense_report/ExpenseReportEditor.tsx")).default,
+                },
+              },
 
               { path: "*", Component: NotFound },
             ],
