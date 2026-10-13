@@ -91,7 +91,7 @@ To raise an older file, `bundle exec spoom srb bump --from false --to true` find
 ## Known gaps
 
 - `Struct` members have untyped readers, so value objects use `Data.define`. Its readers have no inline form. Declare them in `sorbet/rbi/shims/data_define.rbi`.
-- Sorbet checks only the argument count of a `Data.define` constructor, so nothing checks the stored values against the reader types in the shim.
+- Sorbet checks only the argument count of a `Data.define` constructor. Its shim block also declares `def self.new(id:, ...)` with `sig { params(id: Integer, ...).returns(T.attached_class) }`, which makes Sorbet check the keys and value types. A sig on `initialize` is rejected (4010) instead. `Data#with` stays unchecked.
 - `belongs_to` readers are nilable in the DSL RBIs, even when the association is required. Read them with `Must.expect`.
 - `NOT NULL` columns are typed non-nil, although an unsaved record can still hold nil.
 - `Rails.application.config.x` and a parameterized mailer's `params` return untyped. Declare the value where it is read when a type is needed: `delivery = params[:delivery] #: BroadcastDelivery`.
@@ -106,6 +106,7 @@ To raise an older file, `bundle exec spoom srb bump --from false --to true` find
 - Sorbet types the `self` of a bare lambda in a class body as the class, so a validation or callback condition takes the record: `if: ->(record) { record.persisted? }`.
 - Sorbet reads a Hash passed to an optional positional parameter as keyword arguments when the callee also takes keywords. Pass one of the keywords explicitly, as `TitoApi#get_registration` does.
 - A splat of an array whose size is not known statically is error 7019 at every level above `false`. `config/lambda_runner.rb` stays at `false` for this.
+- A `Hash` keyword splat into a method with required keywords is error 7019, and `Data#to_h` returns an untyped `Hash`. Spell the keywords out, as `EnsureSponsorshipTitoDiscountCodeJob` does for `TitoApi`.
 - Tapioca emits no instance variables. One that a gem assigns and a patch reads is declared with `T.let` in an `initialize` body in the gem's shim, as in `sorbet/rbi/shims/aws-sdk-s3.rbi`.
 - Files evaluated in another tool's DSL and unable to resolve, such as `config/ci.rb`, are `typed: ignore`.
 - A spec whose anonymous class defines `initialize` or `self.name` leaks those definitions into `Object` for the whole project. Such a spec is `typed: ignore`.

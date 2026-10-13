@@ -47,17 +47,17 @@
               %th= t('.table.ticket_state')
           %tbody
             - @pass_redemptions.registrations.each_with_index do |registration, reg_index|
-              - registration.tickets.each_with_index do |ticket, ticket_index|
+              - tickets = @pass_redemptions.tickets_for(registration)
+              - tickets.each_with_index do |ticket, ticket_index|
                 %tr{class: reg_index.even? ? '' : 'pass-redemption-odd', style: (ticket_index == 0 && reg_index > 0) ? 'border-top: 3px solid #dee2e6;' : ''}
                   - if ticket_index == 0
-                    %td.text-center{rowspan: registration.tickets.size, class: registration.tickets.size > 1 ? 'align-middle' : nil}
-                      = link_to t('.table.retract'), new_user_conference_sponsorship_retraction_path(@conference, registration.id), class: "btn btn-sm btn-outline-danger #{registration.retractable? && @conference.pass_retraction_enabled? ? '' : 'd-none'}"
+                    %td.text-center{rowspan: tickets.size, class: tickets.size > 1 ? 'align-middle' : nil}
+                      = link_to t('.table.retract'), new_user_conference_sponsorship_retraction_path(@conference, registration.id), class: "btn btn-sm btn-outline-danger #{@pass_redemptions.retractable?(registration) && @conference.pass_retraction_enabled? ? '' : 'd-none'}"
                   %td= registration.reference
                   %td= ticket.reference
                   %td
-                    - if ticket.release&.tito_release_slug
+                    - if (release_key = ticket.release_slug)
                       :ruby
-                        release_key = ticket.release.tito_release_slug
                         color = case release_key
                         when 'sponsor'
                          'success'
@@ -68,7 +68,7 @@
                         else
                          'light'
                         end
-                      %span.badge{class: "badge-#{color}"}= t(".release_type.#{release_key}", default: ticket.release.tito_release_slug)
+                      %span.badge{class: "badge-#{color}"}= t(".release_type.#{release_key}", default: release_key)
                   %td= registration.email
                   %td= ticket.email
                   %td

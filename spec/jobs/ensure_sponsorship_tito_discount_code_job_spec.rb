@@ -24,14 +24,16 @@ RSpec.describe EnsureSponsorshipTitoDiscountCodeJob, type: :job do
 
     expect(api).to have_received(:create_discount_code).with(
       'rubykaigi/2026',
-      hash_including(
-        code: "sa_#{sponsorship.id}_#{sponsorship.ticket_key[0, 12]}",
-        type: 'PercentOffDiscountCode',
-        value: '100.0',
-        quantity: 3,
-        release_ids: ['22'],
-        source_id: '11',
-      ),
+      code: "sa_#{sponsorship.id}_#{sponsorship.ticket_key[0, 12]}",
+      type: 'PercentOffDiscountCode',
+      value: '100.0',
+      only_show_attached: true,
+      reveal_secret: true,
+      block_registrations_if_not_applicable: false,
+      quantity: 3,
+      release_ids: ['22'],
+      source_id: '11',
+      description_for_organizer: "sponsorship=#{sponsorship.id}, domain=#{sponsorship.organization.domain}, plan=#{plan.name}",
     )
     expect(api).to have_received(:get_release).with('rubykaigi/2026', 'sponsor')
     expect(sponsorship.tito_discount_codes.sole).to have_attributes(kind: 'attendee', quantity: 3, tito_discount_code_id: '33')
@@ -45,6 +47,16 @@ RSpec.describe EnsureSponsorshipTitoDiscountCodeJob, type: :job do
 
     expect(api).to have_received(:update_discount_code).with('rubykaigi/2026', 'dc_1', hash_including(quantity: 3))
     expect(discount_code.reload.quantity).to eq(3)
+  end
+
+  it 'sends nil release_ids when the quantity drops to zero' do
+    FactoryBot.create(:tito_discount_code, sponsorship:, kind: :attendee, quantity: 3, tito_discount_code_id: 'dc_1')
+    sponsorship.update!(withdrawn_at: Time.current)
+
+    described_class.perform_now(sponsorship, 'attendee')
+
+    expect(api).to have_received(:update_discount_code).with('rubykaigi/2026', 'dc_1', hash_including(quantity: 0, release_ids: nil))
+    expect(api).not_to have_received(:get_release)
   end
 
   it 'leaves an up-to-date discount code alone' do
@@ -63,8 +75,18 @@ RSpec.describe EnsureSponsorshipTitoDiscountCodeJob, type: :job do
 
     expect(api).to have_received(:create_discount_code).with(
       'rubykaigi/2026',
-      hash_including(type: 'MoneyOffDiscountCode', value: '5000.0', quantity: 6),
+      code: "se_#{sponsorship.id}_#{sponsorship.ticket_key[0, 12]}",
+      type: 'MoneyOffDiscountCode',
+      value: '5000.0',
+      only_show_attached: true,
+      reveal_secret: true,
+      block_registrations_if_not_applicable: true,
+      quantity: 6,
+      release_ids: ['22'],
+      source_id: '11',
+      description_for_organizer: "sponsorship=#{sponsorship.id}, domain=#{sponsorship.organization.domain}, plan=#{plan.name}",
     )
+    expect(api).to have_received(:get_release).with('rubykaigi/2026', 'exhibitor-paid')
   end
 
   it 'does nothing for a conference without a tito_slug' do

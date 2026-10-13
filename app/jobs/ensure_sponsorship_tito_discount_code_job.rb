@@ -2,18 +2,12 @@
 # frozen_string_literal: true
 
 class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
-  #: type discount_code_attributes = {
-  #|   code: String,
-  #|   type: String,
-  #|   value: String,
-  #|   only_show_attached: bool,
-  #|   reveal_secret: bool,
-  #|   block_registrations_if_not_applicable: bool,
-  #|   quantity: Integer,
-  #|   release_ids: Array[String]?,
-  #|   source_id: String,
-  #|   description_for_organizer: String,
-  #| }
+  # The discount code body sent to Tito. Every member is sent, nil and false included.
+  DiscountCodeAttributes = Data.define(
+    :code, :type, :value,
+    :only_show_attached, :reveal_secret, :block_registrations_if_not_applicable,
+    :quantity, :release_ids, :source_id, :description_for_organizer
+  )
 
   #: (Sponsorship, String, ?ignore_quantity: bool) -> void
   def perform(sponsorship, kind, ignore_quantity: false)
@@ -30,12 +24,35 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     if discount_code
       return if discount_code.quantity == quantity && !ignore_quantity
 
-      tito.update_discount_code(tito_slug, discount_code.tito_discount_code_id, **discount_code_attributes)
+      attrs = discount_code_attributes
+      # Spelled out, as Sorbet cannot check a Hash splat against required keywords.
+      tito.update_discount_code(
+        tito_slug, discount_code.tito_discount_code_id,
+        code: attrs.code, type: attrs.type, value: attrs.value,
+        only_show_attached: attrs.only_show_attached,
+        reveal_secret: attrs.reveal_secret,
+        block_registrations_if_not_applicable: attrs.block_registrations_if_not_applicable,
+        quantity: attrs.quantity,
+        release_ids: attrs.release_ids,
+        source_id: attrs.source_id,
+        description_for_organizer: attrs.description_for_organizer,
+      )
       discount_code.update!(quantity: quantity)
     else
       return if quantity < 1
 
-      tito_discount_code = tito.create_discount_code(tito_slug, **discount_code_attributes)
+      attrs = discount_code_attributes
+      tito_discount_code = tito.create_discount_code(
+        tito_slug,
+        code: attrs.code, type: attrs.type, value: attrs.value,
+        only_show_attached: attrs.only_show_attached,
+        reveal_secret: attrs.reveal_secret,
+        block_registrations_if_not_applicable: attrs.block_registrations_if_not_applicable,
+        quantity: attrs.quantity,
+        release_ids: attrs.release_ids,
+        source_id: attrs.source_id,
+        description_for_organizer: attrs.description_for_organizer,
+      )
       TitoDiscountCode.create!(
         sponsorship: sponsorship,
         kind: kind,
@@ -51,9 +68,9 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
     "#{code_prefix}_#{sponsorship.id}_#{sponsorship.ticket_key[0, 12]}"
   end
 
-  #: () -> discount_code_attributes
+  #: () -> DiscountCodeAttributes
   def discount_code_attributes
-    retval = {
+    attrs = DiscountCodeAttributes.new(
       code: code,
       type: 'PercentOffDiscountCode',
       value: '100.0',
@@ -64,14 +81,13 @@ class EnsureSponsorshipTitoDiscountCodeJob < ApplicationJob
       release_ids: quantity > 0 ? release_ids : nil,
       source_id: tito_source.tito_source_id,
       description_for_organizer: "sponsorship=#{sponsorship.id}, domain=#{sponsorship.organization&.domain}, plan=#{sponsorship.plan&.name}",
-    }
-    if kind == 'booth_paid'
-      retval.merge!(
-        type: 'MoneyOffDiscountCode',
-        value: conference.tito_booth_paid_flat_discount_amount.to_s,
-      )
-    end
-    retval
+    )
+    return attrs unless kind == 'booth_paid'
+
+    attrs.with(
+      type: 'MoneyOffDiscountCode',
+      value: conference.tito_booth_paid_flat_discount_amount.to_s,
+    )
   end
 
   #: () -> Integer
