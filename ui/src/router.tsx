@@ -43,6 +43,27 @@ export const router = createBrowserRouter([
               },
 
               // Form descriptions
+              {
+                path: paths.formDescriptionNew,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/FormDescriptionEditor.tsx")).default,
+                },
+              },
+              {
+                path: paths.formDescription,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/FormDescriptionEditor.tsx")).default,
+                },
+              },
+              {
+                path: paths.formDescriptionEdit,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/FormDescriptionEditor.tsx")).default,
+                },
+              },
 
               // Plans
 

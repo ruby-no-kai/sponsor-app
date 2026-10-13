@@ -1,6 +1,7 @@
 import { create, fromJsonString, toJsonString } from "@bufbuild/protobuf";
 import type {
   DescMessage,
+  DescMethod,
   DescMethodUnary,
   MessageInitShape,
   MessageShape,
@@ -68,6 +69,11 @@ export function rpcKey<I extends DescMessage, O extends DescMessage>(
     method.name,
     toJsonString(method.input, create(method.input, input)),
   ];
+}
+
+// Whether an SWR key is one useRpc caches the method's answers under, for mutate's filter form.
+export function isRpcKeyOf(key: unknown, method: DescMethod): boolean {
+  return Array.isArray(key) && key[0] === method.parent.typeName && key[1] === method.name;
 }
 
 // Calls an RPC through SWR. A null input skips the call.

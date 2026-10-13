@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'jsonnet'
 
 RSpec.describe FormDescription, type: :model do
   let(:conference) { FactoryBot.create(:conference) }
@@ -56,144 +57,173 @@ RSpec.describe FormDescription, type: :model do
     end
   end
 
-  describe '#fallback_options=' do
-    it 'accepts JSON string and parses it' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '[{"value": "option1", "name": "First Option", "conditions": [{"plans": ["Ruby"]}]}, {"value": "option2", "name": "Second Option", "conditions": [{"booth_request": true}]}]'
-      form.save!
-
-      expect(form.fallback_options).to all(be_a(FormDescription::FallbackOption))
-      expect(form.fallback_options[0].value).to eq('option1')
-      expect(form.fallback_options[0].name).to eq('First Option')
-      expect(form.fallback_options[0].conditions).to all(be_a(FormDescription::FallbackOptionCondition))
-      expect(form.fallback_options[0].conditions[0].plans).to eq(['Ruby'])
-      expect(form.fallback_options[1].value).to eq('option2')
-      expect(form.fallback_options[1].name).to eq('Second Option')
-      expect(form.fallback_options[1].conditions[0].booth_request).to be(true)
+  describe '#fallback_options' do
+    let(:fallback_options) do
+      Rk::SponsorApp::Internal::FallbackOptions.new(options: [
+        Rk::SponsorApp::Internal::FallbackOption.new(
+          value: 'gold',
+          name: 'Change to Gold',
+          conditions: [Rk::SponsorApp::Internal::FallbackOption::Condition.new(plans: ['Platinum'], booth_request: true)],
+          priority_human: ['{plan}!no_booth', 'Gold'],
+        ),
+        Rk::SponsorApp::Internal::FallbackOption.new(value: 'withdraw', name: 'Withdraw'),
+      ])
     end
 
-    it 'accepts array directly' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = [{'value' => 'option1', 'name' => 'First Option', 'conditions' => [{'plans' => ['Ruby']}]}, {'value' => 'option2', 'name' => 'Second Option'}]
-      form.save!
-
-      expect(form.fallback_options).to all(be_a(FormDescription::FallbackOption))
-      expect(form.fallback_options[0].value).to eq('option1')
-      expect(form.fallback_options[0].name).to eq('First Option')
-      expect(form.fallback_options[0].conditions).to all(be_a(FormDescription::FallbackOptionCondition))
+    def stored_document(form)
+      JSON.parse(described_class.where(id: form.id).pick(Arel.sql('fallback_options::text AS document')))
     end
 
-    it 'accepts options without conditions' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '[{"value": "option1", "name": "First Option"}]'
-      form.save!
-
-      expect(form.fallback_options[0].conditions).to be_nil
+    def store_document(form, document)
+      described_class.where(id: form.id).update_all(['fallback_options = ?::jsonb', JSON.generate(document)]) # rubocop:disable Rails/SkipsModelValidations
     end
 
-    it 'accepts multiple conditions (OR logic)' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '[{"value": "option1", "name": "First Option", "conditions": [{"plans": ["Ruby"]}, {"booth_request": true}]}]'
-      form.save!
+    before { FactoryBot.create(:plan, conference:, name: 'Platinum') }
 
-      expect(form.fallback_options[0].conditions.size).to eq(2)
-      expect(form.fallback_options[0].conditions[0].plans).to eq(['Ruby'])
-      expect(form.fallback_options[0].conditions[1].booth_request).to be(true)
+    it 'is an empty message by default' do
+      expect(described_class.new.fallback_options).to eq(Rk::SponsorApp::Internal::FallbackOptions.new)
     end
 
-    it 'converts conditions to JSON in to_dataset' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '[{"value": "option1", "name": "First Option", "conditions": [{"plans": ["Ruby"]}]}]'
-      form.save!
+    it 'round-trips the message through the column' do
+      form = FactoryBot.create(:form_description, conference:, fallback_options:)
 
-      dataset = form.fallback_options[0].to_dataset
-      expect(dataset[:conditions]).to be_a(String)
-      parsed = JSON.parse(dataset[:conditions])
-      expect(parsed).to eq([{'plans' => ['Ruby']}])
+      expect(described_class.find(form.id).fallback_options).to eq(fallback_options)
     end
 
-    it 'converts priority_human to JSON in to_dataset' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '[{"value": "option1", "name": "First Option", "priority_human": ["Gold", "Silver"]}]'
-      form.save!
+    it 'stores ProtoJSON in the .proto field names with every field present' do
+      form = FactoryBot.create(:form_description, conference:, fallback_options:)
 
-      dataset = form.fallback_options[0].to_dataset
-      expect(dataset[:priority_human]).to be_a(String)
-      parsed = JSON.parse(dataset[:priority_human])
-      expect(parsed).to eq(['Gold', 'Silver'])
+      expect(stored_document(form).fetch('options')).to eq([
+        {
+          'value' => 'gold', 'name' => 'Change to Gold',
+          'conditions' => [{'plans' => ['Platinum'], 'booth_request' => true}],
+          'priority_human' => ['{plan}!no_booth', 'Gold'],
+        },
+        {'value' => 'withdraw', 'name' => 'Withdraw', 'conditions' => [], 'priority_human' => []},
+      ])
     end
 
-    it 'handles blank string as empty array' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = ''
-      form.save!
+    it 'leaves a loaded record unchanged' do
+      form = FactoryBot.create(:form_description, conference:, fallback_options:)
 
-      expect(form.fallback_options).to eq([])
+      expect(described_class.find(form.id).changed?).to be(false)
     end
 
-    it 'handles empty string as empty array' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '   '
-      form.save!
+    it 'reads a document carrying a field the message does not declare' do
+      form = FactoryBot.create(:form_description, conference:)
+      store_document(form, {options: [{value: 'gold', name: 'Gold', retiredField: true}]})
 
-      expect(form.fallback_options).to eq([])
+      expect(described_class.find(form.id).fallback_options.options.map(&:value)).to eq(['gold'])
     end
 
-    it 'adds validation error for invalid JSON' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '{invalid json}'
+    it 'reads a document in the lowerCamelCase JSON names' do
+      form = FactoryBot.create(:form_description, conference:)
+      store_document(form, {options: [{value: 'gold', name: 'Gold', priorityHuman: ['Gold'], conditions: [{boothRequest: false}]}]})
 
-      expect(form).not_to be_valid
-      expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
+      option = described_class.find(form.id).fallback_options.options.first
+      expect(option.priority_human.to_a).to eq(['Gold'])
+      expect(option.conditions.first).to have_attributes(has_booth_request?: true, booth_request: false)
     end
 
-    it 'handles nil as is (uses default)' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = nil
-      form.save!
+    it 'reads a document in the .proto field names, as the migration leaves it' do
+      form = FactoryBot.create(:form_description, conference:)
+      store_document(form, {options: [{value: 'gold', name: 'Gold', priority_human: ['Gold'], conditions: [{booth_request: false}]}]})
 
-      expect(form.fallback_options).to eq([])
+      option = described_class.find(form.id).fallback_options.options.first
+      expect(option.priority_human.to_a).to eq(['Gold'])
+      expect(option.conditions.first).to have_attributes(has_booth_request?: true, booth_request: false)
     end
 
-    it 'adds validation error for non-array JSON' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '{"key": "value"}'
+    it 'casts a Hash to the message' do
+      form = described_class.new(fallback_options: {options: [{value: 'gold', name: 'Gold', conditions: [{plans: ['Platinum']}]}]})
 
-      expect(form).not_to be_valid
-      expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
+      expect(form.fallback_options).to be_a(Rk::SponsorApp::Internal::FallbackOptions)
+      expect(form.fallback_options.options.first.conditions.first.plans.to_a).to eq(['Platinum'])
     end
 
-    it 'adds validation error for array items missing required keys' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '[{"value": "option1"}]'
+    it 'accepts options sharing a value under different conditions' do
+      platinum = ->(booth_request) { Rk::SponsorApp::Internal::FallbackOption::Condition.new(plans: ['Platinum'], booth_request:) }
+      form = FactoryBot.build(:form_description, conference:, fallback_options: Rk::SponsorApp::Internal::FallbackOptions.new(options: [
+        Rk::SponsorApp::Internal::FallbackOption.new(value: 'gold', name: 'Gold, booth or not', conditions: [platinum.(true)]),
+        Rk::SponsorApp::Internal::FallbackOption.new(value: 'gold', name: 'Gold', conditions: [platinum.(false)]),
+      ]))
 
-      expect(form).not_to be_valid
-      expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
+      expect(form).to be_valid
     end
 
-    it 'adds validation error for array with non-hash items' do
-      form = FactoryBot.build(:form_description, conference:, locale: 'en')
-      form.fallback_options = '["string1", "string2"]'
+    describe 'buf.validate rules' do
+      let(:form) { FactoryBot.build(:form_description, conference:, fallback_options:) }
 
-      expect(form).not_to be_valid
-      expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
-    end
-
-    [
-      '[null]',
-      '[1]',
-      '[["a"]]',
-      '[{"value": "a", "name": "A", "conditions": "x"}]',
-      '[{"value": "a", "name": "A", "conditions": {"plans": ["Ruby"]}}]',
-      '[{"value": "a", "name": "A", "conditions": [1]}]',
-      '[{"value": "a", "name": "A", "conditions": ["x"]}]',
-    ].each do |json|
-      it "adds validation error for malformed shape #{json}" do
-        form = FactoryBot.build(:form_description, conference:, locale: 'en')
-        form.fallback_options = json
+      it 'reports a broken rule on the attribute, naming the field' do
+        form.fallback_options.options << Rk::SponsorApp::Internal::FallbackOption.new(value: '', name: 'Nameless')
 
         expect(form).not_to be_valid
-        expect(form.errors[:fallback_options]).to include('must be valid JSON struct')
+        expect(form.errors[:fallback_options]).to eq(['options[2].value: value is required'])
+      end
+
+      it 'reports a blank name' do
+        form.fallback_options.options.first.name = '  '
+
+        expect(form).not_to be_valid
+        expect(form.errors[:fallback_options]).to eq(['options[0].name: value must not be blank'])
+      end
+
+      it 'rejects options sharing both value and conditions' do
+        form.fallback_options.options << Rk::SponsorApp::Internal::FallbackOption.new(value: 'withdraw', name: 'Withdraw again')
+
+        expect(form).not_to be_valid
+        expect(form.errors[:fallback_options]).to eq(['options: options sharing a value must differ in their conditions'])
+      end
+
+      it 'reports a list too long to check for repeats by its size alone' do
+        form.fallback_options = Rk::SponsorApp::Internal::FallbackOptions.new(
+          options: Array.new(100) { |i| Rk::SponsorApp::Internal::FallbackOption.new(value: "option#{i}", name: 'Option') },
+        )
+
+        expect(form).not_to be_valid
+        expect(form.errors[:fallback_options]).to eq(['options: must contain no more than 50 item(s)'])
+      end
+
+      it 'rejects a condition that names neither plans nor a booth request' do
+        form.fallback_options.options.first.conditions << Rk::SponsorApp::Internal::FallbackOption::Condition.new
+
+        expect(form).not_to be_valid
+        expect(form.errors[:fallback_options]).to eq(['options[0].conditions[1]: a condition must name plans or a booth request'])
+      end
+
+      it 'is checked by save' do
+        form.fallback_options.options.first.value = ''
+
+        expect { form.save! }.to raise_error(ActiveRecord::RecordInvalid, /options\[0\]\.value: value is required/)
+      end
+    end
+
+    it 'rejects a condition naming a plan the conference does not have' do
+      fallback_options.options.first.conditions.first.plans << 'Diamond'
+      form = FactoryBot.build(:form_description, conference:, fallback_options:)
+
+      expect(form).not_to be_valid
+      expect(form.errors[:fallback_options]).to eq(['option 1, condition 1 names Diamond, which is not a plan of the conference'])
+      expect(form.errors.details[:fallback_options]).to eq([{error: :unknown_plan}])
+    end
+
+    it 'names every plan of a condition the conference does not have in one error' do
+      fallback_options.options.first.conditions.first.plans.push('Diamond', 'Emerald')
+      form = FactoryBot.build(:form_description, conference:, fallback_options:)
+
+      expect(form).not_to be_valid
+      expect(form.errors[:fallback_options]).to eq(['option 1, condition 1 names Diamond and Emerald, which are not plans of the conference'])
+    end
+  end
+
+  describe 'the fallback options db/seeds.rb loads' do
+    %w[en ja].each do |locale|
+      it "decodes misc/fallback_options_#{locale}.jsonnet into a message breaking no rule" do
+        json = Jsonnet::VM.evaluate_file(Rails.root.join("misc/fallback_options_#{locale}.jsonnet").to_s)
+        fallback_options = Rk::SponsorApp::Internal::FallbackOptions.decode_json(json)
+
+        expect(fallback_options.options.size).to eq(12)
+        expect(Protovalidate.collect_violations(fallback_options)).to be_empty
       end
     end
   end

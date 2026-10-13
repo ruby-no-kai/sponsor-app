@@ -213,6 +213,21 @@ mise run lint:proto     # buf lint and buf format check
 - Sorbet ignores the generated `.rbs`. Message types come from tapioca's Protobuf DSL compiler.
 - `proto/protobufable/` is copied from the protobufable gem for buf. Do not edit it; refresh it when bumping the gem (`spec/proto/vendored_protobufable_spec.rb` checks it).
 
+#### Messages in columns
+
+A `jsonb` column can hold a message rather than a Hash: `form_descriptions.fallback_options` is an `Rk::SponsorApp::Internal::FallbackOptions`. Such messages live in `proto/rubykaigi/sponsor_app/internal/` (package `rubykaigi.sponsor_app.internal`, Ruby `Rk::SponsorApp::Internal`). They are storage, never part of a service: `spec/proto/services_spec.rb` fails on any `.internal.` type an RPC reaches, and `buf.gen.es.yaml` leaves them out of `ui/src/gen`. The API publishes a message of its own, and controllers and resources copy between the two field by field.
+
+- In `rails c`, `FormDescription.first.fallback_options` is the message. A Hash or a ProtoJSON string assigned to the attribute is cast to it.
+- The column stores ProtoJSON with every field present, in the `.proto` field names (`priority_human`). Reads accept the lowerCamelCase JSON names too and ignore unknown fields.
+- `ApplicationRecord` includes `Protobufable::ColumnValidatable`, so the message's `buf.validate` rules run before save, one error on the attribute per violation. Ruby validations remain only for what needs a query.
+
+To add one:
+
+1. Define the message under `proto/rubykaigi/sponsor_app/internal/` and run `mise run gen`.
+2. Declare `attribute :name, Protobufable::JsonType.new(Rk::SponsorApp::Internal::Foo, preserve_proto_fieldnames: true), default: -> { Rk::SponsorApp::Internal::Foo.new }` on the model.
+3. Migrate the stored documents to the message's shape in SQL, without loading models or messages.
+4. Declare the reader's type in `sorbet/rbi/shims/<model>.rbi`, as tapioca types the attribute untyped.
+
 ### Connect RPC API
 
 Rails serves the services in `proto/` over the [Connect protocol](https://connectrpc.com/docs/protocol/) with connect_rpc_rails: `AdminService` for staff and `SponsorService` for sponsors, at `/rubykaigi.sponsor_app.<Service>/<Rpc>`. Unary only, by POST with JSON or binary protobuf, and by GET for RPCs marked `idempotency_level = NO_SIDE_EFFECTS`.
@@ -221,6 +236,7 @@ Rails serves the services in `proto/` over the [Connect protocol](https://connec
 - Every RPC declares its policy right above its `def`: `authorize :any_staff`, `:unrestricted_staff` or `:conference` on `AdminService`, `authorize :sponsorship` or `:public` on `SponsorService`. Serving an RPC without one raises. `:conference` and `:sponsorship` read the request's `conference_slug`, which must be field 1.
 - Responses are built by Alba resources in `app/resources/api/`, bound to their message with `with_protobuf`. Controllers never build a response field by field.
 - Errors are problems: raise an `Errors::*` class from `app/models/errors.rb`, each typed by a `ProblemType` value in `proto/rubykaigi/sponsor_app/problem.proto`. Titles live under `problem_details.titles` in `config/locales/`. `buf.validate` rules on request fields are checked after authentication and answer `invalid_argument` with a `google.rpc.BadRequest`.
+- Create and Update requests carry their `<Resource>Input` in a field named `input`. Save with `save!`: a record failing validation is answered `invalid_argument` with `PROBLEM_TYPE_INVALID_RECORD` (`Errors::InvalidRecord`), whose `google.rpc.BadRequest` names `input.<field>` for each error on an attribute of the same name.
 - A POST must send `Connect-Protocol-Version: 1`, and a request whose `Sec-Fetch-Site` or `Origin` names another origin is refused (`ConnectForgeryProtection`).
 - Routes are drawn only when `config.x.connect_rpc.enabled` is set: always in development and test, and in production only with `SPONSOR_APP_CONNECT_RPC`, because CloudFront does not forward `Connect-Protocol-Version`, `Connect-Timeout-Ms` or `Sec-Fetch-Site`.
 
@@ -274,6 +290,7 @@ To add an SPA screen:
 4. Link with Kumo's `Link`, `LinkButton` or `Sidebar.MenuButton` and an `href`. A path in `paths.ts` navigates in place, and any other is a full page load of the HAML page.
 
 - `ui/src/lib/errors.ts` reads Connect error details: `fieldViolations` turns a `google.rpc.BadRequest` into TanStack Form errors, `problemTypeOf` maps a problem back to `ProblemType`, `requestIdOf` reads `google.rpc.RequestInfo`.
+- A form saves in TanStack Form's `onSubmit`, with `validators: {onChange: rejection.validate}` from `useSaveRejection` (`ui/src/lib/rejection.ts`). When the save fails it calls `rejection.reject(formApi, value, fieldViolations(error, {prefix: "input."}))`, `value` being what `onSubmit` was given. Its `<form noValidate onSubmit>` calls `rejection.submit(form)`. The errors stay on their fields until each field's value changes, and the form can be sent again meanwhile. Form values named after the Input's JSON fields make each violation's path, such as `fallbackOptions[1].value`, the name of its field (`ui/src/routes/admin/FormDescriptionEditor.tsx`). After saving, revalidate what changed with `mutate((key) => isRpcKeyOf(key, method))`.
 - `ui/src/lib/forms.ts` converts between input values and message fields: int64 IDs, `datetime-local` timestamps in the browser's time zone, and `optional` strings.
 - An RPC answering `unauthenticated` sends the browser to the Rails sign-in page, which brings it back afterwards. RPCs are same-origin and need no CSRF token.
 - Code imported by a `*.test.ts` must be erasable TypeScript with `.ts` import extensions, as Node strips the types without compiling. tsconfig's `erasableSyntaxOnly` enforces the former; a missing `.ts` extension surfaces only when `mise run ui:test` loads the module.

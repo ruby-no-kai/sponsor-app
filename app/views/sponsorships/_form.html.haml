@@ -152,7 +152,7 @@
         = form.label :booth_requested, class: 'form-check-label'
       %small.d-none.sponsorships_form_booth_request_uneligible.form-text.text-small.text-info= t('.booth_uneligible_plan_selected', plans: conference.plans.select(&:booth_eligible?).map(&:name).join(', '))
 
-  - if desc.fallback_options.present? && desc.fallback_options.any?
+  - if desc.fallback_options.options.any?
     %section.py-2.d-none.sponsorships_form_fallback_section{data: {locale_withdraw: t('.fallback_option_priority.withdraw'), locale_no_booth: t('.fallback_option_priority.no_booth'), locale_booth: t('.fallback_option_priority.booth')}}
       .form-group
         %h3= t('.fallback_option')
@@ -160,7 +160,7 @@
 
       .form-group
         = form.label :fallback_option
-        = form.select :fallback_option, options_for_select(desc.fallback_options.map {|opt| [opt.name, opt.value, {data: opt.to_dataset}] }, sponsorship.fallback_option), {include_blank: t('.fallback_option_blank')}, class: 'form-control'
+        = form.select :fallback_option, options_for_select(desc.fallback_options.options.map {|opt| [opt.name, opt.value, {data: fallback_option_data(opt)}] }, sponsorship.fallback_option), {include_blank: t('.fallback_option_blank')}, class: 'form-control'
 
       .form-group
         .card.d-none.sponsorships_form_fallback_priority

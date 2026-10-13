@@ -8,5 +8,6 @@
 
 require "connect_rpc_rails/protovalidate"
 require "protobufable/alba_binding"
-require "protobufable/protovalidate"
+require "protobufable/column_validatable"
 require "protobufable/connect"
+require "protobufable/protovalidate"

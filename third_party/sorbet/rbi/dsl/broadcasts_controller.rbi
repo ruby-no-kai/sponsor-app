@@ -15,6 +15,7 @@ class BroadcastsController
     include ::ApplicationHelper
     include ::Admin::BroadcastsHelper
     include ::Admin::SponsorshipsHelper
+    include ::FormDescriptionsHelper
     include ::ApplicationController::HelperMethods
 
     sig { params(html: T.untyped).returns(T.untyped) }

@@ -159,6 +159,32 @@ RSpec.describe Sponsorship, type: :model do
       other_sponsorship = FactoryBot.build(:sponsorship, conference: other_conference, organization:)
       expect(other_sponsorship).to be_valid
     end
+
+    describe 'fallback_option, when the applicant saves' do
+      let(:sponsorship) { FactoryBot.create(:sponsorship, conference:, plan:) }
+
+      before do
+        FactoryBot.create(:form_description, conference:, fallback_options: Rk::SponsorApp::Internal::FallbackOptions.new(
+          options: [Rk::SponsorApp::Internal::FallbackOption.new(value: 'gold', name: 'Change to Gold')],
+        ))
+      end
+
+      it 'accepts a value the form description offers' do
+        sponsorship.fallback_option = 'gold'
+        expect(sponsorship.valid?(:update_by_user)).to be(true)
+      end
+
+      it 'rejects a value the form description does not offer' do
+        sponsorship.fallback_option = 'diamond'
+        expect(sponsorship.valid?(:update_by_user)).to be(false)
+        expect(sponsorship.errors[:fallback_option]).to be_present
+      end
+
+      it 'accepts no fallback option' do
+        sponsorship.fallback_option = ''
+        expect(sponsorship.valid?(:update_by_user)).to be(true)
+      end
+    end
   end
 
   describe 'state management' do

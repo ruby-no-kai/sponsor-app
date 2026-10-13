@@ -23,6 +23,8 @@ module Api
 
     wrap_parameters false
 
+    rescue_from ActiveRecord::RecordInvalid, with: :render_invalid_record
+
     before_action :verify_connect_request_origin!
     before_action :set_locale
     before_action :populate_sentry_scope
@@ -129,6 +131,22 @@ module Api
 
       message = Rack::Utils::HTTP_STATUS_CODES.fetch(error.http_status) { error.code.to_s }
       ConnectRpcRails::Error.new(error.code, message, details: error.details)
+    end
+
+    # A Create or Update request carries its <Resource>Input in a field named `input`, whose fields
+    # the record's attributes map onto by name.
+    #: (ActiveRecord::RecordInvalid) -> void
+    private def render_invalid_record(error)
+      json_names = ConnectRpcRails::Codec::Json == connect_codec
+      input_field = connect_request.class.descriptor.lookup('input') #: Google::Protobuf::FieldDescriptor?
+      field_prefix = input_field ? (json_names ? input_field.json_name : input_field.name) : ''
+
+      render_problem_detailable(Errors::InvalidRecord.new(
+        record: error.record,
+        input_class: input_field&.subtype&.msgclass,
+        field_prefix:,
+        json_names:,
+      ))
     end
 
     # rescue_from swallows the problem before Sentry's middleware sees it, and Sentry does not

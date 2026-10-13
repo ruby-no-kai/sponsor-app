@@ -19,6 +19,7 @@ class ApplicationController
     include ::ApplicationHelper
     include ::Admin::BroadcastsHelper
     include ::Admin::SponsorshipsHelper
+    include ::FormDescriptionsHelper
 
     sig { returns(T.untyped) }
     def current_available_sponsorships; end

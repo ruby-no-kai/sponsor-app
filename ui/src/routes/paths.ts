@@ -9,6 +9,9 @@ export const paths = {
   conference: "/admin/conferences/:slug",
 
   // Form descriptions
+  formDescriptionNew: "/admin/conferences/:slug/form_descriptions/new",
+  formDescription: "/admin/conferences/:slug/form_descriptions/:locale",
+  formDescriptionEdit: "/admin/conferences/:slug/form_descriptions/:locale/edit",
 
   // Plans
 
