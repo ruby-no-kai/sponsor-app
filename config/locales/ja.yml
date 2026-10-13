@@ -50,6 +50,9 @@ ja:
         policy_acknowledged_at: 'ポリシー同意日時'
         policy_agreement: '上記ポリシーに同意する'
 
+      tito_ticket_retraction:
+        tito_registration: 'この登録'
+
       expense_report/status:
         draft: '下書き'
         submitted: '提出済み'
@@ -70,6 +73,10 @@ ja:
               not_eligible: "は選択されたスポンサープランでは対象外です"
             profile:
               too_long: "が長過ぎます。選択されたプランでは英文 %{maximum} ワード程度が上限となっています。"
+        tito_ticket_retraction:
+          attributes:
+            tito_registration:
+              unable_to_retract: 'は自動ではキャンセルできません'
 
   helpers:
     download_previously_uploaded: '(以前にアップロードしたファイルをダウンロードする)'
@@ -631,6 +638,10 @@ ja:
       back: 'スポンサーポータルへ戻る'
       intro: '運営チームからメールで配信したお知らせを新しい順に表示しています。最新の状況は%{link}をご確認ください。'
       portal: 'スポンサーポータル'
+    passes:
+      reason_required: 'キャンセル理由を入力してください。'
+      reason_too_long: 'キャンセル理由は %{count} 文字以内で入力してください。'
+      confirmation_required: '上記の内容を確認し、チェックを入れてください。'
 
     # Expense reports
 

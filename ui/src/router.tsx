@@ -357,6 +357,20 @@ export const router = createBrowserRouter([
                     (await import("./routes/sponsor/PassRedemptions.tsx")).default,
                 },
               },
+              {
+                path: paths.sponsorPassRetractionNew,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/sponsor/PassRetractionForm.tsx")).default,
+                },
+              },
+              {
+                path: paths.sponsorPassRetraction,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/sponsor/PassRetraction.tsx")).default,
+                },
+              },
 
               // Sponsor: Expense reports
 

@@ -2,20 +2,20 @@
 // @generated from file rubykaigi/sponsor_app/sponsor_passes.proto (package rubykaigi.sponsor_app, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
+import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { Conference } from "./conference_pb.ts";
 import { file_rubykaigi_sponsor_app_conference } from "./conference_pb.ts";
 import type { TitoDiscountCode_Kind } from "./tito_discount_code_pb.ts";
 import { file_rubykaigi_sponsor_app_tito_discount_code } from "./tito_discount_code_pb.ts";
-import type { Message } from "@bufbuild/protobuf";
+import type { Message, UnknownEnum } from "@bufbuild/protobuf";
 
 /**
  * Describes the file rubykaigi/sponsor_app/sponsor_passes.proto.
  */
 export const file_rubykaigi_sponsor_app_sponsor_passes: GenFile = /*@__PURE__*/
-  fileDesc("CipydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvc3BvbnNvcl9wYXNzZXMucHJvdG8SFXJ1YnlrYWlnaS5zcG9uc29yX2FwcCJ/ChBQYXNzRGlzY291bnRDb2RlEjoKBGtpbmQYASABKA4yLC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuVGl0b0Rpc2NvdW50Q29kZS5LaW5kEgsKA3VybBgCIAEoCRIVCghxdWFudGl0eRgDIAEoBUgAiAEBQgsKCV9xdWFudGl0eSKGAQoKUGFzc1RpY2tldBIRCglyZWZlcmVuY2UYASABKAkSGQoMcmVsZWFzZV9zbHVnGAIgASgJSACIAQESEgoFZW1haWwYAyABKAlIAYgBARINCgVzdGF0ZRgEIAEoCRIMCgR2b2lkGAUgASgIQg8KDV9yZWxlYXNlX3NsdWdCCAoGX2VtYWlsIpgBChBQYXNzUmVnaXN0cmF0aW9uEgoKAmlkGAEgASgJEhEKCXJlZmVyZW5jZRgCIAEoCRISCgVlbWFpbBgDIAEoCUgAiAEBEhMKC3JldHJhY3RhYmxlGAQgASgIEjIKB3RpY2tldHMYBSADKAsyIS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuUGFzc1RpY2tldEIICgZfZW1haWwiYwooU3BvbnNvclNlcnZpY2VMaXN0UGFzc1JlZGVtcHRpb25zUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJCL/AQopU3BvbnNvclNlcnZpY2VMaXN0UGFzc1JlZGVtcHRpb25zUmVzcG9uc2USNQoKY29uZmVyZW5jZRgBIAEoCzIhLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Db25mZXJlbmNlEj8KDmRpc2NvdW50X2NvZGVzGAIgAygLMicucnVieWthaWdpLnNwb25zb3JfYXBwLlBhc3NEaXNjb3VudENvZGUSPgoNcmVnaXN0cmF0aW9ucxgDIAMoCzInLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5QYXNzUmVnaXN0cmF0aW9uEhoKEnJldHJhY3Rpb25fZW5hYmxlZBgEIAEoCEIR6gIOUms6OlNwb25zb3JBcHBiBnByb3RvMw", [file_buf_validate_validate, file_rubykaigi_sponsor_app_conference, file_rubykaigi_sponsor_app_tito_discount_code]);
+  fileDesc("CipydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvc3BvbnNvcl9wYXNzZXMucHJvdG8SFXJ1YnlrYWlnaS5zcG9uc29yX2FwcCJ/ChBQYXNzRGlzY291bnRDb2RlEjoKBGtpbmQYASABKA4yLC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuVGl0b0Rpc2NvdW50Q29kZS5LaW5kEgsKA3VybBgCIAEoCRIVCghxdWFudGl0eRgDIAEoBUgAiAEBQgsKCV9xdWFudGl0eSKGAQoKUGFzc1RpY2tldBIRCglyZWZlcmVuY2UYASABKAkSGQoMcmVsZWFzZV9zbHVnGAIgASgJSACIAQESEgoFZW1haWwYAyABKAlIAYgBARINCgVzdGF0ZRgEIAEoCRIMCgR2b2lkGAUgASgIQg8KDV9yZWxlYXNlX3NsdWdCCAoGX2VtYWlsIpgBChBQYXNzUmVnaXN0cmF0aW9uEgoKAmlkGAEgASgJEhEKCXJlZmVyZW5jZRgCIAEoCRISCgVlbWFpbBgDIAEoCUgAiAEBEhMKC3JldHJhY3RhYmxlGAQgASgIEjIKB3RpY2tldHMYBSADKAsyIS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuUGFzc1RpY2tldEIICgZfZW1haWwi1wMKDlBhc3NSZXRyYWN0aW9uEhwKFHRpdG9fcmVnaXN0cmF0aW9uX2lkGAEgASgJEjoKBXN0YXRlGAIgASgOMisucnVieWthaWdpLnNwb25zb3JfYXBwLlBhc3NSZXRyYWN0aW9uLlN0YXRlEhEKCXJlZmVyZW5jZRgDIAEoCRISCgVlbWFpbBgEIAEoCUgAiAEBEj0KB3RpY2tldHMYBSADKAsyLC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuUGFzc1JldHJhY3Rpb24uVGlja2V0EhMKC3JldHJhY3RhYmxlGAYgASgIEhMKBnJlYXNvbhgHIAEoCUgBiAEBGmUKBlRpY2tldBIRCglyZWZlcmVuY2UYASABKAkSGQoMcmVsZWFzZV9zbHVnGAIgASgJSACIAQESEgoFZW1haWwYAyABKAlIAYgBAUIPCg1fcmVsZWFzZV9zbHVnQggKBl9lbWFpbCJfCgVTdGF0ZRIVChFTVEFURV9VTlNQRUNJRklFRBAAEhcKE1NUQVRFX05PVF9SRVFVRVNURUQQARIRCg1TVEFURV9QRU5ESU5HEAISEwoPU1RBVEVfQ09NUExFVEVEEANCCAoGX2VtYWlsQgkKB19yZWFzb24ipQEKE1Bhc3NSZXRyYWN0aW9uSW5wdXQScgoGcmVhc29uGAEgASgJQmK6SF+6AVQKJnBhc3NfcmV0cmFjdGlvbl9pbnB1dC5yZWFzb24ubm90X2JsYW5rEhd2YWx1ZSBtdXN0IG5vdCBiZSBibGFuaxoRdGhpcy50cmltKCkgIT0gJyfIAQFyAxjoBxIaCgljb25maXJtZWQYAiABKAhCB7pIBGoCCAEiYwooU3BvbnNvclNlcnZpY2VMaXN0UGFzc1JlZGVtcHRpb25zUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJCL/AQopU3BvbnNvclNlcnZpY2VMaXN0UGFzc1JlZGVtcHRpb25zUmVzcG9uc2USNQoKY29uZmVyZW5jZRgBIAEoCzIhLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Db25mZXJlbmNlEj8KDmRpc2NvdW50X2NvZGVzGAIgAygLMicucnVieWthaWdpLnNwb25zb3JfYXBwLlBhc3NEaXNjb3VudENvZGUSPgoNcmVnaXN0cmF0aW9ucxgDIAMoCzInLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5QYXNzUmVnaXN0cmF0aW9uEhoKEnJldHJhY3Rpb25fZW5hYmxlZBgEIAEoCCKVAQomU3BvbnNvclNlcnZpY2VHZXRQYXNzUmV0cmFjdGlvblJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSMgoUdGl0b19yZWdpc3RyYXRpb25faWQYAiABKAlCFLpIEXIPMg1eWzAtOV17MSwyMH0kIrcBCidTcG9uc29yU2VydmljZUdldFBhc3NSZXRyYWN0aW9uUmVzcG9uc2USNQoKY29uZmVyZW5jZRgBIAEoCzIhLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Db25mZXJlbmNlEjkKCnJldHJhY3Rpb24YAiABKAsyJS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuUGFzc1JldHJhY3Rpb24SGgoScmV0cmFjdGlvbl9lbmFibGVkGAMgASgIItsBCilTcG9uc29yU2VydmljZUNyZWF0ZVBhc3NSZXRyYWN0aW9uUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIyChR0aXRvX3JlZ2lzdHJhdGlvbl9pZBgCIAEoCUIUukgRcg8yDV5bMC05XXsxLDIwfSQSQQoFaW5wdXQYAyABKAsyKi5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuUGFzc1JldHJhY3Rpb25JbnB1dEIGukgDyAEBImcKKlNwb25zb3JTZXJ2aWNlQ3JlYXRlUGFzc1JldHJhY3Rpb25SZXNwb25zZRI5CgpyZXRyYWN0aW9uGAEgASgLMiUucnVieWthaWdpLnNwb25zb3JfYXBwLlBhc3NSZXRyYWN0aW9uQhHqAg5Sazo6U3BvbnNvckFwcGIGcHJvdG8z", [file_buf_validate_validate, file_rubykaigi_sponsor_app_conference, file_rubykaigi_sponsor_app_tito_discount_code]);
 
 /**
  * A discount code as the ticketing service applies it, through which a sponsor's people claim
@@ -115,7 +115,8 @@ export const PassTicketSchema: GenMessage<PassTicket> = /*@__PURE__*/
  */
 export type PassRegistration = Message<"rubykaigi.sponsor_app.PassRegistration"> & {
   /**
-   * Identifier of the registration on the ticketing service, in decimal digits.
+   * Identifier of the registration on the ticketing service, in decimal digits, which
+   * GetPassRetraction and CreatePassRetraction take.
    *
    * @generated from field: string id = 1;
    */
@@ -136,9 +137,9 @@ export type PassRegistration = Message<"rubykaigi.sponsor_app.PassRegistration">
   email?: string | undefined;
 
   /**
-   * Whether the sponsor can void the registration, provided the conference still allows it. Only a
-   * free, uncancelled registration whose tickets are all of one release and all claimed with the
-   * same one of the sponsorship's codes qualifies.
+   * Whether the sponsor can void the registration with CreatePassRetraction, provided the
+   * conference still allows it. Only a free, uncancelled registration whose tickets are all of one
+   * release and all claimed with the same one of the sponsorship's codes qualifies.
    *
    * @generated from field: bool retractable = 4;
    */
@@ -161,6 +162,184 @@ export const PassRegistrationSchema: GenMessage<PassRegistration> = /*@__PURE__*
   messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 2);
 
 /**
+ * The sponsor's request to void a registration and its tickets, which gives the tickets back to
+ * the sponsorship's discount codes. Before one is requested, the registration it would void.
+ *
+ * @generated from message rubykaigi.sponsor_app.PassRetraction
+ */
+export type PassRetraction = Message<"rubykaigi.sponsor_app.PassRetraction"> & {
+  /**
+   * Identifier of the registration on the ticketing service, in decimal digits.
+   *
+   * @generated from field: string tito_registration_id = 1;
+   */
+  titoRegistrationId: string;
+
+  /**
+   * How far the request has come.
+   *
+   * @generated from field: rubykaigi.sponsor_app.PassRetraction.State state = 2;
+   */
+  state: PassRetraction_State;
+
+  /**
+   * Reference the ticketing service shows for the registration, such as "ABCD".
+   *
+   * @generated from field: string reference = 3;
+   */
+  reference: string;
+
+  /**
+   * Email address of the person who registered. Absent when the ticketing service holds none.
+   *
+   * @generated from field: optional string email = 4;
+   */
+  email?: string | undefined;
+
+  /**
+   * Every ticket of the registration, all of which are voided together. Once requested, these are
+   * the tickets as they stood when the request was made.
+   *
+   * @generated from field: repeated rubykaigi.sponsor_app.PassRetraction.Ticket tickets = 5;
+   */
+  tickets: PassRetraction_Ticket[];
+
+  /**
+   * Whether the registration qualifies for voiding, as PassRegistration.retractable describes.
+   *
+   * @generated from field: bool retractable = 6;
+   */
+  retractable: boolean;
+
+  /**
+   * Why the sponsor asked to void the registration. Absent while state is STATE_NOT_REQUESTED.
+   *
+   * @generated from field: optional string reason = 7;
+   */
+  reason?: string | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.PassRetraction.
+ * Use `create(PassRetractionSchema)` to create a new message.
+ */
+export const PassRetractionSchema: GenMessage<PassRetraction> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 3);
+
+/**
+ * A ticket the request voids.
+ *
+ * @generated from message rubykaigi.sponsor_app.PassRetraction.Ticket
+ */
+export type PassRetraction_Ticket = Message<"rubykaigi.sponsor_app.PassRetraction.Ticket"> & {
+  /**
+   * Reference the ticketing service shows for the ticket, such as "ABCD-1".
+   *
+   * @generated from field: string reference = 1;
+   */
+  reference: string;
+
+  /**
+   * Slug of the ticket's release on the ticketing service, such as "sponsor". Absent for a
+   * release the organizers have not set up here.
+   *
+   * @generated from field: optional string release_slug = 2;
+   */
+  releaseSlug?: string | undefined;
+
+  /**
+   * Email address of the person the ticket is assigned to. Absent while it is unassigned.
+   *
+   * @generated from field: optional string email = 3;
+   */
+  email?: string | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.PassRetraction.Ticket.
+ * Use `create(PassRetraction_TicketSchema)` to create a new message.
+ */
+export const PassRetraction_TicketSchema: GenMessage<PassRetraction_Ticket> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 3, 0);
+
+/**
+ * How far the request has come.
+ *
+ * @generated from enum rubykaigi.sponsor_app.PassRetraction.State
+ */
+export const PassRetraction_State = {
+  /**
+   * The zero value proto3 requires. Never returned.
+   *
+   * @generated from enum value: STATE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED: 0,
+
+  /**
+   * Nothing has been requested for the registration yet.
+   *
+   * @generated from enum value: STATE_NOT_REQUESTED = 1;
+   */
+  NOT_REQUESTED: 1,
+
+  /**
+   * Requested, and the ticketing service has not voided the registration yet.
+   *
+   * @generated from enum value: STATE_PENDING = 2;
+   */
+  PENDING: 2,
+
+  /**
+   * The registration and its tickets are voided.
+   *
+   * @generated from enum value: STATE_COMPLETED = 3;
+   */
+  COMPLETED: 3,
+} as const;
+
+/**
+ * How far the request has come.
+ *
+ * @generated from enum rubykaigi.sponsor_app.PassRetraction.State
+ */
+export type PassRetraction_State = (typeof PassRetraction_State)[keyof typeof PassRetraction_State] | UnknownEnum;
+
+/**
+ * Describes the enum rubykaigi.sponsor_app.PassRetraction.State.
+ */
+export const PassRetraction_StateSchema: GenEnum<PassRetraction_State> = /*@__PURE__*/
+  enumDesc(file_rubykaigi_sponsor_app_sponsor_passes, 3, 0);
+
+/**
+ * The writable fields of a PassRetraction.
+ *
+ * @generated from message rubykaigi.sponsor_app.PassRetractionInput
+ */
+export type PassRetractionInput = Message<"rubykaigi.sponsor_app.PassRetractionInput"> & {
+  /**
+   * Why the sponsor asks to void the registration. Required, and more than spaces.
+   *
+   * @generated from field: string reason = 1;
+   */
+  reason: string;
+
+  /**
+   * Whether the sponsor confirms having read what voiding does: every ticket of the registration
+   * is voided, and nobody is notified. Must be true.
+   *
+   * @generated from field: bool confirmed = 2;
+   */
+  confirmed: boolean;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.PassRetractionInput.
+ * Use `create(PassRetractionInputSchema)` to create a new message.
+ */
+export const PassRetractionInputSchema: GenMessage<PassRetractionInput> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 4);
+
+/**
  * Request for SponsorService.ListPassRedemptions.
  *
  * @generated from message rubykaigi.sponsor_app.SponsorServiceListPassRedemptionsRequest
@@ -179,7 +358,7 @@ export type SponsorServiceListPassRedemptionsRequest = Message<"rubykaigi.sponso
  * Use `create(SponsorServiceListPassRedemptionsRequestSchema)` to create a new message.
  */
 export const SponsorServiceListPassRedemptionsRequestSchema: GenMessage<SponsorServiceListPassRedemptionsRequest> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 3);
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 5);
 
 /**
  * Response for SponsorService.ListPassRedemptions.
@@ -222,5 +401,124 @@ export type SponsorServiceListPassRedemptionsResponse = Message<"rubykaigi.spons
  * Use `create(SponsorServiceListPassRedemptionsResponseSchema)` to create a new message.
  */
 export const SponsorServiceListPassRedemptionsResponseSchema: GenMessage<SponsorServiceListPassRedemptionsResponse> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 4);
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 6);
+
+/**
+ * Request for SponsorService.GetPassRetraction.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorServiceGetPassRetractionRequest
+ */
+export type SponsorServiceGetPassRetractionRequest = Message<"rubykaigi.sponsor_app.SponsorServiceGetPassRetractionRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * Identifier of the registration on the ticketing service, as PassRegistration.id gives it.
+   *
+   * @generated from field: string tito_registration_id = 2;
+   */
+  titoRegistrationId: string;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorServiceGetPassRetractionRequest.
+ * Use `create(SponsorServiceGetPassRetractionRequestSchema)` to create a new message.
+ */
+export const SponsorServiceGetPassRetractionRequestSchema: GenMessage<SponsorServiceGetPassRetractionRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 7);
+
+/**
+ * Response for SponsorService.GetPassRetraction.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorServiceGetPassRetractionResponse
+ */
+export type SponsorServiceGetPassRetractionResponse = Message<"rubykaigi.sponsor_app.SponsorServiceGetPassRetractionResponse"> & {
+  /**
+   * The conference sponsored, whose contact address takes requests to void a registration by hand.
+   *
+   * @generated from field: rubykaigi.sponsor_app.Conference conference = 1;
+   */
+  conference?: Conference | undefined;
+
+  /**
+   * The request to void the registration, or the registration before one is made.
+   *
+   * @generated from field: rubykaigi.sponsor_app.PassRetraction retraction = 2;
+   */
+  retraction?: PassRetraction | undefined;
+
+  /**
+   * Whether the conference still lets sponsors void a registration themselves.
+   *
+   * @generated from field: bool retraction_enabled = 3;
+   */
+  retractionEnabled: boolean;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorServiceGetPassRetractionResponse.
+ * Use `create(SponsorServiceGetPassRetractionResponseSchema)` to create a new message.
+ */
+export const SponsorServiceGetPassRetractionResponseSchema: GenMessage<SponsorServiceGetPassRetractionResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 8);
+
+/**
+ * Request for SponsorService.CreatePassRetraction.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorServiceCreatePassRetractionRequest
+ */
+export type SponsorServiceCreatePassRetractionRequest = Message<"rubykaigi.sponsor_app.SponsorServiceCreatePassRetractionRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * Identifier of the registration on the ticketing service, as PassRegistration.id gives it.
+   *
+   * @generated from field: string tito_registration_id = 2;
+   */
+  titoRegistrationId: string;
+
+  /**
+   * Why the sponsor asks to void the registration, and its confirmation of what voiding does.
+   *
+   * @generated from field: rubykaigi.sponsor_app.PassRetractionInput input = 3;
+   */
+  input?: PassRetractionInput | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorServiceCreatePassRetractionRequest.
+ * Use `create(SponsorServiceCreatePassRetractionRequestSchema)` to create a new message.
+ */
+export const SponsorServiceCreatePassRetractionRequestSchema: GenMessage<SponsorServiceCreatePassRetractionRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 9);
+
+/**
+ * Response for SponsorService.CreatePassRetraction.
+ *
+ * @generated from message rubykaigi.sponsor_app.SponsorServiceCreatePassRetractionResponse
+ */
+export type SponsorServiceCreatePassRetractionResponse = Message<"rubykaigi.sponsor_app.SponsorServiceCreatePassRetractionResponse"> & {
+  /**
+   * The request, voided on the ticketing service.
+   *
+   * @generated from field: rubykaigi.sponsor_app.PassRetraction retraction = 1;
+   */
+  retraction?: PassRetraction | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.SponsorServiceCreatePassRetractionResponse.
+ * Use `create(SponsorServiceCreatePassRetractionResponseSchema)` to create a new message.
+ */
+export const SponsorServiceCreatePassRetractionResponseSchema: GenMessage<SponsorServiceCreatePassRetractionResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_sponsor_passes, 10);
 

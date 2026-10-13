@@ -114,6 +114,22 @@ service SponsorService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
+  // Returns the sponsor's request to void a registration, or, before one is made, the registration
+  // as the ticketing service has it now. Answers `not_found` for a registration not made through
+  // the sponsorship's discount codes, and `failed_precondition` while the conference distributes
+  // no tickets through the ticketing service.
+  rpc GetPassRetraction(SponsorServiceGetPassRetractionRequest) returns (SponsorServiceGetPassRetractionResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Voids a registration made through the sponsorship's discount codes, with all of its tickets,
+  // and gives the tickets back to the codes. Nobody holding the tickets is notified. Answers
+  // `failed_precondition` once the conference stops letting sponsors void registrations,
+  // `not_found` as GetPassRetraction does, and `invalid_argument` for a registration that does not
+  // qualify (PassRegistration.retractable). When the ticketing service fails, the request is kept
+  // and calling again retries it. Calling again once it is voided answers it unchanged.
+  rpc CreatePassRetraction(SponsorServiceCreatePassRetractionRequest) returns (SponsorServiceCreatePassRetractionResponse);
+
   // Expense reports
 
   // Viewer

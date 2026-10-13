@@ -75,6 +75,8 @@ export const paths = {
   // Sponsor: Broadcasts and passes
   sponsorBroadcasts: "/conferences/:slug/sponsorship/broadcasts",
   sponsorPassRedemptions: "/conferences/:slug/sponsorship/pass_redemptions",
+  sponsorPassRetractionNew: "/conferences/:slug/sponsorship/pass_redemptions/:id/retraction/new",
+  sponsorPassRetraction: "/conferences/:slug/sponsorship/pass_redemptions/:id/retraction",
 
   // Sponsor: Expense reports
 } as const;

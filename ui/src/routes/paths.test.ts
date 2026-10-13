@@ -109,6 +109,8 @@ describe("isSpaPathname", () => {
     const base = "/conferences/rubykaigi2048/sponsorship";
     assert.ok(isSpaPathname(`${base}/broadcasts`));
     assert.ok(isSpaPathname(`${base}/pass_redemptions`));
+    assert.ok(isSpaPathname(`${base}/pass_redemptions/101/retraction/new`));
+    assert.ok(isSpaPathname(`${base}/pass_redemptions/101/retraction`));
     assert.ok(!isSpaPathname(`${base}/pass_redemptions/101`));
   });
 });

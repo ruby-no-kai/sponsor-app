@@ -35,6 +35,8 @@ module SponsorTranslations
     # Broadcasts and passes
     'broadcasts',
     'pass_redemptions',
+    'pass_retractions',
+    'sponsor_ui.passes',
     'sponsor_ui.broadcasts',
 
     # Expense reports

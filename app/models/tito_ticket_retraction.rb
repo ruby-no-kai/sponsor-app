@@ -89,9 +89,30 @@ class TitoTicketRetraction < ApplicationRecord
     preconds.satisfied?
   end
 
+  # Whether the registration was made under the sponsorship's Tito source, with its discount codes
+  # for the registration and every ticket. Tito also finds a registration by its slug, which the ID
+  # check rules out.
+  #: () -> bool
+  def registered_through_sponsorship?
+    registration = registration_maybe or return false
+    sponsorship = Must.expect(self.sponsorship)
+    codes = sponsorship.tito_discount_codes.pluck(:code)
+
+    return false unless registration.id.to_s == tito_registration_id
+    return false unless registration.source == sponsorship.tito_source_code
+    return false unless codes.include?(registration.discount_code)
+
+    registration.tickets.all? { |ticket| codes.include?(ticket.discount_code) }
+  end
+
   #: () -> String?
   def order_reference
     registration_maybe&.reference
+  end
+
+  #: () -> String?
+  def registration_email
+    registration_maybe&.email
   end
 
   #: () -> String
@@ -102,6 +123,12 @@ class TitoTicketRetraction < ApplicationRecord
   #: () -> Array[String?]?
   def ticket_release_slugs
     registration_maybe&.tickets&.map(&:release_slug)&.uniq
+  end
+
+  # Every ticket of the stored registration, all of which the retraction voids.
+  #: () -> Array[PassRedemption::Ticket]
+  def affected_tickets
+    registration_maybe&.tickets || []
   end
 
   #: () -> void
