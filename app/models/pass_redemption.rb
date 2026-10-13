@@ -99,6 +99,12 @@ class PassRedemption
       registration.tickets.select { |ticket| codes.include?(ticket.discount_code) }
     end
 
+    # Whether the registration holds tickets claimed with codes other than the sponsorship's.
+    #: (Registration) -> bool
+    def holds_other_codes?(registration)
+      tickets_for(registration).size < registration.tickets.size
+    end
+
     # Judges the shown tickets only. TitoTicketRetraction checks every ticket.
     #: (Registration) -> bool
     def retractable?(registration)

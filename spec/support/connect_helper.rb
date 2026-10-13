@@ -103,4 +103,15 @@ end
 
 RSpec.configure do |config|
   config.include ConnectHelper, type: :request
+
+  # An exception escaping the controller is answered by the exceptions app, as in production.
+  config.around(:each, :escaping_exceptions) do |example|
+    env_config = Rails.application.env_config
+    original = env_config.slice('action_dispatch.show_exceptions', 'action_dispatch.show_detailed_exceptions')
+    env_config['action_dispatch.show_exceptions'] = :all
+    env_config['action_dispatch.show_detailed_exceptions'] = false
+    example.run
+  ensure
+    env_config.merge!(original)
+  end
 end
