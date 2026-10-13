@@ -93,6 +93,38 @@ module Rk
 
       def initialize: (?init_map initial_value) -> void
     end
+
+    # Request for SponsorService.ListOpenConferences.
+    class SponsorServiceListOpenConferencesRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceListOpenConferencesRequest]
+
+      type init_map = {
+      }
+
+      def initialize: (?init_map initial_value) -> void
+    end
+
+    # Response for SponsorService.ListOpenConferences.
+    class SponsorServiceListOpenConferencesResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceListOpenConferencesResponse]
+
+      # Conferences taking applications now, oldest first.
+      attr_accessor conferences(): ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::Conference, ::Rk::SponsorApp::Conference]
+      def clear_conferences: () -> void
+
+      type init_map = {
+        conferences: ::Array[::Rk::SponsorApp::Conference]?,
+        "conferences" => ::Array[::Rk::SponsorApp::Conference]?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conferences" name) -> ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::Conference, ::Rk::SponsorApp::Conference]
+
+      def []=:
+          ("conferences" name, ::Google::Protobuf::RepeatedField[::Rk::SponsorApp::Conference, ::Rk::SponsorApp::Conference] value) -> void
+    end
   end
 end
 
@@ -104,6 +136,8 @@ module Google
         | ("rubykaigi.sponsor_app.SponsorServiceGetTranslationsResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceGetTranslationsResponse)])
         | ("rubykaigi.sponsor_app.SponsorServiceSetLocaleRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceSetLocaleRequest)])
         | ("rubykaigi.sponsor_app.SponsorServiceSetLocaleResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceSetLocaleResponse)])
+        | ("rubykaigi.sponsor_app.SponsorServiceListOpenConferencesRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceListOpenConferencesRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceListOpenConferencesResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceListOpenConferencesResponse)])
         | ...
     end
   end

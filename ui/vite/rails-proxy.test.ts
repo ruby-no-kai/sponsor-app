@@ -21,6 +21,7 @@ describe("destinationOf", () => {
       "spa",
     );
     assert.equal(destinationOf(req("HEAD", "/admin/conferences", page), BASE), "spa");
+    assert.equal(destinationOf(req("GET", "/", page), BASE), "spa");
   });
 
   it("renders the SPA for a path segment with dots, as an organization's domain has", () => {
@@ -56,11 +57,11 @@ describe("destinationOf", () => {
 
   it("proxies paths the SPA does not render", () => {
     for (const url of [
-      "/",
       "/admin/conferences/rubykaigi2048/sponsors_yml",
       "/admin/session/new?back_to=%2Fadmin",
       "/auth/github/callback",
       "/conferences/rubykaigi2048/sponsorship",
+      "/session/new",
       "/letter_opener",
       "/vite-dev/@vite/client",
     ]) {

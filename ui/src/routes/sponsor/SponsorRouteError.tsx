@@ -1,7 +1,7 @@
 import { Banner, Empty, LinkButton, Loader } from "@cloudflare/kumo";
 import { Code, ConnectError } from "@connectrpc/connect";
 import { MapTrifoldIcon, WarningIcon } from "@phosphor-icons/react";
-import { generatePath, isRouteErrorResponse, useParams, useRouteError } from "react-router";
+import { isRouteErrorResponse, useParams, useRouteError } from "react-router";
 import {
   isNotFoundError,
   isRetryable,
@@ -14,6 +14,7 @@ import type { Translate } from "../../lib/i18n.tsx";
 import { useDocumentTitle } from "../../lib/title.ts";
 import { toastManager } from "../../lib/toast.ts";
 import { ProblemBanner } from "../RouteError.tsx";
+import { dashboardPath } from "./shellRedirects.ts";
 import type { ErrorTexts } from "../RouteError.tsx";
 
 export function SponsorNotFound() {
@@ -54,10 +55,7 @@ function PreconditionNotice({ message }: { message: string }) {
   return (
     <div className="flex flex-col items-start gap-4">
       <Banner variant="alert" icon={<WarningIcon />} description={message} />
-      <LinkButton
-        href={generatePath("/conferences/:slug/sponsorship", { slug })}
-        variant="secondary"
-      >
+      <LinkButton href={dashboardPath(slug)} variant="secondary">
         {t("sponsor_ui.shell.back_to_portal")}
       </LinkButton>
     </div>

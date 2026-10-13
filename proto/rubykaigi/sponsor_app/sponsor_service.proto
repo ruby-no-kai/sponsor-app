@@ -36,6 +36,12 @@ service SponsorService {
   // cookie. Answers without a session too.
   rpc SetLocale(SponsorServiceSetLocaleRequest) returns (SponsorServiceSetLocaleResponse);
 
+  // Lists the conferences taking sponsorship applications now. A hidden conference, which takes
+  // applications by invitation only, is left out. Answers without a session too.
+  rpc ListOpenConferences(SponsorServiceListOpenConferencesRequest) returns (SponsorServiceListOpenConferencesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   // Applications
 
   // Exhibitions and events

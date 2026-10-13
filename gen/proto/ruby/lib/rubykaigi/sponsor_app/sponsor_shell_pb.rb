@@ -5,9 +5,10 @@
 require 'google/protobuf'
 
 require 'buf/validate/validate_pb'
+require 'rubykaigi/sponsor_app/conference_pb'
 
 
-descriptor_data = "\n)rubykaigi/sponsor_app/sponsor_shell.proto\x12\x15rubykaigi.sponsor_app\x1a\x1b\x62uf/validate/validate.proto\"&\n$SponsorServiceGetTranslationsRequest\"\x8f\x02\n%SponsorServiceGetTranslationsResponse\x12\x16\n\x06locale\x18\x01 \x01(\tR\x06locale\x12r\n\x0ctranslations\x18\x02 \x03(\x0b\x32N.rubykaigi.sponsor_app.SponsorServiceGetTranslationsResponse.TranslationsEntryR\x0ctranslations\x12\x19\n\x08org_name\x18\x03 \x01(\tR\x07orgName\x1a?\n\x11TranslationsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"G\n\x1eSponsorServiceSetLocaleRequest\x12%\n\x06locale\x18\x01 \x01(\tB\r\xbaH\nr\x08R\x02\x65nR\x02jaR\x06locale\"!\n\x1fSponsorServiceSetLocaleResponseB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
+descriptor_data = "\n)rubykaigi/sponsor_app/sponsor_shell.proto\x12\x15rubykaigi.sponsor_app\x1a\x1b\x62uf/validate/validate.proto\x1a&rubykaigi/sponsor_app/conference.proto\"&\n$SponsorServiceGetTranslationsRequest\"\x8f\x02\n%SponsorServiceGetTranslationsResponse\x12\x16\n\x06locale\x18\x01 \x01(\tR\x06locale\x12r\n\x0ctranslations\x18\x02 \x03(\x0b\x32N.rubykaigi.sponsor_app.SponsorServiceGetTranslationsResponse.TranslationsEntryR\x0ctranslations\x12\x19\n\x08org_name\x18\x03 \x01(\tR\x07orgName\x1a?\n\x11TranslationsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"G\n\x1eSponsorServiceSetLocaleRequest\x12%\n\x06locale\x18\x01 \x01(\tB\r\xbaH\nr\x08R\x02\x65nR\x02jaR\x06locale\"!\n\x1fSponsorServiceSetLocaleResponse\"*\n(SponsorServiceListOpenConferencesRequest\"p\n)SponsorServiceListOpenConferencesResponse\x12\x43\n\x0b\x63onferences\x18\x01 \x03(\x0b\x32!.rubykaigi.sponsor_app.ConferenceR\x0b\x63onferencesB\x11\xea\x02\x0eRk::SponsorAppb\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
@@ -18,5 +19,7 @@ module Rk
     SponsorServiceGetTranslationsResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.SponsorServiceGetTranslationsResponse").msgclass
     SponsorServiceSetLocaleRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.SponsorServiceSetLocaleRequest").msgclass
     SponsorServiceSetLocaleResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.SponsorServiceSetLocaleResponse").msgclass
+    SponsorServiceListOpenConferencesRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.SponsorServiceListOpenConferencesRequest").msgclass
+    SponsorServiceListOpenConferencesResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("rubykaigi.sponsor_app.SponsorServiceListOpenConferencesResponse").msgclass
   end
 end
