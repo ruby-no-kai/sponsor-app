@@ -13,7 +13,7 @@ import { erroredFields } from "../../../lib/fieldErrors.ts";
 import { useSaveRejection } from "../../../lib/rejection.ts";
 import { useRpcMutation } from "../../../lib/rpc.ts";
 import { notifyError, toastManager } from "../../../lib/toast.ts";
-import { ConfirmButton } from "../ConfirmButton.tsx";
+import { ConfirmAction } from "./ConfirmAction.tsx";
 import { ErrorList, joined, SaveErrorBanner, useFieldReveal } from "../FormParts.tsx";
 import { addAmounts, formatAmountAt, formatRate } from "./amounts.ts";
 import { useEditor } from "./EditorContext.ts";
@@ -147,7 +147,7 @@ export function LineItemForm({
   return (
     <form
       ref={formRef}
-      className="flex flex-col gap-4 p-4"
+      className="@container flex flex-col gap-4 px-4 py-3"
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
@@ -218,7 +218,7 @@ export function LineItemForm({
         </form.Field>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 @md:grid-cols-2 [&>*]:min-w-0">
         <form.Field name="amount">
           {(field) => (
             <Input
@@ -256,8 +256,11 @@ export function LineItemForm({
         {(errors) => values.taxMode !== "manual" && <ErrorList field="taxAmount" errors={errors} />}
       </form.Subscribe>
 
-      <Text variant="secondary" size="sm">
-        Total (incl. tax): {total === undefined ? "—" : formatAmountAt(total, decimal)}
+      <Text variant="secondary">
+        Total (incl. tax):{" "}
+        <span className="font-mono text-[0.9em] font-medium">
+          {total === undefined ? "—" : formatAmountAt(total, decimal)}
+        </span>
       </Text>
 
       <form.Field name="preliminal">
@@ -359,25 +362,25 @@ export function LineItemForm({
                 error={saveError}
                 onShow={reveal}
               />
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    loading={isSubmitting}
-                    disabled={!isChanged}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    loading={createLineItem.isMutating}
-                    onClick={() => void handleAddSameFiles()}
-                  >
-                    Add line with the same files
-                  </Button>
-                </div>
-                <ConfirmButton
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  loading={isSubmitting}
+                  disabled={!isChanged}
+                >
+                  Save
+                </Button>
+                <Button
+                  variant="secondary"
+                  loading={createLineItem.isMutating}
+                  onClick={() => void handleAddSameFiles()}
+                >
+                  Duplicate line, keep files
+                </Button>
+              </div>
+              <div className="flex border-t border-kumo-line pt-3">
+                <ConfirmAction
                   label="Delete"
                   icon={TrashIcon}
                   title="Delete this line item?"

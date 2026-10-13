@@ -1,7 +1,7 @@
 import { toJsonString } from "@bufbuild/protobuf";
-import { Badge, Banner, Button, Link, Loader, Text } from "@cloudflare/kumo";
+import { Badge, Banner, Button, Loader, Text } from "@cloudflare/kumo";
 import { ArrowLeftIcon, ChatTextIcon } from "@phosphor-icons/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { generatePath, useLocation, useNavigate, useParams } from "react-router";
 import { useSWRConfig } from "swr";
@@ -18,6 +18,7 @@ import type {
   ExpenseReportCalculation,
 } from "../../../gen/rubykaigi/sponsor_app/expense_report_pb.ts";
 import { idFromParam } from "../../../lib/forms.ts";
+import { PageHeader } from "../../../lib/PageHeader.tsx";
 import { callRpc, isRpcKeyOf, useRpc } from "../../../lib/rpc.ts";
 import { NotFound } from "../../RouteError.tsx";
 import { paths } from "../../paths.ts";
@@ -36,6 +37,7 @@ import {
   hashOf,
   isReadOnly,
   selectionFromHash,
+  unlinkedFiles,
 } from "./reportView.ts";
 import type { Selection } from "./reportView.ts";
 import { ReviewForm } from "./ReviewForm.tsx";
@@ -151,6 +153,21 @@ function ReportEditor({
     setPreviewFileId(undefined);
   }
 
+  // The panes of a wide window are never left empty while the report has something to show.
+  const hasSelection = selectedItem !== undefined || selectedFile !== undefined;
+  const firstItem = report.lineItems[0];
+  const firstFile = unlinkedFiles(report)[0];
+  useEffect(() => {
+    if (isMobile || hasSelection) return;
+    if (firstItem !== undefined) {
+      select({ kind: "item", id: firstItem.id });
+      setPreviewFileId(firstItem.fileIds[0]);
+    } else if (firstFile !== undefined) {
+      select({ kind: "file", id: firstFile.id });
+      setPreviewFileId(firstFile.id);
+    }
+  }, [isMobile, hasSelection, firstItem?.id, firstFile?.id]);
+
   function applyReport(next: ExpenseReport | undefined) {
     if (next === undefined) return;
     void mutateReport((current) => current && { ...current, report: next }, {
@@ -209,6 +226,9 @@ function ReportEditor({
   const status = labelOf(EXPENSE_REPORT_STATUS_LABELS, report.status);
   const remaining = subtractAmounts(calculation.totalFee, report.totalAmount);
   const sponsorshipName = response.sponsorship?.name ?? sponsorshipId;
+  const negative = remaining?.startsWith("-") ?? false;
+  const remainingFigure =
+    remaining === undefined ? undefined : formatAmountAt(remaining, calculation.decimal);
 
   let center: ReactNode;
   if (selectedItem !== undefined) {
@@ -227,7 +247,7 @@ function ReportEditor({
     center = <FileView file={selectedFile} onSelectItem={showItem} onDeleted={clearSelection} />;
   } else {
     center = (
-      <div className="flex flex-1 items-center justify-center p-4">
+      <div className="flex flex-1 items-center justify-center px-4 py-3">
         <Text variant="secondary">Select a line item</Text>
       </div>
     );
@@ -236,39 +256,28 @@ function ReportEditor({
   return (
     <EditorProvider value={editor}>
       <div className="flex flex-col gap-4">
-        <div>
-          <div className="flex flex-wrap gap-x-2 text-sm">
-            <Link href={generatePath(paths.conference, { slug })}>{conferenceName}</Link>
-            <span aria-hidden>›</span>
-            <Link href={generatePath(paths.expenseReports, { slug })}>Expense reports</Link>
-            <span aria-hidden>›</span>
-            <Link href={generatePath(paths.sponsorship, { slug, id: sponsorshipId })}>
-              {sponsorshipName}
-            </Link>
-          </div>
-          <Text variant="heading" size="lg" as="h2">
-            Expense report: {sponsorshipName}
-          </Text>
-        </div>
+        <PageHeader
+          crumbs={[
+            { label: conferenceName, href: generatePath(paths.conference, { slug }) },
+            { label: "Expense reports", href: generatePath(paths.expenseReports, { slug }) },
+            {
+              label: sponsorshipName,
+              href: generatePath(paths.sponsorship, { slug, id: sponsorshipId }),
+            },
+          ]}
+          title="Expense report"
+        />
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
           <Badge variant={status.tone}>{status.text}</Badge>
           <Figure label="Fee" value={formatAmountAt(calculation.totalFee, calculation.decimal)} />
-          <span>
-            <Figure
-              label="Expense"
-              value={formatAmountAt(report.totalAmount, calculation.decimal)}
-            />{" "}
-            <Figure
-              label="+ tax"
-              value={formatAmountAt(report.totalTaxAmount, calculation.decimal)}
-            />
-          </span>
-          {remaining !== undefined && (
+          <Figure label="Expense" value={formatAmountAt(report.totalAmount, calculation.decimal)} />
+          <Figure label="Tax" value={formatAmountAt(report.totalTaxAmount, calculation.decimal)} />
+          {remainingFigure !== undefined && (
             <Figure
               label="Remaining"
-              value={formatAmountAt(remaining, calculation.decimal)}
-              className={remaining.startsWith("-") ? "text-kumo-danger" : "text-kumo-success"}
+              value={remainingFigure}
+              className={negative ? "text-kumo-danger" : ""}
             />
           )}
         </div>
@@ -290,8 +299,8 @@ function ReportEditor({
         >
           {({ isDragging, hoverZone }) => (
             <div
-              className={`flex overflow-hidden rounded-lg border border-kumo-line bg-kumo-base ${
-                isMobile ? "min-h-[60vh] flex-col" : "h-[80vh]"
+              className={`overflow-clip rounded-lg border border-kumo-line bg-kumo-base ${
+                isMobile ? "flex flex-col" : "grid grid-cols-[16rem_minmax(0,4fr)_minmax(0,5fr)]"
               }`}
             >
               {(!isMobile || mobileView === "list") && (
@@ -317,7 +326,7 @@ function ReportEditor({
               {(!isMobile || mobileView === "detail") && (
                 <>
                   {isMobile && (
-                    <div className="border-b border-kumo-line p-2">
+                    <div className="border-b border-kumo-line px-2 py-1.5">
                       <Button
                         variant="secondary"
                         size="sm"
@@ -332,10 +341,7 @@ function ReportEditor({
                       </Button>
                     </div>
                   )}
-                  <div
-                    data-drop-zone="linked"
-                    className="relative flex min-h-0 min-w-64 flex-[4_0_0] flex-col overflow-auto"
-                  >
+                  <div data-drop-zone="linked" className="relative flex min-w-0 flex-col">
                     {center}
                     <DropZoneIndicator
                       visible={isDragging}
@@ -365,7 +371,21 @@ function ReportEditor({
           )}
         </FileDropOverlay>
 
-        {report.status !== ExpenseReport_Status.DRAFT && <ReviewForm />}
+        <div className="sticky bottom-0 z-20 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-kumo-line bg-kumo-base py-3 text-sm">
+          <Badge variant={status.tone}>{status.text}</Badge>
+          {remainingFigure !== undefined && (
+            <Figure
+              label="Remaining"
+              value={remainingFigure}
+              className={negative ? "text-kumo-danger" : ""}
+            />
+          )}
+          {report.status !== ExpenseReport_Status.DRAFT && (
+            <div className="flex min-w-0 items-center gap-2 max-md:basis-full md:ml-auto md:flex-1 md:justify-end">
+              <ReviewForm />
+            </div>
+          )}
+        </div>
 
         <UploadDialog state={upload.state} onRetry={upload.retry} onDiscard={upload.discard} />
       </div>
@@ -373,6 +393,7 @@ function ReportEditor({
   );
 }
 
+// A figure in running text, so its mono figures are a little smaller than the words around them.
 function Figure({
   label,
   value,
@@ -385,7 +406,7 @@ function Figure({
   return (
     <span className="whitespace-nowrap">
       <span className="text-kumo-subtle">{label}</span>{" "}
-      <strong className={`font-mono ${className}`}>{value}</strong>
+      <span className={`font-mono text-[0.9em] font-medium ${className}`}>{value}</span>
     </span>
   );
 }
