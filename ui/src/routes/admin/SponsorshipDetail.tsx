@@ -15,7 +15,7 @@ import type {
 } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 import { AdminService } from "../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
 import { SponsorshipState } from "../../gen/rubykaigi/sponsor_app/sponsorship_summary_pb.ts";
-import { idFromParam } from "../../lib/forms.ts";
+import { idFromParam, idToInput } from "../../lib/forms.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
 import { isRpcKeyOf, useRpc, useRpcMutation } from "../../lib/rpc.ts";
 import { notifyError, toastManager } from "../../lib/toast.ts";
@@ -24,8 +24,8 @@ import { paths } from "../paths.ts";
 import { ConfirmButton } from "./ConfirmButton.tsx";
 import { StaffNotes } from "./StaffNotes.tsx";
 import { useConferenceName, useConferenceTitle } from "./conferenceTitle.ts";
+import { SPONSOR_EVENT_STATUS_LABELS } from "./sponsorEventView.ts";
 import {
-  EVENT_STATUS_LABELS,
   EXPENSE_REPORT_STATUS_LABELS,
   boothStatus,
   customizationStatus,
@@ -137,10 +137,17 @@ function Detail({ slug, id, sponsorshipId }: { slug: string; id: string; sponsor
                 <Card title="Events">
                   <ul className="flex flex-col gap-1">
                     {sponsorship.sponsorEvents.map((event) => {
-                      const status = labelOf(EVENT_STATUS_LABELS, event.status);
+                      const status = labelOf(SPONSOR_EVENT_STATUS_LABELS, event.status);
                       return (
                         <li key={event.id.toString()} className="flex justify-between gap-2">
-                          <Link href={`${base}/events/${event.id}`}>{event.title}</Link>
+                          <Link
+                            href={generatePath(paths.sponsorEvent, {
+                              slug,
+                              id: idToInput(event.id),
+                            })}
+                          >
+                            {event.title}
+                          </Link>
                           <Badge variant={status.tone}>{status.text}</Badge>
                         </li>
                       );

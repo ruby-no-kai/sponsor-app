@@ -28,7 +28,7 @@ import type { FormDescription } from "../../gen/rubykaigi/sponsor_app/form_descr
 import { ProblemType } from "../../gen/rubykaigi/sponsor_app/problem_pb.ts";
 import { fieldViolations, problemTypeOf } from "../../lib/errors.ts";
 import type { FormErrors } from "../../lib/errors.ts";
-import { erroredFields } from "../../lib/fieldErrors.ts";
+import { erroredFields, errorsAt } from "../../lib/fieldErrors.ts";
 import { useSaveRejection } from "../../lib/rejection.ts";
 import { isRpcKeyOf, useRpc, useRpcMutation } from "../../lib/rpc.ts";
 import { useDocumentTitle } from "../../lib/title.ts";
@@ -53,7 +53,6 @@ import {
   defaultLocale,
   emptyCondition,
   emptyFallbackOption,
-  errorsAt,
   formValuesFrom,
   inputFrom,
   isBoothRequest,

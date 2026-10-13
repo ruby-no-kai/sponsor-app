@@ -287,50 +287,6 @@ module Rk
 
       # An event the sponsor hosts, such as a party or a meetup.
       class SponsorEvent < ::Google::Protobuf::AbstractMessage
-        # Where the organizers' review of the event stands.
-        module Status
-          extend ::Google::Protobuf::_EnumModule
-
-          # The zero value proto3 requires. Never returned.
-          STATUS_UNSPECIFIED: 0
-
-          # Submitted and awaiting review.
-          STATUS_PENDING: 1
-
-          # Accepted and listed.
-          STATUS_ACCEPTED: 2
-
-          # Turned down.
-          STATUS_REJECTED: 3
-
-          # Withdrawn by the sponsor.
-          STATUS_WITHDRAWN: 4
-
-          def self.lookup:
-              (0 number) -> :STATUS_UNSPECIFIED
-            | (1 number) -> :STATUS_PENDING
-            | (2 number) -> :STATUS_ACCEPTED
-            | (3 number) -> :STATUS_REJECTED
-            | (4 number) -> :STATUS_WITHDRAWN
-            | (::int number) -> names?
-            | ...
-
-          def self.resolve:
-              (:STATUS_UNSPECIFIED name) -> 0
-            | (:STATUS_PENDING name) -> 1
-            | (:STATUS_ACCEPTED name) -> 2
-            | (:STATUS_REJECTED name) -> 3
-            | (:STATUS_WITHDRAWN name) -> 4
-            | (::Symbol name) -> numbers?
-            | ...
-
-          type names = :STATUS_UNSPECIFIED | :STATUS_PENDING | :STATUS_ACCEPTED | :STATUS_REJECTED | :STATUS_WITHDRAWN
-
-          type strings = "STATUS_UNSPECIFIED" | "STATUS_PENDING" | "STATUS_ACCEPTED" | "STATUS_REJECTED" | "STATUS_WITHDRAWN"
-
-          type numbers = 0 | 1 | 2 | 3 | 4
-        end
-
         include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminSponsorship::SponsorEvent]
 
         # Event ID.
@@ -344,8 +300,8 @@ module Rk
         def clear_title: () -> void
 
         # Where the organizers' review stands.
-        attr_reader status(): ::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status::names | ::Integer
-        attr_writer status(): ::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status::names | ::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status::strings | ::Integer | ::Float
+        attr_reader status(): ::Rk::SponsorApp::SponsorEventStatus::names | ::Integer
+        attr_writer status(): ::Rk::SponsorApp::SponsorEventStatus::names | ::Rk::SponsorApp::SponsorEventStatus::strings | ::Integer | ::Float
         attr_reader status_const(): ::Integer
         def clear_status: () -> void
 
@@ -361,8 +317,8 @@ module Rk
           "id" => (::Integer | ::Float)?,
           title: (::String | ::Symbol)?,
           "title" => (::String | ::Symbol)?,
-          status: (::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status::names | ::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status::strings | ::Integer | ::Float)?,
-          "status" => (::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status::names | ::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status::strings | ::Integer | ::Float)?,
+          status: (::Rk::SponsorApp::SponsorEventStatus::names | ::Rk::SponsorApp::SponsorEventStatus::strings | ::Integer | ::Float)?,
+          "status" => (::Rk::SponsorApp::SponsorEventStatus::names | ::Rk::SponsorApp::SponsorEventStatus::strings | ::Integer | ::Float)?,
           starts_at: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
           "starts_at" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp::init_map)?,
         }
@@ -372,13 +328,13 @@ module Rk
         def []:
             ("id" name) -> ::Integer
           | ("title" name) -> ::String
-          | ("status" name) -> (::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status::names | ::Integer)
+          | ("status" name) -> (::Rk::SponsorApp::SponsorEventStatus::names | ::Integer)
           | ("starts_at" name) -> ::Google::Protobuf::Timestamp?
 
         def []=:
             ("id" name, (::Integer | ::Float) value) -> void
           | ("title" name, (::String | ::Symbol) value) -> void
-          | ("status" name, (::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status::names | ::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status::strings | ::Integer | ::Float) value) -> void
+          | ("status" name, (::Rk::SponsorApp::SponsorEventStatus::names | ::Rk::SponsorApp::SponsorEventStatus::strings | ::Integer | ::Float) value) -> void
           | ("starts_at" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
       end
 
@@ -802,7 +758,6 @@ module Google
         | ("rubykaigi.sponsor_app.AdminSponsorship.TitoDiscountCode" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminSponsorship::TitoDiscountCode)])
         | ("rubykaigi.sponsor_app.AdminSponsorship.TitoDiscountCode.Kind" name) -> (::Google::Protobuf::EnumDescriptor & ::Google::Protobuf::_SpecificEnumDescriptor[singleton(::Rk::SponsorApp::AdminSponsorship::TitoDiscountCode::Kind)])
         | ("rubykaigi.sponsor_app.AdminSponsorship.SponsorEvent" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminSponsorship::SponsorEvent)])
-        | ("rubykaigi.sponsor_app.AdminSponsorship.SponsorEvent.Status" name) -> (::Google::Protobuf::EnumDescriptor & ::Google::Protobuf::_SpecificEnumDescriptor[singleton(::Rk::SponsorApp::AdminSponsorship::SponsorEvent::Status)])
         | ("rubykaigi.sponsor_app.AdminSponsorship.ExpenseReport" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminSponsorship::ExpenseReport)])
         | ("rubykaigi.sponsor_app.AdminSponsorship.ExpenseReport.Status" name) -> (::Google::Protobuf::EnumDescriptor & ::Google::Protobuf::_SpecificEnumDescriptor[singleton(::Rk::SponsorApp::AdminSponsorship::ExpenseReport::Status)])
         | ...

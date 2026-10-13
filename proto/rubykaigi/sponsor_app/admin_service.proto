@@ -7,6 +7,7 @@ import "rubykaigi/sponsor_app/admin_conferences.proto";
 import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
 import "rubykaigi/sponsor_app/admin_organizations.proto";
 import "rubykaigi/sponsor_app/admin_plans.proto";
+import "rubykaigi/sponsor_app/admin_sponsor_events.proto";
 import "rubykaigi/sponsor_app/admin_sponsorships.proto";
 import "rubykaigi/sponsor_app/admin_viewer.proto";
 
@@ -177,6 +178,25 @@ service AdminService {
   rpc UpdateBoothAssignment(AdminServiceUpdateBoothAssignmentRequest) returns (AdminServiceUpdateBoothAssignmentResponse);
 
   // Sponsor events
+
+  // Lists every event the sponsors of a conference submitted, pending ones first.
+  rpc ListSponsorEvents(AdminServiceListSponsorEventsRequest) returns (AdminServiceListSponsorEventsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one event of a conference. An event of another conference is answered `not_found`.
+  rpc GetSponsorEvent(AdminServiceGetSponsorEventRequest) returns (AdminServiceGetSponsorEventResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Replaces every changeable field of an event, recording the signed-in staff member in its
+  // editing history, then publishes the change: a chat notification and, when the event is
+  // accepted or its status changes, the conference website's event list. Accepting an event that
+  // has a hero image also proposes the image to the website. A record failing validation, such as
+  // a slug another event of the conference has or a co-host that is no sponsorship of the
+  // conference, is answered `invalid_argument` with PROBLEM_TYPE_INVALID_RECORD. An event of
+  // another conference is answered `not_found`.
+  rpc UpdateSponsorEvent(AdminServiceUpdateSponsorEventRequest) returns (AdminServiceUpdateSponsorEventResponse);
 
   // Announcements
 

@@ -63,6 +63,13 @@ describe("isSpaPathname", () => {
   it("matches the booth assignment page", () => {
     assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/booth_assignment"));
   });
+
+  it("matches the sponsor event pages but leaves the hero image download to Rails", () => {
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/events"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/events/42"));
+    assert.ok(isSpaPathname("/admin/conferences/rubykaigi2048/events/42/edit"));
+    assert.ok(!isSpaPathname("/admin/conferences/rubykaigi2048/events/42/download_asset"));
+  });
 });
 
 describe("matchSpaPath", () => {

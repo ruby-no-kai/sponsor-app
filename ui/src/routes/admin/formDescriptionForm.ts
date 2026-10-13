@@ -7,7 +7,7 @@ import type {
   FormDescription,
 } from "../../gen/rubykaigi/sponsor_app/form_description_pb.ts";
 import type { FormErrors } from "../../lib/errors.ts";
-import type { FieldLayout, FieldMetas } from "../../lib/fieldErrors.ts";
+import type { FieldLayout } from "../../lib/fieldErrors.ts";
 
 // FallbackOption.Condition's optional booth_request as a select value, where "any" is unset.
 export type BoothRequest = "any" | "requested" | "not_requested";
@@ -173,26 +173,6 @@ export function planChoices(planNames: readonly string[], selected: readonly str
 export function movedIndex(from: number, offset: -1 | 1, length: number): number | undefined {
   const to = from + offset;
   return to < 0 || to >= length ? undefined : to;
-}
-
-const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-// Error messages on a path, and with items on the elements of the list it names, such as
-// `priorityHuman[1]`, which have no form field of their own.
-export function errorsAt(
-  fieldMeta: FieldMetas,
-  path: string,
-  { items = false }: { items?: boolean } = {},
-): string[] {
-  const itemPath = new RegExp(`^${escapeRegExp(path)}\\[(\\d+)\\]$`);
-  return Object.entries(fieldMeta).flatMap(([name, meta]) => {
-    const messages = (meta?.errors ?? []).filter(
-      (error): error is string => typeof error === "string",
-    );
-    if (name === path) return messages;
-    const item = items ? itemPath.exec(name) : null;
-    return item === null ? [] : messages.map((message) => `#${Number(item[1]) + 1}: ${message}`);
-  });
 }
 
 // Positions of the options that share a value and conditions, one list per group of them.

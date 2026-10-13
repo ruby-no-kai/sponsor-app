@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { erroredFields, fieldLabel, parentPath } from "./fieldErrors.ts";
+import { create, toBinary } from "@bufbuild/protobuf";
+import { Code, ConnectError } from "@connectrpc/connect";
+import { BadRequestSchema } from "../gen/google/rpc/error_details_pb.ts";
+import { fieldViolations } from "./errors.ts";
+import { erroredFields, errorsAt, fieldLabel, parentPath } from "./fieldErrors.ts";
 
 describe("parentPath", () => {
   it("steps up one segment at a time", () => {
@@ -35,5 +39,55 @@ describe("a layout without lists", () => {
       fields.map(({ path }) => path),
       ["contact.email", "contact.name", "plan", "unknown"],
     );
+  });
+});
+
+describe("errorsAt", () => {
+  // As TanStack Form holds the errors fieldViolations returned, under the field names.
+  function metasFor(...violations: { field: string; description: string }[]) {
+    const error = new ConnectError("invalid", Code.InvalidArgument);
+    error.details.push({
+      type: BadRequestSchema.typeName,
+      value: toBinary(BadRequestSchema, create(BadRequestSchema, { fieldViolations: violations })),
+    });
+    const { fields } = fieldViolations(error, { prefix: "input." });
+    return Object.fromEntries(
+      Object.entries(fields).map(([name, message]) => [name, { errors: [message] }]),
+    );
+  }
+
+  it("finds a violation at a nested field path", () => {
+    const metas = metasFor({
+      field: "input.fallbackOptions[1].value",
+      description: "value is required",
+    });
+
+    assert.deepEqual(errorsAt(metas, "fallbackOptions[1].value"), ["is required"]);
+    assert.deepEqual(errorsAt(metas, "fallbackOptions[0].value"), []);
+  });
+
+  it("finds a message-level violation on a list element", () => {
+    const metas = metasFor({
+      field: "input.fallbackOptions[0].conditions[1]",
+      description: "a condition must name plans or a booth request",
+    });
+
+    assert.deepEqual(errorsAt(metas, "fallbackOptions[0].conditions[1]"), [
+      "a condition must name plans or a booth request",
+    ]);
+  });
+
+  it("numbers the violations of list items when asked", () => {
+    const metas = metasFor(
+      { field: "input.fallbackOptions[0].priorityHuman", description: "too many" },
+      { field: "input.fallbackOptions[0].priorityHuman[1]", description: "too long" },
+      { field: "input.fallbackOptions[0].priorityHumanNote", description: "unrelated" },
+    );
+
+    assert.deepEqual(errorsAt(metas, "fallbackOptions[0].priorityHuman", { items: true }), [
+      "too many",
+      "#2: too long",
+    ]);
+    assert.deepEqual(errorsAt(metas, "fallbackOptions[0].priorityHuman"), ["too many"]);
   });
 });

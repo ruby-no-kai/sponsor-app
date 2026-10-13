@@ -4,10 +4,11 @@ import { create } from "@bufbuild/protobuf";
 import { ValueSchema } from "@bufbuild/protobuf/wkt";
 import {
   AdminSponsorshipSchema,
+  AdminSponsorship_ExpenseReport_Status,
   AdminSponsorship_TitoDiscountCode_Kind,
 } from "../../gen/rubykaigi/sponsor_app/admin_sponsorship_pb.ts";
 import {
-  EVENT_STATUS_LABELS,
+  EXPENSE_REPORT_STATUS_LABELS,
   boothStatus,
   customizationStatus,
   formatAmount,
@@ -78,7 +79,11 @@ describe("labels", () => {
       titoKindLabel(AdminSponsorship_TitoDiscountCode_Kind.BOOTH_PAID),
       "Exhibitor (Paid)",
     );
-    assert.equal(labelOf(EVENT_STATUS_LABELS, 99 as never).text, "99");
+    assert.equal(
+      labelOf(EXPENSE_REPORT_STATUS_LABELS, AdminSponsorship_ExpenseReport_Status.SUBMITTED).text,
+      "submitted",
+    );
+    assert.equal(labelOf(EXPENSE_REPORT_STATUS_LABELS, 99 as never).text, "99");
   });
 });
 

@@ -164,6 +164,9 @@ Rails.application.routes.draw do
       rpc 'UpdateBoothAssignment' => 'api/admin/booth_assignments'
 
       # Sponsor events
+      rpc 'ListSponsorEvents' => 'api/admin/sponsor_events'
+      rpc 'GetSponsorEvent' => 'api/admin/sponsor_events'
+      rpc 'UpdateSponsorEvent' => 'api/admin/sponsor_events'
 
       # Announcements
 

@@ -84,6 +84,27 @@ export function timestampFromInput(value: string): Timestamp | undefined {
   return timestampFromDate(date);
 }
 
+// The value of an <input type="datetime-local"> for a time kept as the wall clock at the venue,
+// which the Timestamp carries as the same reading in UTC. Seconds appear only when set.
+export function venueTimeToInput(timestamp: Timestamp | undefined): string {
+  if (timestamp === undefined) return "";
+  const iso = timestampDate(timestamp).toISOString();
+  const minutes = iso.slice(0, "YYYY-MM-DDTHH:MM".length);
+  const seconds = iso.slice("YYYY-MM-DDTHH:MM:".length, "YYYY-MM-DDTHH:MM:SS".length);
+  return seconds === "00" ? minutes : `${minutes}:${seconds}`;
+}
+
+const VENUE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?$/;
+
+// The Timestamp that reads the same as the input, in UTC whatever the browser's time zone is.
+export function venueTimeFromInput(value: string): Timestamp | undefined {
+  if (value === "") return undefined;
+  const date = VENUE_TIME.test(value) ? new Date(`${value}Z`) : undefined;
+  if (date === undefined || Number.isNaN(date.getTime()))
+    throw new RangeError(`not a datetime-local value: ${JSON.stringify(value)}`);
+  return timestampFromDate(date);
+}
+
 // dateStyle and timeStyle refuse timeZoneName, hence the components.
 const timestampFormat = new Intl.DateTimeFormat(undefined, {
   year: "numeric",
@@ -97,4 +118,18 @@ const timestampFormat = new Intl.DateTimeFormat(undefined, {
 // For display, in the browser's locale and time zone.
 export function formatTimestamp(timestamp: Timestamp | undefined, unset = "—"): string {
   return timestamp === undefined ? unset : timestampFormat.format(timestampDate(timestamp));
+}
+
+const venueTimestampFormat = new Intl.DateTimeFormat(undefined, {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "UTC",
+});
+
+// For display, in the browser's locale, as the wall clock at the venue: the UTC reading, no zone.
+export function formatVenueTimestamp(timestamp: Timestamp | undefined, unset = "—"): string {
+  return timestamp === undefined ? unset : venueTimestampFormat.format(timestampDate(timestamp));
 }
