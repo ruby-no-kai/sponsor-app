@@ -35,6 +35,13 @@ RSpec.describe 'Connect services' do # rubocop:disable RSpec/DescribeClass
           expect(policy).to be_present
         end
 
+        if policy == :conference
+          it "takes conference_slug as field 1, which its #{policy.inspect} policy reads" do
+            field = method.input_type.lookup('conference_slug')
+            expect([field&.number, field&.type]).to eq([1, :string])
+          end
+        end
+
         it 'references no internal type' do
           names = [method.input_type, method.output_type].flat_map { reachable_types(it).keys }
 
