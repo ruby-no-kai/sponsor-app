@@ -427,4 +427,137 @@ RSpec.describe 'SponsorService applications', type: :request do
       end
     end
   end
+
+  describe 'GetSponsorshipApplication' do
+    let(:rpc) { connect_method('SponsorService', 'GetSponsorshipApplication') }
+    let(:request_message) { slug_request(Rk::SponsorApp::SponsorServiceGetSponsorshipApplicationRequest) }
+
+    it 'answers unauthenticated without a sponsor session' do
+      expect(connect_call(rpc, request_message)).to have_attributes(code: 'unauthenticated')
+    end
+
+    context 'when signed in' do
+      before do
+        sponsorship.update!(number_of_additional_attendees: 2)
+        sponsorship.create_customization_request!(body: 'A lounge')
+        sign_in_sponsor(sponsorship.contact.email)
+      end
+
+      it 'returns the answers with the form' do
+        result = connect_call(rpc, request_message)
+
+        expect(result.form.plans.map(&:id)).to eq([plan.id])
+        expect(result.application).to have_attributes(
+          plan_id: plan.id, name: sponsorship.name, number_of_additional_attendees: 2, customization_request: 'A lounge',
+          has_alternate_billing_contact?: false,
+        )
+        expect(result.application.asset_file).to have_attributes(id: sponsorship.asset_file.id, extension: 'jpg')
+        expect(result).to have_attributes(amendment_open: true, accepted: false)
+      end
+
+      it 'answers a GET and a binary call alike' do
+        expected = connect_call(rpc, request_message)
+
+        expect(connect_call(rpc, request_message, via: :get)).to eq(expected)
+        expect(connect_call(rpc, request_message, codec: :proto)).to eq(expected)
+      end
+
+      it 'answers not_found for a conference the contact does not sponsor' do
+        other = FactoryBot.create(:conference, :full)
+        expect(connect_call(rpc, slug_request(Rk::SponsorApp::SponsorServiceGetSponsorshipApplicationRequest, other.slug))).to have_attributes(code: 'not_found')
+      end
+    end
+  end
+
+  describe 'UpdateSponsorship' do
+    let(:rpc) { connect_method('SponsorService', 'UpdateSponsorship') }
+
+    before { allow(ProcessSponsorshipEditJob).to receive(:perform_later) }
+
+    def update(input) = connect_call(rpc, slug_request(Rk::SponsorApp::SponsorServiceUpdateSponsorshipRequest, input:))
+
+    it 'answers unauthenticated without a sponsor session, before checking the input' do
+      expect(update(sponsorship_input)).to have_attributes(code: 'unauthenticated')
+      expect(update(Rk::SponsorApp::SponsorshipInput.new)).to have_attributes(code: 'unauthenticated')
+    end
+
+    context 'when signed in' do
+      before { sign_in_sponsor(sponsorship.contact.email) }
+
+      it 'updates the application as the sponsor, with a staff session too' do
+        sign_in_staff(FactoryBot.create(:staff))
+        sign_in_sponsor(sponsorship.contact.email)
+        sponsorship.create_note!(body: 'Old note')
+        sponsorship.create_alternate_billing_contact!(email: 'billing@contoso.invalid', address: 'Osaka', organization: 'Contoso', name: 'Billing')
+        https! # The locale cookie is Secure.
+        cookies[Rails.application.config.x.locale_cookie_name] = 'ja'
+
+        result = update(sponsorship_input(name: 'Renamed', customization_request: 'A lounge', number_of_additional_attendees: 3))
+
+        expect(result.sponsorship.name).to eq('Renamed')
+        sponsorship.reload
+        expect(sponsorship).to have_attributes(name: 'Renamed', locale: 'ja', number_of_additional_attendees: 3, note: nil, alternate_billing_contact: nil)
+        expect(sponsorship.customization_request.body).to eq('A lounge')
+        expect(sponsorship.contact).to have_attributes(email: 'contact@contoso.invalid', kind: 'primary')
+
+        history = sponsorship.editing_histories.reorder(:id).last
+        expect(history.staff).to be_nil
+        expect(ProcessSponsorshipEditJob).to have_received(:perform_later).with(history)
+      end
+
+      it 'ignores the logo ID while the application has a logo, which is replaced in place' do
+        asset_file = sponsorship.asset_file
+        other = SponsorshipAssetFile.prepare(conference:).tap(&:save!)
+
+        expect(update(sponsorship_input(asset_file_id: other.id)).sponsorship.id).to eq(sponsorship.id)
+        expect(sponsorship.reload.asset_file).to eq(asset_file)
+        expect(other.reload.sponsorship).to be_nil
+      end
+
+      it 'attaches a logo this browser uploaded to an application without one' do
+        sponsorship.asset_file.destroy!
+        asset_file = upload_asset_file
+
+        update(sponsorship_input(asset_file_id: asset_file.id))
+        expect(sponsorship.reload.asset_file).to eq(asset_file)
+        expect(session[:asset_file_ids]).to eq([])
+      end
+
+      it 'answers not_found for a logo another browser uploaded, attaching none' do
+        sponsorship.asset_file.destroy!
+        other = SponsorshipAssetFile.prepare(conference:).tap(&:save!)
+
+        expect(update(sponsorship_input(asset_file_id: other.id))).to have_attributes(code: 'not_found')
+        expect(sponsorship.reload.asset_file).to be_nil
+        expect(other.reload.sponsorship).to be_nil
+      end
+
+      it 'answers not_found for a logo this browser uploaded for another conference' do
+        sponsorship.asset_file.destroy!
+        asset_file = upload_asset_file(FactoryBot.create(:conference, :full, application_opens_at: 1.day.ago))
+
+        expect(update(sponsorship_input(asset_file_id: asset_file.id))).to have_attributes(code: 'not_found')
+        expect(asset_file.reload.sponsorship).to be_nil
+      end
+
+      it 'refuses a plan change once the application is accepted' do
+        sponsorship.update!(accepted: true)
+        gold = FactoryBot.create(:plan, conference:, name: 'Gold')
+
+        error = update(sponsorship_input(plan_id: gold.id))
+        expect(violations_of(error)).to eq([['input.planId', 'UNCHANGEABLE_AFTER_FINALIZATION']])
+        expect(sponsorship.reload.plan).to eq(plan)
+      end
+
+      it 'refuses every change once amendments close, for staff too' do
+        conference.update!(amendment_closes_at: 1.hour.ago)
+        expect(update(sponsorship_input(name: 'Renamed'))).to have_attributes(code: 'failed_precondition')
+
+        sign_in_staff(FactoryBot.create(:staff))
+        sign_in_sponsor(sponsorship.contact.email)
+        expect(update(sponsorship_input(name: 'Renamed'))).to have_attributes(code: 'failed_precondition')
+        expect(sponsorship.reload.name).not_to eq('Renamed')
+      end
+    end
+  end
 end

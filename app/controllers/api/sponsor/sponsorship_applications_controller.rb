@@ -66,6 +66,49 @@ module Api
         )
       end
 
+      authorize :sponsorship
+      #: () -> Rk::SponsorApp::SponsorServiceGetSponsorshipApplicationResponse
+      def get_sponsorship_application
+        sponsorship = current_sponsorship
+        conference = Must.expect(sponsorship.conference)
+
+        Rk::SponsorApp::SponsorServiceGetSponsorshipApplicationResponse.new(
+          form: application_form(conference),
+          application: Api::SponsorshipApplicationResource.new(sponsorship).as_protobuf,
+          amendment_open: !!conference.amendment_open?,
+          accepted: sponsorship.accepted?,
+        )
+      end
+
+      # Staff are held to the window too, as the HAML update is. The editing history records the
+      # change as the sponsor's.
+      authorize :sponsorship
+      #: () -> Rk::SponsorApp::SponsorServiceUpdateSponsorshipResponse
+      def update_sponsorship
+        input = connect_request.input #: Rk::SponsorApp::SponsorshipInput
+        sponsorship = current_sponsorship
+        conference = Must.expect(sponsorship.conference)
+        unless conference.amendment_open?
+          raise Errors::FailedPrecondition.new(detail: "The conference #{conference.slug.inspect} takes no amendments now.")
+        end
+        require_form_description!(conference)
+
+        assign_input(sponsorship, conference, input)
+        # InitiateSponsorshipAssetUpdate replaces a logo in place, so the Input only fills a missing one.
+        if !sponsorship.asset_file && input.has_asset_file_id?
+          asset_file = find_application_asset_file(input.asset_file_id, conference, sponsorship_ids: [])
+          sponsorship.asset_file = asset_file
+          session[:asset_file_ids] = session_asset_file_ids - [asset_file.id]
+        end
+        sponsorship.locale = I18n.locale.to_s
+        sponsorship.save!(context: :update_by_user)
+        ProcessSponsorshipEditJob.perform_later(sponsorship.last_editing_history)
+
+        Rk::SponsorApp::SponsorServiceUpdateSponsorshipResponse.new(
+          sponsorship: Api::SponsorshipResource.new(sponsorship).as_protobuf,
+        )
+      end
+
       #: (Sponsorship, Conference, Rk::SponsorApp::SponsorshipInput) -> void
       private def assign_input(sponsorship, conference, input)
         sponsorship.assign_attributes(

@@ -1020,6 +1020,133 @@ module Rk
           ("sponsorship" name, ::Rk::SponsorApp::Sponsorship? value) -> void
     end
 
+    # Request for SponsorService.GetSponsorshipApplication.
+    class SponsorServiceGetSponsorshipApplicationRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceGetSponsorshipApplicationRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+    end
+
+    # Response for SponsorService.GetSponsorshipApplication.
+    class SponsorServiceGetSponsorshipApplicationResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceGetSponsorshipApplicationResponse]
+
+      # The form.
+      attr_accessor form(): ::Rk::SponsorApp::ApplicationForm?
+      def has_form?: () -> bool
+      def clear_form: () -> void
+
+      # The answers as they stand.
+      attr_accessor application(): ::Rk::SponsorApp::SponsorshipApplication?
+      def has_application?: () -> bool
+      def clear_application: () -> void
+
+      # Whether the sponsor may still change the application. Once false, UpdateSponsorship refuses
+      # every change.
+      attr_accessor amendment_open(): bool
+      def clear_amendment_open: () -> void
+
+      # Whether the application is accepted, which fixes its plan.
+      attr_accessor accepted(): bool
+      def clear_accepted: () -> void
+
+      type init_map = {
+        form: (::Rk::SponsorApp::ApplicationForm | ::Rk::SponsorApp::ApplicationForm::init_map)?,
+        "form" => (::Rk::SponsorApp::ApplicationForm | ::Rk::SponsorApp::ApplicationForm::init_map)?,
+        application: (::Rk::SponsorApp::SponsorshipApplication | ::Rk::SponsorApp::SponsorshipApplication::init_map)?,
+        "application" => (::Rk::SponsorApp::SponsorshipApplication | ::Rk::SponsorApp::SponsorshipApplication::init_map)?,
+        amendment_open: bool?,
+        "amendment_open" => bool?,
+        accepted: bool?,
+        "accepted" => bool?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("form" name) -> ::Rk::SponsorApp::ApplicationForm?
+        | ("application" name) -> ::Rk::SponsorApp::SponsorshipApplication?
+        | ("amendment_open" name) -> bool
+        | ("accepted" name) -> bool
+
+      def []=:
+          ("form" name, ::Rk::SponsorApp::ApplicationForm? value) -> void
+        | ("application" name, ::Rk::SponsorApp::SponsorshipApplication? value) -> void
+        | ("amendment_open" name, bool value) -> void
+        | ("accepted" name, bool value) -> void
+    end
+
+    # Request for SponsorService.UpdateSponsorship.
+    class SponsorServiceUpdateSponsorshipRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceUpdateSponsorshipRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # Every answer, replacing what is stored.
+      attr_accessor input(): ::Rk::SponsorApp::SponsorshipInput?
+      def has_input?: () -> bool
+      def clear_input: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        input: (::Rk::SponsorApp::SponsorshipInput | ::Rk::SponsorApp::SponsorshipInput::init_map)?,
+        "input" => (::Rk::SponsorApp::SponsorshipInput | ::Rk::SponsorApp::SponsorshipInput::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("input" name) -> ::Rk::SponsorApp::SponsorshipInput?
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("input" name, ::Rk::SponsorApp::SponsorshipInput? value) -> void
+    end
+
+    # Response for SponsorService.UpdateSponsorship.
+    class SponsorServiceUpdateSponsorshipResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceUpdateSponsorshipResponse]
+
+      # The sponsorship as updated.
+      attr_accessor sponsorship(): ::Rk::SponsorApp::Sponsorship?
+      def has_sponsorship?: () -> bool
+      def clear_sponsorship: () -> void
+
+      type init_map = {
+        sponsorship: (::Rk::SponsorApp::Sponsorship | ::Rk::SponsorApp::Sponsorship::init_map)?,
+        "sponsorship" => (::Rk::SponsorApp::Sponsorship | ::Rk::SponsorApp::Sponsorship::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("sponsorship" name) -> ::Rk::SponsorApp::Sponsorship?
+
+      def []=:
+          ("sponsorship" name, ::Rk::SponsorApp::Sponsorship? value) -> void
+    end
+
     # Request for SponsorService.CreateSponsorshipAssetUpload.
     class SponsorServiceCreateSponsorshipAssetUploadRequest < ::Google::Protobuf::AbstractMessage
       include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::SponsorServiceCreateSponsorshipAssetUploadRequest]
@@ -1254,6 +1381,10 @@ module Google
         | ("rubykaigi.sponsor_app.SponsorServiceGetApplicationFormResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceGetApplicationFormResponse)])
         | ("rubykaigi.sponsor_app.SponsorServiceCreateSponsorshipRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateSponsorshipRequest)])
         | ("rubykaigi.sponsor_app.SponsorServiceCreateSponsorshipResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateSponsorshipResponse)])
+        | ("rubykaigi.sponsor_app.SponsorServiceGetSponsorshipApplicationRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceGetSponsorshipApplicationRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceGetSponsorshipApplicationResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceGetSponsorshipApplicationResponse)])
+        | ("rubykaigi.sponsor_app.SponsorServiceUpdateSponsorshipRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceUpdateSponsorshipRequest)])
+        | ("rubykaigi.sponsor_app.SponsorServiceUpdateSponsorshipResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceUpdateSponsorshipResponse)])
         | ("rubykaigi.sponsor_app.SponsorServiceCreateSponsorshipAssetUploadRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateSponsorshipAssetUploadRequest)])
         | ("rubykaigi.sponsor_app.SponsorServiceCreateSponsorshipAssetUploadResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceCreateSponsorshipAssetUploadResponse)])
         | ("rubykaigi.sponsor_app.SponsorServiceInitiateSponsorshipAssetUpdateRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::SponsorServiceInitiateSponsorshipAssetUpdateRequest)])

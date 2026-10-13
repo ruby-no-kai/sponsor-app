@@ -349,6 +349,49 @@ message SponsorServiceCreateSponsorshipResponse {
   Sponsorship sponsorship = 1;
 }
 
+// Request for SponsorService.GetSponsorshipApplication.
+message SponsorServiceGetSponsorshipApplicationRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+}
+
+// Response for SponsorService.GetSponsorshipApplication.
+message SponsorServiceGetSponsorshipApplicationResponse {
+  // The form.
+  ApplicationForm form = 1;
+
+  // The answers as they stand.
+  SponsorshipApplication application = 2;
+
+  // Whether the sponsor may still change the application. Once false, UpdateSponsorship refuses
+  // every change.
+  bool amendment_open = 3;
+
+  // Whether the application is accepted, which fixes its plan.
+  bool accepted = 4;
+}
+
+// Request for SponsorService.UpdateSponsorship.
+message SponsorServiceUpdateSponsorshipRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // Every answer, replacing what is stored.
+  SponsorshipInput input = 2 [(buf.validate.field).required = true];
+}
+
+// Response for SponsorService.UpdateSponsorship.
+message SponsorServiceUpdateSponsorshipResponse {
+  // The sponsorship as updated.
+  Sponsorship sponsorship = 1;
+}
+
 // Request for SponsorService.CreateSponsorshipAssetUpload.
 message SponsorServiceCreateSponsorshipAssetUploadRequest {
   // Slug of the conference to upload the logo for, such as "rubykaigi2048".
