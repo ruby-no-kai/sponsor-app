@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/sorah/protobufable.git
-  revision: f000d321a06633d8eff8b55f78b15069c02edc0c
-  ref: f000d321a06633d8eff8b55f78b15069c02edc0c
+  revision: bbb2280e68a3ebf784dd6435175eaa7f9b9b10a2
+  ref: bbb2280e68a3ebf784dd6435175eaa7f9b9b10a2
   specs:
     protobufable (0.1.0)
       actionpack (>= 7.1)

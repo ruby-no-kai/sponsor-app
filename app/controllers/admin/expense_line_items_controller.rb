@@ -14,10 +14,9 @@ module Admin
     protobuf_body Rk::SponsorApp::ExpenseLineItemPatch
     #: () -> void
     def create
-      patch = message #: Rk::SponsorApp::ExpenseLineItemPatch
-      validate_line_item_input!(patch)
-      file_ids = line_item_file_ids(patch)
-      @line_item = expense_report.line_items.build(line_item_attributes(patch))
+      validate_line_item_input!(message)
+      file_ids = line_item_file_ids(message)
+      @line_item = expense_report.line_items.build(line_item_attributes(message))
       @line_item.assign_next_position
 
       ActiveRecord::Base.transaction do
@@ -32,12 +31,11 @@ module Admin
     protobuf_body Rk::SponsorApp::ExpenseLineItemPatch
     #: () -> void
     def update
-      patch = message #: Rk::SponsorApp::ExpenseLineItemPatch
-      validate_line_item_input!(patch)
-      file_ids = line_item_file_ids(patch)
+      validate_line_item_input!(message)
+      file_ids = line_item_file_ids(message)
 
       ActiveRecord::Base.transaction do
-        line_item.assign_attributes(line_item_attributes(patch))
+        line_item.assign_attributes(line_item_attributes(message))
         sync_file_ids(file_ids) if file_ids
         line_item.save!
         reindex_positions if line_item.saved_change_to_position?

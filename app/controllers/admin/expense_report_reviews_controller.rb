@@ -12,14 +12,13 @@ module Admin
     protobuf_body Rk::SponsorApp::ExpenseReportReviewInput
     #: () -> void
     def create
-      input = message #: Rk::SponsorApp::ExpenseReportReviewInput
       submission = expense_report.current_submission
       raise ActiveRecord::RecordNotFound unless submission
 
       ExpenseReportReview.create_for!(
         submission,
-        action: review_action(input),
-        comment: input.comment.presence,
+        action: review_action(message),
+        comment: message.comment.presence,
         staff: current_staff,
       )
 
