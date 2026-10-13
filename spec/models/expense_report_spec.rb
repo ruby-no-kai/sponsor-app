@@ -79,8 +79,8 @@ RSpec.describe ExpenseReport, type: :model do
       expect { report.submit! }.to change(ExpenseReportSubmission, :count).by(1)
       submission = report.current_submission
       expect(submission.revision).to eq(1)
-      expect(submission.data).to be_a(Hash)
-      expect(submission.data['line_items']).to be_present
+      expect(submission.data).to have_attributes(id: report.id, status: 'submitted', revision: 1, total_amount: '0.0', total_tax_amount: '0.0')
+      expect(submission.data.line_items.size).to eq(1)
     end
 
     it 'raises when not draft' do
@@ -128,6 +128,32 @@ RSpec.describe ExpenseReport, type: :model do
     end
   end
 
+  describe '#build_snapshot_data' do
+    it 'snapshots the report and its line items in position order' do
+      report = FactoryBot.create(:expense_report, sponsorship:, total_amount: 1500, total_tax_amount: 100)
+      file = FactoryBot.create(:expense_file, sponsorship:)
+      novelty = FactoryBot.create(:expense_line_item, expense_report: report, title: 'Novelty', notes: 'Exempt', amount: 500, tax_rate: nil, tax_amount: 0, preliminal: true, position: 2)
+      booth = FactoryBot.create(:expense_line_item, expense_report: report, title: 'Booth', amount: 1000, tax_rate: '0.1', position: 1)
+      booth.expense_line_item_files.create!(expense_file: file)
+
+      expect(report.reload.build_snapshot_data).to eq(Rk::SponsorApp::Internal::ExpenseReportSnapshot.new(
+        id: report.id,
+        status: 'draft',
+        total_amount: '1500.0',
+        total_tax_amount: '100.0',
+        revision: 0,
+        line_items: [
+          Rk::SponsorApp::Internal::ExpenseReportSnapshot::LineItem.new(
+            id: booth.id, title: 'Booth', amount: '1000.0', tax_rate: '0.1', tax_amount: '100.0', preliminal: false, position: 1, file_ids: [file.id],
+          ),
+          Rk::SponsorApp::Internal::ExpenseReportSnapshot::LineItem.new(
+            id: novelty.id, title: 'Novelty', notes: 'Exempt', amount: '500.0', tax_amount: '0.0', preliminal: true, position: 2,
+          ),
+        ],
+      ))
+    end
+  end
+
   describe '#refresh_submission_snapshot' do
     it 'updates current submission data when submitted' do
       report = FactoryBot.create(:expense_report, sponsorship:)
@@ -139,7 +165,7 @@ RSpec.describe ExpenseReport, type: :model do
       report.refresh_submission_snapshot
 
       submission = report.current_submission.reload
-      expect(submission.data['line_items'].size).to eq(2)
+      expect(submission.data.line_items.map(&:amount)).to eq(['500.0', '1000.0'])
     end
 
     it 'does nothing when draft' do
