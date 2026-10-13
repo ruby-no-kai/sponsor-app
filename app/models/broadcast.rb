@@ -11,11 +11,17 @@ class Broadcast < ApplicationRecord
 
   enum :status, {created: 0, preparing: 1, modifying: 2, ready: 3, pending: 4, sending: 5, sent: 6, failed: 7}
 
-  validates :campaign, presence: true
+  DISPATCHED_STATUSES = %w(pending sending sent failed).freeze #: Array[String]
+
+  validates :campaign, presence: true, uniqueness: {scope: :conference_id}
   validates :status, presence: true
   validates :title, presence: true
   validates :body, presence: true
-  validate :forbid_changes_to_delivered_content, if: ->(record) { record.persisted? && record.status_was == 'sent' }
+  validate :forbid_changes_to_delivered_content, if: ->(record) { record.persisted? && DISPATCHED_STATUSES.include?(record.status_was) }
+
+  # Whether the title and body are fixed, as some recipients may have their email already.
+  #: () -> bool
+  def content_locked? = DISPATCHED_STATUSES.include?(status)
 
   #: (?now: ActiveSupport::TimeWithZone) -> void
   def perform_later!(now: Time.current)

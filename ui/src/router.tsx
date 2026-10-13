@@ -243,6 +243,33 @@ export const router = createBrowserRouter([
               },
 
               // Broadcasts
+              {
+                path: paths.broadcasts,
+                lazy: {
+                  Component: async () => (await import("./routes/admin/BroadcastList.tsx")).default,
+                },
+              },
+              {
+                path: paths.broadcastNew,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/BroadcastEditor.tsx")).default,
+                },
+              },
+              {
+                path: paths.broadcast,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/BroadcastDetail.tsx")).default,
+                },
+              },
+              {
+                path: paths.broadcastEdit,
+                lazy: {
+                  Component: async () =>
+                    (await import("./routes/admin/BroadcastEditor.tsx")).default,
+                },
+              },
 
               // Expense reports
 

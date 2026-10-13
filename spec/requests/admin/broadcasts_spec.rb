@@ -128,5 +128,21 @@ RSpec.describe "Admin Broadcasts", type: :request do
         expect(broadcast.reload).to have_attributes(campaign: 'New campaign', description: 'New description')
       end
     end
+
+    context "when the broadcast is sending" do
+      let(:broadcast) { FactoryBot.create(:broadcast, conference:, status: :sending, body: "Hello\n\nWorld") }
+
+      it "renders title and body disabled" do
+        get edit_conference_broadcast_path(conference, broadcast)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to match(/<textarea[^>]*disabled="disabled"[^>]*name="broadcast\[body\]"/)
+      end
+
+      it "updates campaign and description" do
+        patch conference_broadcast_path(conference, broadcast), params: {broadcast: new_params.slice(:campaign, :description)}
+        expect(response).to redirect_to(conference_broadcast_path(conference, broadcast))
+        expect(broadcast.reload).to have_attributes(campaign: 'New campaign', description: 'New description', body: "Hello\n\nWorld")
+      end
+    end
   end
 end

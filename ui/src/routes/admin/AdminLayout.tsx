@@ -95,7 +95,11 @@ function conferenceSections(slug: string, { isEditable }: { isEditable: boolean 
       icon: MegaphoneIcon,
       path: generatePath(paths.announcements, { slug }),
     },
-    { label: "Broadcasts", icon: EnvelopeSimpleIcon, path: `${base}/broadcasts` },
+    {
+      label: "Broadcasts",
+      icon: EnvelopeSimpleIcon,
+      path: generatePath(paths.broadcasts, { slug }),
+    },
     { label: "Expense reports", icon: ReceiptIcon, path: `${base}/expense_reports` },
     {
       label: "Attendees",

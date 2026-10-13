@@ -4,6 +4,7 @@ package rubykaigi.sponsor_app;
 
 import "rubykaigi/sponsor_app/admin_announcements.proto";
 import "rubykaigi/sponsor_app/admin_booth_assignments.proto";
+import "rubykaigi/sponsor_app/admin_broadcasts.proto";
 import "rubykaigi/sponsor_app/admin_conferences.proto";
 import "rubykaigi/sponsor_app/admin_form_descriptions.proto";
 import "rubykaigi/sponsor_app/admin_organizations.proto";
@@ -230,6 +231,25 @@ service AdminService {
   rpc UpdateAnnouncement(AdminServiceUpdateAnnouncementRequest) returns (AdminServiceUpdateAnnouncementResponse);
 
   // Broadcasts
+
+  // Lists a conference's broadcasts, most recently created first.
+  rpc ListBroadcasts(AdminServiceListBroadcastsRequest) returns (AdminServiceListBroadcastsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one broadcast of a conference with every recipient. A broadcast of another conference
+  // is answered `not_found`.
+  rpc GetBroadcast(AdminServiceGetBroadcastRequest) returns (AdminServiceGetBroadcastResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Creates a broadcast without recipients, signed by the staff member signed in. It becomes ready
+  // in the background, and nothing is sent until it is dispatched.
+  rpc CreateBroadcast(AdminServiceCreateBroadcastRequest) returns (AdminServiceCreateBroadcastResponse);
+
+  // Replaces every writable field of a broadcast. Once it is dispatched, its title and body can no
+  // longer change.
+  rpc UpdateBroadcast(AdminServiceUpdateBroadcastRequest) returns (AdminServiceUpdateBroadcastResponse);
 
   // Expense reports
 
