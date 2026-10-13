@@ -5,7 +5,7 @@
 # Please instead update this file by running `bin/tapioca gem protobufable`.
 
 
-# pkg:gem/protobufable#lib/protobufable/version.rb:7
+# pkg:gem/protobufable#lib/protobufable/problem_pb.rb:13
 module Protobufable
   class << self
     # pkg:gem/protobufable#lib/protobufable.rb:34
@@ -66,6 +66,23 @@ module Protobufable::ColumnValidatable
   def validate_protobuf_message_columns; end
 end
 
+# pkg:gem/protobufable#lib/protobufable/connect.rb:16
+module Protobufable::Connect; end
+
+# pkg:gem/protobufable#lib/protobufable/connect/problem_rescuable.rb:36
+module Protobufable::Connect::ProblemRescuable
+  extend ::ActiveSupport::Concern
+  include ::Problem::Rescuable
+
+  private
+
+  # pkg:gem/protobufable#lib/protobufable/connect/problem_rescuable.rb:63
+  def problem_message_for(problem, error); end
+
+  # pkg:gem/protobufable#lib/protobufable/connect/problem_rescuable.rb:81
+  def render_problem(problem, error); end
+end
+
 # pkg:gem/protobufable#lib/protobufable.rb:26
 class Protobufable::Error < ::StandardError; end
 
@@ -108,6 +125,158 @@ class Protobufable::JsonType < ::ActiveModel::Type::Value
   # pkg:gem/protobufable#lib/protobufable/json_type.rb:45
   def type; end
 end
+
+# pkg:gem/protobufable#lib/protobufable/problem.rb:21
+module Protobufable::Problem; end
+
+# pkg:gem/protobufable#lib/protobufable/problem/information.rb:39
+module Protobufable::Problem::Information
+  # pkg:gem/protobufable#lib/protobufable/problem/information.rb:54
+  def problem_extensions; end
+
+  # pkg:gem/protobufable#lib/protobufable/problem/information.rb:47
+  def problem_information; end
+
+  class << self
+    # pkg:gem/protobufable#lib/protobufable/problem/information.rb:69
+    def pack(message); end
+  end
+end
+
+# pkg:gem/protobufable#lib/protobufable/problem/information.rb:41
+Protobufable::Problem::Information::MEMBER = T.let(T.unsafe(nil), Symbol)
+
+# pkg:gem/protobufable#lib/protobufable/problem/retry_info.rb:34
+module Protobufable::Problem::RetryInfo
+  include ::Problem::RetryAfter
+  include ::Protobufable::Problem::Information
+
+  # pkg:gem/protobufable#lib/protobufable/problem/retry_info.rb:43
+  def problem_information; end
+
+  class << self
+    # pkg:gem/protobufable#lib/protobufable/problem/retry_info.rb:51
+    def message_for(seconds); end
+  end
+end
+
+# pkg:gem/protobufable#lib/protobufable/problem/retry_info.rb:39
+Protobufable::Problem::RetryInfo::MESSAGE = T.let(T.unsafe(nil), String)
+
+# pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:47
+module Protobufable::Problem::Typeable
+  extend ::ActiveSupport::Concern
+  include GeneratedInstanceMethods
+  include ::Problem::Detailable
+  include ::Problem::I18nable
+
+  mixes_in_class_methods GeneratedClassMethods
+  mixes_in_class_methods ::Problem::Detailable::ClassMethods
+  mixes_in_class_methods ::Problem::I18nable::ClassMethods
+  mixes_in_class_methods ::Protobufable::Problem::Typeable::ClassMethods
+  mixes_in_class_methods ::Protobufable::Problem::Typeable::Derivation
+
+  class << self
+    # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:198
+    def build_catalogue(enum:, annotation:, uri_annotation:, status_annotation:); end
+
+    private
+
+    # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:220
+    def entry_readers(pool, annotation, uri_annotation, status_annotation); end
+
+    # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:250
+    def lookup_extension!(pool, name); end
+  end
+
+  module GeneratedClassMethods
+    def problem_status; end
+    def problem_status=(value); end
+    def problem_status?; end
+    def problem_title; end
+    def problem_title=(value); end
+    def problem_title?; end
+    def problem_title_key; end
+    def problem_title_key=(value); end
+    def problem_title_key?; end
+    def problem_title_scope; end
+    def problem_title_scope=(value); end
+    def problem_title_scope?; end
+    def problem_type_prefix; end
+    def problem_type_prefix=(value); end
+    def problem_type_prefix?; end
+    def problem_type_value; end
+    def problem_type_value=(value); end
+    def problem_type_value?; end
+    def problem_uri; end
+    def problem_uri=(value); end
+    def problem_uri?; end
+  end
+
+  module GeneratedInstanceMethods; end
+end
+
+# pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:100
+module Protobufable::Problem::Typeable::ClassMethods
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:145
+  def problem_status_annotation; end
+
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:156
+  def problem_type(value = T.unsafe(nil)); end
+
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:123
+  def problem_type_annotation; end
+
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:175
+  def problem_type_catalogue; end
+
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:186
+  def problem_type_entry; end
+
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:109
+  def problem_type_enum; end
+
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:139
+  def problem_uri_annotation; end
+end
+
+# pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:64
+module Protobufable::Problem::Typeable::Derivation
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:82
+  def status(value = T.unsafe(nil)); end
+
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:71
+  def type(value = T.unsafe(nil)); end
+end
+
+# pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:54
+class Protobufable::Problem::Typeable::Entry < ::Data
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:54
+  def http_status; end
+
+  # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:54
+  def uri; end
+
+  class << self
+    # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:54
+    def [](*_arg0); end
+
+    # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:54
+    def inspect; end
+
+    # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:54
+    def members; end
+
+    # pkg:gem/protobufable#lib/protobufable/problem/typeable.rb:54
+    def new(*_arg0); end
+  end
+end
+
+# pkg:gem/protobufable#lib/protobufable/problem_details_pb.rb:16
+class Protobufable::ProblemDetails < ::Google::Protobuf::AbstractMessage; end
+
+# pkg:gem/protobufable#lib/protobufable/problem_pb.rb:14
+class Protobufable::ProblemTypeOptions < ::Google::Protobuf::AbstractMessage; end
 
 # pkg:gem/protobufable#lib/protobufable/railtie.rb:15
 class Protobufable::Railtie < ::Rails::Railtie; end

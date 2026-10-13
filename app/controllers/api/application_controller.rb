@@ -1,6 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
+require 'protobufable/connect'
+
 module Api
   # Base of the controllers serving the Connect services in proto/, one action per RPC.
   #
@@ -8,8 +10,10 @@ module Api
   # the policies its service's base controller enforces. Calling an RPC that declares none raises.
   class ApplicationController < ActionController::API
     include ConnectRpcRails::Controller
+    include Protobufable::Connect::ProblemRescuable
     include ActionController::Cookies
     include ConnectForgeryProtection
+    include ConnectRequestInfo
     include LocaleSelectable
 
     # Raised when a controller serves an RPC whose policy it never declared.
@@ -96,13 +100,13 @@ module Api
     #: () -> void
     private def authorize_rpc! = enforce_policy!(rpc_policy)
 
-    # Raises a Connect error when the policy needs a session this request lacks.
+    # Raises a problem when the policy needs a session this request lacks.
     #: (Symbol?) -> void
     private def require_session!(_policy)
       raise NotImplementedError, "#{self.class.name} enforces no session requirement"
     end
 
-    # Raises a Connect error when the session may not run this RPC.
+    # Raises a problem when the session may not run this RPC.
     #: (Symbol?) -> void
     private def enforce_policy!(_policy)
       raise NotImplementedError, "#{self.class.name} enforces no policy"
@@ -112,10 +116,18 @@ module Api
     #: (Exception) -> ConnectRpcRails::Error
     private def connect_error_for(exception)
       error = super
-      return error if exception.is_a?(ConnectRpcRails::Error)
+      return error if exception.is_a?(ConnectRpcRails::Error) || exception.is_a?(Problem::Detailable)
 
       message = Rack::Utils::HTTP_STATUS_CODES.fetch(error.http_status) { error.code.to_s }
       ConnectRpcRails::Error.new(error.code, message, details: error.details)
+    end
+
+    # rescue_from swallows the problem before Sentry's middleware sees it, and Sentry does not
+    # subscribe to the Rails error reporter here.
+    #: (Exception, Problem::Details) -> void
+    private def report_problem(error, problem)
+      super
+      Sentry.capture_exception(error)
     end
 
     #: () -> void

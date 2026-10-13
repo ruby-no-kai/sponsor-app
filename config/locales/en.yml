@@ -588,3 +588,14 @@ en:
     sponsor_event_editing_histories:
       index:
         title: History
+
+  # Keyed by the identifier each ProblemType value publishes, with dashes as underscores.
+  problem_details:
+    titles:
+      unauthenticated: Unauthenticated
+      permission_denied: Permission Denied
+      not_found: Not Found
+      conflict: Conflict
+      failed_precondition: Failed Precondition
+      invalid_record: Invalid Record
+      internal: Internal Error

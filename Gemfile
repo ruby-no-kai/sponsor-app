@@ -34,6 +34,8 @@ gem 'sponsor_app-proto', path: 'gen/proto/ruby'
 gem 'connect_rpc_rails', git: 'https://github.com/ivry-inc/connect_rpc_rails.git', ref: '85c44368d8ec764e3f06966bd7038323af79eb47'
 gem 'protobufable', git: 'https://github.com/sorah/protobufable.git', ref: '3e143adcb76aa5db5b7b4269479356e1c5ddcd5e'
 gem 'protovalidate', '0.1.0.beta3'
+gem 'problem', '~> 0.1'
+gem 'googleapis-common-protos-types', require: 'google/rpc/error_details_pb'
 
 gem 'alba'
 gem 'jbuilder', '~> 2.9'

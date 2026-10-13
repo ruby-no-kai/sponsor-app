@@ -36,8 +36,25 @@ RSpec.describe 'AdminService viewer', type: :request do
       expect(viewer.has_avatar_url?).to be(false)
     end
 
-    it 'answers unauthenticated without a staff session' do
-      expect(connect_call(rpc, request_message)).to have_attributes(status: 401, code: 'unauthenticated')
+    it 'answers unauthenticated with the problem document and the request ID' do
+      error = connect_call(rpc, request_message)
+
+      expect(error).to have_attributes(status: 401, code: 'unauthenticated', message: 'Sign in to the staff area.')
+      expect(error.detail(Protobufable::ProblemDetails)).to have_attributes(
+        type: 'https://sponsorships.rubykaigi.org/problems/unauthenticated',
+        title: 'Unauthenticated',
+        status: 401,
+      )
+      expect(error.detail(Google::Rpc::RequestInfo).request_id).to eq(response.request.request_id)
+      expect(error.detail(Google::Rpc::RequestInfo).request_id).to be_present
+    end
+
+    it 'localizes the problem title' do
+      cookies['__Host-rk-sponsorapp2-hl'] = 'ja'
+
+      error = connect_call(rpc, request_message)
+
+      expect(error.detail(Protobufable::ProblemDetails).title).to eq('ログインが必要です')
     end
   end
 

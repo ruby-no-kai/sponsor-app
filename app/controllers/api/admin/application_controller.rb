@@ -16,7 +16,7 @@ module Api
 
       #: (Symbol?) -> void
       private def require_session!(_policy)
-        raise ConnectRpcRails::Error.new(:unauthenticated, 'Sign in to the staff area.') unless current_staff_maybe
+        raise Errors::Unauthenticated.new(detail: 'Sign in to the staff area.') unless current_staff_maybe
       end
 
       #: (Symbol?) -> void
@@ -25,7 +25,7 @@ module Api
         when nil, :any_staff
           nil
         when :unrestricted_staff
-          raise ConnectRpcRails::Error.new(:permission_denied, 'Restricted staff cannot use this.') if current_staff.restricted?
+          raise Errors::PermissionDenied.new(detail: 'Restricted staff cannot use this.') if current_staff.restricted?
         else
           raise ArgumentError, "unknown policy #{policy.inspect}"
         end

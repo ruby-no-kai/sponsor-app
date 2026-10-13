@@ -196,6 +196,7 @@ mise run lint:proto     # buf lint and buf format check
 - `gen/proto/ruby/` also holds hand-written files the generator keeps: the gemspec and `lib/sponsor_app-proto.rb`.
 - Message classes cannot be reloaded, as google-protobuf raises when a descriptor is registered twice. The Procfile's `proto` process regenerates `gen/` on `.proto` edits, and its `web` process restarts Rails when `gen/proto/ruby/` changes.
 - Sorbet ignores the generated `.rbs`. Message types come from tapioca's Protobuf DSL compiler.
+- `proto/protobufable/` is copied from the protobufable gem for buf. Do not edit it; refresh it when bumping the gem (`spec/proto/vendored_protobufable_spec.rb` checks it).
 
 ### Connect RPC API
 
@@ -204,6 +205,7 @@ Rails serves the services in `proto/` over the [Connect protocol](https://connec
 - Controllers live in `app/controllers/api/admin/`, one action per RPC. They inherit `Api::Admin::ApplicationController`, which authenticates with the HAML side's session cookie.
 - Every RPC declares its policy right above its `def`: `authorize :any_staff` or `:unrestricted_staff`. Serving an RPC without one raises.
 - Responses are built by Alba resources in `app/resources/api/`, bound to their message with `with_protobuf`. Controllers never build a response field by field.
+- Errors are problems: raise an `Errors::*` class from `app/models/errors.rb`, each typed by a `ProblemType` value in `proto/rubykaigi/sponsor_app/problem.proto`. Titles live under `problem_details.titles` in `config/locales/`.
 - A POST must send `Connect-Protocol-Version: 1`, and a request whose `Sec-Fetch-Site` or `Origin` names another origin is refused (`ConnectForgeryProtection`).
 - Routes are drawn only when `config.x.connect_rpc.enabled` is set: always in development and test, and in production only with `SPONSOR_APP_CONNECT_RPC`, because CloudFront does not forward `Connect-Protocol-Version`, `Connect-Timeout-Ms` or `Sec-Fetch-Site`.
 
