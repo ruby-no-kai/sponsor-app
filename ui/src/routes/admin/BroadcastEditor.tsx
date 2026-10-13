@@ -6,8 +6,7 @@ import { generatePath, useNavigate, useParams } from "react-router";
 import { useSWRConfig } from "swr";
 import type { AdminBroadcast } from "../../gen/rubykaigi/sponsor_app/admin_broadcasts_pb.ts";
 import { AdminService } from "../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
-import { fieldViolations } from "../../lib/errors.ts";
-import { erroredFields } from "../../lib/fieldErrors.ts";
+import { erroredFields, errorsUnder } from "../../lib/fieldErrors.ts";
 import { idFromParam } from "../../lib/forms.ts";
 import { useSaveRejection } from "../../lib/rejection.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
@@ -16,13 +15,16 @@ import { toastManager } from "../../lib/toast.ts";
 import { NotFound } from "../RouteError.tsx";
 import { paths } from "../paths.ts";
 import { joined, SaveBar, SaveErrorBanner, Section, useFieldReveal } from "./FormParts.tsx";
+import { RecipientFilterFields } from "./RecipientFilterFields.tsx";
 import {
   BROADCAST_LAYOUT,
   FIELD_LABELS,
   broadcastInputFrom,
+  broadcastSaveErrors,
   broadcastValuesFrom,
 } from "./broadcastForm.ts";
 import { useConferenceName, useConferenceTitle } from "./conferenceTitle.ts";
+import { recipientFilterFrom } from "./recipientFilterForm.ts";
 
 // One page for new and edit, at the paths HAML serves them.
 export default function BroadcastEditor() {
@@ -71,7 +73,11 @@ function Editor({ slug, saved }: { slug: string; saved: AdminBroadcast | undefin
       try {
         const response =
           saved === undefined
-            ? await createBroadcast.trigger({ conferenceSlug: slug, input })
+            ? await createBroadcast.trigger({
+                conferenceSlug: slug,
+                input,
+                recipientFilter: recipientFilterFrom(value.recipientFilter),
+              })
             : await updateBroadcast.trigger({
                 conferenceSlug: slug,
                 broadcastId: saved.id,
@@ -80,7 +86,7 @@ function Editor({ slug, saved }: { slug: string; saved: AdminBroadcast | undefin
         result = response.broadcast;
       } catch (error) {
         setSaveError(error);
-        rejection.reject(formApi, value, fieldViolations(error, { prefix: "input." }));
+        rejection.reject(formApi, value, broadcastSaveErrors(error));
         const [first] = erroredFields(formApi.state.fieldMeta, BROADCAST_LAYOUT);
         if (first !== undefined) reveal(first.path);
         return;
@@ -162,39 +168,77 @@ function Editor({ slug, saved }: { slug: string; saved: AdminBroadcast | undefin
             description="The broadcast has been dispatched, so some recipients may have it already."
           />
         )}
-        <form.Field name="title">
-          {(field) => (
-            <Input
-              label={FIELD_LABELS.title}
-              description="The subject, after the conference's name in brackets."
-              data-field={field.name}
-              disabled={isLocked}
-              value={field.state.value}
-              onChange={(event) => field.handleChange(event.target.value)}
-              onBlur={field.handleBlur}
-              error={joined(field.state.meta.errors)}
-            />
-          )}
-        </form.Field>
-        <form.Field name="body">
-          {(field) => (
-            <InputArea
-              label={FIELD_LABELS.body}
-              description="Markdown supported. @LOGIN@ becomes a sign-in link to the recipient's sponsorship."
-              data-field={field.name}
-              disabled={isLocked}
-              autoResize
-              minRows={10}
-              maxRows={40}
-              className="font-mono"
-              value={field.state.value}
-              onValueChange={field.handleChange}
-              onBlur={field.handleBlur}
-              error={joined(field.state.meta.errors)}
-            />
-          )}
-        </form.Field>
+        {isLocked ? (
+          <form.Subscribe selector={(state) => state.values}>
+            {({ title, body }) => (
+              <>
+                <ReadOnlyValue label={FIELD_LABELS.title}>{title}</ReadOnlyValue>
+                <ReadOnlyValue label={FIELD_LABELS.body} mono>
+                  {body}
+                </ReadOnlyValue>
+              </>
+            )}
+          </form.Subscribe>
+        ) : (
+          <>
+            <form.Field name="title">
+              {(field) => (
+                <Input
+                  label={FIELD_LABELS.title}
+                  description="The subject, after the conference's name in brackets."
+                  data-field={field.name}
+                  value={field.state.value}
+                  onChange={(event) => field.handleChange(event.target.value)}
+                  onBlur={field.handleBlur}
+                  error={joined(field.state.meta.errors)}
+                />
+              )}
+            </form.Field>
+            <form.Field name="body">
+              {(field) => (
+                <InputArea
+                  label={FIELD_LABELS.body}
+                  description="Markdown supported. @LOGIN@ becomes a sign-in link to the recipient's sponsorship."
+                  data-field={field.name}
+                  autoResize
+                  minRows={14}
+                  maxRows={40}
+                  className="font-mono"
+                  value={field.state.value}
+                  onValueChange={field.handleChange}
+                  onBlur={field.handleBlur}
+                  error={joined(field.state.meta.errors)}
+                />
+              )}
+            </form.Field>
+          </>
+        )}
       </Section>
+
+      {saved === undefined && (
+        <Section title="Recipients">
+          <Text variant="secondary">
+            Nothing is sent yet. Review the recipients, add more and dispatch from the broadcast's
+            page.
+          </Text>
+          <form.Field name="recipientFilter">
+            {(field) => (
+              <form.Subscribe selector={(state) => errorsUnder(state.fieldMeta, field.name)}>
+                {(errors) => (
+                  <RecipientFilterFields
+                    slug={slug}
+                    path={field.name}
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    errors={errors}
+                    allowNone
+                  />
+                )}
+              </form.Subscribe>
+            )}
+          </form.Field>
+        </Section>
+      )}
 
       <form.Subscribe
         selector={(state) => ({
@@ -223,5 +267,24 @@ function Editor({ slug, saved }: { slug: string; saved: AdminBroadcast | undefin
         )}
       </form.Subscribe>
     </form>
+  );
+}
+
+function ReadOnlyValue({
+  label,
+  mono = false,
+  children,
+}: {
+  label: string;
+  mono?: boolean;
+  children: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <Text bold>{label}</Text>
+      <Text variant={mono ? "mono" : undefined}>
+        <span className="whitespace-pre-wrap break-words">{children}</span>
+      </Text>
+    </div>
   );
 }

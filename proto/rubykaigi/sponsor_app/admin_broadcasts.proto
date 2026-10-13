@@ -160,6 +160,10 @@ message AdminBroadcastDelivery {
 
   // Where the email stands.
   Status status = 5;
+
+  // Whether RemoveBroadcastDelivery can remove the delivery, which it can while both the delivery
+  // and its broadcast are ready.
+  bool removable = 6;
 }
 
 // The writable fields of a broadcast, taken by AdminService.CreateBroadcast and UpdateBroadcast.
@@ -202,6 +206,122 @@ message BroadcastInput {
       expression: "this.trim() != ''"
     }
   ];
+}
+
+// Which recipients to add to a broadcast, one kind of selection at a time. A sponsorship's email
+// goes to its contact, copying the addresses the contact lists. An address the broadcast already
+// has is skipped.
+message BroadcastRecipientFilter {
+  // Which sponsorships a filter picks by where they stand.
+  enum SponsorshipStatus {
+    // Every sponsorship, whatever its status.
+    SPONSORSHIP_STATUS_UNSPECIFIED = 0;
+
+    // Applied, neither accepted nor withdrawn.
+    SPONSORSHIP_STATUS_PENDING = 1;
+
+    // Accepted and not withdrawn.
+    SPONSORSHIP_STATUS_ACTIVE = 2;
+
+    // Not accepted, withdrawn ones included.
+    SPONSORSHIP_STATUS_NOT_ACCEPTED = 3;
+
+    // Accepted, withdrawn ones included.
+    SPONSORSHIP_STATUS_ACCEPTED = 4;
+
+    // Withdrawn.
+    SPONSORSHIP_STATUS_WITHDRAWN = 5;
+  }
+
+  // Sponsorships of the broadcast's conference.
+  message CurrentSponsors {
+    // Only sponsorships whose emails are written in this locale. Unset picks every locale.
+    optional string locale = 1 [(buf.validate.field).string = {
+      in: [
+        "en",
+        "ja"
+      ]
+    }];
+
+    // Only sponsorships assigned a booth.
+    bool exhibitors_only = 2;
+
+    // Only sponsorships on this plan of the conference. A plan of another conference is answered
+    // `not_found`. Unset picks every plan.
+    optional int64 plan_id = 3 [(buf.validate.field).int64.gt = 0];
+
+    // Only sponsorships of this status.
+    SponsorshipStatus status = 4 [(buf.validate.field).enum.defined_only = true];
+  }
+
+  // Sponsorships of a conference, usually a past one.
+  message PastSponsors {
+    // Slug of the conference, such as "rubykaigi2047". A conference the staff member may not
+    // manage is answered `permission_denied`.
+    string conference_slug = 1 [(buf.validate.field).string = {
+      min_len: 1
+      pattern: "^[a-z0-9][a-z0-9_-]*$"
+    }];
+
+    // Only sponsorships whose emails are written in this locale. Unset picks every locale.
+    optional string locale = 2 [(buf.validate.field).string = {
+      in: [
+        "en",
+        "ja"
+      ]
+    }];
+
+    // Meant to leave out organizations sponsoring the broadcast's conference. Not applied yet, so
+    // they are picked all the same.
+    bool exclude_current_sponsors = 3;
+
+    // Only sponsorships of this status.
+    SponsorshipStatus status = 4 [(buf.validate.field).enum.defined_only = true];
+  }
+
+  // Sponsorships of the broadcast's conference, picked one by one.
+  message Manual {
+    // IDs of sponsorships of the broadcast's conference. An ID of any other is answered
+    // `not_found`.
+    repeated int64 sponsorship_ids = 1 [(buf.validate.field).repeated = {
+      min_items: 1
+      max_items: 1000
+      unique: true
+      items: {
+        int64: {gt: 0}
+      }
+    }];
+  }
+
+  // Addresses that belong to no sponsorship.
+  message Raw {
+    // Email addresses, each once.
+    repeated string emails = 1 [(buf.validate.field).repeated = {
+      min_items: 1
+      max_items: 1000
+      unique: true
+      items: {
+        string: {email: true}
+      }
+    }];
+  }
+
+  // The selection. One is required.
+  oneof kind {
+    option (buf.validate.oneof).required = true;
+
+    // Sponsorships of the broadcast's conference, narrowed by locale, booth, plan and status.
+    CurrentSponsors current_sponsors = 1;
+
+    // Sponsorships of another conference, narrowed by locale and status.
+    PastSponsors past_sponsors = 2;
+
+    // Sponsorships of the broadcast's conference, picked one by one.
+    Manual manual = 3;
+
+    // Addresses that belong to no sponsorship.
+    Raw raw = 4;
+  }
 }
 
 // Request for AdminService.ListBroadcasts.
@@ -252,11 +372,15 @@ message AdminServiceCreateBroadcastRequest {
 
   // The broadcast to create, signed by the staff member signed in.
   BroadcastInput input = 2 [(buf.validate.field).required = true];
+
+  // The first recipients. Absent adds none, and AddBroadcastRecipients adds them once the
+  // broadcast is ready.
+  optional BroadcastRecipientFilter recipient_filter = 3;
 }
 
 // Response for AdminService.CreateBroadcast.
 message AdminServiceCreateBroadcastResponse {
-  // The broadcast created, which becomes ready in the background.
+  // The broadcast created. It is collecting its recipients, and becomes ready once it has.
   AdminBroadcast broadcast = 1;
 }
 
@@ -280,3 +404,42 @@ message AdminServiceUpdateBroadcastResponse {
   // The broadcast as updated.
   AdminBroadcast broadcast = 1;
 }
+
+// Request for AdminService.AddBroadcastRecipients.
+message AdminServiceAddBroadcastRecipientsRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a ready broadcast of the conference.
+  int64 broadcast_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // The recipients to add.
+  BroadcastRecipientFilter recipient_filter = 3 [(buf.validate.field).required = true];
+}
+
+// Response for AdminService.AddBroadcastRecipients.
+message AdminServiceAddBroadcastRecipientsResponse {
+  // The broadcast, adding the recipients. It becomes ready again once it has.
+  AdminBroadcast broadcast = 1;
+}
+
+// Request for AdminService.RemoveBroadcastDelivery.
+message AdminServiceRemoveBroadcastDeliveryRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of a broadcast of the conference.
+  int64 broadcast_id = 2 [(buf.validate.field).int64.gt = 0];
+
+  // ID of a delivery of the broadcast.
+  int64 delivery_id = 3 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.RemoveBroadcastDelivery.
+message AdminServiceRemoveBroadcastDeliveryResponse {}

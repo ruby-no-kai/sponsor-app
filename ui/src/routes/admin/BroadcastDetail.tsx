@@ -1,15 +1,28 @@
-import { Badge, Empty, Link, LinkButton, Loader, Table, Text } from "@cloudflare/kumo";
-import { PencilSimpleIcon, UsersIcon } from "@phosphor-icons/react";
+import { Badge, Button, Empty, Link, LinkButton, Loader, Table, Text } from "@cloudflare/kumo";
+import { PencilSimpleIcon, PlusIcon, TrashIcon, UsersIcon } from "@phosphor-icons/react";
+import { useForm } from "@tanstack/react-form";
+import { useState } from "react";
 import { generatePath, useParams } from "react-router";
+import { useSWRConfig } from "swr";
 import { AdminBroadcast_Status } from "../../gen/rubykaigi/sponsor_app/admin_broadcasts_pb.ts";
-import type { AdminBroadcastDelivery } from "../../gen/rubykaigi/sponsor_app/admin_broadcasts_pb.ts";
+import type {
+  AdminBroadcast,
+  AdminBroadcastDelivery,
+} from "../../gen/rubykaigi/sponsor_app/admin_broadcasts_pb.ts";
 import { AdminService } from "../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
+import { fieldViolations } from "../../lib/errors.ts";
+import { erroredFields, errorsUnder } from "../../lib/fieldErrors.ts";
+import type { FieldLayout } from "../../lib/fieldErrors.ts";
 import { idFromParam } from "../../lib/forms.ts";
 import { PageHeader } from "../../lib/PageHeader.tsx";
-import { useRpc } from "../../lib/rpc.ts";
+import { useSaveRejection } from "../../lib/rejection.ts";
+import { isRpcKeyOf, useRpc, useRpcMutation } from "../../lib/rpc.ts";
+import { toastManager } from "../../lib/toast.ts";
 import { NotFound } from "../RouteError.tsx";
 import { paths } from "../paths.ts";
-import { Section } from "./FormParts.tsx";
+import { ConfirmButton } from "./ConfirmButton.tsx";
+import { SaveErrorBanner, Section, useFieldReveal } from "./FormParts.tsx";
+import { RecipientFilterFields } from "./RecipientFilterFields.tsx";
 import { SandboxedHtml } from "./SandboxedHtml.tsx";
 import { StackedRow, TableOrStack } from "../../lib/StackedRows.tsx";
 import {
@@ -19,7 +32,25 @@ import {
   refreshIntervalFor,
 } from "./broadcastView.ts";
 import { useConferenceName, useConferenceTitle } from "./conferenceTitle.ts";
+import {
+  RECIPIENT_FILTER_LABELS,
+  recipientFilterFrom,
+  recipientFilterValues,
+} from "./recipientFilterForm.ts";
 import { labelOf } from "./sponsorshipView.ts";
+
+const ADD_RECIPIENTS_LAYOUT: FieldLayout = { labels: RECIPIENT_FILTER_LABELS };
+
+// Revalidates every broadcast RPC, as each change moves the broadcast's status.
+function useRevalidateBroadcasts(): () => Promise<unknown> {
+  const { mutate } = useSWRConfig();
+  return () =>
+    mutate(
+      (key) =>
+        isRpcKeyOf(key, AdminService.method.getBroadcast) ||
+        isRpcKeyOf(key, AdminService.method.listBroadcasts),
+    );
+}
 
 export default function BroadcastDetail() {
   const { slug = "", id = "" } = useParams();
@@ -81,10 +112,12 @@ function Detail({ slug, id, broadcastId }: { slug: string; id: string; broadcast
       </Section>
 
       <Section title={`Recipients (${deliveries.length})`}>
-        {broadcast.status !== AdminBroadcast_Status.READY && (
+        {broadcast.status === AdminBroadcast_Status.READY ? (
+          <AddRecipientsForm slug={slug} broadcast={broadcast} />
+        ) : (
           <Text variant="secondary">{recipientsNote(broadcast.status)}</Text>
         )}
-        <Deliveries slug={slug} deliveries={deliveries} />
+        <Deliveries slug={slug} broadcast={broadcast} deliveries={deliveries} />
       </Section>
     </div>
   );
@@ -101,11 +134,98 @@ function recipientsNote(status: AdminBroadcast_Status): string {
   }
 }
 
+function AddRecipientsForm({ slug, broadcast }: { slug: string; broadcast: AdminBroadcast }) {
+  const addRecipients = useRpcMutation(AdminService.method.addBroadcastRecipients);
+  const revalidate = useRevalidateBroadcasts();
+  // The error of the last request, for its code and request ID.
+  const [saveError, setSaveError] = useState<unknown>();
+  const { formRef, reveal } = useFieldReveal();
+  const rejection = useSaveRejection();
+
+  const form = useForm({
+    defaultValues: { recipientFilter: recipientFilterValues("currentSponsors") },
+    validators: { onChange: rejection.validate },
+    onSubmit: async ({ value, formApi }) => {
+      try {
+        await addRecipients.trigger({
+          conferenceSlug: slug,
+          broadcastId: broadcast.id,
+          recipientFilter: recipientFilterFrom(value.recipientFilter),
+        });
+      } catch (error) {
+        setSaveError(error);
+        rejection.reject(formApi, value, fieldViolations(error));
+        const [first] = erroredFields(formApi.state.fieldMeta, ADD_RECIPIENTS_LAYOUT);
+        if (first !== undefined) reveal(first.path);
+        return;
+      }
+      setSaveError(undefined);
+      toastManager.add({ variant: "success", title: "Adding the recipients" });
+      formApi.reset();
+      await revalidate();
+    },
+  });
+
+  return (
+    <form
+      ref={formRef}
+      className="flex flex-col gap-4"
+      noValidate
+      onSubmit={(event) => {
+        event.preventDefault();
+        void rejection.submit(form);
+      }}
+    >
+      <form.Field name="recipientFilter">
+        {(field) => (
+          <form.Subscribe selector={(state) => errorsUnder(state.fieldMeta, field.name)}>
+            {(errors) => (
+              <RecipientFilterFields
+                slug={slug}
+                path={field.name}
+                value={field.state.value}
+                onChange={field.handleChange}
+                errors={errors}
+                allowNone={false}
+              />
+            )}
+          </form.Subscribe>
+        )}
+      </form.Field>
+      <form.Subscribe
+        selector={(state) => ({
+          formError: state.errorMap.onChange,
+          errored: erroredFields(state.fieldMeta, ADD_RECIPIENTS_LAYOUT),
+          isSubmitting: state.isSubmitting,
+        })}
+      >
+        {({ formError, errored, isSubmitting }) => (
+          <div className="flex flex-col gap-3">
+            <SaveErrorBanner
+              formError={formError}
+              errored={errored}
+              error={saveError}
+              onShow={reveal}
+            />
+            <div>
+              <Button type="submit" variant="secondary" icon={PlusIcon} loading={isSubmitting}>
+                Add recipients
+              </Button>
+            </div>
+          </div>
+        )}
+      </form.Subscribe>
+    </form>
+  );
+}
+
 function Deliveries({
   slug,
+  broadcast,
   deliveries,
 }: {
   slug: string;
+  broadcast: AdminBroadcast;
   deliveries: readonly AdminBroadcastDelivery[];
 }) {
   if (deliveries.length === 0) {
@@ -121,7 +241,12 @@ function Deliveries({
   return (
     <TableOrStack
       stack={deliveries.map((delivery) => (
-        <DeliveryStackedRow key={delivery.id.toString()} slug={slug} delivery={delivery} />
+        <DeliveryStackedRow
+          key={delivery.id.toString()}
+          slug={slug}
+          broadcast={broadcast}
+          delivery={delivery}
+        />
       ))}
       table={
         <Table>
@@ -130,11 +255,17 @@ function Deliveries({
               <Table.Head>Name</Table.Head>
               <Table.Head>Email</Table.Head>
               <Table.Head>Status</Table.Head>
+              <Table.Head />
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {deliveries.map((delivery) => (
-              <DeliveryRow key={delivery.id.toString()} slug={slug} delivery={delivery} />
+              <DeliveryRow
+                key={delivery.id.toString()}
+                slug={slug}
+                broadcast={broadcast}
+                delivery={delivery}
+              />
             ))}
           </Table.Body>
         </Table>
@@ -143,9 +274,9 @@ function Deliveries({
   );
 }
 
-type DeliveryProps = { slug: string; delivery: AdminBroadcastDelivery };
+type DeliveryProps = { slug: string; broadcast: AdminBroadcast; delivery: AdminBroadcastDelivery };
 
-function DeliveryRow({ slug, delivery }: DeliveryProps) {
+function DeliveryRow({ slug, broadcast, delivery }: DeliveryProps) {
   return (
     <Table.Row>
       <Table.Cell>
@@ -157,14 +288,22 @@ function DeliveryRow({ slug, delivery }: DeliveryProps) {
       <Table.Cell>
         <DeliveryStatus delivery={delivery} />
       </Table.Cell>
+      <Table.Cell>
+        <RemoveDelivery slug={slug} broadcast={broadcast} delivery={delivery} />
+      </Table.Cell>
     </Table.Row>
   );
 }
 
-function DeliveryStackedRow({ slug, delivery }: DeliveryProps) {
+function DeliveryStackedRow({ slug, broadcast, delivery }: DeliveryProps) {
   return (
     <StackedRow>
-      <DeliveryName slug={slug} delivery={delivery} />
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <DeliveryName slug={slug} delivery={delivery} />
+        </div>
+        <RemoveDelivery slug={slug} broadcast={broadcast} delivery={delivery} />
+      </div>
       <DeliveryEmail delivery={delivery} />
       <div>
         <DeliveryStatus delivery={delivery} />
@@ -211,4 +350,29 @@ function DeliveryEmail({ delivery }: { delivery: AdminBroadcastDelivery }) {
 function DeliveryStatus({ delivery }: { delivery: AdminBroadcastDelivery }) {
   const status = labelOf(DELIVERY_STATUS_LABELS, delivery.status);
   return <Badge variant={status.tone}>{status.text}</Badge>;
+}
+
+function RemoveDelivery({ slug, broadcast, delivery }: DeliveryProps) {
+  const removeDelivery = useRpcMutation(AdminService.method.removeBroadcastDelivery);
+  const revalidate = useRevalidateBroadcasts();
+  if (!delivery.removable) return null;
+  return (
+    <ConfirmButton
+      label="Remove recipient"
+      icon={TrashIcon}
+      iconOnly
+      size="sm"
+      title={`Remove ${delivery.email}?`}
+      description={`They will not get "${broadcast.title}". They can be added again before dispatch.`}
+      confirmLabel="Remove"
+      onConfirm={async () => {
+        await removeDelivery.trigger({
+          conferenceSlug: slug,
+          broadcastId: broadcast.id,
+          deliveryId: delivery.id,
+        });
+        await revalidate();
+      }}
+    />
+  );
 }

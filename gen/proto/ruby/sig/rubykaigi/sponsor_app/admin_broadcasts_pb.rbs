@@ -394,6 +394,11 @@ module Rk
       attr_reader status_const(): ::Integer
       def clear_status: () -> void
 
+      # Whether RemoveBroadcastDelivery can remove the delivery, which it can while both the delivery
+      # and its broadcast are ready.
+      attr_accessor removable(): bool
+      def clear_removable: () -> void
+
       attr_reader _sponsorship(): ::Rk::SponsorApp::AdminBroadcastDelivery::Sponsorship?
       def has__sponsorship?: () -> bool
       def clear__sponsorship: () -> void
@@ -409,6 +414,8 @@ module Rk
         "cc_emails" => ::Array[::String | ::Symbol]?,
         status: (::Rk::SponsorApp::AdminBroadcastDelivery::Status::names | ::Rk::SponsorApp::AdminBroadcastDelivery::Status::strings | ::Integer | ::Float)?,
         "status" => (::Rk::SponsorApp::AdminBroadcastDelivery::Status::names | ::Rk::SponsorApp::AdminBroadcastDelivery::Status::strings | ::Integer | ::Float)?,
+        removable: bool?,
+        "removable" => bool?,
       }
 
       def initialize: (?init_map initial_value) -> void
@@ -419,6 +426,7 @@ module Rk
         | ("email" name) -> ::String
         | ("cc_emails" name) -> (::Google::Protobuf::RepeatedField[::String, ::String | ::Symbol])
         | ("status" name) -> (::Rk::SponsorApp::AdminBroadcastDelivery::Status::names | ::Integer)
+        | ("removable" name) -> bool
 
       def []=:
           ("id" name, (::Integer | ::Float) value) -> void
@@ -426,6 +434,7 @@ module Rk
         | ("email" name, (::String | ::Symbol) value) -> void
         | ("cc_emails" name, (::Google::Protobuf::RepeatedField[::String, ::String | ::Symbol]) value) -> void
         | ("status" name, (::Rk::SponsorApp::AdminBroadcastDelivery::Status::names | ::Rk::SponsorApp::AdminBroadcastDelivery::Status::strings | ::Integer | ::Float) value) -> void
+        | ("removable" name, bool value) -> void
     end
 
     # The writable fields of a broadcast, taken by AdminService.CreateBroadcast and UpdateBroadcast.
@@ -480,6 +489,275 @@ module Rk
         | ("description" name, (::String | ::Symbol) value) -> void
         | ("title" name, (::String | ::Symbol) value) -> void
         | ("body" name, (::String | ::Symbol) value) -> void
+    end
+
+    # Which recipients to add to a broadcast, one kind of selection at a time. A sponsorship's email
+    # goes to its contact, copying the addresses the contact lists. An address the broadcast already
+    # has is skipped.
+    class BroadcastRecipientFilter < ::Google::Protobuf::AbstractMessage
+      # Sponsorships of the broadcast's conference.
+      class CurrentSponsors < ::Google::Protobuf::AbstractMessage
+        include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::BroadcastRecipientFilter::CurrentSponsors]
+
+        # Only sponsorships whose emails are written in this locale. Unset picks every locale.
+        attr_reader locale(): ::String
+        attr_writer locale(): ::String | ::Symbol
+        def has_locale?: () -> bool
+        def clear_locale: () -> void
+
+        # Only sponsorships assigned a booth.
+        attr_accessor exhibitors_only(): bool
+        def clear_exhibitors_only: () -> void
+
+        # Only sponsorships on this plan of the conference. A plan of another conference is answered
+        # `not_found`. Unset picks every plan.
+        attr_reader plan_id(): ::Integer
+        attr_writer plan_id(): ::Integer | ::Float
+        def has_plan_id?: () -> bool
+        def clear_plan_id: () -> void
+
+        # Only sponsorships of this status.
+        attr_reader status(): ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Integer
+        attr_writer status(): ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::strings | ::Integer | ::Float
+        attr_reader status_const(): ::Integer
+        def clear_status: () -> void
+
+        attr_reader _locale(): ::String?
+        def has__locale?: () -> bool
+        def clear__locale: () -> void
+
+        attr_reader _plan_id(): ::Integer?
+        def has__plan_id?: () -> bool
+        def clear__plan_id: () -> void
+
+        type init_map = {
+          locale: (::String | ::Symbol)?,
+          "locale" => (::String | ::Symbol)?,
+          exhibitors_only: bool?,
+          "exhibitors_only" => bool?,
+          plan_id: (::Integer | ::Float)?,
+          "plan_id" => (::Integer | ::Float)?,
+          status: (::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::strings | ::Integer | ::Float)?,
+          "status" => (::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::strings | ::Integer | ::Float)?,
+        }
+
+        def initialize: (?init_map initial_value) -> void
+
+        def []:
+            ("locale" name) -> ::String
+          | ("exhibitors_only" name) -> bool
+          | ("plan_id" name) -> ::Integer
+          | ("status" name) -> (::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Integer)
+
+        def []=:
+            ("locale" name, (::String | ::Symbol) value) -> void
+          | ("exhibitors_only" name, bool value) -> void
+          | ("plan_id" name, (::Integer | ::Float) value) -> void
+          | ("status" name, (::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::strings | ::Integer | ::Float) value) -> void
+      end
+
+      # Sponsorships of a conference, usually a past one.
+      class PastSponsors < ::Google::Protobuf::AbstractMessage
+        include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::BroadcastRecipientFilter::PastSponsors]
+
+        # Slug of the conference, such as "rubykaigi2047". A conference the staff member may not
+        # manage is answered `permission_denied`.
+        attr_reader conference_slug(): ::String
+        attr_writer conference_slug(): ::String | ::Symbol
+        def clear_conference_slug: () -> void
+
+        # Only sponsorships whose emails are written in this locale. Unset picks every locale.
+        attr_reader locale(): ::String
+        attr_writer locale(): ::String | ::Symbol
+        def has_locale?: () -> bool
+        def clear_locale: () -> void
+
+        # Meant to leave out organizations sponsoring the broadcast's conference. Not applied yet, so
+        # they are picked all the same.
+        attr_accessor exclude_current_sponsors(): bool
+        def clear_exclude_current_sponsors: () -> void
+
+        # Only sponsorships of this status.
+        attr_reader status(): ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Integer
+        attr_writer status(): ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::strings | ::Integer | ::Float
+        attr_reader status_const(): ::Integer
+        def clear_status: () -> void
+
+        attr_reader _locale(): ::String?
+        def has__locale?: () -> bool
+        def clear__locale: () -> void
+
+        type init_map = {
+          conference_slug: (::String | ::Symbol)?,
+          "conference_slug" => (::String | ::Symbol)?,
+          locale: (::String | ::Symbol)?,
+          "locale" => (::String | ::Symbol)?,
+          exclude_current_sponsors: bool?,
+          "exclude_current_sponsors" => bool?,
+          status: (::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::strings | ::Integer | ::Float)?,
+          "status" => (::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::strings | ::Integer | ::Float)?,
+        }
+
+        def initialize: (?init_map initial_value) -> void
+
+        def []:
+            ("conference_slug" name) -> ::String
+          | ("locale" name) -> ::String
+          | ("exclude_current_sponsors" name) -> bool
+          | ("status" name) -> (::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Integer)
+
+        def []=:
+            ("conference_slug" name, (::String | ::Symbol) value) -> void
+          | ("locale" name, (::String | ::Symbol) value) -> void
+          | ("exclude_current_sponsors" name, bool value) -> void
+          | ("status" name, (::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::names | ::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus::strings | ::Integer | ::Float) value) -> void
+      end
+
+      # Sponsorships of the broadcast's conference, picked one by one.
+      class Manual < ::Google::Protobuf::AbstractMessage
+        include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::BroadcastRecipientFilter::Manual]
+
+        # IDs of sponsorships of the broadcast's conference. An ID of any other is answered
+        # `not_found`.
+        attr_accessor sponsorship_ids(): ::Google::Protobuf::RepeatedField[::Integer, ::Integer | ::Float]
+        def clear_sponsorship_ids: () -> void
+
+        type init_map = {
+          sponsorship_ids: ::Array[::Integer | ::Float]?,
+          "sponsorship_ids" => ::Array[::Integer | ::Float]?,
+        }
+
+        def initialize: (?init_map initial_value) -> void
+
+        def []:
+            ("sponsorship_ids" name) -> (::Google::Protobuf::RepeatedField[::Integer, ::Integer | ::Float])
+
+        def []=:
+            ("sponsorship_ids" name, (::Google::Protobuf::RepeatedField[::Integer, ::Integer | ::Float]) value) -> void
+      end
+
+      # Addresses that belong to no sponsorship.
+      class Raw < ::Google::Protobuf::AbstractMessage
+        include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::BroadcastRecipientFilter::Raw]
+
+        # Email addresses, each once.
+        attr_accessor emails(): ::Google::Protobuf::RepeatedField[::String, ::String | ::Symbol]
+        def clear_emails: () -> void
+
+        type init_map = {
+          emails: ::Array[::String | ::Symbol]?,
+          "emails" => ::Array[::String | ::Symbol]?,
+        }
+
+        def initialize: (?init_map initial_value) -> void
+
+        def []:
+            ("emails" name) -> (::Google::Protobuf::RepeatedField[::String, ::String | ::Symbol])
+
+        def []=:
+            ("emails" name, (::Google::Protobuf::RepeatedField[::String, ::String | ::Symbol]) value) -> void
+      end
+
+      # Which sponsorships a filter picks by where they stand.
+      module SponsorshipStatus
+        extend ::Google::Protobuf::_EnumModule
+
+        # Every sponsorship, whatever its status.
+        SPONSORSHIP_STATUS_UNSPECIFIED: 0
+
+        # Applied, neither accepted nor withdrawn.
+        SPONSORSHIP_STATUS_PENDING: 1
+
+        # Accepted and not withdrawn.
+        SPONSORSHIP_STATUS_ACTIVE: 2
+
+        # Not accepted, withdrawn ones included.
+        SPONSORSHIP_STATUS_NOT_ACCEPTED: 3
+
+        # Accepted, withdrawn ones included.
+        SPONSORSHIP_STATUS_ACCEPTED: 4
+
+        # Withdrawn.
+        SPONSORSHIP_STATUS_WITHDRAWN: 5
+
+        def self.lookup:
+            (0 number) -> :SPONSORSHIP_STATUS_UNSPECIFIED
+          | (1 number) -> :SPONSORSHIP_STATUS_PENDING
+          | (2 number) -> :SPONSORSHIP_STATUS_ACTIVE
+          | (3 number) -> :SPONSORSHIP_STATUS_NOT_ACCEPTED
+          | (4 number) -> :SPONSORSHIP_STATUS_ACCEPTED
+          | (5 number) -> :SPONSORSHIP_STATUS_WITHDRAWN
+          | (::int number) -> names?
+          | ...
+
+        def self.resolve:
+            (:SPONSORSHIP_STATUS_UNSPECIFIED name) -> 0
+          | (:SPONSORSHIP_STATUS_PENDING name) -> 1
+          | (:SPONSORSHIP_STATUS_ACTIVE name) -> 2
+          | (:SPONSORSHIP_STATUS_NOT_ACCEPTED name) -> 3
+          | (:SPONSORSHIP_STATUS_ACCEPTED name) -> 4
+          | (:SPONSORSHIP_STATUS_WITHDRAWN name) -> 5
+          | (::Symbol name) -> numbers?
+          | ...
+
+        type names = :SPONSORSHIP_STATUS_UNSPECIFIED | :SPONSORSHIP_STATUS_PENDING | :SPONSORSHIP_STATUS_ACTIVE | :SPONSORSHIP_STATUS_NOT_ACCEPTED | :SPONSORSHIP_STATUS_ACCEPTED | :SPONSORSHIP_STATUS_WITHDRAWN
+
+        type strings = "SPONSORSHIP_STATUS_UNSPECIFIED" | "SPONSORSHIP_STATUS_PENDING" | "SPONSORSHIP_STATUS_ACTIVE" | "SPONSORSHIP_STATUS_NOT_ACCEPTED" | "SPONSORSHIP_STATUS_ACCEPTED" | "SPONSORSHIP_STATUS_WITHDRAWN"
+
+        type numbers = 0 | 1 | 2 | 3 | 4 | 5
+      end
+
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::BroadcastRecipientFilter]
+
+      # Sponsorships of the broadcast's conference, narrowed by locale, booth, plan and status.
+      attr_accessor current_sponsors(): ::Rk::SponsorApp::BroadcastRecipientFilter::CurrentSponsors?
+      def has_current_sponsors?: () -> bool
+      def clear_current_sponsors: () -> void
+
+      # Sponsorships of another conference, narrowed by locale and status.
+      attr_accessor past_sponsors(): ::Rk::SponsorApp::BroadcastRecipientFilter::PastSponsors?
+      def has_past_sponsors?: () -> bool
+      def clear_past_sponsors: () -> void
+
+      # Sponsorships of the broadcast's conference, picked one by one.
+      attr_accessor manual(): ::Rk::SponsorApp::BroadcastRecipientFilter::Manual?
+      def has_manual?: () -> bool
+      def clear_manual: () -> void
+
+      # Addresses that belong to no sponsorship.
+      attr_accessor raw(): ::Rk::SponsorApp::BroadcastRecipientFilter::Raw?
+      def has_raw?: () -> bool
+      def clear_raw: () -> void
+
+      # The selection. One is required.
+      attr_reader kind(): (::Rk::SponsorApp::BroadcastRecipientFilter::CurrentSponsors | ::Rk::SponsorApp::BroadcastRecipientFilter::PastSponsors | ::Rk::SponsorApp::BroadcastRecipientFilter::Manual | ::Rk::SponsorApp::BroadcastRecipientFilter::Raw)?
+      def has_kind?: () -> bool
+      def clear_kind: () -> void
+
+      type init_map = {
+        current_sponsors: (::Rk::SponsorApp::BroadcastRecipientFilter::CurrentSponsors | ::Rk::SponsorApp::BroadcastRecipientFilter::CurrentSponsors::init_map)?,
+        "current_sponsors" => (::Rk::SponsorApp::BroadcastRecipientFilter::CurrentSponsors | ::Rk::SponsorApp::BroadcastRecipientFilter::CurrentSponsors::init_map)?,
+        past_sponsors: (::Rk::SponsorApp::BroadcastRecipientFilter::PastSponsors | ::Rk::SponsorApp::BroadcastRecipientFilter::PastSponsors::init_map)?,
+        "past_sponsors" => (::Rk::SponsorApp::BroadcastRecipientFilter::PastSponsors | ::Rk::SponsorApp::BroadcastRecipientFilter::PastSponsors::init_map)?,
+        manual: (::Rk::SponsorApp::BroadcastRecipientFilter::Manual | ::Rk::SponsorApp::BroadcastRecipientFilter::Manual::init_map)?,
+        "manual" => (::Rk::SponsorApp::BroadcastRecipientFilter::Manual | ::Rk::SponsorApp::BroadcastRecipientFilter::Manual::init_map)?,
+        raw: (::Rk::SponsorApp::BroadcastRecipientFilter::Raw | ::Rk::SponsorApp::BroadcastRecipientFilter::Raw::init_map)?,
+        "raw" => (::Rk::SponsorApp::BroadcastRecipientFilter::Raw | ::Rk::SponsorApp::BroadcastRecipientFilter::Raw::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("current_sponsors" name) -> ::Rk::SponsorApp::BroadcastRecipientFilter::CurrentSponsors?
+        | ("past_sponsors" name) -> ::Rk::SponsorApp::BroadcastRecipientFilter::PastSponsors?
+        | ("manual" name) -> ::Rk::SponsorApp::BroadcastRecipientFilter::Manual?
+        | ("raw" name) -> ::Rk::SponsorApp::BroadcastRecipientFilter::Raw?
+
+      def []=:
+          ("current_sponsors" name, ::Rk::SponsorApp::BroadcastRecipientFilter::CurrentSponsors? value) -> void
+        | ("past_sponsors" name, ::Rk::SponsorApp::BroadcastRecipientFilter::PastSponsors? value) -> void
+        | ("manual" name, ::Rk::SponsorApp::BroadcastRecipientFilter::Manual? value) -> void
+        | ("raw" name, ::Rk::SponsorApp::BroadcastRecipientFilter::Raw? value) -> void
     end
 
     # Request for AdminService.ListBroadcasts.
@@ -606,11 +884,23 @@ module Rk
       def has_input?: () -> bool
       def clear_input: () -> void
 
+      # The first recipients. Absent adds none, and AddBroadcastRecipients adds them once the
+      # broadcast is ready.
+      attr_accessor recipient_filter(): ::Rk::SponsorApp::BroadcastRecipientFilter?
+      def has_recipient_filter?: () -> bool
+      def clear_recipient_filter: () -> void
+
+      attr_reader _recipient_filter(): ::Rk::SponsorApp::BroadcastRecipientFilter?
+      def has__recipient_filter?: () -> bool
+      def clear__recipient_filter: () -> void
+
       type init_map = {
         conference_slug: (::String | ::Symbol)?,
         "conference_slug" => (::String | ::Symbol)?,
         input: (::Rk::SponsorApp::BroadcastInput | ::Rk::SponsorApp::BroadcastInput::init_map)?,
         "input" => (::Rk::SponsorApp::BroadcastInput | ::Rk::SponsorApp::BroadcastInput::init_map)?,
+        recipient_filter: (::Rk::SponsorApp::BroadcastRecipientFilter | ::Rk::SponsorApp::BroadcastRecipientFilter::init_map)?,
+        "recipient_filter" => (::Rk::SponsorApp::BroadcastRecipientFilter | ::Rk::SponsorApp::BroadcastRecipientFilter::init_map)?,
       }
 
       def initialize: (?init_map initial_value) -> void
@@ -618,17 +908,19 @@ module Rk
       def []:
           ("conference_slug" name) -> ::String
         | ("input" name) -> ::Rk::SponsorApp::BroadcastInput?
+        | ("recipient_filter" name) -> ::Rk::SponsorApp::BroadcastRecipientFilter?
 
       def []=:
           ("conference_slug" name, (::String | ::Symbol) value) -> void
         | ("input" name, ::Rk::SponsorApp::BroadcastInput? value) -> void
+        | ("recipient_filter" name, ::Rk::SponsorApp::BroadcastRecipientFilter? value) -> void
     end
 
     # Response for AdminService.CreateBroadcast.
     class AdminServiceCreateBroadcastResponse < ::Google::Protobuf::AbstractMessage
       include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceCreateBroadcastResponse]
 
-      # The broadcast created, which becomes ready in the background.
+      # The broadcast created. It is collecting its recipients, and becomes ready once it has.
       attr_accessor broadcast(): ::Rk::SponsorApp::AdminBroadcast?
       def has_broadcast?: () -> bool
       def clear_broadcast: () -> void
@@ -710,6 +1002,121 @@ module Rk
       def []=:
           ("broadcast" name, ::Rk::SponsorApp::AdminBroadcast? value) -> void
     end
+
+    # Request for AdminService.AddBroadcastRecipients.
+    class AdminServiceAddBroadcastRecipientsRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceAddBroadcastRecipientsRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a ready broadcast of the conference.
+      attr_reader broadcast_id(): ::Integer
+      attr_writer broadcast_id(): ::Integer | ::Float
+      def clear_broadcast_id: () -> void
+
+      # The recipients to add.
+      attr_accessor recipient_filter(): ::Rk::SponsorApp::BroadcastRecipientFilter?
+      def has_recipient_filter?: () -> bool
+      def clear_recipient_filter: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        broadcast_id: (::Integer | ::Float)?,
+        "broadcast_id" => (::Integer | ::Float)?,
+        recipient_filter: (::Rk::SponsorApp::BroadcastRecipientFilter | ::Rk::SponsorApp::BroadcastRecipientFilter::init_map)?,
+        "recipient_filter" => (::Rk::SponsorApp::BroadcastRecipientFilter | ::Rk::SponsorApp::BroadcastRecipientFilter::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("broadcast_id" name) -> ::Integer
+        | ("recipient_filter" name) -> ::Rk::SponsorApp::BroadcastRecipientFilter?
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("broadcast_id" name, (::Integer | ::Float) value) -> void
+        | ("recipient_filter" name, ::Rk::SponsorApp::BroadcastRecipientFilter? value) -> void
+    end
+
+    # Response for AdminService.AddBroadcastRecipients.
+    class AdminServiceAddBroadcastRecipientsResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceAddBroadcastRecipientsResponse]
+
+      # The broadcast, adding the recipients. It becomes ready again once it has.
+      attr_accessor broadcast(): ::Rk::SponsorApp::AdminBroadcast?
+      def has_broadcast?: () -> bool
+      def clear_broadcast: () -> void
+
+      type init_map = {
+        broadcast: (::Rk::SponsorApp::AdminBroadcast | ::Rk::SponsorApp::AdminBroadcast::init_map)?,
+        "broadcast" => (::Rk::SponsorApp::AdminBroadcast | ::Rk::SponsorApp::AdminBroadcast::init_map)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("broadcast" name) -> ::Rk::SponsorApp::AdminBroadcast?
+
+      def []=:
+          ("broadcast" name, ::Rk::SponsorApp::AdminBroadcast? value) -> void
+    end
+
+    # Request for AdminService.RemoveBroadcastDelivery.
+    class AdminServiceRemoveBroadcastDeliveryRequest < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceRemoveBroadcastDeliveryRequest]
+
+      # Slug of the conference, such as "rubykaigi2048".
+      attr_reader conference_slug(): ::String
+      attr_writer conference_slug(): ::String | ::Symbol
+      def clear_conference_slug: () -> void
+
+      # ID of a broadcast of the conference.
+      attr_reader broadcast_id(): ::Integer
+      attr_writer broadcast_id(): ::Integer | ::Float
+      def clear_broadcast_id: () -> void
+
+      # ID of a delivery of the broadcast.
+      attr_reader delivery_id(): ::Integer
+      attr_writer delivery_id(): ::Integer | ::Float
+      def clear_delivery_id: () -> void
+
+      type init_map = {
+        conference_slug: (::String | ::Symbol)?,
+        "conference_slug" => (::String | ::Symbol)?,
+        broadcast_id: (::Integer | ::Float)?,
+        "broadcast_id" => (::Integer | ::Float)?,
+        delivery_id: (::Integer | ::Float)?,
+        "delivery_id" => (::Integer | ::Float)?,
+      }
+
+      def initialize: (?init_map initial_value) -> void
+
+      def []:
+          ("conference_slug" name) -> ::String
+        | ("broadcast_id" name) -> ::Integer
+        | ("delivery_id" name) -> ::Integer
+
+      def []=:
+          ("conference_slug" name, (::String | ::Symbol) value) -> void
+        | ("broadcast_id" name, (::Integer | ::Float) value) -> void
+        | ("delivery_id" name, (::Integer | ::Float) value) -> void
+    end
+
+    # Response for AdminService.RemoveBroadcastDelivery.
+    class AdminServiceRemoveBroadcastDeliveryResponse < ::Google::Protobuf::AbstractMessage
+      include ::Google::Protobuf::_MessageClass[::Rk::SponsorApp::AdminServiceRemoveBroadcastDeliveryResponse]
+
+      type init_map = {
+      }
+
+      def initialize: (?init_map initial_value) -> void
+    end
   end
 end
 
@@ -724,6 +1131,12 @@ module Google
         | ("rubykaigi.sponsor_app.AdminBroadcastDelivery.Sponsorship" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminBroadcastDelivery::Sponsorship)])
         | ("rubykaigi.sponsor_app.AdminBroadcastDelivery.Status" name) -> (::Google::Protobuf::EnumDescriptor & ::Google::Protobuf::_SpecificEnumDescriptor[singleton(::Rk::SponsorApp::AdminBroadcastDelivery::Status)])
         | ("rubykaigi.sponsor_app.BroadcastInput" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::BroadcastInput)])
+        | ("rubykaigi.sponsor_app.BroadcastRecipientFilter" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::BroadcastRecipientFilter)])
+        | ("rubykaigi.sponsor_app.BroadcastRecipientFilter.CurrentSponsors" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::BroadcastRecipientFilter::CurrentSponsors)])
+        | ("rubykaigi.sponsor_app.BroadcastRecipientFilter.PastSponsors" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::BroadcastRecipientFilter::PastSponsors)])
+        | ("rubykaigi.sponsor_app.BroadcastRecipientFilter.Manual" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::BroadcastRecipientFilter::Manual)])
+        | ("rubykaigi.sponsor_app.BroadcastRecipientFilter.Raw" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::BroadcastRecipientFilter::Raw)])
+        | ("rubykaigi.sponsor_app.BroadcastRecipientFilter.SponsorshipStatus" name) -> (::Google::Protobuf::EnumDescriptor & ::Google::Protobuf::_SpecificEnumDescriptor[singleton(::Rk::SponsorApp::BroadcastRecipientFilter::SponsorshipStatus)])
         | ("rubykaigi.sponsor_app.AdminServiceListBroadcastsRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceListBroadcastsRequest)])
         | ("rubykaigi.sponsor_app.AdminServiceListBroadcastsResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceListBroadcastsResponse)])
         | ("rubykaigi.sponsor_app.AdminServiceGetBroadcastRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceGetBroadcastRequest)])
@@ -732,6 +1145,10 @@ module Google
         | ("rubykaigi.sponsor_app.AdminServiceCreateBroadcastResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceCreateBroadcastResponse)])
         | ("rubykaigi.sponsor_app.AdminServiceUpdateBroadcastRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceUpdateBroadcastRequest)])
         | ("rubykaigi.sponsor_app.AdminServiceUpdateBroadcastResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceUpdateBroadcastResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceAddBroadcastRecipientsRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceAddBroadcastRecipientsRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceAddBroadcastRecipientsResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceAddBroadcastRecipientsResponse)])
+        | ("rubykaigi.sponsor_app.AdminServiceRemoveBroadcastDeliveryRequest" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceRemoveBroadcastDeliveryRequest)])
+        | ("rubykaigi.sponsor_app.AdminServiceRemoveBroadcastDeliveryResponse" name) -> (::Google::Protobuf::Descriptor & ::Google::Protobuf::_SpecificDescriptor[singleton(::Rk::SponsorApp::AdminServiceRemoveBroadcastDeliveryResponse)])
         | ...
     end
   end

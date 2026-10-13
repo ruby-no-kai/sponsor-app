@@ -6,6 +6,7 @@ RSpec.describe 'AdminService broadcasts', type: :request do
   let(:staff) { FactoryBot.create(:staff) }
   let(:restricted_staff) { FactoryBot.create(:staff, restricted_repos: ['ruby-no-kai/rubykaigi-admitted']) }
   let(:conference) { FactoryBot.create(:conference, :full) }
+  let(:plan) { conference.plans.first }
   let(:other_conference) { FactoryBot.create(:conference, :full) }
 
   before do
@@ -25,6 +26,8 @@ RSpec.describe 'AdminService broadcasts', type: :request do
       **fields,
     )
   end
+
+  def filter(kind, **fields) = Rk::SponsorApp::BroadcastRecipientFilter.new(kind => fields)
 
   describe 'ListBroadcasts' do
     let(:rpc) { connect_method('AdminService', 'ListBroadcasts') }
@@ -119,6 +122,7 @@ RSpec.describe 'AdminService broadcasts', type: :request do
           email: alpha.contact.email,
           cc_emails: ['cc1@alpha.invalid', 'cc2@alpha.invalid'],
           status: :STATUS_READY,
+          removable: true,
         ))
         expect(deliveries.last).to have_attributes(sponsorship: nil, email: 'raw@example.invalid', cc_emails: [])
       end
@@ -128,6 +132,17 @@ RSpec.describe 'AdminService broadcasts', type: :request do
         FactoryBot.create(:broadcast_delivery, broadcast:, sponsorship: past, recipient: past.contact.email, status: :ready)
 
         expect(connect_call(rpc, request_for(broadcast.id)).deliveries.sole.sponsorship.conference_slug).to eq(other_conference.slug)
+      end
+
+      it 'marks a delivery removable only while it and the broadcast are ready' do
+        ready = FactoryBot.create(:broadcast_delivery, broadcast:, status: :ready)
+        sent = FactoryBot.create(:broadcast_delivery, broadcast:, status: :sent)
+
+        removable = connect_call(rpc, request_for(broadcast.id)).deliveries.to_h { [it.id, it.removable] }
+        expect(removable).to eq(ready.id => true, sent.id => false)
+
+        broadcast.update!(status: :modifying)
+        expect(connect_call(rpc, request_for(broadcast.id)).deliveries.map(&:removable)).to eq([false, false])
       end
 
       it 'reads every delivery status' do
@@ -201,14 +216,14 @@ RSpec.describe 'AdminService broadcasts', type: :request do
   describe 'CreateBroadcast' do
     let(:rpc) { connect_method('AdminService', 'CreateBroadcast') }
 
-    def request_with(input, slug: conference.slug)
-      Rk::SponsorApp::AdminServiceCreateBroadcastRequest.new(conference_slug: slug, input:)
+    def request_with(input, recipient_filter: nil, slug: conference.slug)
+      Rk::SponsorApp::AdminServiceCreateBroadcastRequest.new(conference_slug: slug, input:, recipient_filter:)
     end
 
     context 'with a staff session' do
       before { sign_in_staff(staff) }
 
-      it 'creates the broadcast signed by the staff member, collecting no recipients' do
+      it 'creates the broadcast signed by the staff member, collecting no recipients without a filter' do
         result = connect_call(rpc, request_with(input)).broadcast
 
         broadcast = conference.broadcasts.find(result.id)
@@ -225,33 +240,80 @@ RSpec.describe 'AdminService broadcasts', type: :request do
         expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(broadcast, [])
       end
 
-      it 'makes the broadcast ready once the job has run' do
+      it 'queues the job with the filter' do
+        result = connect_call(rpc, request_with(input, recipient_filter: filter(:current_sponsors, locale: 'ja',
+          exhibitors_only: true, plan_id: plan.id, status: :SPONSORSHIP_STATUS_ACTIVE))).broadcast
+
+        expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(
+          conference.broadcasts.find(result.id),
+          [Rk::SponsorApp::Internal::BroadcastRecipientFilter.new(current_sponsors: Rk::SponsorApp::Internal::BroadcastRecipientFilter::CurrentSponsors.new(
+            locale: 'ja', exhibitors_only: true, plan_id: plan.id, status: :SPONSORSHIP_STATUS_ACTIVE,
+          ))],
+        )
+      end
+
+      it 'makes the broadcast ready with its first recipients once the job has run' do
         allow(CreateBroadcastDeliveriesJob).to receive(:perform_later).and_call_original
 
-        result = connect_call(rpc, request_with(input))
+        result = connect_call(rpc, request_with(input, recipient_filter: filter(:raw, emails: ['a@example.invalid', 'b@example.invalid'])))
 
         broadcast = conference.broadcasts.find(result.broadcast.id)
         expect(broadcast).to be_ready
-        expect(broadcast.deliveries).to be_empty
+        expect(broadcast.deliveries.pluck(:recipient, :status)).to contain_exactly(
+          ['a@example.invalid', 'ready'], ['b@example.invalid', 'ready'],
+        )
+      end
+
+      it 'answers not_found for sponsorships of another conference, creating nothing' do
+        mine = sponsorship_of(conference)
+        theirs = sponsorship_of(other_conference)
+
+        error = connect_call(rpc, request_with(input, recipient_filter: filter(:manual, sponsorship_ids: [mine.id, theirs.id])))
+
+        expect(error).to have_attributes(status: 404, code: 'not_found')
+        expect(error.message).to include(theirs.id.to_s)
+        expect(conference.broadcasts).to be_empty
+        expect(CreateBroadcastDeliveriesJob).not_to have_received(:perform_later)
       end
 
       it 'answers invalid_argument with a violation per broken rule, creating nothing' do
-        error = connect_call(rpc, request_with(input(campaign: ' ', title: '', body: "\n")))
+        error = connect_call(rpc, request_with(input(campaign: ' ', title: '', body: "\n"),
+          recipient_filter: filter(:raw, emails: ['ok@example.invalid', 'not an address'])))
 
         expect(error).to have_attributes(status: 400, code: 'invalid_argument')
         expect(violations_of(error)).to contain_exactly(
           ['input.campaign', 'BROADCAST_INPUT_CAMPAIGN_NOT_BLANK'],
           ['input.title', 'REQUIRED'],
           ['input.body', 'BROADCAST_INPUT_BODY_NOT_BLANK'],
+          ['recipientFilter.raw.emails[1]', 'STRING_EMAIL'],
         )
         expect(conference.broadcasts).to be_empty
       end
 
-      it 'creates over binary protobuf too' do
-        result = connect_call(rpc, request_with(input), codec: :proto)
+      it 'answers invalid_argument for a filter that selects no kind' do
+        error = connect_call(rpc, request_with(input, recipient_filter: Rk::SponsorApp::BroadcastRecipientFilter.new))
+
+        expect(violations_of(error)).to eq([['recipientFilter.kind', 'REQUIRED']])
+      end
+
+      it 'creates over binary protobuf too, queueing the filter it carries' do
+        picked = [sponsorship_of(conference), sponsorship_of(conference)]
+
+        result = connect_call(rpc, request_with(input, recipient_filter: filter(:manual, sponsorship_ids: picked.map(&:id))), codec: :proto)
 
         expect(result.broadcast.campaign).to eq('cfp-reminder')
-        expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(conference.broadcasts.find(result.broadcast.id), [])
+        expect(CreateBroadcastDeliveriesJob).to have_received(:perform_later).with(
+          conference.broadcasts.find(result.broadcast.id),
+          [Rk::SponsorApp::Internal::BroadcastRecipientFilter.new(manual: Rk::SponsorApp::Internal::BroadcastRecipientFilter::Manual.new(sponsorship_ids: picked.map(&:id)))],
+        )
+      end
+
+      it 'names the field as a binary request spells it' do
+        error = connect_call(rpc, request_with(input, recipient_filter: filter(:raw, emails: ['ok@example.invalid', 'not an address'])),
+          codec: :proto)
+
+        expect(violations_of(error)).to eq([['recipient_filter.raw.emails[1]', 'STRING_EMAIL']])
+        expect(conference.broadcasts).to be_empty
       end
 
       it "answers invalid_argument naming the campaign when another of the conference's broadcasts has it" do
@@ -277,7 +339,7 @@ RSpec.describe 'AdminService broadcasts', type: :request do
           end
         end
 
-        error = connect_call(rpc, request_with(input))
+        error = connect_call(rpc, request_with(input, recipient_filter: filter(:raw, emails: ['a@example.invalid'])))
 
         expect(error).to have_attributes(status: 409, code: 'aborted')
         expect(problem_type_of(error)).to eq('conflict')

@@ -6,14 +6,26 @@
 
 
 class Rk::SponsorApp::AdminServiceCreateBroadcastRequest < Google::Protobuf::AbstractMessage
-  sig { params(conference_slug: T.nilable(String), input: T.nilable(Rk::SponsorApp::BroadcastInput)).void }
-  def initialize(conference_slug: nil, input: nil); end
+  sig do
+    params(
+      conference_slug: T.nilable(String),
+      input: T.nilable(Rk::SponsorApp::BroadcastInput),
+      recipient_filter: T.nilable(Rk::SponsorApp::BroadcastRecipientFilter)
+    ).void
+  end
+  def initialize(conference_slug: nil, input: nil, recipient_filter: nil); end
+
+  sig { returns(T.nilable(Symbol)) }
+  def _recipient_filter; end
 
   sig { void }
   def clear_conference_slug; end
 
   sig { void }
   def clear_input; end
+
+  sig { void }
+  def clear_recipient_filter; end
 
   sig { returns(String) }
   def conference_slug; end
@@ -24,9 +36,18 @@ class Rk::SponsorApp::AdminServiceCreateBroadcastRequest < Google::Protobuf::Abs
   sig { returns(Object) }
   def has_input?; end
 
+  sig { returns(Object) }
+  def has_recipient_filter?; end
+
   sig { returns(T.nilable(Rk::SponsorApp::BroadcastInput)) }
   def input; end
 
   sig { params(value: T.nilable(Rk::SponsorApp::BroadcastInput)).void }
   def input=(value); end
+
+  sig { returns(T.nilable(Rk::SponsorApp::BroadcastRecipientFilter)) }
+  def recipient_filter; end
+
+  sig { params(value: T.nilable(Rk::SponsorApp::BroadcastRecipientFilter)).void }
+  def recipient_filter=(value); end
 end

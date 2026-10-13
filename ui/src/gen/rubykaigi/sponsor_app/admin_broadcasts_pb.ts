@@ -13,7 +13,7 @@ import type { Message, UnknownEnum } from "@bufbuild/protobuf";
  * Describes the file rubykaigi/sponsor_app/admin_broadcasts.proto.
  */
 export const file_rubykaigi_sponsor_app_admin_broadcasts: GenFile = /*@__PURE__*/
-  fileDesc("CixydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fYnJvYWRjYXN0cy5wcm90bxIVcnVieWthaWdpLnNwb25zb3JfYXBwItQDCg5BZG1pbkJyb2FkY2FzdBIKCgJpZBgBIAEoAxIQCghjYW1wYWlnbhgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRINCgV0aXRsZRgEIAEoCRIMCgRib2R5GAUgASgJEhEKCWJvZHlfaHRtbBgGIAEoCRI8CgZzdGF0dXMYByABKA4yLC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5Ccm9hZGNhc3QuU3RhdHVzEjYKDWRpc3BhdGNoZWRfYXQYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSACIAQESFgoOY29udGVudF9sb2NrZWQYCSABKAgivgEKBlN0YXR1cxIWChJTVEFUVVNfVU5TUEVDSUZJRUQQABISCg5TVEFUVVNfQ1JFQVRFRBABEhQKEFNUQVRVU19QUkVQQVJJTkcQAhIUChBTVEFUVVNfTU9ESUZZSU5HEAMSEAoMU1RBVFVTX1JFQURZEAQSEgoOU1RBVFVTX1BFTkRJTkcQBRISCg5TVEFUVVNfU0VORElORxAGEg8KC1NUQVRVU19TRU5UEAcSEQoNU1RBVFVTX0ZBSUxFRBAIQhAKDl9kaXNwYXRjaGVkX2F0IswBChVBZG1pbkJyb2FkY2FzdFN1bW1hcnkSCgoCaWQYASABKAMSEAoIY2FtcGFpZ24YAiABKAkSDQoFdGl0bGUYAyABKAkSPAoGc3RhdHVzGAQgASgOMiwucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQnJvYWRjYXN0LlN0YXR1cxI2Cg1kaXNwYXRjaGVkX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBQhAKDl9kaXNwYXRjaGVkX2F0IsUEChZBZG1pbkJyb2FkY2FzdERlbGl2ZXJ5EgoKAmlkGAEgASgDElMKC3Nwb25zb3JzaGlwGAIgASgLMjkucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQnJvYWRjYXN0RGVsaXZlcnkuU3BvbnNvcnNoaXBIAIgBARINCgVlbWFpbBgDIAEoCRIRCgljY19lbWFpbHMYBCADKAkSRAoGc3RhdHVzGAUgASgOMjQucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQnJvYWRjYXN0RGVsaXZlcnkuU3RhdHVzGkAKC1Nwb25zb3JzaGlwEgoKAmlkGAEgASgDEgwKBG5hbWUYAiABKAkSFwoPY29uZmVyZW5jZV9zbHVnGAMgASgJIo8CCgZTdGF0dXMSFgoSU1RBVFVTX1VOU1BFQ0lGSUVEEAASEgoOU1RBVFVTX0NSRUFURUQQARIUChBTVEFUVVNfUFJFUEFSSU5HEAISEAoMU1RBVFVTX1JFQURZEAMSEgoOU1RBVFVTX1BFTkRJTkcQBBISCg5TVEFUVVNfU0VORElORxAFEg8KC1NUQVRVU19TRU5UEAYSEQoNU1RBVFVTX0ZBSUxFRBAHEhMKD1NUQVRVU19SRUpFQ1RFRBAIEhMKD1NUQVRVU19BQ0NFUFRFRBAJEhQKEFNUQVRVU19ERUxJVkVSRUQQChIRCg1TVEFUVVNfT1BFTkVEEAsSEgoOU1RBVFVTX0NMSUNLRUQQDEIOCgxfc3BvbnNvcnNoaXAi6AIKDkJyb2FkY2FzdElucHV0EnAKCGNhbXBhaWduGAEgASgJQl66SFu6AVAKImJyb2FkY2FzdF9pbnB1dC5jYW1wYWlnbi5ub3RfYmxhbmsSF3ZhbHVlIG11c3Qgbm90IGJlIGJsYW5rGhF0aGlzLnRyaW0oKSAhPSAnJ8gBAXIDGP8BEhMKC2Rlc2NyaXB0aW9uGAIgASgJEmoKBXRpdGxlGAMgASgJQlu6SFi6AU0KH2Jyb2FkY2FzdF9pbnB1dC50aXRsZS5ub3RfYmxhbmsSF3ZhbHVlIG11c3Qgbm90IGJlIGJsYW5rGhF0aGlzLnRyaW0oKSAhPSAnJ8gBAXIDGP8BEmMKBGJvZHkYBCABKAlCVbpIUroBTAoeYnJvYWRjYXN0X2lucHV0LmJvZHkubm90X2JsYW5rEhd2YWx1ZSBtdXN0IG5vdCBiZSBibGFuaxoRdGhpcy50cmltKCkgIT0gJyfIAQEiXAohQWRtaW5TZXJ2aWNlTGlzdEJyb2FkY2FzdHNSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokImYKIkFkbWluU2VydmljZUxpc3RCcm9hZGNhc3RzUmVzcG9uc2USQAoKYnJvYWRjYXN0cxgBIAMoCzIsLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pbkJyb2FkY2FzdFN1bW1hcnkieQofQWRtaW5TZXJ2aWNlR2V0QnJvYWRjYXN0UmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIdCgxicm9hZGNhc3RfaWQYAiABKANCB7pIBCICIAAinwEKIEFkbWluU2VydmljZUdldEJyb2FkY2FzdFJlc3BvbnNlEjgKCWJyb2FkY2FzdBgBIAEoCzIlLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pbkJyb2FkY2FzdBJBCgpkZWxpdmVyaWVzGAIgAygLMi0ucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQnJvYWRjYXN0RGVsaXZlcnkimwEKIkFkbWluU2VydmljZUNyZWF0ZUJyb2FkY2FzdFJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSPAoFaW5wdXQYAiABKAsyJS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQnJvYWRjYXN0SW5wdXRCBrpIA8gBASJfCiNBZG1pblNlcnZpY2VDcmVhdGVCcm9hZGNhc3RSZXNwb25zZRI4Cglicm9hZGNhc3QYASABKAsyJS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5Ccm9hZGNhc3QiugEKIkFkbWluU2VydmljZVVwZGF0ZUJyb2FkY2FzdFJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHQoMYnJvYWRjYXN0X2lkGAIgASgDQge6SAQiAiAAEjwKBWlucHV0GAMgASgLMiUucnVieWthaWdpLnNwb25zb3JfYXBwLkJyb2FkY2FzdElucHV0Qga6SAPIAQEiXwojQWRtaW5TZXJ2aWNlVXBkYXRlQnJvYWRjYXN0UmVzcG9uc2USOAoJYnJvYWRjYXN0GAEgASgLMiUucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQnJvYWRjYXN0QhHqAg5Sazo6U3BvbnNvckFwcGIGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_timestamp]);
+  fileDesc("CixydWJ5a2FpZ2kvc3BvbnNvcl9hcHAvYWRtaW5fYnJvYWRjYXN0cy5wcm90bxIVcnVieWthaWdpLnNwb25zb3JfYXBwItQDCg5BZG1pbkJyb2FkY2FzdBIKCgJpZBgBIAEoAxIQCghjYW1wYWlnbhgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRINCgV0aXRsZRgEIAEoCRIMCgRib2R5GAUgASgJEhEKCWJvZHlfaHRtbBgGIAEoCRI8CgZzdGF0dXMYByABKA4yLC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5Ccm9hZGNhc3QuU3RhdHVzEjYKDWRpc3BhdGNoZWRfYXQYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSACIAQESFgoOY29udGVudF9sb2NrZWQYCSABKAgivgEKBlN0YXR1cxIWChJTVEFUVVNfVU5TUEVDSUZJRUQQABISCg5TVEFUVVNfQ1JFQVRFRBABEhQKEFNUQVRVU19QUkVQQVJJTkcQAhIUChBTVEFUVVNfTU9ESUZZSU5HEAMSEAoMU1RBVFVTX1JFQURZEAQSEgoOU1RBVFVTX1BFTkRJTkcQBRISCg5TVEFUVVNfU0VORElORxAGEg8KC1NUQVRVU19TRU5UEAcSEQoNU1RBVFVTX0ZBSUxFRBAIQhAKDl9kaXNwYXRjaGVkX2F0IswBChVBZG1pbkJyb2FkY2FzdFN1bW1hcnkSCgoCaWQYASABKAMSEAoIY2FtcGFpZ24YAiABKAkSDQoFdGl0bGUYAyABKAkSPAoGc3RhdHVzGAQgASgOMiwucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQnJvYWRjYXN0LlN0YXR1cxI2Cg1kaXNwYXRjaGVkX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBQhAKDl9kaXNwYXRjaGVkX2F0ItgEChZBZG1pbkJyb2FkY2FzdERlbGl2ZXJ5EgoKAmlkGAEgASgDElMKC3Nwb25zb3JzaGlwGAIgASgLMjkucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQnJvYWRjYXN0RGVsaXZlcnkuU3BvbnNvcnNoaXBIAIgBARINCgVlbWFpbBgDIAEoCRIRCgljY19lbWFpbHMYBCADKAkSRAoGc3RhdHVzGAUgASgOMjQucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQnJvYWRjYXN0RGVsaXZlcnkuU3RhdHVzEhEKCXJlbW92YWJsZRgGIAEoCBpACgtTcG9uc29yc2hpcBIKCgJpZBgBIAEoAxIMCgRuYW1lGAIgASgJEhcKD2NvbmZlcmVuY2Vfc2x1ZxgDIAEoCSKPAgoGU3RhdHVzEhYKElNUQVRVU19VTlNQRUNJRklFRBAAEhIKDlNUQVRVU19DUkVBVEVEEAESFAoQU1RBVFVTX1BSRVBBUklORxACEhAKDFNUQVRVU19SRUFEWRADEhIKDlNUQVRVU19QRU5ESU5HEAQSEgoOU1RBVFVTX1NFTkRJTkcQBRIPCgtTVEFUVVNfU0VOVBAGEhEKDVNUQVRVU19GQUlMRUQQBxITCg9TVEFUVVNfUkVKRUNURUQQCBITCg9TVEFUVVNfQUNDRVBURUQQCRIUChBTVEFUVVNfREVMSVZFUkVEEAoSEQoNU1RBVFVTX09QRU5FRBALEhIKDlNUQVRVU19DTElDS0VEEAxCDgoMX3Nwb25zb3JzaGlwIugCCg5Ccm9hZGNhc3RJbnB1dBJwCghjYW1wYWlnbhgBIAEoCUJeukhbugFQCiJicm9hZGNhc3RfaW5wdXQuY2FtcGFpZ24ubm90X2JsYW5rEhd2YWx1ZSBtdXN0IG5vdCBiZSBibGFuaxoRdGhpcy50cmltKCkgIT0gJyfIAQFyAxj/ARITCgtkZXNjcmlwdGlvbhgCIAEoCRJqCgV0aXRsZRgDIAEoCUJbukhYugFNCh9icm9hZGNhc3RfaW5wdXQudGl0bGUubm90X2JsYW5rEhd2YWx1ZSBtdXN0IG5vdCBiZSBibGFuaxoRdGhpcy50cmltKCkgIT0gJyfIAQFyAxj/ARJjCgRib2R5GAQgASgJQlW6SFK6AUwKHmJyb2FkY2FzdF9pbnB1dC5ib2R5Lm5vdF9ibGFuaxIXdmFsdWUgbXVzdCBub3QgYmUgYmxhbmsaEXRoaXMudHJpbSgpICE9ICcnyAEBIowJChhCcm9hZGNhc3RSZWNpcGllbnRGaWx0ZXISWwoQY3VycmVudF9zcG9uc29ycxgBIAEoCzI/LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Ccm9hZGNhc3RSZWNpcGllbnRGaWx0ZXIuQ3VycmVudFNwb25zb3JzSAASVQoNcGFzdF9zcG9uc29ycxgCIAEoCzI8LnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Ccm9hZGNhc3RSZWNpcGllbnRGaWx0ZXIuUGFzdFNwb25zb3JzSAASSAoGbWFudWFsGAMgASgLMjYucnVieWthaWdpLnNwb25zb3JfYXBwLkJyb2FkY2FzdFJlY2lwaWVudEZpbHRlci5NYW51YWxIABJCCgNyYXcYBCABKAsyMy5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQnJvYWRjYXN0UmVjaXBpZW50RmlsdGVyLlJhd0gAGuEBCg9DdXJyZW50U3BvbnNvcnMSIgoGbG9jYWxlGAEgASgJQg26SApyCFICZW5SAmphSACIAQESFwoPZXhoaWJpdG9yc19vbmx5GAIgASgIEh0KB3BsYW5faWQYAyABKANCB7pIBCICIABIAYgBARJbCgZzdGF0dXMYBCABKA4yQS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQnJvYWRjYXN0UmVjaXBpZW50RmlsdGVyLlNwb25zb3JzaGlwU3RhdHVzQgi6SAWCAQIQAUIJCgdfbG9jYWxlQgoKCF9wbGFuX2lkGvUBCgxQYXN0U3BvbnNvcnMSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSIgoGbG9jYWxlGAIgASgJQg26SApyCFICZW5SAmphSACIAQESIAoYZXhjbHVkZV9jdXJyZW50X3Nwb25zb3JzGAMgASgIElsKBnN0YXR1cxgEIAEoDjJBLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Ccm9hZGNhc3RSZWNpcGllbnRGaWx0ZXIuU3BvbnNvcnNoaXBTdGF0dXNCCLpIBYIBAhABQgkKB19sb2NhbGUaNgoGTWFudWFsEiwKD3Nwb25zb3JzaGlwX2lkcxgBIAMoA0ITukgQkgENCAEQ6AcYASIEIgIgABoqCgNSYXcSIwoGZW1haWxzGAEgAygJQhO6SBCSAQ0IARDoBxgBIgRyAmABIt4BChFTcG9uc29yc2hpcFN0YXR1cxIiCh5TUE9OU09SU0hJUF9TVEFUVVNfVU5TUEVDSUZJRUQQABIeChpTUE9OU09SU0hJUF9TVEFUVVNfUEVORElORxABEh0KGVNQT05TT1JTSElQX1NUQVRVU19BQ1RJVkUQAhIjCh9TUE9OU09SU0hJUF9TVEFUVVNfTk9UX0FDQ0VQVEVEEAMSHwobU1BPTlNPUlNISVBfU1RBVFVTX0FDQ0VQVEVEEAQSIAocU1BPTlNPUlNISVBfU1RBVFVTX1dJVEhEUkFXThAFQg0KBGtpbmQSBbpIAggBIlwKIUFkbWluU2VydmljZUxpc3RCcm9hZGNhc3RzUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJCJmCiJBZG1pblNlcnZpY2VMaXN0QnJvYWRjYXN0c1Jlc3BvbnNlEkAKCmJyb2FkY2FzdHMYASADKAsyLC5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5Ccm9hZGNhc3RTdW1tYXJ5InkKH0FkbWluU2VydmljZUdldEJyb2FkY2FzdFJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHQoMYnJvYWRjYXN0X2lkGAIgASgDQge6SAQiAiAAIp8BCiBBZG1pblNlcnZpY2VHZXRCcm9hZGNhc3RSZXNwb25zZRI4Cglicm9hZGNhc3QYASABKAsyJS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5Ccm9hZGNhc3QSQQoKZGVsaXZlcmllcxgCIAMoCzItLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5BZG1pbkJyb2FkY2FzdERlbGl2ZXJ5IoACCiJBZG1pblNlcnZpY2VDcmVhdGVCcm9hZGNhc3RSZXF1ZXN0EjcKD2NvbmZlcmVuY2Vfc2x1ZxgBIAEoCUIeukgbchkQATIVXlthLXowLTldW2EtejAtOV8tXSokEjwKBWlucHV0GAIgASgLMiUucnVieWthaWdpLnNwb25zb3JfYXBwLkJyb2FkY2FzdElucHV0Qga6SAPIAQESTgoQcmVjaXBpZW50X2ZpbHRlchgDIAEoCzIvLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Ccm9hZGNhc3RSZWNpcGllbnRGaWx0ZXJIAIgBAUITChFfcmVjaXBpZW50X2ZpbHRlciJfCiNBZG1pblNlcnZpY2VDcmVhdGVCcm9hZGNhc3RSZXNwb25zZRI4Cglicm9hZGNhc3QYASABKAsyJS5ydWJ5a2FpZ2kuc3BvbnNvcl9hcHAuQWRtaW5Ccm9hZGNhc3QiugEKIkFkbWluU2VydmljZVVwZGF0ZUJyb2FkY2FzdFJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHQoMYnJvYWRjYXN0X2lkGAIgASgDQge6SAQiAiAAEjwKBWlucHV0GAMgASgLMiUucnVieWthaWdpLnNwb25zb3JfYXBwLkJyb2FkY2FzdElucHV0Qga6SAPIAQEiXwojQWRtaW5TZXJ2aWNlVXBkYXRlQnJvYWRjYXN0UmVzcG9uc2USOAoJYnJvYWRjYXN0GAEgASgLMiUucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQnJvYWRjYXN0ItYBCilBZG1pblNlcnZpY2VBZGRCcm9hZGNhc3RSZWNpcGllbnRzUmVxdWVzdBI3Cg9jb25mZXJlbmNlX3NsdWcYASABKAlCHrpIG3IZEAEyFV5bYS16MC05XVthLXowLTlfLV0qJBIdCgxicm9hZGNhc3RfaWQYAiABKANCB7pIBCICIAASUQoQcmVjaXBpZW50X2ZpbHRlchgDIAEoCzIvLnJ1YnlrYWlnaS5zcG9uc29yX2FwcC5Ccm9hZGNhc3RSZWNpcGllbnRGaWx0ZXJCBrpIA8gBASJmCipBZG1pblNlcnZpY2VBZGRCcm9hZGNhc3RSZWNpcGllbnRzUmVzcG9uc2USOAoJYnJvYWRjYXN0GAEgASgLMiUucnVieWthaWdpLnNwb25zb3JfYXBwLkFkbWluQnJvYWRjYXN0IqIBCipBZG1pblNlcnZpY2VSZW1vdmVCcm9hZGNhc3REZWxpdmVyeVJlcXVlc3QSNwoPY29uZmVyZW5jZV9zbHVnGAEgASgJQh66SBtyGRABMhVeW2EtejAtOV1bYS16MC05Xy1dKiQSHQoMYnJvYWRjYXN0X2lkGAIgASgDQge6SAQiAiAAEhwKC2RlbGl2ZXJ5X2lkGAMgASgDQge6SAQiAiAAIi0KK0FkbWluU2VydmljZVJlbW92ZUJyb2FkY2FzdERlbGl2ZXJ5UmVzcG9uc2VCEeoCDlJrOjpTcG9uc29yQXBwYgZwcm90bzM", [file_buf_validate_validate, file_google_protobuf_timestamp]);
 
 /**
  * An email organizers send to many recipients at once, such as an announcement to every sponsor
@@ -270,6 +270,14 @@ export type AdminBroadcastDelivery = Message<"rubykaigi.sponsor_app.AdminBroadca
    * @generated from field: rubykaigi.sponsor_app.AdminBroadcastDelivery.Status status = 5;
    */
   status: AdminBroadcastDelivery_Status;
+
+  /**
+   * Whether RemoveBroadcastDelivery can remove the delivery, which it can while both the delivery
+   * and its broadcast are ready.
+   *
+   * @generated from field: bool removable = 6;
+   */
+  removable: boolean;
 };
 
 /**
@@ -472,6 +480,253 @@ export const BroadcastInputSchema: GenMessage<BroadcastInput> = /*@__PURE__*/
   messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 3);
 
 /**
+ * Which recipients to add to a broadcast, one kind of selection at a time. A sponsorship's email
+ * goes to its contact, copying the addresses the contact lists. An address the broadcast already
+ * has is skipped.
+ *
+ * @generated from message rubykaigi.sponsor_app.BroadcastRecipientFilter
+ */
+export type BroadcastRecipientFilter = Message<"rubykaigi.sponsor_app.BroadcastRecipientFilter"> & {
+  /**
+   * The selection. One is required.
+   *
+   * @generated from oneof rubykaigi.sponsor_app.BroadcastRecipientFilter.kind
+   */
+  kind: {
+    /**
+     * Sponsorships of the broadcast's conference, narrowed by locale, booth, plan and status.
+     *
+     * @generated from field: rubykaigi.sponsor_app.BroadcastRecipientFilter.CurrentSponsors current_sponsors = 1;
+     */
+    value: BroadcastRecipientFilter_CurrentSponsors;
+    case: "currentSponsors";
+  } | {
+    /**
+     * Sponsorships of another conference, narrowed by locale and status.
+     *
+     * @generated from field: rubykaigi.sponsor_app.BroadcastRecipientFilter.PastSponsors past_sponsors = 2;
+     */
+    value: BroadcastRecipientFilter_PastSponsors;
+    case: "pastSponsors";
+  } | {
+    /**
+     * Sponsorships of the broadcast's conference, picked one by one.
+     *
+     * @generated from field: rubykaigi.sponsor_app.BroadcastRecipientFilter.Manual manual = 3;
+     */
+    value: BroadcastRecipientFilter_Manual;
+    case: "manual";
+  } | {
+    /**
+     * Addresses that belong to no sponsorship.
+     *
+     * @generated from field: rubykaigi.sponsor_app.BroadcastRecipientFilter.Raw raw = 4;
+     */
+    value: BroadcastRecipientFilter_Raw;
+    case: "raw";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.BroadcastRecipientFilter.
+ * Use `create(BroadcastRecipientFilterSchema)` to create a new message.
+ */
+export const BroadcastRecipientFilterSchema: GenMessage<BroadcastRecipientFilter> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 4);
+
+/**
+ * Sponsorships of the broadcast's conference.
+ *
+ * @generated from message rubykaigi.sponsor_app.BroadcastRecipientFilter.CurrentSponsors
+ */
+export type BroadcastRecipientFilter_CurrentSponsors = Message<"rubykaigi.sponsor_app.BroadcastRecipientFilter.CurrentSponsors"> & {
+  /**
+   * Only sponsorships whose emails are written in this locale. Unset picks every locale.
+   *
+   * @generated from field: optional string locale = 1;
+   */
+  locale?: string | undefined;
+
+  /**
+   * Only sponsorships assigned a booth.
+   *
+   * @generated from field: bool exhibitors_only = 2;
+   */
+  exhibitorsOnly: boolean;
+
+  /**
+   * Only sponsorships on this plan of the conference. A plan of another conference is answered
+   * `not_found`. Unset picks every plan.
+   *
+   * @generated from field: optional int64 plan_id = 3;
+   */
+  planId?: bigint | undefined;
+
+  /**
+   * Only sponsorships of this status.
+   *
+   * @generated from field: rubykaigi.sponsor_app.BroadcastRecipientFilter.SponsorshipStatus status = 4;
+   */
+  status: BroadcastRecipientFilter_SponsorshipStatus;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.BroadcastRecipientFilter.CurrentSponsors.
+ * Use `create(BroadcastRecipientFilter_CurrentSponsorsSchema)` to create a new message.
+ */
+export const BroadcastRecipientFilter_CurrentSponsorsSchema: GenMessage<BroadcastRecipientFilter_CurrentSponsors> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 4, 0);
+
+/**
+ * Sponsorships of a conference, usually a past one.
+ *
+ * @generated from message rubykaigi.sponsor_app.BroadcastRecipientFilter.PastSponsors
+ */
+export type BroadcastRecipientFilter_PastSponsors = Message<"rubykaigi.sponsor_app.BroadcastRecipientFilter.PastSponsors"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2047". A conference the staff member may not
+   * manage is answered `permission_denied`.
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * Only sponsorships whose emails are written in this locale. Unset picks every locale.
+   *
+   * @generated from field: optional string locale = 2;
+   */
+  locale?: string | undefined;
+
+  /**
+   * Meant to leave out organizations sponsoring the broadcast's conference. Not applied yet, so
+   * they are picked all the same.
+   *
+   * @generated from field: bool exclude_current_sponsors = 3;
+   */
+  excludeCurrentSponsors: boolean;
+
+  /**
+   * Only sponsorships of this status.
+   *
+   * @generated from field: rubykaigi.sponsor_app.BroadcastRecipientFilter.SponsorshipStatus status = 4;
+   */
+  status: BroadcastRecipientFilter_SponsorshipStatus;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.BroadcastRecipientFilter.PastSponsors.
+ * Use `create(BroadcastRecipientFilter_PastSponsorsSchema)` to create a new message.
+ */
+export const BroadcastRecipientFilter_PastSponsorsSchema: GenMessage<BroadcastRecipientFilter_PastSponsors> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 4, 1);
+
+/**
+ * Sponsorships of the broadcast's conference, picked one by one.
+ *
+ * @generated from message rubykaigi.sponsor_app.BroadcastRecipientFilter.Manual
+ */
+export type BroadcastRecipientFilter_Manual = Message<"rubykaigi.sponsor_app.BroadcastRecipientFilter.Manual"> & {
+  /**
+   * IDs of sponsorships of the broadcast's conference. An ID of any other is answered
+   * `not_found`.
+   *
+   * @generated from field: repeated int64 sponsorship_ids = 1;
+   */
+  sponsorshipIds: bigint[];
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.BroadcastRecipientFilter.Manual.
+ * Use `create(BroadcastRecipientFilter_ManualSchema)` to create a new message.
+ */
+export const BroadcastRecipientFilter_ManualSchema: GenMessage<BroadcastRecipientFilter_Manual> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 4, 2);
+
+/**
+ * Addresses that belong to no sponsorship.
+ *
+ * @generated from message rubykaigi.sponsor_app.BroadcastRecipientFilter.Raw
+ */
+export type BroadcastRecipientFilter_Raw = Message<"rubykaigi.sponsor_app.BroadcastRecipientFilter.Raw"> & {
+  /**
+   * Email addresses, each once.
+   *
+   * @generated from field: repeated string emails = 1;
+   */
+  emails: string[];
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.BroadcastRecipientFilter.Raw.
+ * Use `create(BroadcastRecipientFilter_RawSchema)` to create a new message.
+ */
+export const BroadcastRecipientFilter_RawSchema: GenMessage<BroadcastRecipientFilter_Raw> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 4, 3);
+
+/**
+ * Which sponsorships a filter picks by where they stand.
+ *
+ * @generated from enum rubykaigi.sponsor_app.BroadcastRecipientFilter.SponsorshipStatus
+ */
+export const BroadcastRecipientFilter_SponsorshipStatus = {
+  /**
+   * Every sponsorship, whatever its status.
+   *
+   * @generated from enum value: SPONSORSHIP_STATUS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED: 0,
+
+  /**
+   * Applied, neither accepted nor withdrawn.
+   *
+   * @generated from enum value: SPONSORSHIP_STATUS_PENDING = 1;
+   */
+  PENDING: 1,
+
+  /**
+   * Accepted and not withdrawn.
+   *
+   * @generated from enum value: SPONSORSHIP_STATUS_ACTIVE = 2;
+   */
+  ACTIVE: 2,
+
+  /**
+   * Not accepted, withdrawn ones included.
+   *
+   * @generated from enum value: SPONSORSHIP_STATUS_NOT_ACCEPTED = 3;
+   */
+  NOT_ACCEPTED: 3,
+
+  /**
+   * Accepted, withdrawn ones included.
+   *
+   * @generated from enum value: SPONSORSHIP_STATUS_ACCEPTED = 4;
+   */
+  ACCEPTED: 4,
+
+  /**
+   * Withdrawn.
+   *
+   * @generated from enum value: SPONSORSHIP_STATUS_WITHDRAWN = 5;
+   */
+  WITHDRAWN: 5,
+} as const;
+
+/**
+ * Which sponsorships a filter picks by where they stand.
+ *
+ * @generated from enum rubykaigi.sponsor_app.BroadcastRecipientFilter.SponsorshipStatus
+ */
+export type BroadcastRecipientFilter_SponsorshipStatus = (typeof BroadcastRecipientFilter_SponsorshipStatus)[keyof typeof BroadcastRecipientFilter_SponsorshipStatus] | UnknownEnum;
+
+/**
+ * Describes the enum rubykaigi.sponsor_app.BroadcastRecipientFilter.SponsorshipStatus.
+ */
+export const BroadcastRecipientFilter_SponsorshipStatusSchema: GenEnum<BroadcastRecipientFilter_SponsorshipStatus> = /*@__PURE__*/
+  enumDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 4, 0);
+
+/**
  * Request for AdminService.ListBroadcasts.
  *
  * @generated from message rubykaigi.sponsor_app.AdminServiceListBroadcastsRequest
@@ -490,7 +745,7 @@ export type AdminServiceListBroadcastsRequest = Message<"rubykaigi.sponsor_app.A
  * Use `create(AdminServiceListBroadcastsRequestSchema)` to create a new message.
  */
 export const AdminServiceListBroadcastsRequestSchema: GenMessage<AdminServiceListBroadcastsRequest> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 4);
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 5);
 
 /**
  * Response for AdminService.ListBroadcasts.
@@ -512,7 +767,7 @@ export type AdminServiceListBroadcastsResponse = Message<"rubykaigi.sponsor_app.
  * Use `create(AdminServiceListBroadcastsResponseSchema)` to create a new message.
  */
 export const AdminServiceListBroadcastsResponseSchema: GenMessage<AdminServiceListBroadcastsResponse> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 5);
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 6);
 
 /**
  * Request for AdminService.GetBroadcast.
@@ -540,7 +795,7 @@ export type AdminServiceGetBroadcastRequest = Message<"rubykaigi.sponsor_app.Adm
  * Use `create(AdminServiceGetBroadcastRequestSchema)` to create a new message.
  */
 export const AdminServiceGetBroadcastRequestSchema: GenMessage<AdminServiceGetBroadcastRequest> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 6);
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 7);
 
 /**
  * Response for AdminService.GetBroadcast.
@@ -569,7 +824,7 @@ export type AdminServiceGetBroadcastResponse = Message<"rubykaigi.sponsor_app.Ad
  * Use `create(AdminServiceGetBroadcastResponseSchema)` to create a new message.
  */
 export const AdminServiceGetBroadcastResponseSchema: GenMessage<AdminServiceGetBroadcastResponse> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 7);
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 8);
 
 /**
  * Request for AdminService.CreateBroadcast.
@@ -590,6 +845,14 @@ export type AdminServiceCreateBroadcastRequest = Message<"rubykaigi.sponsor_app.
    * @generated from field: rubykaigi.sponsor_app.BroadcastInput input = 2;
    */
   input?: BroadcastInput | undefined;
+
+  /**
+   * The first recipients. Absent adds none, and AddBroadcastRecipients adds them once the
+   * broadcast is ready.
+   *
+   * @generated from field: optional rubykaigi.sponsor_app.BroadcastRecipientFilter recipient_filter = 3;
+   */
+  recipientFilter?: BroadcastRecipientFilter | undefined;
 };
 
 /**
@@ -597,7 +860,7 @@ export type AdminServiceCreateBroadcastRequest = Message<"rubykaigi.sponsor_app.
  * Use `create(AdminServiceCreateBroadcastRequestSchema)` to create a new message.
  */
 export const AdminServiceCreateBroadcastRequestSchema: GenMessage<AdminServiceCreateBroadcastRequest> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 8);
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 9);
 
 /**
  * Response for AdminService.CreateBroadcast.
@@ -606,7 +869,7 @@ export const AdminServiceCreateBroadcastRequestSchema: GenMessage<AdminServiceCr
  */
 export type AdminServiceCreateBroadcastResponse = Message<"rubykaigi.sponsor_app.AdminServiceCreateBroadcastResponse"> & {
   /**
-   * The broadcast created, which becomes ready in the background.
+   * The broadcast created. It is collecting its recipients, and becomes ready once it has.
    *
    * @generated from field: rubykaigi.sponsor_app.AdminBroadcast broadcast = 1;
    */
@@ -618,7 +881,7 @@ export type AdminServiceCreateBroadcastResponse = Message<"rubykaigi.sponsor_app
  * Use `create(AdminServiceCreateBroadcastResponseSchema)` to create a new message.
  */
 export const AdminServiceCreateBroadcastResponseSchema: GenMessage<AdminServiceCreateBroadcastResponse> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 9);
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 10);
 
 /**
  * Request for AdminService.UpdateBroadcast.
@@ -653,7 +916,7 @@ export type AdminServiceUpdateBroadcastRequest = Message<"rubykaigi.sponsor_app.
  * Use `create(AdminServiceUpdateBroadcastRequestSchema)` to create a new message.
  */
 export const AdminServiceUpdateBroadcastRequestSchema: GenMessage<AdminServiceUpdateBroadcastRequest> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 10);
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 11);
 
 /**
  * Response for AdminService.UpdateBroadcast.
@@ -674,5 +937,111 @@ export type AdminServiceUpdateBroadcastResponse = Message<"rubykaigi.sponsor_app
  * Use `create(AdminServiceUpdateBroadcastResponseSchema)` to create a new message.
  */
 export const AdminServiceUpdateBroadcastResponseSchema: GenMessage<AdminServiceUpdateBroadcastResponse> = /*@__PURE__*/
-  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 11);
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 12);
+
+/**
+ * Request for AdminService.AddBroadcastRecipients.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceAddBroadcastRecipientsRequest
+ */
+export type AdminServiceAddBroadcastRecipientsRequest = Message<"rubykaigi.sponsor_app.AdminServiceAddBroadcastRecipientsRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a ready broadcast of the conference.
+   *
+   * @generated from field: int64 broadcast_id = 2;
+   */
+  broadcastId: bigint;
+
+  /**
+   * The recipients to add.
+   *
+   * @generated from field: rubykaigi.sponsor_app.BroadcastRecipientFilter recipient_filter = 3;
+   */
+  recipientFilter?: BroadcastRecipientFilter | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceAddBroadcastRecipientsRequest.
+ * Use `create(AdminServiceAddBroadcastRecipientsRequestSchema)` to create a new message.
+ */
+export const AdminServiceAddBroadcastRecipientsRequestSchema: GenMessage<AdminServiceAddBroadcastRecipientsRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 13);
+
+/**
+ * Response for AdminService.AddBroadcastRecipients.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceAddBroadcastRecipientsResponse
+ */
+export type AdminServiceAddBroadcastRecipientsResponse = Message<"rubykaigi.sponsor_app.AdminServiceAddBroadcastRecipientsResponse"> & {
+  /**
+   * The broadcast, adding the recipients. It becomes ready again once it has.
+   *
+   * @generated from field: rubykaigi.sponsor_app.AdminBroadcast broadcast = 1;
+   */
+  broadcast?: AdminBroadcast | undefined;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceAddBroadcastRecipientsResponse.
+ * Use `create(AdminServiceAddBroadcastRecipientsResponseSchema)` to create a new message.
+ */
+export const AdminServiceAddBroadcastRecipientsResponseSchema: GenMessage<AdminServiceAddBroadcastRecipientsResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 14);
+
+/**
+ * Request for AdminService.RemoveBroadcastDelivery.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceRemoveBroadcastDeliveryRequest
+ */
+export type AdminServiceRemoveBroadcastDeliveryRequest = Message<"rubykaigi.sponsor_app.AdminServiceRemoveBroadcastDeliveryRequest"> & {
+  /**
+   * Slug of the conference, such as "rubykaigi2048".
+   *
+   * @generated from field: string conference_slug = 1;
+   */
+  conferenceSlug: string;
+
+  /**
+   * ID of a broadcast of the conference.
+   *
+   * @generated from field: int64 broadcast_id = 2;
+   */
+  broadcastId: bigint;
+
+  /**
+   * ID of a delivery of the broadcast.
+   *
+   * @generated from field: int64 delivery_id = 3;
+   */
+  deliveryId: bigint;
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceRemoveBroadcastDeliveryRequest.
+ * Use `create(AdminServiceRemoveBroadcastDeliveryRequestSchema)` to create a new message.
+ */
+export const AdminServiceRemoveBroadcastDeliveryRequestSchema: GenMessage<AdminServiceRemoveBroadcastDeliveryRequest> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 15);
+
+/**
+ * Response for AdminService.RemoveBroadcastDelivery.
+ *
+ * @generated from message rubykaigi.sponsor_app.AdminServiceRemoveBroadcastDeliveryResponse
+ */
+export type AdminServiceRemoveBroadcastDeliveryResponse = Message<"rubykaigi.sponsor_app.AdminServiceRemoveBroadcastDeliveryResponse"> & {
+};
+
+/**
+ * Describes the message rubykaigi.sponsor_app.AdminServiceRemoveBroadcastDeliveryResponse.
+ * Use `create(AdminServiceRemoveBroadcastDeliveryResponseSchema)` to create a new message.
+ */
+export const AdminServiceRemoveBroadcastDeliveryResponseSchema: GenMessage<AdminServiceRemoveBroadcastDeliveryResponse> = /*@__PURE__*/
+  messageDesc(file_rubykaigi_sponsor_app_admin_broadcasts, 16);
 
