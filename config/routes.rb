@@ -167,6 +167,7 @@ Rails.application.routes.draw do
       rpc 'ListSponsorEvents' => 'api/admin/sponsor_events'
       rpc 'GetSponsorEvent' => 'api/admin/sponsor_events'
       rpc 'UpdateSponsorEvent' => 'api/admin/sponsor_events'
+      rpc 'ListSponsorEventEditingHistory' => 'api/admin/sponsor_event_editing_histories'
 
       # Announcements
 

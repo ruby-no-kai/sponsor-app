@@ -4,6 +4,7 @@ package rubykaigi.sponsor_app;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
+import "rubykaigi/sponsor_app/editing_history.proto";
 import "rubykaigi/sponsor_app/sponsor_event_status.proto";
 import "rubykaigi/sponsor_app/sponsorship_summary.proto";
 
@@ -204,4 +205,23 @@ message AdminServiceUpdateSponsorEventRequest {
 message AdminServiceUpdateSponsorEventResponse {
   // The event as updated.
   AdminSponsorEvent sponsor_event = 1;
+}
+
+// Request for AdminService.ListSponsorEventEditingHistory.
+message AdminServiceListSponsorEventEditingHistoryRequest {
+  // Slug of the conference, such as "rubykaigi2048".
+  string conference_slug = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "^[a-z0-9][a-z0-9_-]*$"
+  }];
+
+  // ID of an event of the conference.
+  int64 sponsor_event_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+// Response for AdminService.ListSponsorEventEditingHistory.
+message AdminServiceListSponsorEventEditingHistoryResponse {
+  // Every save of the event, by its sponsor or by staff, most recent first. Not paginated, as an
+  // event is saved a few times at most.
+  repeated EditingHistoryEntry entries = 1;
 }

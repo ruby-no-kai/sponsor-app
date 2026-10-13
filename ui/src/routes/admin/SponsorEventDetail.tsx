@@ -1,5 +1,5 @@
 import { Badge, LayerCard, Link, LinkButton, Loader, Text } from "@cloudflare/kumo";
-import { PencilSimpleIcon } from "@phosphor-icons/react";
+import { ClockCounterClockwiseIcon, PencilSimpleIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { generatePath, useParams } from "react-router";
 import type { AdminSponsorEvent } from "../../gen/rubykaigi/sponsor_app/admin_sponsor_events_pb.ts";
@@ -61,6 +61,13 @@ function Detail({
               icon={PencilSimpleIcon}
             >
               Edit
+            </LinkButton>
+            <LinkButton
+              href={generatePath(paths.sponsorEventEditingHistory, pathParams)}
+              variant="secondary"
+              icon={ClockCounterClockwiseIcon}
+            >
+              History
             </LinkButton>
           </>
         }

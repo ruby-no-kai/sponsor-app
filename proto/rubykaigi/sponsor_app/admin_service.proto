@@ -198,6 +198,12 @@ service AdminService {
   // another conference is answered `not_found`.
   rpc UpdateSponsorEvent(AdminServiceUpdateSponsorEventRequest) returns (AdminServiceUpdateSponsorEventResponse);
 
+  // Lists every save of an event with what it changed. An event of another conference is answered
+  // `not_found`.
+  rpc ListSponsorEventEditingHistory(AdminServiceListSponsorEventEditingHistoryRequest) returns (AdminServiceListSponsorEventEditingHistoryResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   // Announcements
 
   // Broadcasts
