@@ -29,6 +29,11 @@ export const paths = {
   sponsorshipStaffNotes: "/admin/conferences/:slug/sponsorships/:id/staff_notes",
 
   // Organizations
+  organizations: "/admin/organizations",
+  organizationNew: "/admin/organizations/new",
+  // A domain has dots, which a dynamic segment matches as Rails' `[^/]+` constraint does.
+  organization: "/admin/organizations/:domain",
+  organizationEdit: "/admin/organizations/:domain/edit",
 
   // Booth assignments
 

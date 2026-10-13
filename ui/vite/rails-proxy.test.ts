@@ -23,6 +23,17 @@ describe("destinationOf", () => {
     assert.equal(destinationOf(req("HEAD", "/admin/conferences", page), BASE), "spa");
   });
 
+  it("renders the SPA for a path segment with dots, as an organization's domain has", () => {
+    assert.equal(
+      destinationOf(req("GET", "/admin/organizations/contoso.example.co.invalid", page), BASE),
+      "spa",
+    );
+    assert.equal(
+      destinationOf(req("GET", "/admin/organizations/contoso.example.co.invalid/edit", page), BASE),
+      "spa",
+    );
+  });
+
   it("falls back to Accept when Sec-Fetch-Dest is absent", () => {
     assert.equal(
       destinationOf(req("GET", "/admin/conferences", { accept: "text/html" }), BASE),
