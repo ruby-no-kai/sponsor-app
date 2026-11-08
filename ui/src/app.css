@@ -1,3 +1,19 @@
 @source "../node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
 @import "@cloudflare/kumo/styles";
 @import "tailwindcss";
+
+/* NavigationProgress: shown only once a navigation has waited a moment, then sweeping across. */
+@keyframes navigation-progress-appear {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes navigation-progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}

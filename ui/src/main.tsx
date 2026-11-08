@@ -15,7 +15,7 @@ createRoot(rootElement).render(
   <StrictMode>
     <SWRConfig value={swrConfig}>
       <Toasty toastManager={toastManager}>
-        <RouterProvider router={router} />
+        <RouterProvider router={router} useTransitions />
       </Toasty>
     </SWRConfig>
   </StrictMode>,

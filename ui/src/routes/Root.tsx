@@ -1,11 +1,13 @@
 import { LinkProvider, Loader } from "@cloudflare/kumo";
 import { Outlet } from "react-router";
 import { AppLink } from "../lib/AppLink.tsx";
+import { NavigationProgress } from "../lib/ScreenOutlet.tsx";
 
 // AppLink renders React Router's Link, which needs the router around it.
 export function Root() {
   return (
     <LinkProvider component={AppLink}>
+      <NavigationProgress />
       <Outlet />
     </LinkProvider>
   );

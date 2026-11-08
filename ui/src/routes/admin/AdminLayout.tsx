@@ -17,9 +17,10 @@ import {
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import { useEffect } from "react";
-import { Outlet, generatePath, useLocation, useParams } from "react-router";
+import { generatePath, useLocation, useParams } from "react-router";
 import { unload } from "swr";
 import { AdminService } from "../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
+import { ScreenOutlet } from "../../lib/ScreenOutlet.tsx";
 import { isSigningIn, useRpc, useRpcMutation } from "../../lib/rpc.ts";
 import { notifyError } from "../../lib/toast.ts";
 import { paths } from "../paths.ts";
@@ -50,7 +51,7 @@ export default function AdminLayout() {
       </Sidebar>
       <main className="min-w-0 flex-1 p-6">
         <MobileHeader />
-        <Outlet />
+        <ScreenOutlet />
       </main>
     </Sidebar.Provider>
   );
