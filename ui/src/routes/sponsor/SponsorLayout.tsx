@@ -1,13 +1,14 @@
 import { Badge, Button, DropdownMenu, Link, LinkButton, Loader } from "@cloudflare/kumo";
 import { CaretDownIcon, ListIcon, TranslateIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo } from "react";
-import { Outlet, useLocation, useSearchParams } from "react-router";
+import { useLocation, useSearchParams } from "react-router";
 import { SWRConfig, unload, useSWRConfig } from "swr";
 import { SponsorService } from "../../gen/rubykaigi/sponsor_app/sponsor_service_pb.ts";
 import type { SponsorViewer_Sponsorship } from "../../gen/rubykaigi/sponsor_app/sponsor_viewer_pb.ts";
 import { I18nProvider, useT } from "../../lib/i18n.tsx";
 import type { I18n } from "../../lib/i18n.tsx";
 import { useGoTo } from "../../lib/navigation.ts";
+import { ScreenOutlet } from "../../lib/ScreenOutlet.tsx";
 import {
   callRpc,
   revalidationErrorReporter,
@@ -122,7 +123,7 @@ function Shell() {
         <div className="flex min-h-svh flex-col">
           <NavBar />
           <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 md:px-6">
-            <Outlet />
+            <ScreenOutlet />
           </main>
         </div>
       </SWRConfig>
