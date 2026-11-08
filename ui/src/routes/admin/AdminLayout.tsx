@@ -29,9 +29,10 @@ export default function AdminLayout() {
 
   return (
     <Sidebar.Provider defaultOpen>
-      {/* The column runs the page's full height, with its content sticky in the viewport. */}
+      {/* The column runs the page's full height, with its content sticky in the viewport. Kumo's
+          h-full would stop the column at the viewport's height. */}
       <Sidebar
-        className="md:box-content md:border-r md:border-kumo-line"
+        className="md:box-content md:h-auto md:self-stretch md:border-r md:border-kumo-line"
         contentClassName="md:sticky md:top-0 md:h-svh border-r-0"
       >
         <Sidebar.Header>
