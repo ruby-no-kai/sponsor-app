@@ -12,6 +12,8 @@ import {
   collidingOptions,
   defaultLocale,
   emptyFallbackOption,
+  fallbackOptionsFromJson,
+  fallbackOptionsToJson,
   formValuesFrom,
   inputFrom,
   isBoothRequest,
@@ -241,5 +243,58 @@ describe("collisions", () => {
     const errors = { form: "Not saved", fields: { locale: "is required" } };
 
     assert.equal(withCollisions(errors, options), errors);
+  });
+});
+
+describe("fallback options as JSON", () => {
+  const options: FallbackOptionValues[] = [
+    {
+      value: "gold",
+      name: "Change to Gold",
+      conditions: [{ plans: ["Platinum"], boothRequest: "requested" }],
+      priorityHuman: ["Gold"],
+    },
+    { value: "none", name: "Withdraw", conditions: [], priorityHuman: [] },
+  ];
+
+  it("spells the options as the HAML form does", () => {
+    assert.deepEqual(JSON.parse(fallbackOptionsToJson(options)), {
+      options: [
+        {
+          value: "gold",
+          name: "Change to Gold",
+          conditions: [{ plans: ["Platinum"], booth_request: true }],
+          priority_human: ["Gold"],
+        },
+        { value: "none", name: "Withdraw" },
+      ],
+    });
+  });
+
+  it("reads back what it writes", () => {
+    assert.deepEqual(fallbackOptionsFromJson(fallbackOptionsToJson(options)), options);
+  });
+
+  it("reads the lowerCamelCase names too", () => {
+    assert.deepEqual(
+      fallbackOptionsFromJson('{"options": [{"value": "a", "priorityHuman": ["Gold"]}]}'),
+      [{ value: "a", name: "", conditions: [], priorityHuman: ["Gold"] }],
+    );
+  });
+
+  it("holds no options in an empty text or document", () => {
+    assert.deepEqual(fallbackOptionsFromJson("  "), []);
+    assert.deepEqual(fallbackOptionsFromJson("{}"), []);
+  });
+
+  it("names what is wrong", () => {
+    assert.throws(() => fallbackOptionsFromJson("{"), SyntaxError);
+    assert.throws(() => fallbackOptionsFromJson("[]"), /expected an object/);
+    assert.throws(() => fallbackOptionsFromJson('{"opts": []}'), /unknown field "opts"/);
+    assert.throws(() => fallbackOptionsFromJson('{"options": {}}'), /must be a list/);
+    assert.throws(
+      () => fallbackOptionsFromJson('{"options": [{"value": "a"}, {"valeu": "b"}]}'),
+      /option #2: .*valeu/,
+    );
   });
 });

@@ -1,7 +1,8 @@
-import { getOption } from "@bufbuild/protobuf";
-import type { MessageInitShape } from "@bufbuild/protobuf";
+import { create, fromJson, getOption, toJson } from "@bufbuild/protobuf";
+import type { JsonValue, MessageInitShape } from "@bufbuild/protobuf";
 import { field as fieldRules } from "../../gen/buf/validate/validate_pb.ts";
 import { FormDescriptionInputSchema } from "../../gen/rubykaigi/sponsor_app/admin_form_descriptions_pb.ts";
+import { FallbackOptionSchema } from "../../gen/rubykaigi/sponsor_app/form_description_pb.ts";
 import type {
   FallbackOption,
   FormDescription,
@@ -130,6 +131,41 @@ function fallbackOptionValues(option: FallbackOption): FallbackOptionValues {
   };
 }
 
+// The options as the HAML form's textarea spells them: a FallbackOptions message in ProtoJSON with
+// the .proto field names, so a document copied from either form pastes into the other.
+export function fallbackOptionsToJson(options: readonly FallbackOptionValues[]): string {
+  const messages = options.map((option) =>
+    toJson(FallbackOptionSchema, create(FallbackOptionSchema, fallbackOptionInput(option)), {
+      useProtoFieldName: true,
+    }),
+  );
+  return JSON.stringify({ options: messages }, null, 2);
+}
+
+// Reads what fallbackOptionsToJson writes, where an empty text holds no options. Raises on JSON
+// that is no FallbackOptions message, naming the option at fault.
+export function fallbackOptionsFromJson(text: string): FallbackOptionValues[] {
+  if (text.trim() === "") return [];
+  const document: unknown = JSON.parse(text);
+  if (document === null || typeof document !== "object" || Array.isArray(document)) {
+    throw new Error('expected an object such as {"options": [...]}');
+  }
+  const { options = [], ...rest } = document as Record<string, unknown>;
+  const [unknownField] = Object.keys(rest);
+  if (unknownField !== undefined) throw new Error(`unknown field "${unknownField}"`);
+  if (!Array.isArray(options)) throw new Error('"options" must be a list');
+
+  return options.map((option: JsonValue, index) => {
+    try {
+      return fallbackOptionValues(fromJson(FallbackOptionSchema, option));
+    } catch (error) {
+      throw new Error(`option #${index + 1}: ${error instanceof Error ? error.message : error}`, {
+        cause: error,
+      });
+    }
+  });
+}
+
 // A new form description starts empty, in the locale given.
 export function formValuesFrom(
   formDescription: FormDescription | undefined,
@@ -151,14 +187,17 @@ export function formValuesFrom(
 export function inputFrom(
   values: FormDescriptionValues,
 ): MessageInitShape<typeof FormDescriptionInputSchema> {
+  return { ...values, fallbackOptions: values.fallbackOptions.map(fallbackOptionInput) };
+}
+
+function fallbackOptionInput(
+  option: FallbackOptionValues,
+): MessageInitShape<typeof FallbackOptionSchema> {
   return {
-    ...values,
-    fallbackOptions: values.fallbackOptions.map((option) => ({
-      ...option,
-      conditions: option.conditions.map(({ plans, boothRequest }) => ({
-        plans,
-        boothRequest: boothRequestFromInput(boothRequest),
-      })),
+    ...option,
+    conditions: option.conditions.map(({ plans, boothRequest }) => ({
+      plans,
+      boothRequest: boothRequestFromInput(boothRequest),
     })),
   };
 }

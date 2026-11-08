@@ -7,6 +7,7 @@ import {
   InputArea,
   Loader,
   Select,
+  Tabs,
   TagInput,
   Text,
 } from "@cloudflare/kumo";
@@ -28,7 +29,8 @@ import type { FormDescription } from "../../gen/rubykaigi/sponsor_app/form_descr
 import { ProblemType } from "../../gen/rubykaigi/sponsor_app/problem_pb.ts";
 import { fieldViolations, problemTypeOf } from "../../lib/errors.ts";
 import type { FormErrors } from "../../lib/errors.ts";
-import { erroredFields, errorsAt, errorsUnder } from "../../lib/fieldErrors.ts";
+import { erroredFields, errorsAt, errorsUnder, fieldLabel } from "../../lib/fieldErrors.ts";
+import type { FieldMetas } from "../../lib/fieldErrors.ts";
 import { useSaveRejection } from "../../lib/rejection.ts";
 import { isRpcKeyOf, useRpc, useRpcMutation } from "../../lib/rpc.ts";
 import { useDocumentTitle } from "../../lib/title.ts";
@@ -53,6 +55,8 @@ import {
   defaultLocale,
   emptyCondition,
   emptyFallbackOption,
+  fallbackOptionsFromJson,
+  fallbackOptionsToJson,
   formValuesFrom,
   inputFrom,
   isBoothRequest,
@@ -118,6 +122,12 @@ function Editor({
   const [saveError, setSaveError] = useState<unknown>();
   const { formRef, reveal } = useFieldReveal();
   const rejection = useSaveRejection();
+  // The JSON mode's text, and why it is no FallbackOptions message. While it is one, it is also
+  // the form's fallbackOptions, which is what the save sends.
+  const [fallbackMode, setFallbackMode] = useState<"form" | "json">("form");
+  const [fallbackJson, setFallbackJson] = useState<{ text: string; error?: string }>({
+    text: "",
+  });
 
   const form = useForm({
     defaultValues: formValuesFrom(saved, newLocale),
@@ -143,7 +153,9 @@ function Editor({
       if (result === undefined) return;
       lastSaved.current = result;
       setSaved(result);
-      formApi.reset(formValuesFrom(result));
+      const savedValues = formValuesFrom(result);
+      formApi.reset(savedValues);
+      setFallbackJson({ text: fallbackOptionsToJson(savedValues.fallbackOptions) });
       toastManager.add({
         variant: "success",
         title: `Saved the ${result.locale} form description`,
@@ -162,6 +174,27 @@ function Editor({
     },
   });
 
+  function changeFallbackMode(mode: string) {
+    if (mode === "json") {
+      setFallbackJson({ text: fallbackOptionsToJson(form.state.values.fallbackOptions) });
+      setFallbackMode("json");
+    } else if (mode === "form" && fallbackJson.error === undefined) {
+      setFallbackMode("form");
+    }
+  }
+
+  function editFallbackJson(text: string) {
+    let options;
+    try {
+      options = fallbackOptionsFromJson(text);
+    } catch (error) {
+      setFallbackJson({ text, error: error instanceof Error ? error.message : String(error) });
+      return;
+    }
+    setFallbackJson({ text });
+    form.setFieldValue("fallbackOptions", options);
+  }
+
   return (
     <form
       ref={formRef}
@@ -169,6 +202,10 @@ function Editor({
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
+        if (fallbackMode === "json" && fallbackJson.error !== undefined) {
+          reveal("fallbackOptions");
+          return;
+        }
         void rejection.submit(form);
       }}
     >
@@ -220,266 +257,316 @@ function Editor({
       </Section>
 
       <Section title={FIELD_LABELS.fallbackOptions}>
-        <Text variant="secondary">
-          Alternatives an applicant picks in case the plan they applied for cannot be granted. An
-          option is offered when any of its conditions matches, and always when it has none.
-        </Text>
-        <form.Subscribe selector={(state) => errorsAt(state.fieldMeta, "fallbackOptions")}>
-          {(errors) => <ErrorList field="fallbackOptions" errors={errors} />}
-        </form.Subscribe>
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <Text variant="secondary">
+            Alternatives an applicant picks in case the plan they applied for cannot be granted. An
+            option is offered when any of its conditions matches, and always when it has none.
+          </Text>
+          <Tabs
+            className="shrink-0"
+            size="sm"
+            value={fallbackMode}
+            onValueChange={changeFallbackMode}
+            tabs={[
+              { value: "form", label: "Form" },
+              { value: "json", label: "JSON" },
+            ]}
+          />
+        </div>
 
-        <form.Field name="fallbackOptions" mode="array">
-          {(options) => (
-            <div className="flex flex-col gap-3">
-              {options.state.value.length === 0 && (
-                <Empty
-                  size="sm"
-                  title="No fallback options"
-                  description="The form asks for none."
-                />
-              )}
-              <ul className="divide-y divide-kumo-line border-y border-kumo-line">
-                {options.state.value.map((_option, index) => (
-                  <form.Subscribe
-                    key={index}
-                    selector={(state) =>
-                      Object.keys(errorsUnder(state.fieldMeta, `fallbackOptions[${index}]`))
-                        .length > 0
-                    }
-                  >
-                    {(hasErrors) => (
-                      <OptionRow
-                        forceOpen={hasErrors}
-                        summary={
-                          // The array field re-renders only when options are added or removed.
-                          <form.Subscribe selector={(state) => state.values.fallbackOptions[index]}>
-                            {(option) => (
-                              <>
-                                <span className="shrink-0 text-kumo-subtle">#{index + 1}</span>
-                                <span className="shrink-0 font-mono text-[0.9em]">
-                                  {option?.value}
-                                </span>
-                                <span className="truncate text-kumo-subtle">{option?.name}</span>
-                              </>
-                            )}
-                          </form.Subscribe>
-                        }
-                        actions={
-                          <>
-                            <MoveButtons
-                              index={index}
-                              length={options.state.value.length}
-                              onMove={(to) => options.moveValue(index, to)}
-                            />
-                            <Button
-                              variant="ghost"
-                              shape="square"
-                              size="sm"
-                              icon={TrashIcon}
-                              aria-label={`Remove option ${index + 1}`}
-                              onClick={() => options.removeValue(index)}
-                            />
-                          </>
-                        }
-                      >
-                        <div className="flex flex-col gap-3 pb-4 pl-6">
-                          <div className="grid gap-3 md:grid-cols-[1fr_2fr]">
-                            <form.Field name={`fallbackOptions[${index}].value`}>
-                              {(field) => (
-                                <Input
-                                  label={FIELD_LABELS.value}
-                                  description="What the sponsorship records."
-                                  className="font-mono"
-                                  data-field={field.name}
-                                  value={field.state.value}
-                                  onChange={(event) => field.handleChange(event.target.value)}
-                                  error={joined(field.state.meta.errors)}
-                                />
+        {fallbackMode === "json" ? (
+          <form.Subscribe selector={(state) => fallbackOptionsErrors(state.fieldMeta)}>
+            {(errors) => (
+              <InputArea
+                label="FallbackOptions message as JSON"
+                description={
+                  <>
+                    The HAML form&apos;s format, such as{" "}
+                    <code className="font-mono text-[0.9em]">
+                      {
+                        '{"options": [{"value": "gold", "name": "Change to Gold", "conditions": [{"plans": ["Platinum"], "booth_request": true}], "priority_human": ["Gold"]}]}'
+                      }
+                    </code>
+                  </>
+                }
+                data-field="fallbackOptions"
+                className="font-mono text-[0.9em]"
+                autoResize
+                minRows={10}
+                maxRows={40}
+                spellCheck={false}
+                value={fallbackJson.text}
+                onValueChange={editFallbackJson}
+                error={
+                  fallbackJson.error === undefined
+                    ? errors
+                    : `Not a FallbackOptions message: ${fallbackJson.error}. Fix it to save or to return to the form.`
+                }
+              />
+            )}
+          </form.Subscribe>
+        ) : (
+          <form.Subscribe selector={(state) => errorsAt(state.fieldMeta, "fallbackOptions")}>
+            {(errors) => <ErrorList field="fallbackOptions" errors={errors} />}
+          </form.Subscribe>
+        )}
+
+        {fallbackMode === "form" && (
+          <form.Field name="fallbackOptions" mode="array">
+            {(options) => (
+              <div className="flex flex-col gap-3">
+                {options.state.value.length === 0 && (
+                  <Empty
+                    size="sm"
+                    title="No fallback options"
+                    description="The form asks for none."
+                  />
+                )}
+                <ul className="divide-y divide-kumo-line border-y border-kumo-line">
+                  {options.state.value.map((_option, index) => (
+                    <form.Subscribe
+                      key={index}
+                      selector={(state) =>
+                        Object.keys(errorsUnder(state.fieldMeta, `fallbackOptions[${index}]`))
+                          .length > 0
+                      }
+                    >
+                      {(hasErrors) => (
+                        <OptionRow
+                          forceOpen={hasErrors}
+                          summary={
+                            // The array field re-renders only when options are added or removed.
+                            <form.Subscribe
+                              selector={(state) => state.values.fallbackOptions[index]}
+                            >
+                              {(option) => (
+                                <>
+                                  <span className="shrink-0 text-kumo-subtle">#{index + 1}</span>
+                                  <span className="shrink-0 font-mono text-[0.9em]">
+                                    {option?.value}
+                                  </span>
+                                  <span className="truncate text-kumo-subtle">{option?.name}</span>
+                                </>
+                              )}
+                            </form.Subscribe>
+                          }
+                          actions={
+                            <>
+                              <MoveButtons
+                                index={index}
+                                length={options.state.value.length}
+                                onMove={(to) => options.moveValue(index, to)}
+                              />
+                              <Button
+                                variant="ghost"
+                                shape="square"
+                                size="sm"
+                                icon={TrashIcon}
+                                aria-label={`Remove option ${index + 1}`}
+                                onClick={() => options.removeValue(index)}
+                              />
+                            </>
+                          }
+                        >
+                          <div className="flex flex-col gap-3 pb-4 pl-6">
+                            <div className="grid gap-3 md:grid-cols-[1fr_2fr]">
+                              <form.Field name={`fallbackOptions[${index}].value`}>
+                                {(field) => (
+                                  <Input
+                                    label={FIELD_LABELS.value}
+                                    description="What the sponsorship records."
+                                    className="font-mono"
+                                    data-field={field.name}
+                                    value={field.state.value}
+                                    onChange={(event) => field.handleChange(event.target.value)}
+                                    error={joined(field.state.meta.errors)}
+                                  />
+                                )}
+                              </form.Field>
+                              <form.Field name={`fallbackOptions[${index}].name`}>
+                                {(field) => (
+                                  <Input
+                                    label={FIELD_LABELS.name}
+                                    description="What the form shows."
+                                    data-field={field.name}
+                                    value={field.state.value}
+                                    onChange={(event) => field.handleChange(event.target.value)}
+                                    error={joined(field.state.meta.errors)}
+                                  />
+                                )}
+                              </form.Field>
+                            </div>
+
+                            <form.Field name={`fallbackOptions[${index}].conditions`} mode="array">
+                              {(conditions) => (
+                                <div className="flex flex-col gap-2">
+                                  <Text bold>{FIELD_LABELS.conditions}</Text>
+                                  <form.Subscribe
+                                    selector={(state) =>
+                                      errorsAt(
+                                        state.fieldMeta,
+                                        `fallbackOptions[${index}].conditions`,
+                                      )
+                                    }
+                                  >
+                                    {(errors) => (
+                                      <ErrorList
+                                        field={`fallbackOptions[${index}].conditions`}
+                                        errors={errors}
+                                      />
+                                    )}
+                                  </form.Subscribe>
+                                  {conditions.state.value.map((_condition, conditionIndex) => {
+                                    const path =
+                                      `fallbackOptions[${index}].conditions[${conditionIndex}]` as const;
+                                    return (
+                                      <div
+                                        key={conditionIndex}
+                                        className="flex flex-col gap-2 rounded-md border border-kumo-line p-3"
+                                      >
+                                        <div className="flex flex-wrap items-start gap-6">
+                                          <form.Field name={`${path}.plans`}>
+                                            {(field) => {
+                                              const choices = planChoices(
+                                                planNames,
+                                                field.state.value,
+                                              );
+                                              return (
+                                                <form.Subscribe
+                                                  selector={(state) =>
+                                                    errorsAt(state.fieldMeta, `${path}.plans`, {
+                                                      items: true,
+                                                    })
+                                                  }
+                                                >
+                                                  {(errors) => (
+                                                    <div data-field={field.name}>
+                                                      <Checkbox.Group
+                                                        legend={FIELD_LABELS.plans}
+                                                        description={PLANS_HELP}
+                                                        value={field.state.value}
+                                                        onValueChange={(checked) =>
+                                                          field.handleChange(
+                                                            choices.filter((name) =>
+                                                              checked.includes(name),
+                                                            ),
+                                                          )
+                                                        }
+                                                        error={joined(errors)}
+                                                      >
+                                                        {choices.map((name) => (
+                                                          <Checkbox.Item
+                                                            key={name}
+                                                            value={name}
+                                                            label={
+                                                              planNames.includes(name)
+                                                                ? name
+                                                                : `${name} (no such plan)`
+                                                            }
+                                                          />
+                                                        ))}
+                                                      </Checkbox.Group>
+                                                    </div>
+                                                  )}
+                                                </form.Subscribe>
+                                              );
+                                            }}
+                                          </form.Field>
+                                          <form.Field name={`${path}.boothRequest`}>
+                                            {(field) => (
+                                              <div data-field={field.name}>
+                                                <Select
+                                                  label={FIELD_LABELS.boothRequest}
+                                                  className="min-w-40"
+                                                  value={field.state.value}
+                                                  onValueChange={(value) => {
+                                                    if (isBoothRequest(value))
+                                                      field.handleChange(value);
+                                                  }}
+                                                  items={BOOTH_REQUEST_LABELS}
+                                                  error={joined(field.state.meta.errors)}
+                                                />
+                                              </div>
+                                            )}
+                                          </form.Field>
+                                          <Button
+                                            variant="ghost"
+                                            shape="square"
+                                            size="sm"
+                                            icon={TrashIcon}
+                                            aria-label={`Remove condition ${conditionIndex + 1}`}
+                                            onClick={() => conditions.removeValue(conditionIndex)}
+                                          />
+                                        </div>
+                                        <form.Subscribe
+                                          selector={(state) => errorsAt(state.fieldMeta, path)}
+                                        >
+                                          {(errors) => <ErrorList field={path} errors={errors} />}
+                                        </form.Subscribe>
+                                      </div>
+                                    );
+                                  })}
+                                  <div>
+                                    <Button
+                                      variant="secondary"
+                                      size="sm"
+                                      icon={PlusIcon}
+                                      onClick={() => conditions.pushValue(emptyCondition())}
+                                    >
+                                      Add condition
+                                    </Button>
+                                  </div>
+                                </div>
                               )}
                             </form.Field>
-                            <form.Field name={`fallbackOptions[${index}].name`}>
-                              {(field) => (
-                                <Input
-                                  label={FIELD_LABELS.name}
-                                  description="What the form shows."
-                                  data-field={field.name}
-                                  value={field.state.value}
-                                  onChange={(event) => field.handleChange(event.target.value)}
-                                  error={joined(field.state.meta.errors)}
-                                />
-                              )}
-                            </form.Field>
-                          </div>
 
-                          <form.Field name={`fallbackOptions[${index}].conditions`} mode="array">
-                            {(conditions) => (
-                              <div className="flex flex-col gap-2">
-                                <Text bold>{FIELD_LABELS.conditions}</Text>
+                            <form.Field name={`fallbackOptions[${index}].priorityHuman`}>
+                              {(field) => (
                                 <form.Subscribe
                                   selector={(state) =>
                                     errorsAt(
                                       state.fieldMeta,
-                                      `fallbackOptions[${index}].conditions`,
+                                      `fallbackOptions[${index}].priorityHuman`,
+                                      {
+                                        items: true,
+                                      },
                                     )
                                   }
                                 >
                                   {(errors) => (
-                                    <ErrorList
-                                      field={`fallbackOptions[${index}].conditions`}
-                                      errors={errors}
-                                    />
+                                    <div data-field={field.name}>
+                                      <TagInput
+                                        label={FIELD_LABELS.priorityHuman}
+                                        description='Plans after the one applied for: a plan name or {plan}, optionally followed by !booth or !no_booth, or "!withdraw".'
+                                        placeholder="Gold"
+                                        value={field.state.value}
+                                        onValueChange={field.handleChange}
+                                        error={joined(errors)}
+                                      />
+                                    </div>
                                   )}
                                 </form.Subscribe>
-                                {conditions.state.value.map((_condition, conditionIndex) => {
-                                  const path =
-                                    `fallbackOptions[${index}].conditions[${conditionIndex}]` as const;
-                                  return (
-                                    <div
-                                      key={conditionIndex}
-                                      className="flex flex-col gap-2 rounded-md border border-kumo-line p-3"
-                                    >
-                                      <div className="flex flex-wrap items-start gap-6">
-                                        <form.Field name={`${path}.plans`}>
-                                          {(field) => {
-                                            const choices = planChoices(
-                                              planNames,
-                                              field.state.value,
-                                            );
-                                            return (
-                                              <form.Subscribe
-                                                selector={(state) =>
-                                                  errorsAt(state.fieldMeta, `${path}.plans`, {
-                                                    items: true,
-                                                  })
-                                                }
-                                              >
-                                                {(errors) => (
-                                                  <div data-field={field.name}>
-                                                    <Checkbox.Group
-                                                      legend={FIELD_LABELS.plans}
-                                                      description={PLANS_HELP}
-                                                      value={field.state.value}
-                                                      onValueChange={(checked) =>
-                                                        field.handleChange(
-                                                          choices.filter((name) =>
-                                                            checked.includes(name),
-                                                          ),
-                                                        )
-                                                      }
-                                                      error={joined(errors)}
-                                                    >
-                                                      {choices.map((name) => (
-                                                        <Checkbox.Item
-                                                          key={name}
-                                                          value={name}
-                                                          label={
-                                                            planNames.includes(name)
-                                                              ? name
-                                                              : `${name} (no such plan)`
-                                                          }
-                                                        />
-                                                      ))}
-                                                    </Checkbox.Group>
-                                                  </div>
-                                                )}
-                                              </form.Subscribe>
-                                            );
-                                          }}
-                                        </form.Field>
-                                        <form.Field name={`${path}.boothRequest`}>
-                                          {(field) => (
-                                            <div data-field={field.name}>
-                                              <Select
-                                                label={FIELD_LABELS.boothRequest}
-                                                className="min-w-40"
-                                                value={field.state.value}
-                                                onValueChange={(value) => {
-                                                  if (isBoothRequest(value))
-                                                    field.handleChange(value);
-                                                }}
-                                                items={BOOTH_REQUEST_LABELS}
-                                                error={joined(field.state.meta.errors)}
-                                              />
-                                            </div>
-                                          )}
-                                        </form.Field>
-                                        <Button
-                                          variant="ghost"
-                                          shape="square"
-                                          size="sm"
-                                          icon={TrashIcon}
-                                          aria-label={`Remove condition ${conditionIndex + 1}`}
-                                          onClick={() => conditions.removeValue(conditionIndex)}
-                                        />
-                                      </div>
-                                      <form.Subscribe
-                                        selector={(state) => errorsAt(state.fieldMeta, path)}
-                                      >
-                                        {(errors) => <ErrorList field={path} errors={errors} />}
-                                      </form.Subscribe>
-                                    </div>
-                                  );
-                                })}
-                                <div>
-                                  <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    icon={PlusIcon}
-                                    onClick={() => conditions.pushValue(emptyCondition())}
-                                  >
-                                    Add condition
-                                  </Button>
-                                </div>
-                              </div>
-                            )}
-                          </form.Field>
-
-                          <form.Field name={`fallbackOptions[${index}].priorityHuman`}>
-                            {(field) => (
-                              <form.Subscribe
-                                selector={(state) =>
-                                  errorsAt(
-                                    state.fieldMeta,
-                                    `fallbackOptions[${index}].priorityHuman`,
-                                    {
-                                      items: true,
-                                    },
-                                  )
-                                }
-                              >
-                                {(errors) => (
-                                  <div data-field={field.name}>
-                                    <TagInput
-                                      label={FIELD_LABELS.priorityHuman}
-                                      description='Plans after the one applied for: a plan name or {plan}, optionally followed by !booth or !no_booth, or "!withdraw".'
-                                      placeholder="Gold"
-                                      value={field.state.value}
-                                      onValueChange={field.handleChange}
-                                      error={joined(errors)}
-                                    />
-                                  </div>
-                                )}
-                              </form.Subscribe>
-                            )}
-                          </form.Field>
-                        </div>
-                      </OptionRow>
-                    )}
-                  </form.Subscribe>
-                ))}
-              </ul>
-              <div>
-                <Button
-                  variant="secondary"
-                  icon={ListPlusIcon}
-                  onClick={() => options.pushValue(emptyFallbackOption())}
-                >
-                  Add option
-                </Button>
+                              )}
+                            </form.Field>
+                          </div>
+                        </OptionRow>
+                      )}
+                    </form.Subscribe>
+                  ))}
+                </ul>
+                <div>
+                  <Button
+                    variant="secondary"
+                    icon={ListPlusIcon}
+                    onClick={() => options.pushValue(emptyFallbackOption())}
+                  >
+                    Add option
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
-        </form.Field>
+            )}
+          </form.Field>
+        )}
       </Section>
 
       <form.Subscribe
@@ -510,6 +597,20 @@ function Editor({
       </form.Subscribe>
     </form>
   );
+}
+
+// The errors of fallbackOptions and of every field below it, each labelled by its place, for the
+// JSON mode, which has no field of its own for them.
+function fallbackOptionsErrors(fieldMeta: FieldMetas): string | undefined {
+  const lines = Object.entries(fieldMeta).flatMap(([path, meta]) => {
+    if (path !== "fallbackOptions" && !path.startsWith("fallbackOptions[")) return [];
+    const label =
+      path === "fallbackOptions" ? "" : `${fieldLabel(path, FORM_DESCRIPTION_LAYOUT)}: `;
+    return (meta?.errors ?? []).flatMap((error) =>
+      typeof error === "string" ? [`${label}${error}`] : [],
+    );
+  });
+  return lines.length === 0 ? undefined : lines.join("; ");
 }
 
 // Field violations go to their fields. A locale already described is the locale field's problem.
