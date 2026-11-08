@@ -1,8 +1,10 @@
-import { Badge, Button, Loader, Sidebar, Text, useSidebar } from "@cloudflare/kumo";
+import { Badge, Button, DropdownMenu, Loader, Sidebar, Text, useSidebar } from "@cloudflare/kumo";
 import {
   BuildingsIcon,
   CalendarBlankIcon,
   CalendarDotsIcon,
+  CaretUpDownIcon,
+  CheckIcon,
   CoinsIcon,
   EnvelopeSimpleIcon,
   ListChecksIcon,
@@ -20,10 +22,12 @@ import { useEffect } from "react";
 import { generatePath, useLocation, useParams } from "react-router";
 import { unload } from "swr";
 import { AdminService } from "../../gen/rubykaigi/sponsor_app/admin_service_pb.ts";
+import { AppLink } from "../../lib/AppLink.tsx";
 import { ScreenOutlet } from "../../lib/ScreenOutlet.tsx";
 import { isSigningIn, useRpc, useRpcMutation } from "../../lib/rpc.ts";
 import { notifyError } from "../../lib/toast.ts";
 import { paths } from "../paths.ts";
+import { switchedConferencePath } from "./conferenceSwitch.ts";
 
 export default function AdminLayout() {
   const { slug } = useParams();
@@ -37,13 +41,11 @@ export default function AdminLayout() {
         contentClassName="md:sticky md:top-0 md:h-svh border-r-0"
       >
         <Sidebar.Header>
-          <Text variant="heading" as="h1">
-            Sponsor App
-          </Text>
+          <ConferenceSwitcher currentSlug={slug} />
         </Sidebar.Header>
         <Sidebar.Content>
           {slug !== undefined && <ConferenceSections slug={slug} />}
-          <ConferencesGroup currentSlug={slug} />
+          <GlobalSections />
         </Sidebar.Content>
         <Sidebar.Footer>
           <ViewerPanel />
@@ -74,133 +76,145 @@ function MobileHeader() {
   );
 }
 
-type Section = { label: string; icon: Icon; path: string };
+type Section = { label: string; icon: Icon; pattern: string };
 
 // AppLink decides per path whether a section opens in the SPA or as its HAML page.
-function conferenceSections(slug: string, { isEditable }: { isEditable: boolean }): Section[] {
+function conferenceSections({ isEditable }: { isEditable: boolean }): Section[] {
   return [
-    { label: "Overview", icon: PresentationIcon, path: generatePath(paths.conference, { slug }) },
-    { label: "Plans", icon: CoinsIcon, path: generatePath(paths.plans, { slug }) },
-    {
-      label: "Booth assignment",
-      icon: StorefrontIcon,
-      path: generatePath(paths.boothAssignment, { slug }),
-    },
-    {
-      label: "Events",
-      icon: CalendarDotsIcon,
-      path: generatePath(paths.sponsorEvents, { slug }),
-    },
-    {
-      label: "Announcements",
-      icon: MegaphoneIcon,
-      path: generatePath(paths.announcements, { slug }),
-    },
-    {
-      label: "Broadcasts",
-      icon: EnvelopeSimpleIcon,
-      path: generatePath(paths.broadcasts, { slug }),
-    },
-    {
-      label: "Expense reports",
-      icon: ReceiptIcon,
-      path: generatePath(paths.expenseReports, { slug }),
-    },
-    {
-      label: "Attendees",
-      icon: ListChecksIcon,
-      path: generatePath(paths.attendeesKeeper, { slug }),
-    },
-    { label: "Table view", icon: TableIcon, path: generatePath(paths.sponsorshipTable, { slug }) },
+    { label: "Overview", icon: PresentationIcon, pattern: paths.conference },
+    { label: "Plans", icon: CoinsIcon, pattern: paths.plans },
+    { label: "Booth assignment", icon: StorefrontIcon, pattern: paths.boothAssignment },
+    { label: "Events", icon: CalendarDotsIcon, pattern: paths.sponsorEvents },
+    { label: "Announcements", icon: MegaphoneIcon, pattern: paths.announcements },
+    { label: "Broadcasts", icon: EnvelopeSimpleIcon, pattern: paths.broadcasts },
+    { label: "Expense reports", icon: ReceiptIcon, pattern: paths.expenseReports },
+    { label: "Attendees", icon: ListChecksIcon, pattern: paths.attendeesKeeper },
+    { label: "Table view", icon: TableIcon, pattern: paths.sponsorshipTable },
     ...(isEditable
-      ? [
-          {
-            label: "Edit conference",
-            icon: PencilSimpleIcon,
-            path: generatePath(paths.conferenceEdit, { slug }),
-          },
-        ]
+      ? [{ label: "Edit conference", icon: PencilSimpleIcon, pattern: paths.conferenceEdit }]
       : []),
   ];
+}
+
+function useIsUnrestricted(): boolean {
+  const viewer = useRpc(AdminService.method.getViewer, {}).data?.staff;
+  return viewer !== undefined && !viewer.restricted;
+}
+
+// Picks the conference the sections below work on, as a cloud console picks its account.
+function ConferenceSwitcher({ currentSlug }: { currentSlug: string | undefined }) {
+  const { pathname } = useLocation();
+  const isEditable = useIsUnrestricted();
+  const { data, error } = useRpc(AdminService.method.listConferences, {});
+  const current = data?.conferences.find((entry) => entry.conference?.slug === currentSlug);
+  const patterns = conferenceSections({ isEditable }).map((section) => section.pattern);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenu.Trigger
+        render={
+          <button
+            type="button"
+            className="flex w-full min-w-0 cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-kumo-default outline-none ring ring-kumo-line hover:bg-kumo-tint focus-visible:ring-kumo-focus"
+          >
+            <CalendarBlankIcon className="size-4 shrink-0 text-kumo-brand" weight="duotone" />
+            <span className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
+              {current?.conference !== undefined ? (
+                <>
+                  <span className="truncate">{current.conference.name}</span>
+                  {current.hidden && <Badge variant="secondary">Hidden</Badge>}
+                </>
+              ) : (
+                <span className="truncate text-kumo-subtle">Choose a conference</span>
+              )}
+            </span>
+            <span className="w-4 shrink-0 overflow-hidden group-data-[state=collapsed]/sidebar:w-0">
+              <CaretUpDownIcon className="size-4 text-kumo-subtle" />
+            </span>
+          </button>
+        }
+      />
+      <DropdownMenu.Content className="w-(--anchor-width) min-w-56">
+        <DropdownMenu.Group>
+          <DropdownMenu.Label>Conferences</DropdownMenu.Label>
+          {data?.conferences.map(({ conference, hidden }) =>
+            conference === undefined ? null : (
+              <DropdownMenu.LinkItem
+                key={conference.slug}
+                render={
+                  <AppLink href={switchedConferencePath(pathname, patterns, conference.slug)} />
+                }
+                className="gap-1.5"
+              >
+                <span className="truncate">{conference.name}</span>
+                {hidden && <Badge variant="secondary">Hidden</Badge>}
+                {conference.slug === currentSlug && (
+                  <CheckIcon className="ml-auto size-4 shrink-0" aria-label="Current" />
+                )}
+              </DropdownMenu.LinkItem>
+            ),
+          )}
+          {error !== undefined && data === undefined && !isSigningIn(error) && (
+            <DropdownMenu.Item disabled>Conferences failed to load.</DropdownMenu.Item>
+          )}
+        </DropdownMenu.Group>
+        <DropdownMenu.Separator />
+        <DropdownMenu.LinkItem icon={SquaresFourIcon} render={<AppLink href={paths.conferences} />}>
+          All conferences
+        </DropdownMenu.LinkItem>
+      </DropdownMenu.Content>
+    </DropdownMenu>
+  );
 }
 
 // Listed only for a conference the viewer can manage, so a mistyped slug shows no menu.
 function ConferenceSections({ slug }: { slug: string }) {
   const { pathname } = useLocation();
   const { data } = useRpc(AdminService.method.listConferences, {});
-  const viewer = useRpc(AdminService.method.getViewer, {}).data?.staff;
+  const isEditable = useIsUnrestricted();
   const conference = data?.conferences.find((entry) => entry.conference?.slug === slug)?.conference;
   if (conference === undefined) return null;
 
   return (
     <Sidebar.Group>
-      <Sidebar.GroupLabel>{conference.name}</Sidebar.GroupLabel>
       <Sidebar.Menu>
-        {conferenceSections(slug, {
-          isEditable: viewer !== undefined && !viewer.restricted,
-        }).map(({ label, icon, path }) => (
-          <Sidebar.MenuButton
-            key={path}
-            icon={icon}
-            href={path}
-            active={pathname === path}
-            tooltip={label}
-          >
-            {label}
-          </Sidebar.MenuButton>
-        ))}
+        {conferenceSections({ isEditable }).map(({ label, icon, pattern }) => {
+          const path = generatePath(pattern, { slug });
+          return (
+            <Sidebar.MenuButton
+              key={pattern}
+              icon={icon}
+              href={path}
+              active={pathname === path}
+              tooltip={label}
+            >
+              {label}
+            </Sidebar.MenuButton>
+          );
+        })}
       </Sidebar.Menu>
     </Sidebar.Group>
   );
 }
 
-function ConferencesGroup({ currentSlug }: { currentSlug: string | undefined }) {
+// Pages that span every conference, as a cloud console's global services do.
+function GlobalSections() {
   const { pathname } = useLocation();
-  const { data, error } = useRpc(AdminService.method.listConferences, {});
-  const viewer = useRpc(AdminService.method.getViewer, {}).data?.staff;
+  if (!useIsUnrestricted()) return null;
 
   return (
     <Sidebar.Group>
-      <Sidebar.GroupLabel>Conferences</Sidebar.GroupLabel>
+      <Sidebar.GroupLabel>Across conferences</Sidebar.GroupLabel>
       <Sidebar.Menu>
         <Sidebar.MenuButton
-          icon={SquaresFourIcon}
-          href={paths.conferences}
-          active={pathname === paths.conferences}
-          tooltip="All conferences"
+          icon={BuildingsIcon}
+          href={paths.organizations}
+          active={pathname === paths.organizations}
+          tooltip="Organizations"
         >
-          All conferences
+          Organizations
         </Sidebar.MenuButton>
-        {data?.conferences.map(({ conference, hidden }) => {
-          if (conference === undefined) return null;
-          return (
-            <Sidebar.MenuButton
-              key={conference.slug}
-              icon={CalendarBlankIcon}
-              href={generatePath(paths.conference, { slug: conference.slug })}
-              active={conference.slug === currentSlug}
-            >
-              {conference.name}
-              {hidden && <Sidebar.MenuBadge>Hidden</Sidebar.MenuBadge>}
-            </Sidebar.MenuButton>
-          );
-        })}
-        {viewer !== undefined && !viewer.restricted && (
-          <Sidebar.MenuButton
-            icon={BuildingsIcon}
-            href={paths.organizations}
-            active={pathname === paths.organizations}
-            tooltip="Organizations"
-          >
-            Organizations
-          </Sidebar.MenuButton>
-        )}
       </Sidebar.Menu>
-      {error !== undefined && data === undefined && !isSigningIn(error) && (
-        <Text variant="error" size="sm">
-          Conferences failed to load.
-        </Text>
-      )}
     </Sidebar.Group>
   );
 }
