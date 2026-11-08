@@ -197,6 +197,42 @@ mise run lint:proto     # buf lint and buf format check
 - Message classes cannot be reloaded, as google-protobuf raises when a descriptor is registered twice. The Procfile's `proto` process regenerates `gen/` on `.proto` edits, and its `web` process restarts Rails when `gen/proto/ruby/` changes.
 - Sorbet ignores the generated `.rbs`. Message types come from tapioca's Protobuf DSL compiler.
 
+### Connect RPC API
+
+Rails serves the services in `proto/` over the [Connect protocol](https://connectrpc.com/docs/protocol/) with connect_rpc_rails: `AdminService` for staff, at `/rubykaigi.sponsor_app.<Service>/<Rpc>`. Unary only, by POST with JSON or binary protobuf, and by GET for RPCs marked `idempotency_level = NO_SIDE_EFFECTS`.
+
+- Controllers live in `app/controllers/api/admin/`, one action per RPC. They inherit `Api::Admin::ApplicationController`, which authenticates with the HAML side's session cookie.
+- Every RPC declares its policy right above its `def`: `authorize :any_staff` or `:unrestricted_staff`. Serving an RPC without one raises.
+- Responses are built by Alba resources in `app/resources/api/`, bound to their message with `with_protobuf`. Controllers never build a response field by field.
+- A POST must send `Connect-Protocol-Version: 1`, and a request whose `Sec-Fetch-Site` or `Origin` names another origin is refused (`ConnectForgeryProtection`).
+- Routes are drawn only when `config.x.connect_rpc.enabled` is set: always in development and test, and in production only with `SPONSOR_APP_CONNECT_RPC`, because CloudFront does not forward `Connect-Protocol-Version`, `Connect-Timeout-Ms` or `Sec-Fetch-Site`.
+
+To add an RPC:
+
+1. Declare it in its domain's section of `admin_service.proto`, with `<Service><Rpc>Request`/`Response` messages in `admin_<domain>.proto`. Mark reads `NO_SIDE_EFFECTS`.
+2. Run `mise run gen`.
+3. Map it in the service's single `connect_service` block in `config/routes.rb`, in the same section.
+4. Implement the action with its `authorize` policy, building the response with a bound resource.
+5. Add a request spec under `spec/requests/api/` using `connect_call` from `spec/support/connect_helper.rb`. `spec/proto/services_spec.rb` fails until the RPC is routed to an action with a policy.
+
+Calling it with curl:
+
+```bash
+# Sign in as staff: claim a session token, keeping the session cookie
+handle=$(bin/rails runner 'puts SessionToken.create!(staff: Staff.first!).handle')
+curl -c jar "http://sponsor-app.localhost:1355/session/claim/$handle"
+
+# POST, JSON
+curl -b jar -H 'Content-Type: application/json' -H 'Connect-Protocol-Version: 1' \
+  -d '{}' \
+  http://sponsor-app.localhost:1355/rubykaigi.sponsor_app.AdminService/GetViewer
+
+# GET, for an RPC without side effects
+curl -b jar 'http://sponsor-app.localhost:1355/rubykaigi.sponsor_app.AdminService/GetViewer?connect=v1&encoding=json&message=%7B%7D'
+```
+
+An error is a JSON body `{"code", "message", "details"}`, each detail a protobuf message named by `type` and encoded in unpadded base64 under `value`.
+
 ## Development Notes
 
 ### Authentication Backdoor

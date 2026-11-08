@@ -8,40 +8,42 @@
 # pkg:gem/protobufable#lib/protobufable/version.rb:7
 module Protobufable
   class << self
-    # pkg:gem/protobufable#lib/protobufable.rb:34
+    # pkg:gem/protobufable#lib/protobufable.rb:36
     def install!; end
   end
 end
 
 # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:33
 module Protobufable::AlbaBinding
-  # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:47
+  mixes_in_class_methods ::Protobufable::AlbaBinding::HelperMethods
+
+  # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:45
   def as_protobuf; end
 
-  # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:58
+  # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:56
   def to_json(*); end
 
-  # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:51
+  # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:49
   def to_protobuf; end
 
   class << self
     # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:37
     def included(base); end
 
-    # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:139
+    # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:135
     def produced_attributes(resource); end
 
-    # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:126
+    # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:122
     def register_timestamp_type!; end
   end
 end
 
-# pkg:gem/protobufable#lib/protobufable/alba_binding.rb:66
+# pkg:gem/protobufable#lib/protobufable/alba_binding.rb:64
 module Protobufable::AlbaBinding::HelperMethods
-  # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:70
+  # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:68
   def message_class; end
 
-  # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:89
+  # pkg:gem/protobufable#lib/protobufable/alba_binding.rb:87
   def with_protobuf(klass, &block); end
 end
 
@@ -56,6 +58,21 @@ end
 # pkg:gem/protobufable#lib/protobufable/bad_request.rb:34
 Protobufable::BadRequest::MESSAGE = T.let(T.unsafe(nil), String)
 
+# pkg:gem/protobufable#lib/protobufable/binary_coder.rb:17
+class Protobufable::BinaryCoder
+  # pkg:gem/protobufable#lib/protobufable/binary_coder.rb:24
+  def initialize(message_class); end
+
+  # pkg:gem/protobufable#lib/protobufable/binary_coder.rb:40
+  def dump(message); end
+
+  # pkg:gem/protobufable#lib/protobufable/binary_coder.rb:31
+  def load(bytes); end
+
+  # pkg:gem/protobufable#lib/protobufable/binary_coder.rb:19
+  def message_class; end
+end
+
 # pkg:gem/protobufable#lib/protobufable/column_validatable.rb:25
 module Protobufable::ColumnValidatable
   extend ::ActiveSupport::Concern
@@ -66,7 +83,7 @@ module Protobufable::ColumnValidatable
   def validate_protobuf_message_columns; end
 end
 
-# pkg:gem/protobufable#lib/protobufable.rb:26
+# pkg:gem/protobufable#lib/protobufable.rb:28
 class Protobufable::Error < ::StandardError; end
 
 # pkg:gem/protobufable#lib/protobufable/field_path.rb:21
@@ -83,6 +100,21 @@ module Protobufable::FieldPath
     # pkg:gem/protobufable#lib/protobufable/field_path.rb:52
     def subscript(element); end
   end
+end
+
+# pkg:gem/protobufable#lib/protobufable/json_coder.rb:20
+class Protobufable::JsonCoder
+  # pkg:gem/protobufable#lib/protobufable/json_coder.rb:29
+  def initialize(message_class, preserve_proto_fieldnames: T.unsafe(nil)); end
+
+  # pkg:gem/protobufable#lib/protobufable/json_coder.rb:57
+  def dump(message); end
+
+  # pkg:gem/protobufable#lib/protobufable/json_coder.rb:40
+  def load(json); end
+
+  # pkg:gem/protobufable#lib/protobufable/json_coder.rb:22
+  def message_class; end
 end
 
 # pkg:gem/protobufable#lib/protobufable/json_type.rb:25

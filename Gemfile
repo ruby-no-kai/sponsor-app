@@ -31,8 +31,9 @@ gem 'lambdakiq'
 
 gem 'google-protobuf'
 gem 'sponsor_app-proto', path: 'gen/proto/ruby'
-gem 'protobufable', git: 'https://github.com/sorah/protobufable.git', ref: 'bbb2280e68a3ebf784dd6435175eaa7f9b9b10a2'
-gem 'protovalidate', '0.1.0.beta3'
+gem 'connect_rpc_rails', '~> 0.2'
+gem 'protobufable', '~> 0.2'
+gem 'protovalidate', '~> 0.1'
 
 gem 'alba'
 gem 'jbuilder', '~> 2.9'

@@ -118,6 +118,37 @@ Rails.application.routes.draw do
     post '/webhooks/mailgun' => 'webhooks/mailgun#webhook'
   end
 
+  # One connect_service block per service, as the first block for a service shadows any later one.
+  # Outside any namespace, since connect_rpc_rails checks controller paths without its module.
+  connect_rpc_enabled = Rails.application.config.x.connect_rpc.enabled #: bool
+  if connect_rpc_enabled
+    connect_service 'rubykaigi.sponsor_app.AdminService' do
+      # Conferences
+
+      # Form descriptions
+
+      # Plans
+
+      # Sponsorships
+
+      # Organizations
+
+      # Booth assignments
+
+      # Sponsor events
+
+      # Announcements
+
+      # Broadcasts
+
+      # Expense reports
+
+      # Viewer
+      rpc 'GetViewer' => 'api/admin/viewer'
+      rpc 'SignOut' => 'api/admin/viewer'
+    end
+  end
+
   get '/site/sha' => RevisionPlate::App.new(File.join(__dir__, '..', 'REVISION'))
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
