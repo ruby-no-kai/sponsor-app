@@ -1,25 +1,3 @@
-GIT
-  remote: https://github.com/ivry-inc/connect_rpc_rails.git
-  revision: 85c44368d8ec764e3f06966bd7038323af79eb47
-  ref: 85c44368d8ec764e3f06966bd7038323af79eb47
-  specs:
-    connect_rpc_rails (0.1.0)
-      actionpack (>= 7.0)
-      base64
-      google-protobuf (~> 4.26)
-
-GIT
-  remote: https://github.com/sorah/protobufable.git
-  revision: 3e143adcb76aa5db5b7b4269479356e1c5ddcd5e
-  ref: 3e143adcb76aa5db5b7b4269479356e1c5ddcd5e
-  specs:
-    protobufable (0.1.0)
-      actionpack (>= 7.1)
-      activemodel (>= 7.1)
-      activerecord (>= 7.1)
-      activesupport (>= 7.1)
-      google-protobuf (~> 4.26)
-
 PATH
   remote: gen/proto/ruby
   specs:
@@ -155,6 +133,10 @@ GEM
     commonmarker (2.10.0-arm64-darwin)
     commonmarker (2.10.0-x86_64-linux)
     concurrent-ruby (1.3.8)
+    connect_rpc_rails (0.2.0)
+      actionpack (>= 7.0)
+      base64
+      google-protobuf (~> 4.26)
     connection_pool (3.0.2)
     crack (1.0.1)
       bigdecimal
@@ -353,11 +335,17 @@ GEM
       premailer (~> 1.7, >= 1.7.9)
     prettyprint (0.2.1)
     prism (1.9.0)
-    protovalidate (0.1.0.beta3-aarch64-linux-gnu)
+    protobufable (0.2.0)
+      actionpack (>= 7.1)
+      activemodel (>= 7.1)
+      activerecord (>= 7.1)
+      activesupport (>= 7.1)
+      google-protobuf (~> 4.26)
+    protovalidate (0.1.0-aarch64-linux-gnu)
       google-protobuf (>= 4.31)
-    protovalidate (0.1.0.beta3-arm64-darwin)
+    protovalidate (0.1.0-arm64-darwin)
       google-protobuf (>= 4.31)
-    protovalidate (0.1.0.beta3-x86_64-linux-gnu)
+    protovalidate (0.1.0-x86_64-linux-gnu)
       google-protobuf (>= 4.31)
     public_suffix (7.0.5)
     puma (8.0.2)
@@ -596,7 +584,7 @@ DEPENDENCIES
   aws_lambda_ric
   bootsnap
   commonmarker
-  connect_rpc_rails!
+  connect_rpc_rails (~> 0.2)
   connection_pool
   factory_bot_rails
   faker
@@ -618,8 +606,8 @@ DEPENDENCIES
   openssl
   pg (>= 0.18, < 2.0)
   premailer-rails
-  protobufable!
-  protovalidate (= 0.1.0.beta3)
+  protobufable (~> 0.2)
+  protovalidate (~> 0.1)
   puma
   rack-contrib
   rails (~> 8.1.0)
