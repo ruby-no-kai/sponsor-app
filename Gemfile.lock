@@ -154,6 +154,7 @@ GEM
       addressable
       base64
       ssrf_filter (~> 1.5)
+    csv (3.3.6)
     date (3.6.0)
     diff-lcs (1.6.2)
     drb (2.2.3)
@@ -587,6 +588,7 @@ DEPENDENCIES
   bootsnap
   commonmarker
   connection_pool
+  csv
   factory_bot_rails
   faker
   google-protobuf

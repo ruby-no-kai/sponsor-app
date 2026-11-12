@@ -8,6 +8,7 @@ gem 'rack-contrib'
 
 gem 'pg', '>= 0.18', '< 2.0'
 gem 'connection_pool'
+gem 'csv'
 
 gem 'addressable'
 gem 'commonmarker'

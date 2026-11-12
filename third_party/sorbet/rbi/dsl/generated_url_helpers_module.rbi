@@ -58,6 +58,9 @@ module GeneratedUrlHelpersModule
   def conference_form_descriptions_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def conference_invoices_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def conference_plan_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }

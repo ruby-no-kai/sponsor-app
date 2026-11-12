@@ -3,3 +3,4 @@
 /gen/proto/ruby/*.gemspec linguist-generated=false
 /gen/proto/ruby/lib/sponsor_app-proto.rb linguist-generated=false
 /app/javascript/gen/** linguist-generated=true
+/spec/fixtures/files/money_forward_invoice_csv/*.csv text eol=crlf

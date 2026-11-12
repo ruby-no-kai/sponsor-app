@@ -1,0 +1,59 @@
+%nav{aria: {label: 'breadcrumb'}}
+  %ol.breadcrumb
+    %li.breadcrumb-item= link_to @conference.name, conference_path(@conference)
+    %li.breadcrumb-item.active{aria: {current: 'page'}} Invoices
+
+.d-md-flex.justify-content-between
+  %h3 Invoices
+
+.card.mb-3
+  .card-body
+    = form_with url: conference_invoices_path(@conference), method: :get, local: true do
+      = hidden_field_tag :filters, 1
+
+      .form-group
+        = label_tag :invoice_date, 'Invoice date'
+        = date_field_tag :invoice_date, @invoice_date, class: 'form-control', required: true
+
+      .form-group
+        = label_tag :delivery_date, 'Delivery date (conference first day)'
+        = date_field_tag :delivery_date, @delivery_date, class: 'form-control', required: true
+
+      .form-group
+        = label_tag :starting_invoice_number, 'Starting invoice number'
+        = number_field_tag :starting_invoice_number, format('%03d', @starting_invoice_number), class: 'form-control', min: 1, step: 1, required: true
+
+      .form-group
+        %strong Locale
+        - @invoice_filter.locales.each do |locale|
+          .form-check
+            = check_box_tag 'locales[]', locale, @invoice_filter.selected_locales.include?(locale), id: "locale_#{locale}", class: 'form-check-input'
+            = label_tag "locale_#{locale}", locale, class: 'form-check-label'
+
+      .form-group
+        %strong Plan
+        - @invoice_filter.plans.each do |plan|
+          .form-check
+            = check_box_tag 'plan_ids[]', plan.id, @invoice_filter.selected_plan_ids.include?(plan.id.to_s), id: "plan_#{plan.id}", class: 'form-check-input'
+            = label_tag "plan_#{plan.id}", plan.name, class: 'form-check-label'
+
+      .form-group
+        %strong Customization
+        - [['All', 'all'], ['Customized only', 'with'], ['Non-customized only', 'without']].each do |label, value|
+          .form-check
+            = radio_button_tag :customization_filter, value, @invoice_filter.customization_filter == value, id: "customization_#{value}", class: 'form-check-input'
+            = label_tag "customization_#{value}", label, class: 'form-check-label'
+
+      = submit_tag 'Update', class: 'btn btn-primary'
+      = button_tag 'Export CSV', type: :submit, formaction: conference_invoices_path(@conference, format: :csv), class: 'btn btn-secondary ml-2'
+
+- if @invoice_rows.any?
+  = render 'invoice_table', title: 'Invoices included in CSV export', headers: @invoice_headers, rows: @invoice_rows
+- else
+  .alert.alert-info
+    There are no invoices to export.
+
+- if @excluded_invoice_rows.any?
+  .alert.alert-warning.mt-3
+    The invoices below have a negative subtotal and will not be included in the CSV export.
+  = render 'invoice_table', title: 'Excluded invoices (negative subtotal)', headers: @invoice_headers, rows: @excluded_invoice_rows

@@ -1,0 +1,15 @@
+.row
+  .col-12
+    .card.responsive-table
+      .card-header= title
+      %div{style: 'overflow-x: scroll;'}
+        %table.card-body.table.table-hover.table-small{style: 'border-collapse: collapse; white-space: nowrap;width: 100%;'}
+          %thead
+            %tr
+              - headers.each do |heading|
+                %th{scope: :col}= heading
+          %tbody
+            - rows.each do |row|
+              %tr
+                - row.each do |column|
+                  %td= column

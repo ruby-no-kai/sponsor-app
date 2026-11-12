@@ -58,6 +58,9 @@ module GeneratedPathHelpersModule
   def conference_form_descriptions_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def conference_invoices_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def conference_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
